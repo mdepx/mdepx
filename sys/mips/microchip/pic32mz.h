@@ -144,4 +144,56 @@
 #define	DEVCFG1_FNOSC_SPLL		(0x1 << DEVCFG1_FNOSC_S)
 #define	DEVCFG1_FNOSC_FRC		(0x0 << DEVCFG1_FNOSC_S)
 
+#define	DEVCFG2_UPLLFSEL_24MHZ		(1 << 30) /* USB PLL Input Frequency Select bit */
+#define	DEVCFG2_UPLLFSEL_12MHZ		(0 << 30) /* USB PLL Input Frequency Select bit */
+#define	DEVCFG2_FDSEN			(1 << 28) /* Deep Sleep mode is entered on a WAIT instruction */
+#define	DEVCFG2_DSWDTEN			(1 << 27) /* Deep Sleep Watchdog Timer Enable bit */
+#define	DEVCFG2_DSWDTOSC		(1 << 26) /* Deep Sleep Watchdog Timer Reference Clock Select bit */
+#define	DEVCFG2_DSWDTPS_S		21 /* Deep Sleep Watchdog Timer Postscale Select bits */
+#define	DEVCFG2_DSWDTPS_M		(0x1f << DEVCFG2_DSWDTPS_S)
+#define	DEVCFG2_DSWDTPS(n)		((n) << DEVCFG2_DSWDTPS_S)
+#define	DEVCFG2_DSBOREN			(1 << 20) /* Deep Sleep BOR Enable bit */
+#define	DEVCFG2_VBATBOREN		(1 << 19) /* VBAT BOR Enable bit */
+#define	DEVCFG2_FPLLODIV_S		16 /* Default System PLL Output Divisor bits */
+#define	DEVCFG2_FPLLODIV_M		(0x7 << DEVCFG2_FPLLODIV_S)
+#define	DEVCFG2_FPLLODIV_32		(0x7 << DEVCFG2_FPLLODIV_S)
+#define	DEVCFG2_FPLLODIV_16		(0x4 << DEVCFG2_FPLLODIV_S)
+#define	DEVCFG2_FPLLODIV_8		(0x3 << DEVCFG2_FPLLODIV_S)
+#define	DEVCFG2_FPLLODIV_4		(0x2 << DEVCFG2_FPLLODIV_S)
+#define	DEVCFG2_FPLLODIV_2		(0x1 << DEVCFG2_FPLLODIV_S)
+#define	DEVCFG2_FPLLMULT_S		8 /* System PLL Feedback Divider bits */
+#define	DEVCFG2_FPLLMULT_M		(0x7f << DEVCFG2_FPLLMULT_S)
+#define	DEVCFG2_FPLLMULT(n)		(((n) - 1) << DEVCFG2_FPLLMULT_S)
+#define	DEVCFG2_FPLLICLK_FRC		(1 << 7) /* System PLL Input Clock Select bit */
+#define	DEVCFG2_FPLLICLK_POSC		(0 << 7) /* System PLL Input Clock Select bit */
+#define	DEVCFG2_FPLLRNG_S		4 /* System PLL Divided Input Clock Frequency Range bits */
+#define	DEVCFG2_FPLLRNG_M		(0x7 << DEVCFG2_FPLLRNG_S)
+#define	DEVCFG2_FPLLRNG_34_64		(0x5 << DEVCFG2_FPLLRNG_S)
+#define	DEVCFG2_FPLLRNG_21_42		(0x4 << DEVCFG2_FPLLRNG_S)
+#define	DEVCFG2_FPLLRNG_13_26		(0x3 << DEVCFG2_FPLLRNG_S)
+#define	DEVCFG2_FPLLRNG_8_16		(0x2 << DEVCFG2_FPLLRNG_S)
+#define	DEVCFG2_FPLLRNG_5_10		(0x1 << DEVCFG2_FPLLRNG_S)
+#define	DEVCFG2_FPLLRNG_BYPASS		(0x0 << DEVCFG2_FPLLRNG_S)
+#define	DEVCFG2_FPLLIDIV_S		0 /* PLL Input Divider bits */
+#define	DEVCFG2_FPLLIDIV_M		(0x7 << DEVCFG2_FPLLIDIV_S)
+#define	DEVCFG2_FPLLIDIV(n)		(((n) - 1) << DEVCFG2_FPLLIDIV_S)
+
+#define	DEVCFG3_IOL1WAY			(1 << 29) /* Peripheral Pin Select Configuration bit */
+#define	DEVCFG3_PMDL1WAY		(1 << 28) /* Peripheral Module Disable Configuration bit */
+#define	DEVCFG3_PGL1WAY			(1 << 27) /* Permission Group Lock One Way Configuration bit */
+#define	DEVCFG3_FETHIO			(1 << 25) /* Ethernet I/O Pin Selection Configuration bit */
+#define	DEVCFG3_FMIIEN			(1 << 24) /* Ethernet MII Enable Configuration bit */
+#define	DEVCFG3_EXTDDRSIZE_S		16 /* External DDR2 SDRAM Size bits */
+#define	DEVCFG3_EXTDDRSIZE_M		(0xf << DEVCFG3_EXTDDRSIZE_S)
+#define	DEVCFG3_EXTDDRSIZE_128MB	(0xf << DEVCFG3_EXTDDRSIZE_S)
+#define	DEVCFG3_EXTDDRSIZE_64MB		(0x6 << DEVCFG3_EXTDDRSIZE_S)
+#define	DEVCFG3_EXTDDRSIZE_32MB		(0x5 << DEVCFG3_EXTDDRSIZE_S)
+#define	DEVCFG3_EXTDDRSIZE_16MB		(0x4 << DEVCFG3_EXTDDRSIZE_S)
+#define	DEVCFG3_EXTDDRSIZE_8MB		(0x3 << DEVCFG3_EXTDDRSIZE_S)
+#define	DEVCFG3_EXTDDRSIZE_4MB		(0x2 << DEVCFG3_EXTDDRSIZE_S)
+#define	DEVCFG3_EXTDDRSIZE_2MB		(0x1 << DEVCFG3_EXTDDRSIZE_S)
+#define	DEVCFG3_EXTDDRSIZE_1MB		(0x0 << DEVCFG3_EXTDDRSIZE_S)
+#define	DEVCFG3_USERID_S		0
+#define	DEVCFG3_USERID_M		(0xffff << DEVCFG3_USERID_S)
+
 #endif /* !_MIPS_MICROCHIP_PIC32MZ_H_ */
