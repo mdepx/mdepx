@@ -33,12 +33,4 @@
 	unsigned __DEVCFG2 __attribute__ ((section (".config2"))) = (cfg2); \
 	unsigned __DEVCFG3 __attribute__ ((section (".config3"))) = (cfg3)
 
-#define	PIC32MM_CFG0	0xa4210582
-#define	PIC32MM_CFG1	0x80000012
-#define	PIC32MM_CFG2	0x00237068
-#define	PIC32MM_CFG3	0x00000001
-
-#define	PIC32MM_DEVCFG	PIC32_DEVCFG(PIC32MM_CFG0, PIC32MM_CFG1, \
-				     PIC32MM_CFG2, PIC32MM_CFG3)
-
 #endif /* !_MIPS_MICROCHIP_PIC32_H_ */
