@@ -32,6 +32,11 @@
 #define	UART2_BASE	0xBF822200
 #define	SYSCFG_BASE	0xBF800000
 
+#define	DEVCFG0_UNUSED			0xb4c00880
+#define	DEVCFG1_UNUSED			0x00003800
+#define	DEVCFG2_UNUSED			0xa0008008
+#define	DEVCFG3_UNUSED			0xc4f00000
+
 #define	DEVCFG0_EJTAGBEN		(1 << 30) /* EJTAG Boot Enable bit */
 #define	DEVCFG0_POSCAGC			(1 << 27) /* Primary Oscillator Auto Gain Control bit */
 #define	DEVCFG0_POSCTYPE_S		24 /* Primary Oscillator Type bits */
@@ -137,7 +142,6 @@
 #define	DEVCFG1_DMTINV_0		(0x0 << DEVCFG1_DMTINV_S)
 #define	DEVCFG1_FNOSC_S			0 /* Oscillator Selection bits */
 #define	DEVCFG1_FNOSC_M			(0x7 << DEVCFG1_FNOSC_S)
-#define	DEVCFG1_FNOSC_SPLL		(0x7 << DEVCFG1_FNOSC_S)
 #define	DEVCFG1_FNOSC_LPRC		(0x5 << DEVCFG1_FNOSC_S)
 #define	DEVCFG1_FNOSC_SOSC		(0x4 << DEVCFG1_FNOSC_S)
 #define	DEVCFG1_FNOSC_POSC_HS_EC	(0x2 << DEVCFG1_FNOSC_S)
@@ -195,5 +199,6 @@
 #define	DEVCFG3_EXTDDRSIZE_1MB		(0x0 << DEVCFG3_EXTDDRSIZE_S)
 #define	DEVCFG3_USERID_S		0
 #define	DEVCFG3_USERID_M		(0xffff << DEVCFG3_USERID_S)
+#define	DEVCFG3_USERID(n)		((n & 0xffff) << DEVCFG3_USERID_S)
 
 #endif /* !_MIPS_MICROCHIP_PIC32MZ_H_ */
