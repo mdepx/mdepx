@@ -77,4 +77,71 @@
 #define	DEVCFG0_DEBUG_S			0 /* Background Debugger (forced to `11' if code-protect is ON) */
 #define	DEVCFG0_DEBUG_DISABLED		(2 << DEVCFG0_DEBUG_S)
 
+#define	DEVCFG1_FDMTEN			(1 << 31) /* Deadman Timer enable bit */
+#define	DEVCFG1_DMTCNT(n)		((n) << 26) /* Deadman Timer Count Select bits */
+#define	DEVCFG1_FWDTWINSZ_S		24 /* Watchdog Timer Window Size bits */
+#define	DEVCFG1_FWDTWINSZ_M		(0x3 << DEVCFG1_FWDTWINSZ_S)
+#define	DEVCFG1_FWDTWINSZ_25		(0x3 << DEVCFG1_FWDTWINSZ_S)
+#define	DEVCFG1_FWDTWINSZ_37_5		(0x2 << DEVCFG1_FWDTWINSZ_S)
+#define	DEVCFG1_FWDTWINSZ_50		(0x1 << DEVCFG1_FWDTWINSZ_S)
+#define	DEVCFG1_FWDTWINSZ_75		(0x0 << DEVCFG1_FWDTWINSZ_S)
+#define	DEVCFG1_FWDTEN			(1 << 23) /* Watchdog Timer Enable bit */
+#define	DEVCFG1_WINDIS			(1 << 22) /* Watchdog Timer Window Enable bit */
+#define	DEVCFG1_WDTSPGM			(1 << 21) /* Watchdog Timer Stop During Flash Programming bit */
+#define	DEVCFG1_WDTPS_S			16 /* Watchdog Timer Postscale Select bits */
+#define	DEVCFG1_WDTPS_M			(0x1f << DEVCFG1_WDTPS_S)
+#define	DEVCFG1_WDTPS_1048576		(20 << DEVCFG1_WDTPS_S)
+#define	DEVCFG1_WDTPS_524288		(19 << DEVCFG1_WDTPS_S)
+#define	DEVCFG1_WDTPS_262144		(18 << DEVCFG1_WDTPS_S)
+#define	DEVCFG1_WDTPS_131072		(17 << DEVCFG1_WDTPS_S)
+#define	DEVCFG1_WDTPS_64536		(16 << DEVCFG1_WDTPS_S)
+#define	DEVCFG1_WDTPS_32768		(15 << DEVCFG1_WDTPS_S)
+#define	DEVCFG1_WDTPS_16384		(14 << DEVCFG1_WDTPS_S)
+#define	DEVCFG1_WDTPS_8192		(13 << DEVCFG1_WDTPS_S)
+#define	DEVCFG1_WDTPS_4096		(12 << DEVCFG1_WDTPS_S)
+#define	DEVCFG1_WDTPS_2048		(11 << DEVCFG1_WDTPS_S)
+#define	DEVCFG1_WDTPS_1024		(10 << DEVCFG1_WDTPS_S)
+#define	DEVCFG1_WDTPS_512		(9 << DEVCFG1_WDTPS_S)
+#define	DEVCFG1_WDTPS_256		(8 << DEVCFG1_WDTPS_S)
+#define	DEVCFG1_WDTPS_128		(7 << DEVCFG1_WDTPS_S)
+#define	DEVCFG1_WDTPS_64		(6 << DEVCFG1_WDTPS_S)
+#define	DEVCFG1_WDTPS_32		(5 << DEVCFG1_WDTPS_S)
+#define	DEVCFG1_WDTPS_16		(4 << DEVCFG1_WDTPS_S)
+#define	DEVCFG1_WDTPS_8			(3 << DEVCFG1_WDTPS_S)
+#define	DEVCFG1_WDTPS_4			(2 << DEVCFG1_WDTPS_S)
+#define	DEVCFG1_WDTPS_2			(1 << DEVCFG1_WDTPS_S)
+#define	DEVCFG1_WDTPS_1			(0 << DEVCFG1_WDTPS_S)
+#define	DEVCFG1_FCKSM_S			14 /* Clock Switching and Monitoring Selection Configuration bits */
+#define	DEVCFG1_FCKSM_M			(0x3 << DEVCFG1_FCKSM_S)
+#define	DEVCFG1_FCKSM_CKS_EN_M_EN	(0x3 << DEVCFG1_FCKSM_S)
+#define	DEVCFG1_FCKSM_CKS_DIS_M_EN	(0x2 << DEVCFG1_FCKSM_S)
+#define	DEVCFG1_FCKSM_CKS_EN_M_DIS	(0x1 << DEVCFG1_FCKSM_S)
+#define	DEVCFG1_FCKSM_CKS_DIS_M_DIS	(0x0 << DEVCFG1_FCKSM_S)
+#define	DEVCFG1_OSCIOFNC		(1 << 10) /* CLKO Enable Configuration bit */
+#define	DEVCFG1_POSCMOD_S		8 /* Primary Oscillator Configuration bits */
+#define	DEVCFG1_POSCMOD_M		(0x3 << DEVCFG1_POSCMOD_S)
+#define	DEVCFG1_POSCMOD_DIS		(0x3 << DEVCFG1_POSCMOD_S)
+#define	DEVCFG1_POSCMOD_HS_OSC		(0x2 << DEVCFG1_POSCMOD_S)
+#define	DEVCFG1_POSCMOD_EC		(0x0 << DEVCFG1_POSCMOD_S)
+#define	DEVCFG1_IESO			(1 << 7) /* Internal External Switchover bit */
+#define	DEVCFG1_FSOSCEN			(1 << 6) /* Secondary Oscillator Enable bit */
+#define	DEVCFG1_DMTINV_S		3 /* Deadman Timer Count Window Interval bits */
+#define	DEVCFG1_DMTINV_M		(0x7 << DEVCFG1_DMTINV_S)
+#define	DEVCFG1_DMTINV_127_128		(0x7 << DEVCFG1_DMTINV_S)
+#define	DEVCFG1_DMTINV_63_64		(0x6 << DEVCFG1_DMTINV_S)
+#define	DEVCFG1_DMTINV_31_32		(0x5 << DEVCFG1_DMTINV_S)
+#define	DEVCFG1_DMTINV_15_16		(0x4 << DEVCFG1_DMTINV_S)
+#define	DEVCFG1_DMTINV_7_8		(0x3 << DEVCFG1_DMTINV_S)
+#define	DEVCFG1_DMTINV_3_4		(0x2 << DEVCFG1_DMTINV_S)
+#define	DEVCFG1_DMTINV_1_2		(0x1 << DEVCFG1_DMTINV_S)
+#define	DEVCFG1_DMTINV_0		(0x0 << DEVCFG1_DMTINV_S)
+#define	DEVCFG1_FNOSC_S			0 /* Oscillator Selection bits */
+#define	DEVCFG1_FNOSC_M			(0x7 << DEVCFG1_FNOSC_S)
+#define	DEVCFG1_FNOSC_SPLL		(0x7 << DEVCFG1_FNOSC_S)
+#define	DEVCFG1_FNOSC_LPRC		(0x5 << DEVCFG1_FNOSC_S)
+#define	DEVCFG1_FNOSC_SOSC		(0x4 << DEVCFG1_FNOSC_S)
+#define	DEVCFG1_FNOSC_POSC_HS_EC	(0x2 << DEVCFG1_FNOSC_S)
+#define	DEVCFG1_FNOSC_SPLL		(0x1 << DEVCFG1_FNOSC_S)
+#define	DEVCFG1_FNOSC_FRC		(0x0 << DEVCFG1_FNOSC_S)
+
 #endif /* !_MIPS_MICROCHIP_PIC32MZ_H_ */
