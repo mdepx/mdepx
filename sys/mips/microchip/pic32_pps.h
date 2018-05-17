@@ -27,12 +27,6 @@
 #ifndef _MIPS_MICROCHIP_PIC32_PPS_H_
 #define	_MIPS_MICROCHIP_PIC32_PPS_H_
 
-#include <sys/types.h>
-
-struct pic32_pps_softc {
-	uint32_t base;
-};
-
 /* MZEF */
 #define	PPS_U2RXR	0x070
 #define	PPS_U4RXR	0x080
@@ -67,6 +61,11 @@ struct pic32_pps_softc {
 #define	 C1OUT		0b1110
 #define	 REFCLKO3	0b1111
 
+struct pic32_pps_softc {
+	uint32_t base;
+};
+
 void pic32_pps_init(struct pic32_pps_softc *sc, uint32_t base);
+void pic32_pps_write(struct pic32_pps_softc *sc, uint32_t reg, uint32_t val);
 
 #endif /* !_MIPS_MICROCHIP_PIC32_PPS_H_ */
