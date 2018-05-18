@@ -31,7 +31,7 @@
 #ifndef	_MACHINE_ABI_H_
 #define	_MACHINE_ABI_H_
 
-#if defined(__mips_n32)
+#if defined(__mips_n32) || defined(__mips_o32)
 #define	REG_SIZE	4
 #elif defined(__mips_n64)
 #define	REG_SIZE	8

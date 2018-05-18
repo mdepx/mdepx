@@ -30,7 +30,7 @@
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-void
+static void
 mpll_init(struct pic32_syscfg_softc *sc)
 {
 	uint32_t mask;

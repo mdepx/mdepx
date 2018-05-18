@@ -83,7 +83,7 @@ pic32_port_lat(struct pic32_port_softc *sc,
 	WR4(sc, PORT_LAT(port), reg);
 }
 
-void
+static void
 pic32_port_unlock(struct pic32_port_softc *sc)
 {
 	uint32_t reg;
