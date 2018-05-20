@@ -37,6 +37,13 @@ enum port_state {
 #define	PORT_A	0
 #define	PORT_B	1
 #define	PORT_C	2
+#define	PORT_D	3
+#define	PORT_E	4
+#define	PORT_F	5
+#define	PORT_G	6
+#define	PORT_H	7
+#define	PORT_J	8
+#define	PORT_K	9
 
 /* Peripheral pin select */
 #define	PPS_RPCON		(0x80)
@@ -46,18 +53,18 @@ enum port_state {
 #define	PPS_RPOR(n)		(0x190 + 0x10 * (n))
 
 /* Pin configuration */
-#define	PORT_ANSEL(n)		(0x00 + 0x200 + 0x100 * (n))
-#define	PORT_TRIS(n)		(0x10 + 0x200 + 0x100 * (n))
-#define	PORT_PORT(n)		(0x20 + 0x200 + 0x100 * (n))
-#define	PORT_LAT(n)		(0x30 + 0x200 + 0x100 * (n))
-#define	PORT_ODC(n)		(0x40 + 0x200 + 0x100 * (n))
-#define	PORT_CNPU(n)		(0x50 + 0x200 + 0x100 * (n))
-#define	PORT_CNPD(n)		(0x60 + 0x200 + 0x100 * (n))
-#define	PORT_CNCON(n)		(0x70 + 0x200 + 0x100 * (n))
-#define	PORT_CNEN0(n)		(0x80 + 0x200 + 0x100 * (n))
-#define	PORT_CNSTAT(n)		(0x90 + 0x200 + 0x100 * (n))
-#define	PORT_CNEN1(n)		(0xA0 + 0x200 + 0x100 * (n))
-#define	PORT_CNF(n)		(0xB0 + 0x200 + 0x100 * (n))
+#define	PORT_ANSEL(n)		(0x00 + 0x100 * (n))
+#define	PORT_TRIS(n)		(0x10 + 0x100 * (n))
+#define	PORT_PORT(n)		(0x20 + 0x100 * (n))
+#define	PORT_LAT(n)		(0x30 + 0x100 * (n))
+#define	PORT_ODC(n)		(0x40 + 0x100 * (n))
+#define	PORT_CNPU(n)		(0x50 + 0x100 * (n))
+#define	PORT_CNPD(n)		(0x60 + 0x100 * (n))
+#define	PORT_CNCON(n)		(0x70 + 0x100 * (n))
+#define	PORT_CNEN0(n)		(0x80 + 0x100 * (n))
+#define	PORT_CNSTAT(n)		(0x90 + 0x100 * (n))
+#define	PORT_CNEN1(n)		(0xA0 + 0x100 * (n))
+#define	PORT_CNF(n)		(0xB0 + 0x100 * (n))
 
 /* Output pin selection */
 #define	RPOR_NC		0	/* None (not connected) */
