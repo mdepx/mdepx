@@ -45,6 +45,7 @@
 
 #define	RPB0		5
 /* Peripheral Pin Select Output Register Map */
+#define	PPS_RPG8R	0x2A0
 #define	PPS_RPG9R	0x2A4
 #define	PPS_RPD4R	0x1D0
 #define	 NO_CONNECT	0b0000
