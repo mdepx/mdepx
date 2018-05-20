@@ -24,10 +24,7 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/types.h>
-
-#include <stdio.h>
-
+#include <sys/cdefs.h>
 #include <dev/spi/spi.h>
 
 #include <mips/microchip/pic32_spi.h>
