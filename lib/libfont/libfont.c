@@ -24,10 +24,8 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/types.h>
+#include <sys/cdefs.h>
 #include <sys/endian.h>
-
-#include <stdio.h>
 
 #include <libfont/libfont.h>
 
@@ -58,7 +56,7 @@ struct toc_entry {
 };
 
 int
-utf8_to_ucs2(char *input, char **end_ptr)
+utf8_to_ucs2(uint8_t *input, uint8_t **end_ptr)
 {
 
 	*end_ptr = input;
@@ -153,24 +151,6 @@ draw_char(struct font_info *font, uint16_t c)
 		}
 	}
 }
-
-#if 0
-void
-draw_text(char *buf)
-{
-	char *newptr;
-	int i;
-	int c;
-
-	for (;;) {
-		c = utf8_to_ucs2(buf, &newptr);
-		if (c == -1)
-			break;
-		buf = newptr;
-		draw_char(c);
-	}
-}
-#endif
 
 static void
 encodings(struct font_info *font, uint8_t *ptr, uint32_t size)
@@ -374,9 +354,4 @@ font_init(struct font_info *font, uint8_t *header)
 		dprintf("entry %d size %d\n", i, entry->size);
 		dprintf("entry %d offset %d\n", i, entry->offset);
 	}
-
-#if 0
-	const char *t = "Мороз и солнце; день чудесный!  Еще ты дремлешь, друг прелестный - Пора, красавица, проснись: Открой сомкнуты негой взоры Навстречу северной Авроры, Звездою севера явись!";
-	draw_text(t);
-#endif
 }

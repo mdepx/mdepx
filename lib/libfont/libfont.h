@@ -54,6 +54,6 @@ void font_init(struct font_info *font, uint8_t *header);
 void draw_char(struct font_info *font, uint16_t c);
 void get_char_info(struct font_info *font, uint16_t c,
     struct char_info *ci);
-int utf8_to_ucs2(char *input, char **end_ptr);
+int utf8_to_ucs2(uint8_t *input, uint8_t **end_ptr);
 
 #endif /* !_LIB_LIBFONT_LIBFONT_H_ */
