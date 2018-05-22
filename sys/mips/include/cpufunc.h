@@ -33,6 +33,7 @@
 #define	CP0_WIRED	$6
 #define	CP0_BAD_VADDR	$8
 #define	CP0_COUNT	$9
+#define	CP0_COMPARE	$11
 #define	CP0_STATUS	$12,0
 #define	CP0_INTCTL	$12,1
 #define	CP0_CAUSE	$13,0
@@ -67,8 +68,17 @@
 })
 
 #define	mips_rd_count()		mfc0(9, 0)
+#define	mips_rd_compare()	mfc0(11, 0)
+
+#define	mips_wr_compare(val)	mtc0(11, 0, (val))
+
 #define	mips_rd_status()	mfc0(12, 0)
 #define	mips_wr_status(val)	mtc0(12, 0, (val))
+#define	mips_wr_ebase(val)	mtc0(15, 1, (val))
+
 #define	mips_rd_cinfo()		mfc0(15, 6)
+
+#define	mips_rd_cause()		mfc0(13, 0)
+#define	mips_wr_cause(val)	mtc0(13, 0, (val))
 
 #endif /* !_MACHINE_CPUFUNC_H_ */
