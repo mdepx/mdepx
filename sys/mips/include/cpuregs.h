@@ -58,4 +58,19 @@
 #define	MIPS_SR_RP	(1 << 27)
 #define	MIPS_SR_CU(n)	(1 << (28 + (n)))
 
+/* CP0 cause register */
+#define	MIPS_CR_EXC_CODE_S	2
+#define	MIPS_CR_EXC_CODE_M	(0x1f << MIPS_CR_EXC_CODE_S)
+#define	 MIPS_CR_EXC_CODE_INTERRUPT	0
+#define	MIPS_CR_IP_S		8
+#define	MIPS_CR_IP_M		(0xff << MIPS_CR_IP_S)
+#define	MIPS_CR_IP(n)		(1 << (MIPS_CR_IP_S + (n)))
+#define	MIPS_CR_IP_SOFT(n)	MIPS_CR_IP((n))
+#define	MIPS_CR_IP_HARD(n)	MIPS_CR_IP(2 + (n))
+#define	MIPS_CR_WP		(1 << 22)
+#define	MIPS_CR_IV		(1 << 23)
+#define	MIPS_CR_CE_S		28
+#define	MIPS_CR_CE_M		(0x3 << MIPS_CR_CE_S)
+#define	MIPS_CR_BD		(1 << 31)
+
 #endif /* !_MACHINE_CPUREGS_H_ */
