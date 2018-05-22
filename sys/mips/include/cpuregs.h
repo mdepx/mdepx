@@ -32,7 +32,36 @@
 #endif
 
 /* CP0 status register */
-#define	MIPS_SR_INT_IE	(1 << 0)
+#define	MIPS_SR_IE	(1 << 0)
+#define	MIPS_SR_EXL	(1 << 1)
+#define	MIPS_SR_ERL	(1 << 2)
+#define	MIPS_SR_R0	(1 << 3) /* Read-only */
+#define	MIPS_SR_UM	(1 << 4)
+#define	MIPS_SR_KSU_S	3
+#define	MIPS_SR_KSU_M	(0x3 << MIPS_SR_KSU_S)
+#define	MIPS_SR_UX	5
+#define	MIPS_SR_SX	6
+#define	MIPS_SR_KX	7
+#define	MIPS_SR_IM_S	8
+#define	MIPS_SR_IM_M	(0xff << MIPS_SR_IM_S)
+#define	MIPS_SR_IM(n)	(1 << (MIPS_SR_IM_S + (n)))
+#define	MIPS_SR_IM_SOFT_0	MIPS_SR_IM(0)
+#define	MIPS_SR_IM_SOFT_1	MIPS_SR_IM(1)
+#define	MIPS_SR_IM_HARD_0	MIPS_SR_IM(2)
+#define	MIPS_SR_IM_HARD_1	MIPS_SR_IM(3)
+#define	MIPS_SR_IM_HARD_2	MIPS_SR_IM(4)
+#define	MIPS_SR_IM_HARD_3	MIPS_SR_IM(5)
+#define	MIPS_SR_IM_HARD_4	MIPS_SR_IM(6)
+#define	MIPS_SR_IM_HARD_5	MIPS_SR_IM(7)
+#define	MIPS_SR_NMI	(1 << 19)
+#define	MIPS_SR_SR	(1 << 20)
+#define	MIPS_SR_RS	(1 << 21)
 #define	MIPS_SR_BEV	(1 << 22)
+#define	MIPS_SR_PX	(1 << 23)
+#define	MIPS_SR_MX	(1 << 24)
+#define	MIPS_SR_RE	(1 << 25)
+#define	MIPS_SR_FR	(1 << 26)
+#define	MIPS_SR_RP	(1 << 27)
+#define	MIPS_SR_CU(n)	(1 << (28 + (n)))
 
 #endif /* !_MACHINE_CPUREGS_H_ */
