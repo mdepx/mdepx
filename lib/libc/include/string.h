@@ -29,5 +29,6 @@
 
 size_t strlen(const char *s);
 size_t strnlen(const char *s, size_t maxlen);
+void * memcpy(void *dst, const void *src, size_t len);
 
 #endif /* !_INCLUDE_STRING_H_ */

@@ -28,5 +28,6 @@
 #define _INCLUDE_STRINGS_H_
 
 void bzero(void *b, size_t len);
+void bcopy(const void *src, void *dst, size_t len);
 
 #endif /* !_INCLUDE_STRINGS_H_ */
