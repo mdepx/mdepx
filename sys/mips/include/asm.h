@@ -33,6 +33,11 @@
 
 #include <machine/abi.h>
 
+#define	VECTOR(sym)					\
+	.text; .globl sym; .ent sym; sym:
+#define	VECTOR_END(sym)					\
+	.text; .end sym; .globl sym; sym:
+
 #define	ENTRY(sym)					\
 	.text; .globl sym; .ent sym; sym:
 

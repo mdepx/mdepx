@@ -29,6 +29,7 @@
 
 #define	TCON	0x00
 #define	 TCON_ON	(1 << 15)
+#define	 TCON_TGATE	(1 << 7) /* Timer Gated Time Accumulation Enable bit */
 #define	 TCON_T32	(1 << 3) /* 32-Bit Timer Mode Select */
 #define	TMR	0x10
 #define	PR	0x20
@@ -36,5 +37,8 @@
 struct pic32_timer_softc {
 	uint32_t base;
 };
+
+void pic32_timer_init(struct pic32_timer_softc *sc, uint32_t base);
+void pic32_timer_enable(struct pic32_timer_softc *sc);
 
 #endif /* !_MIPS_MICROCHIP_PIC32_TIMER_H_ */

@@ -24,22 +24,20 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/types.h>
-
-#include <stdio.h>
+#include <sys/cdefs.h>
 
 #include <mips/microchip/pic32_timer.h>
 
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-static void
+void
 pic32_timer_enable(struct pic32_timer_softc *sc)
 {
 	uint32_t reg;
 
 	WR4(sc, TCON, 0);
-	WR4(sc, TMR, 0);
+	WR4(sc, TMR, 0xffffffff);
 
 	reg = (0x7 << 4); /* 1:256 prescale value */
 	reg |= TCON_ON;
@@ -47,15 +45,8 @@ pic32_timer_enable(struct pic32_timer_softc *sc)
 }
 
 void
-pic32_timer_init(uint32_t base, struct pic32_timer_softc *sc)
+pic32_timer_init(struct pic32_timer_softc *sc, uint32_t base)
 {
 
 	sc->base = base;
-}
-
-void
-pic32_timer_delay(struct pic32_timer_softc *sc, char c)
-{
-
-	/* TODO */
 }

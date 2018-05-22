@@ -32,6 +32,8 @@
 #define	UART2_BASE	0xBF822200
 #define	SYSCFG_BASE	0xBF800000
 #define	SPI2_BASE	0xBF821200
+#define	INTC_BASE	0xBF810000
+#define	TIMER_BASE(n)	(0xBF840000 + ((n - 1) * 0x200))	/* Timer1 - Timer9 */
 
 #define	DEVCFG0_UNUSED			0xb4c00880
 #define	DEVCFG1_UNUSED			0x00003800
