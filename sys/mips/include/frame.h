@@ -33,16 +33,17 @@
 
 #include <machine/abi.h>
 
-#if !defined(__mips_n32) && !defined(__mips_n64)
-.error "Add support"
-#endif
-
 #ifndef __ASSEMBLER__
 struct trapframe {
 	register_t	tf_at;
 	register_t	tf_v[2];
+#if defined(__mips_n32) || defined(__mips_n64)
 	register_t	tf_a[8];
 	register_t	tf_t[6];
+#else
+	register_t	tf_a[4];
+	register_t	tf_t[10];
+#endif
 	register_t	tf_s[8];
 	register_t	tf_gp;
 	register_t	tf_sp;

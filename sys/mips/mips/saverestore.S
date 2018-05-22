@@ -44,6 +44,7 @@
 	REG_S	a1, (REG_SIZE * 4)(sp)
 	REG_S	a2, (REG_SIZE * 5)(sp)
 	REG_S	a3, (REG_SIZE * 6)(sp)
+#if defined(__mips_n32) || defined(__mips_n64)
 	REG_S	a4, (REG_SIZE * 7)(sp)
 	REG_S	a5, (REG_SIZE * 8)(sp)
 	REG_S	a6, (REG_SIZE * 9)(sp)
@@ -53,6 +54,16 @@
 	REG_S	t1, (REG_SIZE * 12)(sp)
 	REG_S	t2, (REG_SIZE * 13)(sp)
 	REG_S	t3, (REG_SIZE * 14)(sp)
+#else
+	REG_S	t0, (REG_SIZE * 7)(sp)
+	REG_S	t1, (REG_SIZE * 8)(sp)
+	REG_S	t2, (REG_SIZE * 9)(sp)
+	REG_S	t3, (REG_SIZE * 10)(sp)
+	REG_S	t4, (REG_SIZE * 11)(sp)
+	REG_S	t5, (REG_SIZE * 12)(sp)
+	REG_S	t6, (REG_SIZE * 13)(sp)
+	REG_S	t7, (REG_SIZE * 14)(sp)
+#endif
 	REG_S	t8, (REG_SIZE * 15)(sp)
 	REG_S	t9, (REG_SIZE * 16)(sp)
 
@@ -109,6 +120,7 @@
 	REG_L	a1, (REG_SIZE * 4)(sp)
 	REG_L	a2, (REG_SIZE * 5)(sp)
 	REG_L	a3, (REG_SIZE * 6)(sp)
+#if defined(__mips_n32) || defined(__mips_n64)
 	REG_L	a4, (REG_SIZE * 7)(sp)
 	REG_L	a5, (REG_SIZE * 8)(sp)
 	REG_L	a6, (REG_SIZE * 9)(sp)
@@ -118,6 +130,17 @@
 	REG_L	t1, (REG_SIZE * 12)(sp)
 	REG_L	t2, (REG_SIZE * 13)(sp)
 	REG_L	t3, (REG_SIZE * 14)(sp)
+#else
+	REG_L	t0, (REG_SIZE * 7)(sp)
+	REG_L	t1, (REG_SIZE * 8)(sp)
+	REG_L	t2, (REG_SIZE * 9)(sp)
+	REG_L	t3, (REG_SIZE * 10)(sp)
+
+	REG_L	t4, (REG_SIZE * 11)(sp)
+	REG_L	t5, (REG_SIZE * 12)(sp)
+	REG_L	t6, (REG_SIZE * 13)(sp)
+	REG_L	t7, (REG_SIZE * 14)(sp)
+#endif
 	REG_L	t8, (REG_SIZE * 15)(sp)
 	REG_L	t9, (REG_SIZE * 16)(sp)
 
