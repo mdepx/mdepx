@@ -34,7 +34,6 @@
 void
 pic32_intc_init(struct pic32_intc_softc *sc, uint32_t base)
 {
-	uint32_t reg;
 
 	sc->base = base;
 
@@ -42,26 +41,28 @@ pic32_intc_init(struct pic32_intc_softc *sc, uint32_t base)
 }
 
 void
-pic32_intc_enable(struct pic32_intc_softc *sc,
-    struct pic32_intr *intr, uint8_t prio)
+pic32_intc_enable(struct pic32_intc_softc *sc, int irq, uint8_t prio)
 {
+	uint32_t reg;
+	uint8_t prio_shift;
 
-	reg = RD4(sc, INTC_IEC(intr->ctrl));
-	reg |= (1 << intr->ctrl_bit);
-	WR4(sc, INTC_IEC(intr->ctrl), reg);
+	prio_shift = 2 + 8 * (irq % 4);
 
-	reg = RD4(sc, INTC_IPC(intr->prio));
-	reg |= (prio << intr->prio_bit);
-	WR4(sc, INTC_IPC(intr->prio), reg);
+	reg = RD4(sc, INTC_IEC(irq / 32));
+	reg |= (1 << (irq % 32));
+	WR4(sc, INTC_IEC(irq / 32), reg);
+
+	reg = RD4(sc, INTC_IPC(irq / 4));
+	reg |= (prio << prio_shift);
+	WR4(sc, INTC_IPC(irq / 4), reg);
 }
 
 void
-pic32_intc_clear_pending(struct pic32_intc_softc *sc,
-    struct pic32_intr *intr)
+pic32_intc_clear_pending(struct pic32_intc_softc *sc, int irq)
 {
 	uint32_t reg;
 
-	RD4(sc, INTC_IFS(intr->flag));
-	reg &= ~(1 << intr->flag_bit);
-	WR4(sc, INTC_IFS(intr->flag), reg);
+	reg = RD4(sc, INTC_IFS(irq / 32));
+	reg &= ~(1 << (irq % 32));
+	WR4(sc, INTC_IFS(irq / 32), reg);
 }

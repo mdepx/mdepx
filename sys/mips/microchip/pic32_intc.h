@@ -40,19 +40,8 @@ struct pic32_intc_softc {
 	uint32_t base;
 };
 
-struct pic32_intr {
-	uint8_t flag;
-	uint8_t ctrl;
-	uint8_t prio;
-	uint8_t sub_prio;
-	uint8_t flag_bit;
-	uint8_t ctrl_bit;
-	uint8_t prio_bit;
-	uint8_t sub_prio_bit;
-};
-
 void pic32_intc_init(struct pic32_intc_softc *sc, uint32_t base);
-void pic32_intc_enable(struct pic32_intc_softc *sc, struct pic32_intr *intr, uint8_t prio);
-void pic32_intc_clear_pending(struct pic32_intc_softc *sc, struct pic32_intr *intr);
+void pic32_intc_enable(struct pic32_intc_softc *sc, int irq, uint8_t prio);
+void pic32_intc_clear_pending(struct pic32_intc_softc *sc, int irq);
 
 #endif /* !_MIPS_MICROCHIP_PIC32_INTC_H_ */
