@@ -46,7 +46,8 @@
 static struct mips_intr mips_intr_table[7];
 
 void
-mips_assign_intr(uint8_t ip, void (*handler)(struct trapframe *, int irq))
+mips_assign_intr(void *arg, uint8_t ip,
+    void (*handler)(void *arg, struct trapframe *, int irq))
 {
 	int i;
 
@@ -61,6 +62,7 @@ mips_assign_intr(uint8_t ip, void (*handler)(struct trapframe *, int irq))
 
 	mips_intr_table[ip].active = 1;
 	mips_intr_table[ip].handler = handler;
+	mips_intr_table[ip].arg = arg;
 }
 
 void
@@ -68,6 +70,7 @@ mips_exception(struct trapframe *frame)
 {
 	uint32_t exc_code;
 	uint32_t cause;
+	void *arg;
 	int i;
 
 	cause = mips_rd_cause();
@@ -77,8 +80,10 @@ mips_exception(struct trapframe *frame)
 	case MIPS_CR_EXC_CODE_INTERRUPT:
 		for (i = 0; i < MIPS_N_INTR; i++)
 			if ((cause & MIPS_CR_IP(i)) && \
-			    (mips_intr_table[i].active))
-				mips_intr_table[i].handler(frame, i);
+			    (mips_intr_table[i].active)) {
+				arg = mips_intr_table[i].arg;
+				mips_intr_table[i].handler(arg, frame, i);
+			}
 		break;
 	default:
 		printf("Add handler\n");

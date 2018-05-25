@@ -31,14 +31,15 @@
 #ifndef	_MIPS_MIPS_TRAP_H_
 #define	_MIPS_MIPS_TRAP_H_
 
-void mips_assign_intr(uint8_t ip, void (*handler)(struct trapframe *, int irq));
+void mips_assign_intr(void *arg, uint8_t ip, void (*handler)(void *arg, struct trapframe *, int irq));
 void mips_exception(struct trapframe *frame);
 
 #define	MIPS_N_INTR	7
 
 struct mips_intr {
-	void (*handler)(struct trapframe *frame, int irq);
+	void (*handler)(void *arg, struct trapframe *frame, int irq);
 	int active;
+	void *arg;
 };
 
 #endif /* !_MIPS_MIPS_TRAP_H_ */
