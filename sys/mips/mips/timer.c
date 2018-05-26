@@ -101,6 +101,11 @@ mips_timer_udelay(struct mips_timer_softc *sc, uint32_t usec)
 void
 mips_timer_init(struct mips_timer_softc *sc, uint32_t freq)
 {
+	uint32_t reg;
+
+	reg = mips_rd_config7();
+	if ((reg & CONFIG7_WII) == 0)
+		printf("%s: can't initialize timer\n", __func__);
 
 	sc->frequency = freq;
 	sc->ticks_per_usec = freq / 1000000;

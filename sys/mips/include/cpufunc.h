@@ -76,6 +76,8 @@
 #define	mips_wr_cause(val)	mtc0(13, 0, (val))
 #define	mips_wr_ebase(val)	mtc0(15, 1, (val))
 #define	mips_rd_cinfo()		mfc0(15, 6)
+#define	mips_rd_config7()	mfc0(16, 7)
+#define	 CONFIG7_WII		(1 << 31)	/* Wait IE Ignore bit */
 
 #ifndef __ASSEMBLER__
 static __inline void
