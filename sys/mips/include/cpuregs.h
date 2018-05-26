@@ -61,7 +61,26 @@
 /* CP0 cause register */
 #define	MIPS_CR_EXC_CODE_S	2
 #define	MIPS_CR_EXC_CODE_M	(0x1f << MIPS_CR_EXC_CODE_S)
-#define	 MIPS_CR_EXC_CODE_INTERRUPT	0
+#define	 MIPS_CR_EXC_CODE_INT		0 /* Interrupt */
+#define	 MIPS_CR_EXC_CODE_MOD		1 /* TLB modification exception */
+#define	 MIPS_CR_EXC_CODE_TLBL		2 /* TLB exception (load or instruction fetch) */
+#define	 MIPS_CR_EXC_CODE_TLBS		3 /* TLB exception (store) */
+#define	 MIPS_CR_EXC_CODE_ADEL		4 /* Address error exception (load or instruction fetch) */
+#define	 MIPS_CR_EXC_CODE_ADES		5 /* Address error exception (store) */
+#define	 MIPS_CR_EXC_CODE_IBE		6 /* Bus error exception (instruction fetch) */
+#define	 MIPS_CR_EXC_CODE_DBE		7 /* Bus error exception (data reference: load or store) */
+#define	 MIPS_CR_EXC_CODE_SYS		8 /* Syscall exception */
+#define	 MIPS_CR_EXC_CODE_BP		9 /* Breakpoint exception */
+#define	 MIPS_CR_EXC_CODE_RI		10 /* Reserved instruction exception */
+#define	 MIPS_CR_EXC_CODE_CPU		11 /* Coprocessor Unusable exception */
+#define	 MIPS_CR_EXC_CODE_OV		12 /* Arithmetic Overflow exception */
+#define	 MIPS_CR_EXC_CODE_TR		13 /* Trap exception */
+#define	 MIPS_CR_EXC_CODE_FPE		15 /* Floating point exception */
+#define	 MIPS_CR_EXC_CODE_C2E		18 /* Reserved for precise Coprocessor 2 exceptions */
+#define	 MIPS_CR_EXC_CODE_MDMX		22 /* Reserved for MDMX Unusable Exception in MIPS64 */
+#define	 MIPS_CR_EXC_CODE_WATCH		23 /* Reference to WatchHi/WatchLo address */
+#define	 MIPS_CR_EXC_CODE_MCHECK	24 /* Machine check */
+#define	 MIPS_CR_EXC_CODE_CACHE_ERR	30 /* Cache error */
 #define	MIPS_CR_IP_S		8
 #define	MIPS_CR_IP_M		(0xff << MIPS_CR_IP_S)
 #define	MIPS_CR_IP(n)		(1 << (MIPS_CR_IP_S + (n)))

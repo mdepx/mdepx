@@ -77,7 +77,7 @@ mips_exception(struct trapframe *frame)
 	exc_code = (cause & MIPS_CR_EXC_CODE_M) >> \
 	    MIPS_CR_EXC_CODE_S;
 	switch (exc_code) {
-	case MIPS_CR_EXC_CODE_INTERRUPT:
+	case MIPS_CR_EXC_CODE_INT:
 		for (i = 0; i < MIPS_N_INTR; i++)
 			if ((cause & MIPS_CR_IP(i)) && \
 			    (mips_intr_table[i].active)) {
@@ -86,7 +86,8 @@ mips_exception(struct trapframe *frame)
 			}
 		break;
 	default:
-		printf("Add handler\n");
+		printf("%s: missing handler: exc_code %d, badvaddr %x\n",
+		    __func__, exc_code, frame->tf_badvaddr);
 	}
 
 	dprintf("Exception cause: %x, code %d\n", cause, exc_code);
