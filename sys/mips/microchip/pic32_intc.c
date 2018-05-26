@@ -26,8 +26,8 @@
 
 #include <sys/cdefs.h>
 #include <machine/frame.h>
-#include <machine/cpufunc.h>
 #include <machine/cpuregs.h>
+#include <machine/cpufunc.h>
 
 #include <mips/microchip/pic32_intc.h>
 

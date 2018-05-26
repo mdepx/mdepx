@@ -29,8 +29,50 @@
  */
 
 #include <sys/cdefs.h>
+#include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
 #include <mips/mips/timer.h>
+
+void
+mips_timer_intr(void *arg)
+{
+	struct mips_timer_softc *sc;
+
+	sc = arg;
+
+	if (sc->usleep > 0)
+		sc->usleep = 0;
+}
+
+void
+mips_timer_usleep(struct mips_timer_softc *sc, uint32_t usec)
+{
+	uint32_t intr;
+	uint32_t reg;
+	uint8_t flag;
+	uint32_t ticks;
+
+	sc->usleep = usec;
+
+	ticks = (usec * sc->ticks_per_usec);
+
+	flag = 0;
+
+	while (((volatile uint32_t *)&sc->usleep)[0] > 0) {
+		intr = intr_disable();
+
+		if (flag == 0) {
+			reg = mips_rd_count();
+			reg += ticks;
+			mips_wr_compare(reg);
+			flag = 1;
+		}
+
+		__asm("wait");
+
+		intr_restore(intr);
+	}
+}
 
 void
 mips_timer_udelay(struct mips_timer_softc *sc, uint32_t usec)

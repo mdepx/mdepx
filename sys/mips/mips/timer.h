@@ -34,9 +34,12 @@
 struct mips_timer_softc {
 	uint32_t frequency;
 	uint32_t ticks_per_usec;
+	uint32_t usleep;
 };
 
 void mips_timer_init(struct mips_timer_softc *sc, uint32_t freq);
 void mips_timer_udelay(struct mips_timer_softc *sc, uint32_t usec);
+void mips_timer_intr(void *arg);
+void mips_timer_usleep(struct mips_timer_softc *sc, uint32_t usec);
 
 #endif /* !_MIPS_MIPS_TIMER_H_ */
