@@ -49,7 +49,7 @@
 #define	PMON_HIGH	$17,4
 #define	PMON_LC		$17,5
 #define	PMON_RC		$17,6
-#define	CP0_WATCHLo	$18,0
+#define	CP0_WATCHLO	$18,0
 #define	CP0_WATCHHI	$19,0
 #define	CP0_ERRCTL	$26,0
 
@@ -69,16 +69,43 @@
 
 #define	mips_rd_count()		mfc0(9, 0)
 #define	mips_rd_compare()	mfc0(11, 0)
-
 #define	mips_wr_compare(val)	mtc0(11, 0, (val))
-
 #define	mips_rd_status()	mfc0(12, 0)
 #define	mips_wr_status(val)	mtc0(12, 0, (val))
-#define	mips_wr_ebase(val)	mtc0(15, 1, (val))
-
-#define	mips_rd_cinfo()		mfc0(15, 6)
-
 #define	mips_rd_cause()		mfc0(13, 0)
 #define	mips_wr_cause(val)	mtc0(13, 0, (val))
+#define	mips_wr_ebase(val)	mtc0(15, 1, (val))
+#define	mips_rd_cinfo()		mfc0(15, 6)
+
+#ifndef __ASSEMBLER__
+static __inline void
+intr_enable(void)
+{
+	register_t status;
+
+	status = mips_rd_status();
+	status |= MIPS_SR_IE;
+	mips_wr_status(status);
+};
+
+static __inline register_t
+intr_disable(void)
+{
+	register_t reg;
+
+	reg = mips_rd_status();
+	mips_wr_status(reg & ~MIPS_SR_IE);
+
+	return (reg & MIPS_SR_IE);
+};
+
+static __inline void
+intr_restore(register_t reg)
+{
+
+	if (reg == MIPS_SR_IE)
+		intr_enable();
+};
+#endif
 
 #endif /* !_MACHINE_CPUFUNC_H_ */
