@@ -25,11 +25,49 @@
  */
 
 #include <sys/cdefs.h>
+#include <machine/frame.h>
+#include <machine/cpufunc.h>
+#include <machine/cpuregs.h>
 
 #include <mips/microchip/pic32_intc.h>
 
+#define	INTC_DEBUG
+#undef	INTC_DEBUG
+
+#ifdef	INTC_DEBUG
+#define	dprintf(fmt, ...)	printf(fmt, ##__VA_ARGS__)
+#else
+#define	dprintf(fmt, ...)
+#endif
+
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+
+void
+pic32_intc_intr(void *arg, struct trapframe *frame, int irq)
+{
+	struct pic32_intc_softc *sc;
+	uint32_t ifs;
+	uint32_t ipend;
+	int i, b;
+
+	sc = (struct pic32_intc_softc *)arg;
+
+	dprintf("hard intr %d\n", irq);
+
+	for (i = 0; i < 6; i++) {
+		ifs = RD4(sc, INTC_IFS(i));
+		for (b = 0; b < 31; b++)
+			if (ifs & (1 << b)) {
+				ipend = (i * 32 + b);
+				if (sc->map[ipend].handler != NULL) {
+					sc->map[ipend].handler(sc->map[ipend].arg);
+					dprintf("intr %d\n", ipend);
+					pic32_intc_clear_pending(sc, ipend);
+				}
+			}
+	}
+}
 
 void
 pic32_intc_init(struct pic32_intc_softc *sc, uint32_t base)
@@ -38,6 +76,14 @@ pic32_intc_init(struct pic32_intc_softc *sc, uint32_t base)
 	sc->base = base;
 
 	WR4(sc, INTC_INTCON, 0);
+}
+
+void
+pic32_intc_install_map(struct pic32_intc_softc *sc,
+    const struct intr_entry *map)
+{
+
+	sc->map = map;
 }
 
 void
