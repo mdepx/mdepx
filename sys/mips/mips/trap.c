@@ -43,26 +43,31 @@
 #define	dprintf(fmt, ...)
 #endif
 
-static struct mips_intr mips_intr_table[7];
+static void
+default_handler(void *arg, struct trapframe *frame, int i)
+{
+
+	printf("Install interrupt handler!\n");
+}
+
+static const struct mips_intr_entry mips_intr_map[MIPS_N_INTR] = {
+	[0] = { default_handler, NULL },
+	[1] = { default_handler, NULL },
+	[2] = { default_handler, NULL },
+	[3] = { default_handler, NULL },
+	[4] = { default_handler, NULL },
+	[5] = { default_handler, NULL },
+	[6] = { default_handler, NULL },
+	[7] = { default_handler, NULL },
+};
+
+static const struct mips_intr_entry *map = mips_intr_map;
 
 void
-mips_assign_intr(void *arg, uint8_t ip,
-    void (*handler)(void *arg, struct trapframe *, int irq))
+mips_install_intr_map(const struct mips_intr_entry *m)
 {
-	int i;
 
-	/*
-	 * TODO: add KASSERT
-	 * KASSERT(ip < MIPS_N_INTR, (""));
-	 */
-
-	/* TODO: clear BSS */
-	for (i = 0; i < MIPS_N_INTR; i++)
-		mips_intr_table[i].active = 0;
-
-	mips_intr_table[ip].active = 1;
-	mips_intr_table[ip].handler = handler;
-	mips_intr_table[ip].arg = arg;
+	map = m;
 }
 
 void
@@ -70,7 +75,6 @@ mips_exception(struct trapframe *frame)
 {
 	uint32_t exc_code;
 	uint32_t cause;
-	void *arg;
 	int i;
 
 	cause = mips_rd_cause();
@@ -79,10 +83,11 @@ mips_exception(struct trapframe *frame)
 	switch (exc_code) {
 	case MIPS_CR_EXC_CODE_INT:
 		for (i = 0; i < MIPS_N_INTR; i++)
-			if ((cause & MIPS_CR_IP(i)) && \
-			    (mips_intr_table[i].active)) {
-				arg = mips_intr_table[i].arg;
-				mips_intr_table[i].handler(arg, frame, i);
+			if (cause & MIPS_CR_IP(i)) {
+				if (map[i].handler != NULL)
+					map[i].handler(map[i].arg, frame, i);
+				else
+					printf("%s: spurious intr %d\n", __func__, i);
 			}
 		break;
 	default:
