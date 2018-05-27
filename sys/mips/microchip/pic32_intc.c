@@ -79,8 +79,8 @@ pic32_intc_init(struct pic32_intc_softc *sc, uint32_t base)
 }
 
 void
-pic32_intc_install_map(struct pic32_intc_softc *sc,
-    const struct intr_entry *map)
+pic32_intc_install_intr_map(struct pic32_intc_softc *sc,
+    const struct intc_intr_entry *map)
 {
 
 	sc->map = map;
