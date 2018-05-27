@@ -28,8 +28,6 @@
 
 #include <mips/microchip/pic32_port.h>
 
-#define	SYSKEY		0xBF803B30
-
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
@@ -83,44 +81,10 @@ pic32_port_lat(struct pic32_port_softc *sc,
 	WR4(sc, PORT_LAT(port), reg);
 }
 
-static void
-pic32_port_unlock(struct pic32_port_softc *sc)
-{
-	uint32_t reg;
-
-	*(volatile uint32_t *)(SYSKEY) = 0xAA996655;
-	*(volatile uint32_t *)(SYSKEY) = 0x556699AA;
-
-	reg = RD4(sc, PPS_RPCON);
-	reg &= ~(1 << 11);
-	WR4(sc,	PPS_RPCON, reg);
-}
-
-void
-pic32_port_rpinr(struct pic32_port_softc *sc,
-    uint32_t reg, uint32_t val)
-{
-
-	WR4(sc,	PPS_RPINR(reg), val);
-}
-
-void
-pic32_port_rpor(struct pic32_port_softc *sc,
-    uint8_t rpor, uint32_t val)
-{
-	uint32_t reg;
-
-	reg = RD4(sc, PPS_RPOR(rpor));
-	reg |= val;
-	WR4(sc, PPS_RPOR(rpor), reg);
-}
-
 void
 pic32_port_init(struct pic32_port_softc *sc,
     uint32_t base)
 {
 
 	sc->base = base;
-
-	pic32_port_unlock(sc);
 }

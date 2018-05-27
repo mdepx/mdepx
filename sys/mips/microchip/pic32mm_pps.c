@@ -24,25 +24,50 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_MIPS_MICROCHIP_PIC32MM_H_
-#define	_MIPS_MICROCHIP_PIC32MM_H_
+#include <sys/types.h>
+#include <mips/microchip/pic32mm_pps.h>
 
-#define	PORTS_BASE	0xBF802600
-#define	PPS_BASE	0xBF802400
-#define	UART1_BASE	0xBF800600
-#define	UART2_BASE	0xBF800680
-#define	SPI1_BASE	0xBF808080
-#define	SPI2_BASE	0xBF808100
-#define	TIMER_BASE	0xBF808000
-#define	CCP1_BASE	0xBF800100
-#define	ADC1_BASE	0xBF800700
+#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-#define	PIC32MM_CFG0	0xa4210582
-#define	PIC32MM_CFG1	0x80000012
-#define	PIC32MM_CFG2	0x00237068
-#define	PIC32MM_CFG3	0x00000001
+static void
+pic32_pps_unlock(struct pic32_pps_softc *sc)
+{
+	uint32_t reg;
 
-#define	PIC32MM_DEVCFG	PIC32_DEVCFG(PIC32MM_CFG0, PIC32MM_CFG1, \
-				     PIC32MM_CFG2, PIC32MM_CFG3)
+	*(volatile uint32_t *)(SYSKEY) = 0xAA996655;
+	*(volatile uint32_t *)(SYSKEY) = 0x556699AA;
 
-#endif /* !_MIPS_MICROCHIP_PIC32MM_H_ */
+	reg = RD4(sc, PPS_RPCON);
+	reg &= ~(1 << 11);
+	WR4(sc,	PPS_RPCON, reg);
+}
+
+void
+pic32_pps_rpinr(struct pic32_pps_softc *sc,
+    uint32_t reg, uint32_t val)
+{
+
+	WR4(sc,	PPS_RPINR(reg), val);
+}
+
+void
+pic32_pps_rpor(struct pic32_pps_softc *sc,
+    uint8_t rpor, uint32_t val)
+{
+	uint32_t reg;
+
+	reg = RD4(sc, PPS_RPOR(rpor));
+	reg |= val;
+	WR4(sc, PPS_RPOR(rpor), reg);
+}
+
+void
+pic32_pps_init(struct pic32_pps_softc *sc,
+    uint32_t base)
+{
+
+	sc->base = base;
+
+	pic32_pps_unlock(sc);
+}

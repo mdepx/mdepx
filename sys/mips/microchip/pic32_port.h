@@ -45,13 +45,6 @@ enum port_state {
 #define	PORT_J	8
 #define	PORT_K	9
 
-/* Peripheral pin select */
-#define	PPS_RPCON		(0x80)
-
-/* There is no RPINR0 in manual, so n - 1 */
-#define	PPS_RPINR(n)		(0xA0 + 0x10 * (n - 1))
-#define	PPS_RPOR(n)		(0x190 + 0x10 * (n))
-
 /* Pin configuration */
 #define	PORT_ANSEL(n)		(0x00 + 0x100 * (n))
 #define	PORT_TRIS(n)		(0x10 + 0x100 * (n))
@@ -83,11 +76,8 @@ struct pic32_port_softc {
 };
 
 void pic32_port_init(struct pic32_port_softc *sc, uint32_t base);
-
 void pic32_port_ansel(struct pic32_port_softc *sc, uint32_t port, uint32_t pin, int digital);
 void pic32_port_tris(struct pic32_port_softc *sc, uint32_t port, uint32_t pin, enum port_state st);
 void pic32_port_lat(struct pic32_port_softc *sc, uint32_t port, uint32_t pin, uint8_t enable);
-void pic32_port_rpinr(struct pic32_port_softc *sc, uint32_t reg, uint32_t val);
-void pic32_port_rpor(struct pic32_port_softc *sc, uint8_t rpor, uint32_t val);
 
 #endif /* !_MIPS_MICROCHIP_PIC32_PORT_H_ */
