@@ -59,20 +59,21 @@ pic32_spi_transfer(struct spi_device *dev,
 	for (i = 0; i < len; i++) {
 		WR1(sc, SPIBUF, out[i]);
 
-		timeout = 1000;
-		do {
-			if (RD4(sc, SPISTAT) & SPISTAT_SPIRBF)
-				break;
-		} while (timeout--);
-		if (timeout == 0)
-			return (-1);
+		if (in != NULL) {
+			timeout = 1000;
+			do {
+				if (RD4(sc, SPISTAT) & SPISTAT_SPIRBF)
+					break;
+			} while (timeout--);
+			if (timeout == 0)
+				return (-1);
 
-		rd = RD1(sc, SPIBUF);
-
-		if (in != NULL)
+			rd = RD1(sc, SPIBUF);
 			in[i] = rd;
 
-		dprintf("wr %x rd %x\n", out[i], in[i]);
+			dprintf("wr %x rd %x\n", out[i], in[i]);
+		} else
+			dprintf("wr %x\n", out[i]);
 	}
 
 	return (0);
@@ -81,7 +82,8 @@ pic32_spi_transfer(struct spi_device *dev,
 void
 pic32_spi_init(struct spi_device *dev,
     struct pic32_spi_softc *sc, uint32_t base,
-    uint32_t cpu_freq, uint32_t baud_rate)
+    uint32_t cpu_freq, uint32_t baud_rate,
+    uint32_t spicon)
 {
 	uint32_t reg;
 
@@ -97,17 +99,8 @@ pic32_spi_init(struct spi_device *dev,
 	reg = ((cpu_freq / baud_rate) / 2) - 1;
 	WR4(sc, SPIBRG, reg);
 
-	reg = SPICON_MSTEN;
-	reg |= (SPICON_CKE);
-	/*
-	 * TODO
-	 * reg |= (SPICON_CKP);
-	 * reg |= (SPICON_SMP);
-	 * reg |= SPICON_MSSEN;
-	 * reg |= SPICON_DISSDO;
-	 */
+	reg = spicon;
 	WR4(sc, SPICON, reg);
-
 	reg |= SPICON_ON;
 	WR4(sc, SPICON, reg);
 }
