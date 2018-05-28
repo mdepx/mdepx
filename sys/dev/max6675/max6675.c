@@ -24,10 +24,20 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/types.h>
+#include <sys/cdefs.h>
 #include <dev/spi/spi.h>
+#include <sys/endian.h>
 
-uint16_t
+#define	MAX6675_DEBUG
+#undef	MAX6675_DEBUG
+
+#ifdef	MAX6675_DEBUG
+#define	dprintf(fmt, ...)	printf(fmt, ##__VA_ARGS__)
+#else
+#define	dprintf(fmt, ...)
+#endif
+
+static uint16_t
 max6675_read(spi_device_t *dev)
 {
 	uint16_t val;
@@ -35,9 +45,25 @@ max6675_read(spi_device_t *dev)
 
 	wr = 0xffff;
 
-	dev->transfer(dev, &wr, &val, 2);
+	dev->transfer(dev, (uint8_t *)&wr, (uint8_t *)&val, 2);
 
-	val = (val << 8) | (val >> 8);
+	val = bswap16(val);
+
+	dprintf("%s: read 0x%x, val %d\n", __func__, val,
+	    ((val >> 3) & 0x3ff) >> 2);
 
 	return (val);
+}
+
+uint32_t
+max6675_read_celsius(spi_device_t *dev)
+{
+	uint32_t data;
+
+	data = max6675_read(dev);
+
+	data >>= 3;
+	data >>= 2;
+
+	return (data);
 }

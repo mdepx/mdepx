@@ -24,71 +24,9 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/types.h>
-#include <sys/endian.h>
+#ifndef	_DEV_MAX6675_MAX6675_H_
+#define	_DEV_MAX6675_MAX6675_H_
 
-#include <stdio.h>
+int max6675_read_celsius(spi_device_t *dev);
 
-#include <dev/spi/spi.h>
-#include <dev/max31855/max31855.h>
-
-#define	MAX31855_DEBUG
-#undef	MAX31855_DEBUG
-
-#ifdef	MAX31855_DEBUG
-#define	dprintf(fmt, ...)	printf(fmt, ##__VA_ARGS__)
-#else
-#define	dprintf(fmt, ...)
-#endif
-
-static uint32_t
-max31855_read(spi_device_t *dev)
-{
-	uint32_t val1;
-	uint32_t val;
-	uint32_t wr;
-
-	wr = 0xffffffff;
-
-	dev->transfer(dev, (uint8_t *)&wr, (uint8_t *)&val1, 4);
-
-	val = bswap32(val1);
-
-	if (val & 0x1)
-		printf("Error: OC\n");
-	if (val & 0x2)
-		printf("Error: SCG\n");
-	if (val & 0x4)
-		printf("Error: SCV\n");
-
-	if (val & (1 << 16))
-		printf("Fault\n");
-
-	dprintf("val1 %x, val %x. Temperature Data %d, Internal Temperature Data %d\n",
-	    val1, val, (val >> 18) >> 2, ((val >> 4) & 0xfff) >> 4);
-
-	return (val);
-}
-
-int
-max31855_read_celsius(spi_device_t *dev)
-{
-	int reg;
-	int v;
-
-	reg = max31855_read(dev);
-
-	if (reg & (1 << 31)) {
-		/* Negative value, drop the lower 18 bits and sign-extend. */
-		v = 0xFFFFC000 | ((reg >> 18) & 0x00003FFFF);
-	} else {
-		/* Positive value, drop the lower 18 bits. */
-		v = reg >> 18;
-	}
-
-	dprintf("reg %x, val %d\n", reg, v);
-
-	v >>= 2;
-
-	return (v);
-}
+#endif /* !_DEV_MAX6675_MAX6675_H_ */
