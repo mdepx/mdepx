@@ -60,6 +60,14 @@
 #define	ST7789V_IDMOFF		0x38	/* Idle mode off */
 #define	ST7789V_IDMON		0x39	/* Idle mode on */
 #define	ST7789V_COLMOD		0x3A	/* Interface pixel format */
+#define	 COLMOD_RGB_FMT_S	4	/* RGB interface color format */
+#define	 COLMOD_RGB_FMT_65K	(5 << COLMOD_RGB_FMT_S)
+#define	 COLMOD_RGB_FMT_262K	(6 << COLMOD_RGB_FMT_S)
+#define	 COLMOD_CTRL_FMT_S	0	/* Control interface color format */
+#define	 COLMOD_CTRL_FMT_12BIT	(3 << COLMOD_CTRL_FMT_S)
+#define	 COLMOD_CTRL_FMT_16BIT	(5 << COLMOD_CTRL_FMT_S)
+#define	 COLMOD_CTRL_FMT_18BIT	(6 << COLMOD_CTRL_FMT_S)
+#define	 COLMOD_CTRL_FMT_16M	(7 << COLMOD_CTRL_FMT_S)
 #define	ST7789V_RAMWRC		0x3C	/* Memory write continue */
 #define	ST7789V_RAMRDC		0x3E	/* Memory read continue */
 #define	ST7789V_TESCAN		0x44	/* Set tear scanline */
