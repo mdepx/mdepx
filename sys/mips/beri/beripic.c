@@ -28,11 +28,19 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/types.h>
+#include <sys/cdefs.h>
 #include <sys/endian.h>
 
-#include <stdio.h>
+#define	BERIPIC_DEBUG
+#undef	BERIPIC_DEBUG
 
+#ifdef	BERIPIC_DEBUG
+#define	dprintf(fmt, ...)	printf(fmt, ##__VA_ARGS__)
+#else
+#define	dprintf(fmt, ...)
+#endif
+
+#include <machine/frame.h>
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
 
@@ -44,8 +52,50 @@
     *(volatile uint64_t *)((_sc)->res->ip_set + _reg) = _val
 #define	WR_IP_CLEAR(_sc, _reg, _val)	\
     *(volatile uint64_t *)((_sc)->res->ip_clear + _reg) = _val
+#define	RD_CFG(_sc, _reg)		\
+    *(volatile uint64_t *)((_sc)->res->cfg + _reg)
+#define	RD_IP_READ(_sc, _reg)		\
+    *(volatile uint64_t *)((_sc)->res->ip_read + _reg)
 
-#define	BERIPIC_NIRQS	32
+void
+beripic_intr(void *arg, struct trapframe *frame, int irq)
+{
+	struct beripic_softc *sc;
+	uint32_t hard_irq;
+	uint64_t reg;
+	uint64_t intr;
+	int i;
+
+	sc = arg;
+
+	hard_irq = (irq - 2);
+
+	intr = RD_IP_READ(sc, 0);
+	for (i = 0; i < 32; i++) {
+		if (intr & (1 << i)) {
+			reg = RD_CFG(sc, (i * 8));
+			if ((reg & BP_CFG_IRQ_M) != hard_irq)
+				continue;
+			if ((reg & BP_CFG_ENABLE) == 0)
+				continue;
+
+			if (sc->map[i].handler != NULL) {
+				sc->map[i].handler(sc->map[i].arg);
+				dprintf("%s: intr %d\n", __func__, i);
+			}
+
+			WR_IP_CLEAR(sc, 0, (1 << i));
+		}
+	}
+}
+
+void
+beripic_install_intr_map(struct beripic_softc *sc,
+    const struct beripic_intr_entry *map)
+{
+
+	sc->map = map;
+}
 
 void
 beripic_enable(struct beripic_softc *sc,
@@ -83,6 +133,7 @@ beripic_init(struct beripic_softc *sc,
 	res->cfg |= MIPS_XKPHYS_UNCACHED_BASE;
 	res->ip_set |= MIPS_XKPHYS_UNCACHED_BASE;
 	res->ip_clear |= MIPS_XKPHYS_UNCACHED_BASE;
+	res->ip_read |= MIPS_XKPHYS_UNCACHED_BASE;
 
 	for (i = 0; i < BERIPIC_NIRQS; i++)
 		WR_CFG(sc, i * 8, 0);

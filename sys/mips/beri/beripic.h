@@ -37,6 +37,8 @@
 #define	BP_CFG_TID_M		(0x7FFFFF << BP_CFG_TID_S)
 #define	BP_CFG_ENABLE		(1 << 31)
 
+#define	BERIPIC_NIRQS	32
+
 struct beripic_resource {
 	uint64_t cfg;
 	uint64_t ip_read;
@@ -44,12 +46,20 @@ struct beripic_resource {
 	uint64_t ip_clear;
 };
 
+struct beripic_intr_entry {
+	void (*handler) (void *arg);
+	void *arg;
+};
+
 struct beripic_softc {
 	struct beripic_resource *res;
+	const struct beripic_intr_entry *map;
 };
 
 int beripic_init(struct beripic_softc *sc, struct beripic_resource *res);
 void beripic_enable(struct beripic_softc *sc,
     uint32_t beripic_irq, uint32_t hard_irq);
+void beripic_intr(void *arg, struct trapframe *frame, int i);
+void beripic_install_intr_map(struct beripic_softc *sc, const struct beripic_intr_entry *map);
 
 #endif /* !_MIPS_BERI_BERIPIC_H_ */
