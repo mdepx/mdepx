@@ -33,8 +33,8 @@
 
 #include <stdio.h>
 
-#include <machine/cpufunc.h>
 #include <machine/cpuregs.h>
+#include <machine/cpufunc.h>
 
 #include <mips/beri/beripic.h>
 
