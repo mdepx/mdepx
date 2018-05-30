@@ -27,6 +27,7 @@
 #ifndef _SYS_SYSTM_H_
 #define _SYS_SYSTM_H_
 
-void udelay(uint32_t usec);
+void udelay(uint32_t usec);	/* polling delay */
+void usleep(uint32_t usec);	/* interrupt-driven sleep */
 
 #endif /* !_SYS_SYSTM_H_ */
