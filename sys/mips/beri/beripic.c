@@ -68,6 +68,8 @@ beripic_intr(void *arg, struct trapframe *frame, int irq)
 
 	sc = arg;
 
+	dprintf("%s\n", __func__);
+
 	hard_irq = (irq - 2);
 
 	intr = RD_IP_READ(sc, 0);

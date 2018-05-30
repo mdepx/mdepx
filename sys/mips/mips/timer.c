@@ -29,19 +29,33 @@
  */
 
 #include <sys/cdefs.h>
+#include <machine/frame.h>
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
 #include <mips/mips/timer.h>
 
+#define	TIMER_DEBUG
+#undef	TIMER_DEBUG
+
+#ifdef	TIMER_DEBUG
+#define	dprintf(fmt, ...)	printf(fmt, ##__VA_ARGS__)
+#else
+#define	dprintf(fmt, ...)
+#endif
+
 void
-mips_timer_intr(void *arg)
+mips_timer_intr(void *arg, struct trapframe *frame, int irq)
 {
 	struct mips_timer_softc *sc;
+
+	dprintf("%s\n", __func__);
 
 	sc = arg;
 
 	if (sc->usleep > 0)
 		sc->usleep = 0;
+
+	mips_wr_compare(-1);
 }
 
 void

@@ -78,6 +78,7 @@ mips_exception(struct trapframe *frame)
 	int i;
 
 	cause = mips_rd_cause();
+	dprintf("%s: cause %x\n", __func__, cause);
 	exc_code = (cause & MIPS_CR_EXC_CODE_M) >> \
 	    MIPS_CR_EXC_CODE_S;
 	switch (exc_code) {
