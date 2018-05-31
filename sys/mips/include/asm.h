@@ -52,9 +52,11 @@
 #if REG_SIZE == 4
 #define	REG_S		sw
 #define	REG_L		lw
+#define	PTR_LA		la
 #elif REG_SIZE == 8
 #define	REG_S		sd
 #define	REG_L		ld
+#define	PTR_LA		dla
 #endif
 
 #endif	/* !_MACHINE_ASM_H_ */

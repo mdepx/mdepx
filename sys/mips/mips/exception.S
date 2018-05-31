@@ -33,7 +33,7 @@ VECTOR(MipsException)
 	save_registers
 	nop
 	move	a0, sp
-	la	k0, mips_exception
+	PTR_LA	k0, mips_exception
 	jalr	k0
 	nop
 	restore_registers
