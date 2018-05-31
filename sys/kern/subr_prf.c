@@ -38,13 +38,10 @@
 
 /* __FBSDID("$FreeBSD: head/sys/kern/subr_prf.c 326656 2017-12-07 07:55:38Z bde $"); */
 
-#include <sys/types.h>
+#include <sys/cdefs.h>
 #include <sys/stddef.h>
 #include <sys/stdarg.h>
 #include <sys/libkern.h>
-
-#include <stdio.h>
-#include <string.h>
 
 /* Max number conversion buffer length: a u_quad_t in base 2, plus NUL byte. */
 #define MAXNBUF	(sizeof(intmax_t) * NBBY + 1)

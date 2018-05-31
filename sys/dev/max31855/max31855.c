@@ -24,10 +24,8 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/types.h>
+#include <sys/cdefs.h>
 #include <sys/endian.h>
-
-#include <stdio.h>
 
 #include <dev/spi/spi.h>
 #include <dev/max31855/max31855.h>
