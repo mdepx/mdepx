@@ -27,32 +27,6 @@
 #ifndef	_MACHINE_CPUFUNC_H_
 #define	_MACHINE_CPUFUNC_H_
 
-#define	CP0_USERLOCAL	$4,2
-#define	CP0_PAGEMASK	$5,0
-#define	CP0_TLB_SPEC	$5,4
-#define	CP0_WIRED	$6
-#define	CP0_BAD_VADDR	$8
-#define	CP0_COUNT	$9
-#define	CP0_COMPARE	$11
-#define	CP0_STATUS	$12,0
-#define	CP0_INTCTL	$12,1
-#define	CP0_CAUSE	$13,0
-#define	CP0_EXC_PC	$14
-#define	CP0_EBASE	$15,1
-#define	CP0_CONFIG	$16,0
-#define	CP0_CONFIG1	$16,1
-#define	CP0_CONFIG2	$16,2
-#define	CP0_CONFIG3	$16,3
-#define	CP0_CONFIG7	$16,7
-#define	CP0_LLADDR	$17,0
-#define	PMON_CSR	$17,7
-#define	PMON_HIGH	$17,4
-#define	PMON_LC		$17,5
-#define	PMON_RC		$17,6
-#define	CP0_WATCHLO	$18,0
-#define	CP0_WATCHHI	$19,0
-#define	CP0_ERRCTL	$26,0
-
 #define mtc0(reg, sel, value)						\
 	__asm __volatile(						\
 		"mtc0   %z0, $%1, %2"					\
@@ -79,7 +53,6 @@
 #define	mips_rd_config7()	mfc0(16, 7)
 #define	 CONFIG7_WII		(1 << 31)	/* Wait IE Ignore bit */
 
-#ifndef __ASSEMBLER__
 static __inline void
 intr_enable(void)
 {
@@ -108,6 +81,5 @@ intr_restore(register_t reg)
 	if (reg == MIPS_SR_IE)
 		intr_enable();
 };
-#endif
 
 #endif /* !_MACHINE_CPUFUNC_H_ */

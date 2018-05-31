@@ -92,4 +92,30 @@
 #define	MIPS_CR_CE_M		(0x3 << MIPS_CR_CE_S)
 #define	MIPS_CR_BD		(1 << 31)
 
+#define	CP0_USERLOCAL	$4,2
+#define	CP0_PAGEMASK	$5,0
+#define	CP0_TLB_SPEC	$5,4
+#define	CP0_WIRED	$6
+#define	CP0_BAD_VADDR	$8
+#define	CP0_COUNT	$9
+#define	CP0_COMPARE	$11
+#define	CP0_STATUS	$12,0
+#define	CP0_INTCTL	$12,1
+#define	CP0_CAUSE	$13,0
+#define	CP0_EXC_PC	$14
+#define	CP0_EBASE	$15,1
+#define	CP0_CONFIG	$16,0
+#define	CP0_CONFIG1	$16,1
+#define	CP0_CONFIG2	$16,2
+#define	CP0_CONFIG3	$16,3
+#define	CP0_CONFIG7	$16,7
+#define	CP0_LLADDR	$17,0
+#define	PMON_CSR	$17,7
+#define	PMON_HIGH	$17,4
+#define	PMON_LC		$17,5
+#define	PMON_RC		$17,6
+#define	CP0_WATCHLO	$18,0
+#define	CP0_WATCHHI	$19,0
+#define	CP0_ERRCTL	$26,0
+
 #endif /* !_MACHINE_CPUREGS_H_ */

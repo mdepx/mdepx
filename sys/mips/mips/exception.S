@@ -26,7 +26,7 @@
 
 #include <machine/regdef.h>
 #include <machine/asm.h>
-#include <machine/cpufunc.h>
+#include <machine/cpuregs.h>
 #include <mips/mips/saverestore.S>
 
 VECTOR(MipsException)
@@ -40,4 +40,4 @@ VECTOR(MipsException)
 	sync
 	eret
 	nop
-VECTOR_END(MipsExceptionEnd)
+VECTOR_END(MipsException)

@@ -36,7 +36,7 @@
 #define	VECTOR(sym)					\
 	.text; .globl sym; .ent sym; sym:
 #define	VECTOR_END(sym)					\
-	.text; .end sym; .globl sym; sym:
+	.text; .end sym; .globl sym ## End; sym ## End:
 
 #define	ENTRY(sym)					\
 	.text; .globl sym; .ent sym; sym:
