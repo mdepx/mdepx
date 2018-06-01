@@ -30,15 +30,20 @@
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-int
-stm32f4_flash_init(struct stm32f4_flash_softc *sc, uint32_t base)
+void
+stm32f4_flash_setup(struct stm32f4_flash_softc *sc)
 {
 	uint32_t reg;
 
-	sc->base = base;
-
 	reg = (ACR_LATENCY(5) | ACR_ICEN | ACR_DCEN | ACR_PRFTEN);
 	WR4(sc, FLASH_ACR, reg);
+}
+
+int
+stm32f4_flash_init(struct stm32f4_flash_softc *sc, uint32_t base)
+{
+
+	sc->base = base;
 
 	return (0);
 }

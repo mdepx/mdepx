@@ -31,7 +31,7 @@
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
-vos_init(struct stm32f4_pwr_softc *sc)
+stm32f4_vos_setup(struct stm32f4_pwr_softc *sc)
 {
 	uint32_t reg;
 
@@ -41,7 +41,7 @@ vos_init(struct stm32f4_pwr_softc *sc)
 }
 
 void
-pwr_init(struct stm32f4_pwr_softc *sc)
+stm32f4_pwr_setup(struct stm32f4_pwr_softc *sc)
 {
 	uint32_t reg;
 

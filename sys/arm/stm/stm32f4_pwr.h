@@ -42,7 +42,7 @@ struct stm32f4_pwr_softc {
 };
 
 int stm32f4_pwr_init(struct stm32f4_pwr_softc *sc, uint32_t base);
-void pwr_init(struct stm32f4_pwr_softc *sc);
-void vos_init(struct stm32f4_pwr_softc *sc);
+void stm32f4_pwr_setup(struct stm32f4_pwr_softc *sc);
+void stm32f4_vos_setup(struct stm32f4_pwr_softc *sc);
 
 #endif /* !_ARM_STM_STM32F4_PWR_H_ */

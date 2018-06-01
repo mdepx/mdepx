@@ -40,5 +40,6 @@ struct stm32f4_flash_softc {
 };
 
 int stm32f4_flash_init(struct stm32f4_flash_softc *sc, uint32_t base);
+void stm32f4_flash_setup(struct stm32f4_flash_softc *sc);
 
 #endif /* !_ARM_STM_STM32F4_FLASH_H_ */
