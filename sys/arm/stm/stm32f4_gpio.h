@@ -27,18 +27,6 @@
 #ifndef _ARM_STM_STM32F4_GPIO_H_
 #define _ARM_STM_STM32F4_GPIO_H_
 
-#define	PORT_A	0
-#define	PORT_B	1
-#define	PORT_C	2
-#define	PORT_D	3
-#define	PORT_E	4
-#define	PORT_F	5
-#define	PORT_G	6
-#define	PORT_H	7
-#define	PORT_I	8
-#define	PORT_J	9
-#define	PORT_K	10
-
 #define	GPIO_MODER(n)	(0x00 + 0x400 * n)
 #define	GPIO_OTYPER(n)	(0x04 + 0x400 * n)
 #define	GPIO_OSPEEDR(n)	(0x08 + 0x400 * n)
@@ -55,6 +43,20 @@
 #define	FLOAT		0
 #define	PULLUP		1
 #define	PULLDOWN	2
+
+enum {
+	PORT_A,
+	PORT_B,
+	PORT_C,
+	PORT_D,
+	PORT_E,
+	PORT_F,
+	PORT_G,
+	PORT_H,
+	PORT_I,
+	PORT_J,
+	PORT_K,
+};
 
 struct gpio_pin {
 	uint32_t	port;
