@@ -70,6 +70,18 @@
 #define	 TIM1EN		(1 << 0)
 
 #define	RCC_CFGR	0x08
+#define	 CFGR_PPRE2_S	13 /* APB high-speed prescaler (APB2) */
+#define	 CFGR_PPRE2_M	(0x7 << CFGR_PPRE2_S)
+#define	 CFGR_PPRE1_S	10 /* APB Low speed prescaler (APB1) */
+#define	 CFGR_PPRE1_M	(0x7 << CFGR_PPRE1_S)
+#define	 CFGR_HPRE_S	4 /* AHB prescaler */
+#define	 CFGR_HPRE_M	(0xf << CFGR_HPRE_S)
+#define	 CFGR_SW_S	0 /* System clock switch */
+#define	 CFGR_SW_M	(0x3 << CFGR_SW_S)
+#define	 CFGR_SW_PLLR	(0x3 << CFGR_SW_S)
+#define	 CFGR_SW_PLLP	(0x2 << CFGR_SW_S)
+#define	 CFGR_SW_HSE	(0x1 << CFGR_SW_S)
+#define	 CFGR_SW_HSI	(0x0 << CFGR_SW_S)
 #define	RCC_CR		0x00
 #define	 PLLSAIRDY	(1 << 29)
 #define	 PLLSAION	(1 << 28)

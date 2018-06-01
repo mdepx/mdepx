@@ -47,37 +47,33 @@ struct pllcfgr_s {
 static void
 rcc_reset(struct stm32f4_rcc_softc *sc)
 {
+#if 0
 	uint32_t reg;
 
-/* Enable the Internal High Speed clock (HSI) */
-
+	/* Enable the Internal High Speed clock (HSI) */
 	reg = RD4(sc, RCC_CR);
 	reg |= (HSION);
 	WR4(sc, RCC_CR, reg);
 
-/* Reset CFGR register */
-
+	/* Reset CFGR register */
 	WR4(sc, RCC_CFGR, 0);
 
-/* Reset HSION, HSEON, CSSON and PLLON bits */
-
+	/* Reset HSION, HSEON, CSSON and PLLON */
 	reg = RD4(sc, RCC_CR);
 	reg &= ~(HSION | HSEON | CSSON | PLLON);
 	WR4(sc, RCC_CR, reg);
 
-/* Reset PLLCFGR register to reset default */
-
+	/* Reset PLLCFGR register to reset default */
 	//WR4(sc, RCC_PLLCFGR, 0x24003010);
 
-/* Reset HSEBYP bit */
-
+	/* Reset HSEBYP bit */
 	reg = RD4(sc, RCC_CR);
 	reg &= ~(HSEBYP);
 	WR4(sc, RCC_CR, reg);
 
-/* Disable all interrupts */
-
+	/* Disable all interrupts */
 	WR4(sc, RCC_CIR, 0);
+#endif
 }
 
 int
@@ -106,16 +102,12 @@ stm32f4_rcc_setup(struct stm32f4_rcc_softc *sc, struct stm32f4_pwr_softc *pwr_sc
 	reg |= (PWREN);
 	WR4(sc, RCC_APB1ENR, reg);
 
-	stm32f4_vos_setup(pwr_sc);
+	//stm32f4_vos_setup(pwr_sc);
 
 	reg = RD4(sc, RCC_CFGR);
-	reg |= (4 << 13); //PPRE2 div by 2
-	reg |= (5 << 10); //PPRE1 div by 4
-	//reg |= (6 << 10); //PPRE1 div by 8
-	//reg |= (7 << 10); //PPRE1 div by 16
-	reg &= ~(0xf << 4); // AHB prescaler
-	//reg |= (10 << 4); /* div by 8 */
-	//reg |= (8 << 4); /* div by 2 */
+	reg |= (4 << CFGR_PPRE2_S); //PPRE2 div by 2
+	reg |= (5 << CFGR_PPRE1_S); //PPRE1 div by 4
+	reg &= ~(0xf << CFGR_HPRE_S); // AHB prescaler
 	WR4(sc, RCC_CFGR, reg);
 
 	pllcfgr.pllm = 0;
@@ -150,6 +142,7 @@ stm32f4_rcc_setup(struct stm32f4_rcc_softc *sc, struct stm32f4_pwr_softc *pwr_sc
 	while ((RD4(sc, RCC_CR) & PLLRDY) == 0)
 		;
 
+#if 0
 	/* SAI LCD */
 	switch(sc->hwtype) {
 	case HWTYPE_STM32F4:
@@ -188,6 +181,7 @@ stm32f4_rcc_setup(struct stm32f4_rcc_softc *sc, struct stm32f4_pwr_softc *pwr_sc
 		printf("unknown hwtype\n");
 		return (-1);
 	}
+#endif
 
 	if (sc->hwtype == HWTYPE_STM32F7) {
 		//PCLK2
@@ -211,12 +205,12 @@ stm32f4_rcc_setup(struct stm32f4_rcc_softc *sc, struct stm32f4_pwr_softc *pwr_sc
 		;
 #endif
 
-	stm32f4_pwr_setup(pwr_sc);
-	stm32f4_flash_setup(flash_sc);
+	//stm32f4_pwr_setup(pwr_sc);
+	//stm32f4_flash_setup(flash_sc);
 
 	reg = RD4(sc, RCC_CFGR);
-	reg &= ~(3 << 0);
-	reg |= (2 << 0); //PLL used as the system clock
+	reg &= ~(CFGR_SW_M);
+	reg |= CFGR_SW_PLLP;
 	WR4(sc, RCC_CFGR, reg);
 
 	while (((RD4(sc, RCC_CFGR) >> 2) & 2) != 2)
