@@ -32,108 +32,36 @@
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-enum {
-	HWTYPE_NONE,
-	HWTYPE_STM32F4,
-	HWTYPE_STM32F7,
-};
-
-struct pllcfgr_s {
-	int pllm;
-	int plln;
-	int pllq;
-};
-
-static void
-rcc_reset(struct stm32f4_rcc_softc *sc)
+void
+stm32f4_rcc_pll_configure(struct stm32f4_rcc_softc *sc,
+    int pllm, int plln, int pllq, int pllp, uint8_t external,
+    uint32_t rcc_cfgr)
 {
-#if 0
 	uint32_t reg;
 
-	/* Enable the Internal High Speed clock (HSI) */
-	reg = RD4(sc, RCC_CR);
-	reg |= (HSION);
-	WR4(sc, RCC_CR, reg);
+	if (external) {
+		/* Use external ocsillator */
+		reg = RD4(sc, RCC_CR);
+		reg |= HSEON;
+		WR4(sc, RCC_CR, reg);
+		while ((RD4(sc, RCC_CR) & HSERDY) == 0)
+			;
+	} else {
+		reg = RD4(sc, RCC_CR);
+		reg |= (HSION);
+		WR4(sc, RCC_CR, reg);
+		while ((RD4(sc, RCC_CR) & HSIRDY) == 0)
+			;
+	}
 
-	/* Reset CFGR register */
-	WR4(sc, RCC_CFGR, 0);
+	WR4(sc, RCC_CFGR, rcc_cfgr);
 
-	/* Reset HSION, HSEON, CSSON and PLLON */
-	reg = RD4(sc, RCC_CR);
-	reg &= ~(HSION | HSEON | CSSON | PLLON);
-	WR4(sc, RCC_CR, reg);
-
-	/* Reset PLLCFGR register to reset default */
-	//WR4(sc, RCC_PLLCFGR, 0x24003010);
-
-	/* Reset HSEBYP bit */
-	reg = RD4(sc, RCC_CR);
-	reg &= ~(HSEBYP);
-	WR4(sc, RCC_CR, reg);
-
-	/* Disable all interrupts */
-	WR4(sc, RCC_CIR, 0);
-#endif
-}
-
-int
-stm32f4_rcc_setup(struct stm32f4_rcc_softc *sc, struct stm32f4_pwr_softc *pwr_sc,
-    struct stm32f4_flash_softc *flash_sc)
-{
-	struct pllcfgr_s pllcfgr;
-	uint32_t reg;
-
-	rcc_reset(sc);
-
-	//reg = RD4(sc, RCC_CR);
-	//reg |= (HSION);
-	//WR4(sc, RCC_CR, reg);
-	//while ((RD4(sc, RCC_CR) & HSIRDY) == 0)
-	//	;
-
-	/* Use external ocsillator */
-	reg = RD4(sc, RCC_CR);
-	reg |= HSEON;
-	WR4(sc, RCC_CR, reg);
-	while ((RD4(sc, RCC_CR) & HSERDY) == 0)
-		;
-
-	reg = RD4(sc, RCC_APB1ENR);
-	reg |= (PWREN);
-	WR4(sc, RCC_APB1ENR, reg);
-
-	//stm32f4_vos_setup(pwr_sc);
-
-	reg = RD4(sc, RCC_CFGR);
-	reg |= (4 << CFGR_PPRE2_S); //PPRE2 div by 2
-	reg |= (5 << CFGR_PPRE1_S); //PPRE1 div by 4
-	reg &= ~(0xf << CFGR_HPRE_S); // AHB prescaler
-	WR4(sc, RCC_CFGR, reg);
-
-	pllcfgr.pllm = 0;
-	pllcfgr.plln = 0;
-	pllcfgr.pllq = 0;
-
-	switch (sc->hwtype) {
-	case HWTYPE_STM32F4:
-		pllcfgr.pllm = 8;
-		pllcfgr.plln = 336;
-		pllcfgr.pllq = 7;
-		break;
-	case HWTYPE_STM32F7:
-		pllcfgr.pllm = 25;
-		pllcfgr.plln = 432;
-		pllcfgr.pllq = 9;
-		break;
-	default:
-		printf("unknown pll");
-	};
-
-	reg = (pllcfgr.pllm << 0); //PLLM
-	reg |= (pllcfgr.plln << 6); //PLLN
-	reg |= (0 << 16); //PLLP = 2
-	reg |= (pllcfgr.pllq << 24); //PLLQ
-	reg |= (1 << 22); //PLLSRC - HSE
+	reg = (pllm << PLLCFGR_PLLM_S);
+	reg |= (plln << PLLCFGR_PLLN_S);
+	reg |= (pllq << PLLCFGR_PLLQ_S);
+	reg |= (pllp << PLLCFGR_PLLP_S);
+	if (external)
+		reg |= PLLCFGR_PLLSRC_HSE;
 	WR4(sc, RCC_PLLCFGR, reg);
 
 	reg = RD4(sc, RCC_CR);
@@ -141,130 +69,28 @@ stm32f4_rcc_setup(struct stm32f4_rcc_softc *sc, struct stm32f4_pwr_softc *pwr_sc
 	WR4(sc, RCC_CR, reg);
 	while ((RD4(sc, RCC_CR) & PLLRDY) == 0)
 		;
+}
 
-#if 0
-	/* SAI LCD */
-	switch(sc->hwtype) {
-	case HWTYPE_STM32F4:
-		reg = (192 << 6) | (7 << 24) | (4 << 28);
-		WR4(sc, RCC_PLLSAICFGR, reg);
-
-		reg = (0x2 << PLLSAIDIVR_S);
-		WR4(sc, RCC_DCKCFGR, reg);
-
-		break;
-	case HWTYPE_STM32F7:
-		reg = (192 << 6) | (4 << 24) | (5 << 28);
-		WR4(sc, RCC_PLLSAICFGR, reg);
-
-#if 1
-#define	 PLLI2SN_M	(0x1ff << PLLI2SN_S)
-#define	 PLLI2SQ_M	(0xf << PLLI2SQ_S)
-
-		/* (25000000/25)*429/(2*19) = 11289473 hz I2S */
-
-		reg = RD4(sc, RCC_PLLI2SCFGR);
-		reg &= ~(PLLI2SN_M);
-		reg = (429 << PLLI2SN_S);
-		reg &= ~(PLLI2SQ_M);
-		reg |= (2 << PLLI2SQ_S);
-		WR4(sc, RCC_PLLI2SCFGR, reg);
-
-		reg = (0x1 << PLLSAIDIVR_S);
-		reg |= (SAI2SEL_PLLI2S << SAI2SEL_S);
-		reg |= (8 << PLLI2SDIV_S);
-		WR4(sc, RCC_DCKCFGR, reg);
-#endif
-
-		break;
-	default:
-		printf("unknown hwtype\n");
-		return (-1);
-	}
-#endif
-
-	if (sc->hwtype == HWTYPE_STM32F7) {
-		//PCLK2
-		reg = (0 << USART6SEL_S);
-		reg |= (0 << I2C3SEL_S);
-		reg |= (SDMMCSEL_PLL48 << SDMMCSEL_S);
-		WR4(sc, RCC_DCKCFGR2, reg);
-	}
-
-	reg = RD4(sc, RCC_CR);
-	reg |= PLLSAION;
-	WR4(sc, RCC_CR, reg);
-	while ((RD4(sc, RCC_CR) & PLLSAIRDY) == 0)
-		;
-
-#if 1
-	reg = RD4(sc, RCC_CR);
-	reg |= CR_PLLI2SON;
-	WR4(sc, RCC_CR, reg);
-	while ((RD4(sc, RCC_CR) & CR_PLLI2SRDY) == 0)
-		;
-#endif
-
-	//stm32f4_pwr_setup(pwr_sc);
-	//stm32f4_flash_setup(flash_sc);
+int
+stm32f4_rcc_setup(struct stm32f4_rcc_softc *sc, uint32_t ahb1enr,
+    uint32_t ahb2enr, uint32_t ahb3enr, uint32_t apb1enr,
+    uint32_t apb2enr)
+{
+	uint32_t reg;
 
 	reg = RD4(sc, RCC_CFGR);
 	reg &= ~(CFGR_SW_M);
 	reg |= CFGR_SW_PLLP;
 	WR4(sc, RCC_CFGR, reg);
 
-	while (((RD4(sc, RCC_CFGR) >> 2) & 2) != 2)
+	while ((RD4(sc, RCC_CFGR) & CFGR_SWS_M) != CFGR_SWS_PLL)
 		;
 
-	/* AHB */
-	reg = RD4(sc, RCC_AHB1ENR);
-	reg |= (RCCAEN | RCCBEN | RCCCEN);
-	reg |= (RCCDEN | RCCEEN | RCCFEN);
-	reg |= (RCCGEN | RCCHEN | RCCIEN);
-	reg |= (RCCJEN | RCCKEN);
-	reg |= (OTGHSEN);
-	reg |= (DMA1EN | DMA2EN);
-	reg |= (ETHMACRXEN | ETHMACTXEN | ETHMACEN);
-	//reg |= (ETHMACPTPEN);
-	WR4(sc, RCC_AHB1ENR, reg);
-
-	reg = RD4(sc, RCC_AHB2ENR);
-	reg |= (OTGFSEN);
-	WR4(sc, RCC_AHB2ENR, reg);
-
-	reg = RD4(sc, RCC_AHB3ENR);
-	reg |= (FMCEN);
-	WR4(sc, RCC_AHB3ENR, reg);
-
-	/* APB */
-	reg = RD4(sc, RCC_APB1ENR);
-	reg |= (TIM2EN);
-	reg |= (I2C3EN);
-	reg |= (SPI2EN);
-	WR4(sc, RCC_APB1ENR, reg);
-
-	reg = RD4(sc, RCC_APB2ENR);
-	reg |= (USART1EN);
-	reg |= (USART6EN);
-	reg |= (SDMMC1EN);
-	reg |= (TIM1EN);
-	reg |= (SPI5EN);
-	reg |= (LTDCEN);
-	reg |= (DSIEN);
-	reg |= (SAI2EN);
-	reg |= (SYSCFGEN);
-	WR4(sc, RCC_APB2ENR, reg);
-
-	/* Reset I2C3 */
-	reg = RD4(sc, RCC_APB1RSTR);
-	reg |= (I2C3RST);
-	reg |= (SPI2RST);
-	WR4(sc, RCC_APB1RSTR, reg);
-
-	reg = RD4(sc, RCC_APB1RSTR);
-	reg &= ~(I2C3RST);
-	reg &= ~(SPI2RST);
-	WR4(sc, RCC_APB1RSTR, reg);
+	WR4(sc, RCC_AHB1ENR, ahb1enr);
+	WR4(sc, RCC_AHB2ENR, ahb2enr);
+	WR4(sc, RCC_AHB3ENR, ahb3enr);
+	WR4(sc, RCC_APB1ENR, apb1enr);
+	WR4(sc, RCC_APB2ENR, apb2enr);
 
 	return (0);
 }
@@ -274,7 +100,6 @@ stm32f4_rcc_init(struct stm32f4_rcc_softc *sc, uint32_t base)
 {
 
 	sc->base = base;
-	sc->hwtype = HWTYPE_STM32F4;
 
 	return (0);
 }
