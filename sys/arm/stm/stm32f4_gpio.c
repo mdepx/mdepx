@@ -47,9 +47,9 @@ pin_set(struct stm32f4_gpio_softc *sc, uint32_t port,
 #endif
 
 void
-pin_configure(struct stm32f4_gpio_softc *sc, struct gpio_pin *pins)
+pin_configure(struct stm32f4_gpio_softc *sc, const struct gpio_pin *pins)
 {
-	struct gpio_pin *cfg;
+	const struct gpio_pin *cfg;
 	uint32_t afr;
 	uint32_t reg;
 	int i;
