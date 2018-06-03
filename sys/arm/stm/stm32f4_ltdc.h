@@ -95,19 +95,6 @@
 #define	LTDC_L2CFBLNR	0x0134 /*   */
 #define	LTDC_L2CLUTWR	0x0144 /*   */
 
-struct layer_info {
-	uint32_t width;
-	uint32_t height;
-	uint32_t hsync;
-	uint32_t vsync;
-	uint32_t vfp;
-	uint32_t hfp;
-	uint32_t vbp;
-	uint32_t hbp;
-	uint32_t bpp;
-	uint32_t base;
-};
-
 struct stm32f4_ltdc_softc {
 	uint32_t base;
 };

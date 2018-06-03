@@ -25,6 +25,7 @@
  */
 
 #include <sys/cdefs.h>
+#include <dev/display/panel.h>
 #include <arm/stm/stm32f4_ltdc.h>
 
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
