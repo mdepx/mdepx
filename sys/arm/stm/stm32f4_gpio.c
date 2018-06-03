@@ -30,7 +30,6 @@
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-#if 0
 void
 pin_set(struct stm32f4_gpio_softc *sc, uint32_t port,
     uint32_t pin, uint32_t enable)
@@ -44,7 +43,6 @@ pin_set(struct stm32f4_gpio_softc *sc, uint32_t port,
 
 	WR4(sc, GPIO_BSSR(port), reg);
 }
-#endif
 
 void
 pin_configure(struct stm32f4_gpio_softc *sc, const struct gpio_pin *pins)

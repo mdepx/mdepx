@@ -74,5 +74,7 @@ int stm32f4_gpio_init(struct stm32f4_gpio_softc *sc, uint32_t base,
     uint32_t cpu_freq, uint32_t baud_rate);
 
 void pin_configure(struct stm32f4_gpio_softc *sc, const struct gpio_pin *pins);
+void pin_set(struct stm32f4_gpio_softc *sc, uint32_t port,
+    uint32_t pin, uint32_t enable);
 
 #endif /* !_ARM_STM_STM32F4_GPIO_H_ */
