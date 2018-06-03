@@ -55,7 +55,7 @@ stm32f4_dsi_short(dsi_device_t *dev, uint8_t vchid,
 
 static void
 stm32f4_dsi_long(dsi_device_t *dev, uint8_t vchid, uint32_t data_type,
-    uint32_t nparams, uint32_t param1, const uint8_t *params)
+    const uint8_t *params, uint32_t nparams)
 {
 	struct stm32f4_dsi_softc *sc;
 	uint32_t data0;
@@ -69,25 +69,16 @@ stm32f4_dsi_long(dsi_device_t *dev, uint8_t vchid, uint32_t data_type,
 	while ((RD4(sc, DSI_GPSR) & GPSR_CMDFE) != 1)
 		;
 	
-	for (i = 0; i < nparams; ) {
-		if (i == 0) {
-			reg = param1;
-			reg |= (params[i] << 8);
-			reg |= (params[i+1] << 16);
-			reg |= (params[i+2] << 24);
-			i += 3;
-		} else {
-			reg = params[i];
-			reg |= (params[i+1] << 8);
-			reg |= (params[i+2] << 16);
-			reg |= (params[i+3] << 24);
-			i += 4;
-		}
+	for (i = 0; i < nparams; i += 4) {
+		reg = params[i];
+		reg |= (params[i+1] << 8);
+		reg |= (params[i+2] << 16);
+		reg |= (params[i+3] << 24);
 		WR4(sc, DSI_GPDR, reg);
 	}
 
-	data0 = (nparams + 1) & 0xff;
-	data1 = ((nparams + 1) >> 8) & 0xff;
+	data0 = nparams & 0xff;
+	data1 = (nparams >> 8) & 0xff;
 
 	reg = (data_type << GHCR_DT_S);
 	reg |= (vchid << GHCR_VCID_S);

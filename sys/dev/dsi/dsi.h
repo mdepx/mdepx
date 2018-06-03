@@ -39,7 +39,7 @@ struct dsi_device {
 	void (*dsi_short)(struct dsi_device *, uint8_t vchid, uint8_t data_type,
 	    uint8_t data0, uint8_t data1);
 	void (*dsi_long)(struct dsi_device *, uint8_t vchid, uint32_t data_type,
-	    uint32_t nparams, uint32_t param1, const uint8_t *params);
+	    const uint8_t *params, uint32_t nparams);
 	void *arg;
 };
 
