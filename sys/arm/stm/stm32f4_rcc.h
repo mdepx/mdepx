@@ -146,5 +146,6 @@ void stm32f4_rcc_pll_configure(struct stm32f4_rcc_softc *sc,
 int stm32f4_rcc_setup(struct stm32f4_rcc_softc *sc, uint32_t ahb1enr,  
     uint32_t ahb2enr, uint32_t ahb3enr, uint32_t apb1enr,
     uint32_t apb2enr);
+void stm32f4_rcc_pllsai(struct stm32f4_rcc_softc *sc);
 
 #endif /* !_ARM_STM_STM32F4_RCC_H_ */

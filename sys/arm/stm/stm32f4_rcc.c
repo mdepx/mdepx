@@ -33,6 +33,24 @@
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
+stm32f4_rcc_pllsai(struct stm32f4_rcc_softc *sc)
+{
+	uint32_t reg;
+
+	reg = (192 << 6) | (7 << 24) | (4 << 28);
+	WR4(sc, RCC_PLLSAICFGR, reg);
+
+	reg = (0x2 << PLLSAIDIVR_S);
+	WR4(sc, RCC_DCKCFGR, reg);
+
+	reg = RD4(sc, RCC_CR);
+	reg |= PLLSAION;
+	WR4(sc, RCC_CR, reg);
+	while ((RD4(sc, RCC_CR) & PLLSAIRDY) == 0)
+		;
+}
+
+void
 stm32f4_rcc_pll_configure(struct stm32f4_rcc_softc *sc,
     int pllm, int plln, int pllq, int pllp, uint8_t external,
     uint32_t rcc_cfgr)
