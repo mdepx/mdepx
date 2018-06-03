@@ -31,7 +31,8 @@
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 static void
-stm32f4_ltdc_layer(struct stm32f4_ltdc_softc *sc, const struct layer_info *info, int i)
+stm32f4_ltdc_layer(struct stm32f4_ltdc_softc *sc,
+    const struct layer_info *info, int i)
 {
 	int nbytes_per_pixel;
 	uint32_t reg;
@@ -39,10 +40,14 @@ stm32f4_ltdc_layer(struct stm32f4_ltdc_softc *sc, const struct layer_info *info,
 	uint8_t *b;
 	uint32_t stride;
 
-	reg = (info->hsync + info->hbp) | ((info->hsync + info->hbp + info->width - 1) << 16);
+	printf("layer->base %x\n", info->base);
+
+	reg = (info->hsync + info->hbp) |
+	    ((info->hsync + info->hbp + info->width - 1) << 16);
 	WR4(sc, LTDC_LWHPCR(i), reg);
 
-	reg = (info->vsync + info->vbp) | ((info->vsync + info->vbp + info->height - 1) << 16);
+	reg = (info->vsync + info->vbp) |
+	    ((info->vsync + info->vbp + info->height - 1) << 16);
 	WR4(sc, LTDC_LWVPCR(i), reg);
 
 	if (info->bpp == 16)
@@ -63,13 +68,54 @@ stm32f4_ltdc_layer(struct stm32f4_ltdc_softc *sc, const struct layer_info *info,
 	/* Clear before enabling */
 	b = (uint8_t *)info->base;
 	for (p = 0; p < (stride * info->height); p++)
-		*(b + p) = 0;
+		*(b + p) = 0xff;
 
-	/* Enable the info */
+	/* Enable the layer */
 	reg = RD4(sc, LTDC_LCR(i));
 	reg |= (LCR_LEN);
 	WR4(sc, LTDC_LCR(i), reg);
 }
+
+static void
+stm32f4_ltdc_conf(struct stm32f4_ltdc_softc *sc,
+    const struct layer_info *info, int i)
+{
+	uint32_t reg;
+
+	reg = ((info->hsync - 1) << SSCR_HSW_S);
+	reg |= ((info->vsync - 1) << SSCR_VSW_S);
+	WR4(sc, LTDC_SSCR, reg);
+
+	reg = ((info->hsync + info->hbp - 1) << BPCR_AHBP_S);
+	reg |= ((info->vsync + info->vbp - 1) << BPCR_AVBP_S);
+	WR4(sc, LTDC_BPCR, reg);
+
+	reg = ((info->vsync + info->vbp + info->height - 1) << AWCR_AAH_S);
+	reg |= ((info->hsync + info->hbp + info->width - 1) << AWCR_AAW_S);
+	WR4(sc, LTDC_AWCR, reg);
+
+	reg = ((info->vsync + info->vbp + info->height + info->vfp - 1) << TWCR_TOTALH_S);
+	reg |= ((info->hsync + info->hbp + info->width + info->hfp - 1) << TWCR_TOTALW_S);
+	WR4(sc, LTDC_TWCR, reg);
+
+	/* Background color */
+	WR4(sc, LTDC_BCCR, 0xeeffee);
+
+	stm32f4_ltdc_layer(sc, info, i);
+
+	WR4(sc, LTDC_SRCR, SRCR_IMR);
+
+	reg = RD4(sc, LTDC_GCR);
+	//reg |= (GCR_HSPOL | GCR_VSPOL | GCR_DEPOL | GCR_PCPOL);
+	WR4(sc, LTDC_GCR, reg);
+
+	reg = RD4(sc, LTDC_GCR);
+	reg |= (GCR_LTDCEN);
+	WR4(sc, LTDC_GCR, reg);
+
+	printf("ltdc initialized\n");
+}
+
 
 void
 stm32f4_ltdc_setup(struct stm32f4_ltdc_softc *sc,
@@ -78,7 +124,7 @@ stm32f4_ltdc_setup(struct stm32f4_ltdc_softc *sc,
 	int i;
 
 	for (i = 0; i < nlayers; i++)
-		stm32f4_ltdc_layer(sc, &info[i], i);
+		stm32f4_ltdc_conf(sc, &info[i], i);
 }
 
 int
