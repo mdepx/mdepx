@@ -71,9 +71,12 @@ stm32f4_dsi_long(dsi_device_t *dev, uint8_t vchid, uint32_t data_type,
 	
 	for (i = 0; i < nparams; i += 4) {
 		reg = params[i];
-		reg |= (params[i+1] << 8);
-		reg |= (params[i+2] << 16);
-		reg |= (params[i+3] << 24);
+		if ((i + 1) < nparams)
+			reg |= (params[i + 1] << 8);
+		if ((i + 2) < nparams)
+			reg |= (params[i + 2] << 16);
+		if ((i + 3) < nparams)
+			reg |= (params[i + 3] << 24);
 		WR4(sc, DSI_GPDR, reg);
 	}
 
