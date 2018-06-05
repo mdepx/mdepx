@@ -37,9 +37,6 @@ stm32f4_ltdc_layer(struct stm32f4_ltdc_softc *sc,
 {
 	int nbytes_per_pixel;
 	uint32_t reg;
-	uint32_t p;
-	uint8_t *b;
-	uint32_t stride;
 
 	printf("layer->base %x\n", info->base);
 
@@ -63,13 +60,6 @@ stm32f4_ltdc_layer(struct stm32f4_ltdc_softc *sc,
 	reg = ((info->width * nbytes_per_pixel) << 16);
 	reg |= ((info->width * nbytes_per_pixel) + 3);
 	WR4(sc, LTDC_LCFBLR(i), reg);
-
-	stride = (info->width * info->bpp / 8);
-
-	/* Clear before enabling */
-	b = (uint8_t *)info->base;
-	for (p = 0; p < (stride * info->height); p++)
-		*(b + p) = 0xff;
 
 	/* Enable the layer */
 	reg = RD4(sc, LTDC_LCR(i));
