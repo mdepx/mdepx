@@ -154,11 +154,11 @@ otm8009a_init(dsi_device_t *dev, enum otm_format fmt,
 
 	switch (fmt) {
 	case OTM_FMT_RGB888:
-		dcs_write_cmd(dev, OTM_CMD_COLMOD,
+		dcs_write_seq(dev, OTM_CMD_COLMOD,
 		    (COLMOD_VIPF_24_1 | COLMOD_IFPF_24));
 		break;
 	case OTM_FMT_RGB565:
-		dcs_write_cmd(dev, OTM_CMD_COLMOD,
+		dcs_write_seq(dev, OTM_CMD_COLMOD,
 		    (COLMOD_VIPF_16 | COLMOD_IFPF_16));
 	default:
 		break;
@@ -169,9 +169,9 @@ otm8009a_init(dsi_device_t *dev, enum otm_format fmt,
 	 * so configure landspace if required
 	 */
 	if (orientation == OTM_ORIENTATION_LANDSCAPE) {
-		dcs_write_cmd(dev, OTM_CMD_MADCTL, (MADCTL_MV | MADCTL_MX));
-		dcs_write_cmd(dev, OTM_CMD_CASET, 0x00, 0x00, 0x03, 0x1F);
-		dcs_write_cmd(dev, OTM_CMD_PASET, 0x00, 0x00, 0x01, 0xDF);
+		dcs_write_seq(dev, OTM_CMD_MADCTL, (MADCTL_MV | MADCTL_MX));
+		dcs_write_seq(dev, OTM_CMD_CASET, 0x00, 0x00, 0x03, 0x1F);
+		dcs_write_seq(dev, OTM_CMD_PASET, 0x00, 0x00, 0x01, 0xDF);
 	}
 
 	/* Content Adaptive Backlight Control */
