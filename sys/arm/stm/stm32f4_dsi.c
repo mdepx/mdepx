@@ -221,7 +221,7 @@ stm32f4_dsi_setup(struct stm32f4_dsi_softc *sc,
 
 	/* TODO: calculate this */
 	lane_byte_clk_khz = 62500;
-	lcd_clock = 27429;
+	lcd_clock = 4000;
 
 	HorizontalLine = ((info->width + info->hsync + info->hbp + info->hfp)
 	    * lane_byte_clk_khz) / lcd_clock;
