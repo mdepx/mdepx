@@ -35,6 +35,7 @@
 #include <arm/stm/stm32f4_fmc.h>
 #include <arm/stm/stm32f4_ltdc.h>
 #include <arm/stm/stm32f4_dsi.h>
+#include <arm/stm/stm32f4_timer.h>
 
 #define	USART6_BASE	0x40011400
 #define	FLASH_BASE	0x40023C00
@@ -45,5 +46,6 @@
 #define	LTDC_BASE	0x40016800
 #define	DSI_BASE	0x40016C00
 #define	NVIC_BASE	0xE000E000
+#define	TIM2_BASE	0x40000000
 
 #endif	/* !_ARM_STM_STM32F4_H_ */
