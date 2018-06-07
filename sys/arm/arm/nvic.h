@@ -39,6 +39,6 @@ struct arm_nvic_softc {
 };
 
 int arm_nvic_init(struct arm_nvic_softc *sc, uint32_t base);
-void arm_nvic_setup(struct arm_nvic_softc *sc);
+void arm_nvic_enable_intr(struct arm_nvic_softc *sc, uint32_t intr);
 
 #endif /* !_ARM_ARM_NVIC_H_ */

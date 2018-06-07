@@ -30,10 +30,19 @@
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
+#if 0
 void
-arm_nvic_setup(struct arm_nvic_softc *sc)
+arm_nvic_intr(struct trapframe *frame, uint32_t intr)
 {
 
+}
+#endif
+
+void
+arm_nvic_enable_intr(struct arm_nvic_softc *sc, uint32_t n)
+{
+
+	WR4(sc, NVIC_ISER((n / 32)), (1 << (n % 32)));
 }
 
 int
