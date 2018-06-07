@@ -24,47 +24,25 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
+	.cpu cortex-m4
+	.syntax unified
+	.thumb
 
-#include <machine/frame.h>
-
-#include <arm/arm/nvic.h>
-
-#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
-#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
-
-static const struct nvic_intr_entry *map;
-
-void
-arm_nvic_install_intr_map(struct arm_nvic_softc *sc,
-    const struct nvic_intr_entry *m)
-{
-
-	map = m;
-}
-
-void
-arm_nvic_intr(uint32_t irq, struct trapframe *frame)
-{
-
-	if (map[irq].handler != NULL)
-		map[irq].handler(map[irq].arg, frame, irq);
-	else
-		printf("%s: spurious intr %d\n", __func__, irq);
-}
-
-void
-arm_nvic_enable_intr(struct arm_nvic_softc *sc, uint32_t n)
-{
-
-	WR4(sc, NVIC_ISER((n / 32)), (1 << (n % 32)));
-}
-
-int
-arm_nvic_init(struct arm_nvic_softc *sc, uint32_t base)
-{
-
-	sc->base = base;
-
-	return (0);
-}
+	.globl exception
+	.text
+	.thumb_func
+	.type exception, function
+exception:
+	mrs	r0, ipsr		/* r0 = exception number */
+	mov	r2, sp
+	mrs	r3, primask
+	stmdb	sp!, {r2-r11, r14}	/* save r4-r11, r14, sp and primask */
+	cpsid	i			/* disable interrupts */
+	mov	r1, sp
+	mov	r4, sp
+	bl	arm_exception		/* r0 = irq number, r1 = registers saved on stack */
+	mov	r1, r4
+	ldmia	r1!, {r2-r11, r14}
+	msr 	msp, r1
+	msr	primask, r3		/* restore interrupts */
+	bx	r14

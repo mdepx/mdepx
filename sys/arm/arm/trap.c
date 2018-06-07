@@ -25,46 +25,19 @@
  */
 
 #include <sys/cdefs.h>
-
 #include <machine/frame.h>
-
 #include <arm/arm/nvic.h>
 
-#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
-#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
-
-static const struct nvic_intr_entry *map;
+void arm_exception(int irq, struct trapframe *tf);
 
 void
-arm_nvic_install_intr_map(struct arm_nvic_softc *sc,
-    const struct nvic_intr_entry *m)
+arm_exception(int exc_code, struct trapframe *tf)
 {
+	uint32_t irq;
 
-	map = m;
-}
-
-void
-arm_nvic_intr(uint32_t irq, struct trapframe *frame)
-{
-
-	if (map[irq].handler != NULL)
-		map[irq].handler(map[irq].arg, frame, irq);
-	else
-		printf("%s: spurious intr %d\n", __func__, irq);
-}
-
-void
-arm_nvic_enable_intr(struct arm_nvic_softc *sc, uint32_t n)
-{
-
-	WR4(sc, NVIC_ISER((n / 32)), (1 << (n % 32)));
-}
-
-int
-arm_nvic_init(struct arm_nvic_softc *sc, uint32_t base)
-{
-
-	sc->base = base;
-
-	return (0);
+	if (exc_code >= 16) {
+		irq = exc_code - 16;
+		arm_nvic_intr(irq, tf);
+	} else
+		printf("unhandled exception %d\n", exc_code);
 }
