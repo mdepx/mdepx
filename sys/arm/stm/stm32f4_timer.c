@@ -68,9 +68,14 @@ stm32f4_timer_setup(struct stm32f4_timer_softc *sc, uint32_t usec)
 	WR4(sc, TIM_DIER, reg);
 }
 
-
 void
 stm32f4_timer_udelay(struct stm32f4_timer_softc *sc, uint32_t usec)
+{
+
+}
+
+void
+stm32f4_timer_usleep(struct stm32f4_timer_softc *sc, uint32_t usec)
 {
 	uint32_t primask;
 

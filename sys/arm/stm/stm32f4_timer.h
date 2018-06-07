@@ -63,5 +63,6 @@ int stm32f4_timer_init(struct stm32f4_timer_softc *sc,
 void stm32f4_timer_setup(struct stm32f4_timer_softc *sc, uint32_t usec);
 void stm32f4_timer_intr(void *arg, struct trapframe *tf, int irq);
 void stm32f4_timer_udelay(struct stm32f4_timer_softc *sc, uint32_t usec);
+void stm32f4_timer_usleep(struct stm32f4_timer_softc *sc, uint32_t usec);
 
 #endif /* !_ARM_STM_STM32F4_TIMER_H_ */
