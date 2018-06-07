@@ -25,18 +25,35 @@
  */
 
 #include <sys/cdefs.h>
+
+#include <machine/frame.h>
+
 #include <arm/arm/nvic.h>
 
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-#if 0
+static const struct nvic_intr_entry *map;
+
 void
-arm_nvic_intr(struct trapframe *frame, uint32_t intr)
+arm_nvic_install_intr_map(struct arm_nvic_softc *sc,
+    const struct nvic_intr_entry *m)
 {
 
+	map = m;
 }
-#endif
+
+void
+arm_nvic_intr(uint32_t irq, struct trapframe *frame)
+{
+
+	irq -= 16;
+
+	if (map[irq].handler != NULL)
+		map[irq].handler(map[irq].arg, frame, irq);
+	else
+		printf("%s: spurious intr %d\n", __func__, irq);
+}
 
 void
 arm_nvic_enable_intr(struct arm_nvic_softc *sc, uint32_t n)

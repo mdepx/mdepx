@@ -34,11 +34,18 @@
 #define	NVIC_ISER(n)	(0x100 + 0x4 * n)
 #define	NVIC_ICPR(n)	(0x280 + 0x4 * n)
 
+struct nvic_intr_entry {
+	void (*handler) (void *arg, struct trapframe *frame, int irq);
+	void *arg;
+};
+
 struct arm_nvic_softc {
 	uint32_t base;
 };
 
 int arm_nvic_init(struct arm_nvic_softc *sc, uint32_t base);
 void arm_nvic_enable_intr(struct arm_nvic_softc *sc, uint32_t intr);
+void arm_nvic_intr(uint32_t irq, struct trapframe *frame);
+void arm_nvic_install_intr_map(struct arm_nvic_softc *sc, const struct nvic_intr_entry *m);
 
 #endif /* !_ARM_ARM_NVIC_H_ */
