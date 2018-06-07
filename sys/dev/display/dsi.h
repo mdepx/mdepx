@@ -24,8 +24,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_DEV_DSI_DSI_H_
-#define	_DEV_DSI_DSI_H_
+#ifndef	_DEV_DISPLAY_DSI_H_
+#define	_DEV_DISPLAY_DSI_H_
 
 #define	DSI_DCS_SHORT_PKT_WRITE_P0	0x05 /* DCS short write, no parameters */
 #define	DSI_DCS_SHORT_PKT_WRITE_P1	0x15 /* DCS short write, one parameter */
@@ -46,4 +46,4 @@ struct dsi_device {
 
 typedef struct dsi_device dsi_device_t;
 
-#endif /* !_DEV_DSI_DSI_H_ */
+#endif /* !_DEV_DISPLAY_DSI_H_ */

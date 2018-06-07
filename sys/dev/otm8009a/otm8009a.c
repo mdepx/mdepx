@@ -26,7 +26,7 @@
 
 #include <sys/cdefs.h>
 #include <sys/systm.h>
-#include <dev/dsi/dsi.h>
+#include <dev/display/dsi.h>
 #include <dev/otm8009a/otm8009a.h>
 
 #define	OTM8009A_DEBUG

@@ -26,7 +26,7 @@
 
 #include <sys/cdefs.h>
 #include <dev/display/panel.h>
-#include <dev/dsi/dsi.h>
+#include <dev/display/dsi.h>
 
 #include <arm/stm/stm32f4_dsi.h>
 
