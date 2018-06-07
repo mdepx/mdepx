@@ -24,76 +24,34 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
-#include <machine/frame.h>
-#include <arm/stm/stm32f4_timer.h>
+#ifndef	_MACHINE_FRAME_H_
+#define	_MACHINE_FRAME_H_
 
-#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
-#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+#ifndef __ASSEMBLER__
+struct hwregs {
+	uint32_t r0;
+	uint32_t r1;
+	uint32_t r2;
+	uint32_t r3;
+	uint32_t r12;
+	uint32_t r14; /* lr */
+	uint32_t r15; /* pc */
+	uint32_t xpsr;
+};
 
-void
-stm32f4_timer_intr(void *arg, struct trapframe *tf, int irq)
-{
-	struct stm32f4_timer_softc *sc;
-	uint32_t reg;
+struct trapframe {
+	struct hwregs	*hwregs;
+	register_t	tf_primask;
+	register_t	tf_r4;
+	register_t	tf_r5;
+	register_t	tf_r6;
+	register_t	tf_r7;
+	register_t	tf_r8;
+	register_t	tf_r9;
+	register_t	tf_r10;
+	register_t	tf_r11;
+	register_t	tf_r14;
+};
+#endif
 
-	sc = arg;
-
-	reg = RD4(sc, TIM_SR);
-	reg &= ~SR_UIF;
-	WR4(sc, TIM_SR, reg);
-
-	reg = RD4(sc, TIM_DIER);
-	reg &= ~DIER_UIE;
-	WR4(sc, TIM_DIER, reg);
-}
-
-void
-stm32f4_timer_setup(struct stm32f4_timer_softc *sc, uint32_t usec)
-{
-	uint32_t ticks;
-	uint32_t reg;
-
-	ticks = usec * (sc->freq / 1000000);
-
-	WR4(sc, TIM_CNT, ticks);
-
-	reg = RD4(sc, TIM_CR1);
-	reg |= CR1_CEN;
-	reg |= CR1_DIR;
-	WR4(sc, TIM_CR1, reg);
-
-	reg = RD4(sc, TIM_DIER);
-	reg |= DIER_UIE;
-	WR4(sc, TIM_DIER, reg);
-}
-
-
-void
-stm32f4_timer_udelay(struct stm32f4_timer_softc *sc, uint32_t usec)
-{
-	uint32_t primask;
-
-	__asm __volatile( "mrs     %0, primask\n"
-	    : "=&r" (primask) :: "memory");
-
-	__asm __volatile("cpsid i");
-
-	stm32f4_timer_setup(sc, usec);
-
-	__asm __volatile("wfi");
-
-	__asm __volatile( "msr     primask, %0\n"
-	    :: "r" (primask) : "memory");
-}
-
-int
-stm32f4_timer_init(struct stm32f4_timer_softc *sc,
-    uint32_t base, uint32_t freq)
-{
-
-	sc->base = base;
-	sc->freq = freq;
-
-	return (0);
-}
+#endif /* !_MACHINE_FRAME_H_ */
