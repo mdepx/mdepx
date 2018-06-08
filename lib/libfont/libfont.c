@@ -293,7 +293,7 @@ bitmaps(struct font_info *font, uint8_t *ptr, uint32_t size)
 	dprintf("sizes %x\n", be32toh(*bitmapSizes));
 }
 
-void
+int
 font_init(struct font_info *font, uint8_t *header)
 {
 	struct toc_entry *entry;
@@ -301,7 +301,9 @@ font_init(struct font_info *font, uint8_t *header)
 	uint8_t *addr;
 	int i;
 
-	/* TODO: header is always "\1fcp" */
+	if (header[0] != '\1' || header[1] != 'f' ||
+	    header[2] != 'c' || header[3] != 'p')
+		return (-1);
 
 	dprintf("%s\n", __func__);
 
@@ -354,4 +356,6 @@ font_init(struct font_info *font, uint8_t *header)
 		dprintf("entry %d size %d\n", i, entry->size);
 		dprintf("entry %d offset %d\n", i, entry->offset);
 	}
+
+	return (0);
 }

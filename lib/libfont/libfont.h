@@ -50,7 +50,7 @@ struct char_info {
 	uint32_t ysize;
 };
 
-void font_init(struct font_info *font, uint8_t *header);
+int font_init(struct font_info *font, uint8_t *header);
 void draw_char(struct font_info *font, uint16_t c);
 void get_char_info(struct font_info *font, uint16_t c,
     struct char_info *ci);
