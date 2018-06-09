@@ -27,6 +27,16 @@
 #ifndef	_MIPS_MICROCHIP_PIC32MZDA_H_
 #define	_MIPS_MICROCHIP_PIC32MZDA_H_
 
+#include <mips/microchip/pic32.h>
+#include <mips/microchip/pic32mz.h>
+#include <mips/microchip/pic32_uart.h>
+#include <mips/microchip/pic32_timer.h>
+#include <mips/microchip/pic32_intc.h>
+#include <mips/microchip/pic32_spi.h>
+#include <mips/microchip/pic32_pps.h>
+#include <mips/microchip/pic32_port.h>
+#include <mips/microchip/pic32_syscfg.h>
+
 #define	_CORE_TIMER_VECTOR		0
 #define	_CORE_SOFTWARE_0_VECTOR		1
 #define	_CORE_SOFTWARE_1_VECTOR		2
