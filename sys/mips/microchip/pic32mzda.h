@@ -239,4 +239,96 @@
 #define	_ADC7_WARM_VECTOR		214
 #define	_MPLL_FAULT_VECTOR		215
 
+/* Peripheral Pin Select */
+
+/* Input Selection Set 2 */
+#define	 IS2_RPD9	0b0000
+#define	 IS2_RESERVED0	0b0001
+#define	 IS2_RPB8	0b0010
+#define	 IS2_RPB15	0b0011
+#define	 IS2_RPD4	0b0100
+#define	 IS2_RPB0	0b0101
+#define	 IS2_RPE3	0b0110
+#define	 IS2_RPB7	0b0111
+#define	 IS2_RESERVED1	0b1000
+#define	 IS2_RPF12	0b1001
+#define	 IS2_RFD12	0b1010
+#define	 IS2_RPF8	0b1011
+#define	 IS2_RPC3	0b1100
+#define	 IS2_RPE9	0b1101
+#define	 IS2_RESERVED2	0b1110
+#define	 IS2_RESERVED3	0b1111
+
+/* Output Selection Set 0 */
+#define	 OS0_NO_CONNECT	0b0000
+#define	 OS0_U3TX	0b0001
+#define	 OS0_U4RTS	0b0010
+#define	 OS0_RESERVED0	0b0011
+#define	 OS0_RESERVED1	0b0100
+#define	 OS0_SDO1	0b0101
+#define	 OS0_SDO2	0b0110
+#define	 OS0_SDO3	0b0111
+#define	 OS0_RESERVED2	0b1000
+#define	 OS0_SDO5	0b1001
+#define	 OS0_SS6	0b1010
+#define	 OS0_OC3	0b1011
+#define	 OS0_OC6	0b1100
+#define	 OS0_REFCLKO4	0b1101
+#define	 OS0_C2OUT	0b1110
+#define	 OS0_C1TX	0b1111
+
+/* Output Selection Set 1 */
+#define	 OS1_NO_CONNECT	0b0000
+#define	 OS1_U1TX	0b0001
+#define	 OS1_U2RTS	0b0010
+#define	 OS1_U5TX	0b0011
+#define	 OS1_U6RTS	0b0100
+#define	 OS1_SDO1	0b0101
+#define	 OS1_SDO2	0b0110
+#define	 OS1_SDO3	0b0111
+#define	 OS1_SDO4	0b1000
+#define	 OS1_SDO5	0b1001
+#define	 OS1_RESERVED0	0b1010
+#define	 OS1_OC4	0b1011
+#define	 OS1_OC7	0b1100
+#define	 OS1_RESERVED1	0b1101
+#define	 OS1_RESERVED2	0b1110
+#define	 OS1_REFCLKO1	0b1111
+
+/* Output Selection Set 2 */
+#define	 OS2_NO_CONNECT	0b0000
+#define	 OS2_U3RTS	0b0001
+#define	 OS2_U4TX	0b0010
+#define	 OS2_RESERVED0	0b0011
+#define	 OS2_U6TX	0b0100
+#define	 OS2_SS1	0b0101
+#define	 OS2_RESERVED1	0b0110
+#define	 OS2_SS3	0b0111
+#define	 OS2_SS4	0b1000
+#define	 OS2_SS5	0b1001
+#define	 OS2_SDO6	0b1010
+#define	 OS2_OC5	0b1011
+#define	 OS2_OC8	0b1100
+#define	 OS2_RESERVED2	0b1101
+#define	 OS2_C1OUT	0b1110
+#define	 OS2_REFCLKO3	0b1111
+
+/* Output Selection Set 3 */
+#define	 OS3_NO_CONNECT	0b0000
+#define	 OS3_U1RTS	0b0001
+#define	 OS3_U2TX	0b0010
+#define	 OS3_U5RTS	0b0011
+#define	 OS3_U6TX	0b0100
+#define	 OS3_RESERVED0	0b0101
+#define	 OS3_SS2	0b0110
+#define	 OS3_RESERVED1	0b0111
+#define	 OS3_SDO4	0b1000
+#define	 OS3_RESERVED2	0b1001
+#define	 OS3_SDO6	0b1010
+#define	 OS3_OC2	0b1011
+#define	 OS3_OC1	0b1100
+#define	 OS3_OC9	0b1101
+#define	 OS3_RESERVED3	0b1110
+#define	 OS3_C2TX	0b1111
+
 #endif /* !_MIPS_MICROCHIP_PIC32MZDA_H_ */

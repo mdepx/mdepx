@@ -27,40 +27,14 @@
 #ifndef _MIPS_MICROCHIP_PIC32_PPS_H_
 #define	_MIPS_MICROCHIP_PIC32_PPS_H_
 
-/* MZEF */
+/* Peripheral Pin Select Input Register Map */
 #define	PPS_U2RXR	0x070
 #define	PPS_U4RXR	0x080
-#define	 RPD1		0x0
-#define	 RPG9		0x1
-#define	 RPB14		0x2
-#define	 RPD0		0x3
-#define	 RPB6		0x5
-#define	 RPD5		0x6
-#define	 RPB2		0x7
-#define	 RPF3		0x8
-#define	 RPF13_1	0x9
-#define	 RPF2_1		0xb
-#define	 RPC2_1		0xc
-#define	 RPE8_1		0xd
 
-#define	RPB0		5
 /* Peripheral Pin Select Output Register Map */
 #define	PPS_RPG8R	0x2A0
 #define	PPS_RPG9R	0x2A4
 #define	PPS_RPD4R	0x1D0
-#define	 NO_CONNECT	0b0000
-#define	 U3RTS		0b0001
-#define	 U4TX		0b0010
-#define	 U6TX		0b0100
-#define	 SS1		0b0101
-#define	 SS3		0b0111
-#define	 SS4		0b1000
-#define	 SS5_1		0b1001
-#define	 SDO6_1		0b1010
-#define	 OC5		0b1011
-#define	 OC8		0b1100
-#define	 C1OUT		0b1110
-#define	 REFCLKO3	0b1111
 
 struct pic32_pps_softc {
 	uint32_t base;
