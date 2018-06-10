@@ -28,8 +28,6 @@
 
 #include <mips/microchip/pic32_ccp.h>
 
-static struct pic32_ccp_softc *pic32_ccp_sc;
-
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
@@ -41,8 +39,6 @@ pic32_ccp_init(struct pic32_ccp_softc *sc,
 	uint32_t freq;
 
 	sc->base = base;
-
-	pic32_ccp_sc = sc;
 
 	WR4(sc, CCPCON1, 0);
 

@@ -28,8 +28,6 @@
 
 #include <mips/microchip/pic32_uart.h>
 
-static struct pic32_uart_softc *pic32_uart_sc;
-
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
@@ -51,8 +49,6 @@ pic32_uart_init(struct pic32_uart_softc *sc, uint32_t base,
 	uint32_t freq;
 
 	sc->base = base;
-
-	pic32_uart_sc = sc;
 
 	WR4(sc, UART_MODE, 0);
 	WR4(sc, UART_STA, 0);
