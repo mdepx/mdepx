@@ -274,6 +274,12 @@ struct ddr2_sdram {
 	uint32_t t_faw;		/* 4-bank activate period (1Gb) */
 	uint32_t t_mrd_tck;	/* LOAD MODE cycle time */
 	uint32_t t_refi;	/* Average periodic refresh */
+
+	/* Addressing */
+	uint8_t col_bits;	/* Column Address Shift bits */
+	uint8_t ba_bits;	/* Bank Address Select Shift bits */
+	uint8_t row_bits;	/* Row Address Select Shift bits */
+	uint8_t cs_bits;	/* Chip Select Shift bits */
 };
 
 struct pic32_ddr_softc {
