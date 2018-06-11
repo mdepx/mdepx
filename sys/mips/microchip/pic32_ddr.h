@@ -231,8 +231,56 @@
 #define	 DLYSTVAL_M		(0xf << DLYSTVAL_S)
 #define	DDR_PHYCLKDLY		0x1140
 
+#define	IDLE_NOP	(CLKENCMD1 | CSCMD1_M | RASCMD1 | CASCMD1 | \
+			 WENCMD1 | CLKENCMD2 | CSCMD2_M | \
+			 RASCMD2 | CASCMD2 | WENCMD2)
+#define	PRECH_ALL_CMD	(CLKENCMD1 | CASCMD1 | CLKENCMD2 | CSCMD2_M | \
+			 RASCMD2 | CASCMD2 | WENCMD2)
+#define	REF_CMD		(CLKENCMD1 | WENCMD1 | CLKENCMD2 | CSCMD2_M | \
+			 RASCMD2 | CASCMD2 | WENCMD2)
+#define	LOAD_MODE_CMD	(CLKENCMD1 | CLKENCMD2 | CSCMD2_M | \
+			 RASCMD2 | CASCMD2 | WENCMD2)
+#define	SELF_REF_CMD	(WENCMD1 | CSCMD2_M | \
+			 RASCMD2 | CASCMD2 | WENCMD2)
+#define	PWR_DOWN	(CSCMD1_M | RASCMD1 | CASCMD1 | \
+			 WENCMD1 | CLKENCMD2 | CSCMD2_M | \
+			 RASCMD2 | CASCMD2 | WENCMD2)
+#define	SELF_REF_EXIT	(CLKENCMD2 | CSCMD1_M | RASCMD1 | CASCMD1 | \
+			 WENCMD1 | CLKENCMD2 | CSCMD2_M | \
+			 RASCMD2 | CASCMD2 | WENCMD2)
+
+struct ddr2_sdram {
+	uint8_t bl;
+	uint8_t rcas;		/* Read CAS latency */
+	uint8_t wcas;		/* Write CAS latency */
+	uint32_t t_ck;		/* Clock cycle time (pico seconds) */
+	uint32_t t_ck_ctrl;
+	uint32_t t_rfc_min;	/* REFRESH- to- ACTIVATE or to -REFRESH interval */
+	uint32_t t_wr;		/* Write recovery time */
+	uint32_t t_rp;		/* PRECHARGE period */
+	uint32_t t_rcd;		/* ACTIVATE-to-READ or WRITE delay */
+	uint32_t t_rrd;		/* ACTIVATE -to- ACTIVATE delay different bank */
+	uint32_t t_rrd_tck;
+	uint32_t t_wtr;		/* Internal WRITE-to- READ delay */
+	uint32_t t_wtr_tck;
+	uint32_t t_rtp;		/* Internal READ-to- PRECHARGE delay */
+	uint32_t t_rtp_tck;
+	uint32_t t_xp_tck;	/* Exit precharge power-down and active power-down to any nonREAD command */
+	uint32_t t_cke_tck;	/* CKE MIN HIGH/LOW time */
+	uint32_t t_xsnr;	/* Exit SELF REFRESH to nonREAD command */
+	uint32_t t_dllk;
+	uint32_t t_ras_min;
+	uint32_t t_rc;
+	uint32_t t_faw;		/* 4-bank activate period (1Gb) */
+	uint32_t t_mrd_tck;	/* LOAD MODE cycle time */
+	uint32_t t_refi;	/* Average periodic refresh */
+};
+
 struct pic32_ddr_softc {
 	uint32_t base;
 };
+
+void pic32_ddr_init(struct pic32_ddr_softc *sc, uint32_t base,
+    const struct ddr2_sdram *sdram);
 
 #endif	/* !_MIPS_MICROCHIP_PIC32_DDR_H_ */

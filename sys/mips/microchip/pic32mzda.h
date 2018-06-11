@@ -36,7 +36,12 @@
 #include <mips/microchip/pic32_pps.h>
 #include <mips/microchip/pic32_port.h>
 #include <mips/microchip/pic32_syscfg.h>
+#include <mips/microchip/pic32_ddr.h>
 
+/* Register map */
+#define	DDR_BASE			0xBF8E8000
+
+/* Interrupt controller */
 #define	_CORE_TIMER_VECTOR		0
 #define	_CORE_SOFTWARE_0_VECTOR		1
 #define	_CORE_SOFTWARE_1_VECTOR		2
