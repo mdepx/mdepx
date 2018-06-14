@@ -24,11 +24,9 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_SYS_LIMITS_H_
-#define	_SYS_LIMITS_H_
+#ifndef _MACHINE_LIMITS_H_
+#define _MACHINE_LIMITS_H_
 
-#include <machine/limits.h>
+#define	__UINT_MAX	0xffffffff
 
-#define	UINT_MAX	__UINT_MAX
-
-#endif /* !_SYS_LIMITS_H_ */
+#endif	/* !_MACHINE_LIMITS_H_ */
