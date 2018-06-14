@@ -74,4 +74,9 @@ typedef	__register_t	register_t;
 #define	INT_MAX		__INT_MAX
 #define	NULL		((void *)0)
 
+typedef	_Bool		bool;
+
+#define	true		1
+#define	false		0
+
 #endif /* !_SYS_TYPES_H_ */
