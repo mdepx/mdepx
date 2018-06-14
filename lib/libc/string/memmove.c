@@ -24,15 +24,13 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _INCLUDE_STRING_H_
-#define _INCLUDE_STRING_H_
+#include <sys/cdefs.h>
 
-size_t strlen(const char *s);
-size_t strnlen(const char *s, size_t maxlen);
-int strcmp(const char *s1, const char *s2);
-void * memcpy(void *dst, const void *src, size_t len);
-void * memset(void *dest, int c, size_t len);
-void * memmove(void *dst, const void *src, size_t len);
-int memcmp(const void *b1, const void *b2, size_t len);
+void *
+memmove(void *dst, const void *src, size_t len)
+{
 
-#endif /* !_INCLUDE_STRING_H_ */
+	bcopy(src, dst, len);
+
+	return (dst);
+}

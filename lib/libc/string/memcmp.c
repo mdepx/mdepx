@@ -1,6 +1,11 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
- * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright (c) 1990, 1993
+ *	The Regents of the University of California.  All rights reserved.
+ *
+ * This code is derived from software contributed to Berkeley by
+ * Chris Torek.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -10,11 +15,14 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -24,15 +32,22 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _INCLUDE_STRING_H_
-#define _INCLUDE_STRING_H_
+#include <sys/cdefs.h>
+/* __FBSDID("$FreeBSD: head/sys/libkern/memcmp.c 326023 2017-11-20 19:43:44Z pfg $"); */
 
-size_t strlen(const char *s);
-size_t strnlen(const char *s, size_t maxlen);
-int strcmp(const char *s1, const char *s2);
-void * memcpy(void *dst, const void *src, size_t len);
-void * memset(void *dest, int c, size_t len);
-void * memmove(void *dst, const void *src, size_t len);
-int memcmp(const void *b1, const void *b2, size_t len);
+/*
+ * Compare memory regions.
+ */
+int
+memcmp(const void *s1, const void *s2, size_t n)
+{
+	if (n != 0) {
+		const unsigned char *p1 = s1, *p2 = s2;
 
-#endif /* !_INCLUDE_STRING_H_ */
+		do {
+			if (*p1++ != *p2++)
+				return (*--p1 - *--p2);
+		} while (--n != 0);
+	}
+	return (0);
+}
