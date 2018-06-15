@@ -27,8 +27,11 @@
 #include <sys/cdefs.h>
 #include <sys/malloc.h>
 
+#include <string.h>
+#include <stdio.h>
+
 #define	MALLOC_DEBUG
-#undef	MALLOC_DEBUG
+//#undef	MALLOC_DEBUG
 
 #ifdef	MALLOC_DEBUG
 #define	dprintf(fmt, ...)	printf(fmt, ##__VA_ARGS__)
@@ -41,15 +44,17 @@
 #define	DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
 
 struct mem_info {
-	uint32_t start;
-	uint32_t size;
+	uintptr_t start;
+	uintptr_t size;
 };
 
 struct node_s {
 	struct node_s *next;
 	struct node_s *prev;
 	uint32_t size;
-	uint32_t index;
+	uint16_t index;
+	uint16_t flags;
+#define	FLAG_ALLOCATED	(1 << 0)
 };
 
 struct node_s nodelist[32];
@@ -81,6 +86,8 @@ malloc_addfree(struct node_s *node)
 	struct node_s *prev;
 	int i;
 
+	printf("\n%s: %p\n", __func__, node);
+
 	i = size2i(node->size);
 
 	dprintf("%s: node %p size %d\n", __func__, node, node->size);
@@ -88,7 +95,7 @@ malloc_addfree(struct node_s *node)
 	for (prev = &nodelist[i], next = nodelist[i].next;
 	    (next && next->size && (next->size < node->size));
 	     prev = next, next = next->next) {
-		printf("prev %p\n", prev);
+		dprintf("prev %p\n", prev);
 	}
 
 	dprintf("%s: prev is %p next is %p node is %p\n",
@@ -116,7 +123,7 @@ region_init(struct mem_info *region)
 }
 
 void
-malloc_add_region(int base, int size)
+malloc_add_region(uintptr_t base, int size)
 {
 
 	bzero((void *)base, size);
@@ -138,33 +145,148 @@ malloc_init(void)
 		nodelist[i].prev = &nodelist[i-1];
 	}
 	for (i = 0; i < 32; i++)
-		nodelist[i].index = i;
+		nodelist[i].index = i + 1;
 
 	nregions = 0;
 }
 
-void *
-malloc(size_t size)
+void
+dump_mem(void)
 {
+	struct node_s *node;
 
-	return (NULL);
+	printf("\n -- %s -- \n", __func__);
+
+	for (node = &nodelist[0]; node != NULL; node = node->next)
+		printf("node %p next %p idx %d size %d\n",
+		    node, node->next, node->index, node->size);
+	printf(" -- %s completed -- \n", __func__);
+}
+
+void *
+kern_malloc(size_t size)
+{
+	struct node_s *node;
+	struct node_s *next;
+	struct node_s *prev;
+	struct node_s *new;
+	void *res;
+	int avail;
+	int i;
+
+	printf("\n%s: %d\n", __func__, size);
+
+	if (size == 0)
+		return (NULL);
+
+	while (size & 0x3)
+		size += 1;
+
+	i = size2i(size);
+
+	for (node = nodelist[i].next;
+	    (node && (node->size < size));
+	     node = node->next) {
+		dprintf("node %p idx %d size %d request size %d\n",
+		    node, node->index, node->size, size);
+	}
+
+	if (node) {
+		/* Node found. Remove it from list */
+		dprintf("node found %p size %d\n",
+		    node, node->size);
+
+		prev = node->prev;
+		prev->next = node->next;
+		if (node->next) {
+			next = node->next;
+			next->prev = prev;
+		}
+
+		/* Exact match ? */
+		if (node->size == size)
+			goto finish;
+
+		/* Create new free node */
+		avail = (node->size - size - sizeof(struct node_s));
+		if (avail > 0) {
+			new = (struct node_s *)((uint8_t *)node +
+			    sizeof(struct node_s) + size);
+			new->size = avail;
+			new->next = NULL;
+			new->prev = NULL;
+			new->index = 0;
+			dprintf("add new free %p\n", new);
+			malloc_addfree(new);
+
+		}
+
+		/* Adjust the size */
+		node->size = size;
+	} else
+		return (NULL);
+
+finish:
+	res = (void *)((char *)node + sizeof(struct node_s));
+	node->flags = FLAG_ALLOCATED;
+
+	//printf("node 0x%08x bzero 0x%08x, %d\n", (uint32_t)node,
+	//  (uint32_t)res, node->size);
+	bzero(res, node->size);
+
+	return (res);
 }
 
 void
-free(void *ptr)
+kern_free(void *ptr)
 {
 	struct node_s *node;
+	struct node_s *prev;
+	struct node_s *next;
+	struct node_s *n;
 
 	if (ptr == NULL)
 		return;
 
-	node = (struct node_s *)((char *)ptr - sizeof(struct node_s));
+	printf("\n%s: %p\n", __func__, ptr);
 
-	/* TODO: merge free */
-	//prev = node->prev;
-	//next = node->next;
-	//prev->next = next;
-	//next->prev = prev;
+	node = (struct node_s *)((char *)ptr - sizeof(struct node_s));
+	node->flags &= ~FLAG_ALLOCATED;
+
+	next = ptr + node->size;
+	printf("%s: next is %p, next->flags %d, next->index %d\n",
+	    __func__, next, next->flags, next->index);
+
+	//if (node->next != next)
+	//	printf("node->next %p, next %p\n", node->next, next);
+	//	while (1);
+
+	if ((next->flags & FLAG_ALLOCATED) == 0 && (next->index == 0)) {
+		n = next + next->size + sizeof(struct node_s);
+
+		/* Remove node */
+		printf("%s: removing next node: %p\n", __func__, next);
+		next->prev->next = next->next;
+		if (next->next)
+			next->next->prev = next->prev;
+
+		/* Merge */
+		node->size += next->size + sizeof(struct node_s);
+		next = n;
+	}
+
+	prev = node->prev;
+	if ((prev->flags & FLAG_ALLOCATED) == 0 && (prev->index == 0)) {
+		/* Remove node */
+		printf("%s: removing prev node: %p\n", __func__, prev);
+		prev->prev->next = prev->next;
+		if (prev->next)
+			prev->next->prev = prev->prev;
+
+		/* Merge */
+		prev->size += node->size + sizeof(struct node_s);
+		node = prev;
+	}
 
 	node->next = 0;
 	node->prev = 0;
