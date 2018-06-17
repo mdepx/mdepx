@@ -28,20 +28,12 @@
 
 #include <sys/cdefs.h>
 
-/* For native build */
+/* For local build */
 #include <sys/types.h>
 #include <string.h>
 #include <stdio.h>
 
 #include "fl_alloc.h"
-
-#define	MAX_REGIONS	10
-#define	DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
-
-struct mem_info {
-	uintptr_t start;
-	uintptr_t size;
-};
 
 struct node_s {
 	struct node_s *next;
@@ -56,8 +48,6 @@ struct node_s {
 #define	NODE_S	sizeof(struct node_s)
 
 struct node_s nodelist[32];
-static uint32_t nregions;
-struct mem_info regions[MAX_REGIONS];
 
 static int
 size2i(uint32_t size)
@@ -97,34 +87,23 @@ fl_add_node(struct node_s *node)
 		next->prev = node;
 }
 
-static void
-fl_region_init(struct mem_info *region)
-{
-	struct node_s *node;
-
-	node = (struct node_s *)region->start;
-	node->size = NODE_S;
-	node->flags = FLAG_ALLOCATED;
-
-	node = (struct node_s *)((uint8_t *)region->start + NODE_S);
-	node->size = region->size - 2 * NODE_S;
-	node->flags = NODE_S;
-	fl_add_node(node);
-
-	node = (struct node_s *)((uint8_t *)region->start +
-	    region->size - NODE_S);
-	node->size = NODE_S;
-	node->flags = (region->size - 2 * NODE_S) | FLAG_ALLOCATED;
-}
-
 void
 fl_add_region(uintptr_t base, int size)
 {
+	struct node_s *node;
 
-	regions[nregions].start = base;
-	regions[nregions].size = size;
-	fl_region_init(&regions[nregions]);
-	nregions++;
+	node = (struct node_s *)base;
+	node->size = NODE_S;
+	node->flags = FLAG_ALLOCATED;
+
+	node = (struct node_s *)(base + NODE_S);
+	node->size = size - 2 * NODE_S;
+	node->flags = NODE_S;
+	fl_add_node(node);
+
+	node = (struct node_s *)(base + size - NODE_S);
+	node->size = NODE_S;
+	node->flags = (size - 2 * NODE_S) | FLAG_ALLOCATED;
 }
 
 void
@@ -137,8 +116,6 @@ fl_init(void)
 		nodelist[i - 1].next = &nodelist[i];
 		nodelist[i].prev = &nodelist[i - 1];
 	}
-
-	nregions = 0;
 }
 
 void

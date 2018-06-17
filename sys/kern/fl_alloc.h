@@ -24,8 +24,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _SYS_MALLOC_H_
-#define _SYS_MALLOC_H_
+#ifndef _SYS_KERN_FL_ALLOC_
+#define _SYS_KERN_FL_ALLOC_
 
 void fl_init(void);
 void fl_add_region(uintptr_t base, int size);
@@ -33,4 +33,4 @@ void * fl_alloc(size_t size);
 void fl_free(void *ptr);
 void fl_dump(void);
 
-#endif /* !_SYS_MALLOC_H_*/
+#endif /* !_SYS_KERN_FL_ALLOC_*/
