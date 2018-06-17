@@ -21,24 +21,7 @@
 /* #define XZ_DEC_ARMTHUMB */
 /* #define XZ_DEC_SPARC */
 
-#if 0
-/*
- * MSVC doesn't support modern C but XZ Embedded is mostly C89
- * so these are enough.
- */
-#ifdef _MSC_VER
-typedef unsigned char bool;
-#	define true 1
-#	define false 0
-#	define inline __inline
-#else
-#	include <stdbool.h>
-#endif
-#endif
-
 #include <sys/cdefs.h>
-//#include <stdlib.h>
-//#include <string.h>
 
 #include "xz.h"
 
