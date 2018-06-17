@@ -30,17 +30,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#define	MALLOC_DEBUG
-//#undef	MALLOC_DEBUG
-
-#ifdef	MALLOC_DEBUG
-#define	dprintf(fmt, ...)	printf(fmt, ##__VA_ARGS__)
-#else
-#define	dprintf(fmt, ...)
-#endif
-
 #define	MAX_REGIONS	10
-
 #define	DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
 
 struct mem_info {
@@ -52,10 +42,13 @@ struct node_s {
 	struct node_s *next;
 	struct node_s *prev;
 	uint32_t size;
-	uint16_t index;
-	uint16_t flags;
-#define	FLAG_ALLOCATED	(1 << 0)
+	uint32_t flags;
+#define	FLAG_ALLOCATED		(1 << 31)
+#define	FLAG_PREV_SIZE_S	0
+#define	FLAG_PREV_SIZE_M	(0x7fffffff << FLAG_PREV_SIZE_S)
 };
+
+#define	NODE_S	sizeof(struct node_s)
 
 struct node_s nodelist[32];
 static uint32_t nregions;
@@ -86,20 +79,11 @@ malloc_addfree(struct node_s *node)
 	struct node_s *prev;
 	int i;
 
-	printf("\n%s: %p\n", __func__, node);
-
 	i = size2i(node->size);
-
-	dprintf("%s: node %p size %d\n", __func__, node, node->size);
 
 	for (prev = &nodelist[i], next = nodelist[i].next;
 	    (next && next->size && (next->size < node->size));
-	     prev = next, next = next->next) {
-		dprintf("prev %p\n", prev);
-	}
-
-	dprintf("%s: prev is %p next is %p node is %p\n",
-	    __func__, prev, next, node);
+	     prev = next, next = next->next);
 
 	prev->next = node;
 	node->prev = prev;
@@ -108,25 +92,29 @@ malloc_addfree(struct node_s *node)
 		next->prev = node;
 }
 
-
 static void
 region_init(struct mem_info *region)
 {
 	struct node_s *node;
 
 	node = (struct node_s *)region->start;
-	node->size = (region->size - sizeof(struct node_s));
-	node->next = 0;
-	node->prev = 0;
+	node->size = NODE_S;
+	node->flags = FLAG_ALLOCATED;
 
+	node = (struct node_s *)((uint8_t *)region->start + NODE_S);
+	node->size = region->size - 2 * NODE_S;
+	node->flags = NODE_S;
 	malloc_addfree(node);
+
+	node = (struct node_s *)((uint8_t *)region->start +
+	    region->size - NODE_S);
+	node->size = NODE_S;
+	node->flags = (region->size - 2 * NODE_S) | FLAG_ALLOCATED;
 }
 
 void
 malloc_add_region(uintptr_t base, int size)
 {
-
-	bzero((void *)base, size);
 
 	regions[nregions].start = base;
 	regions[nregions].size = size;
@@ -139,13 +127,11 @@ malloc_init(void)
 {
 	int i;
 
-	memset(&nodelist, 0, sizeof(struct node_s) * 32);
+	memset(&nodelist, 0, NODE_S * 32);
 	for (i = 1; i < 32; i++) {
-		nodelist[i-1].next = &nodelist[i];
-		nodelist[i].prev = &nodelist[i-1];
+		nodelist[i - 1].next = &nodelist[i];
+		nodelist[i].prev = &nodelist[i - 1];
 	}
-	for (i = 0; i < 32; i++)
-		nodelist[i].index = i + 1;
 
 	nregions = 0;
 }
@@ -157,9 +143,12 @@ dump_mem(void)
 
 	printf("\n -- %s -- \n", __func__);
 
-	for (node = &nodelist[0]; node != NULL; node = node->next)
-		printf("node %p next %p idx %d size %d\n",
-		    node, node->next, node->index, node->size);
+	for (node = &nodelist[0]; node != NULL; node = node->next) {
+		if (node->size != 0)
+			printf("    ");
+		printf("node %p, next %p, prev %p, size %d, flags %x\n",
+		    node, node->next, node->prev, node->size, node->flags);
+	}
 	printf(" -- %s completed -- \n", __func__);
 }
 
@@ -170,71 +159,50 @@ kern_malloc(size_t size)
 	struct node_s *next;
 	struct node_s *prev;
 	struct node_s *new;
-	void *res;
 	int avail;
 	int i;
 
-	printf("\n%s: %d\n", __func__, size);
-
-	if (size == 0)
+	if (size <= 0)
 		return (NULL);
 
-	while (size & 0x3)
-		size += 1;
+	size += NODE_S;
 
 	i = size2i(size);
 
 	for (node = nodelist[i].next;
 	    (node && (node->size < size));
-	     node = node->next) {
-		dprintf("node %p idx %d size %d request size %d\n",
-		    node, node->index, node->size, size);
-	}
+	     node = node->next);
 
 	if (node) {
 		/* Node found. Remove it from list */
-		dprintf("node found %p size %d\n",
-		    node, node->size);
+		node->prev->next = node->next;
+		if (node->next)
+			node->next->prev = node->prev;
 
-		prev = node->prev;
-		prev->next = node->next;
-		if (node->next) {
-			next = node->next;
-			next->prev = prev;
-		}
+		/* Split the node if space allows */
+		avail = (node->size - size);
+		if (avail > NODE_S) {
+			/* Adjust the size of current node */
+			next = (struct node_s *)((uint8_t *)node + node->size);
+			next->flags &= FLAG_ALLOCATED;
+			next->flags |= avail;
+			node->size = size;
 
-		/* Exact match ? */
-		if (node->size == size)
-			goto finish;
-
-		/* Create new free node */
-		avail = (node->size - size - sizeof(struct node_s));
-		if (avail > 0) {
-			new = (struct node_s *)((uint8_t *)node +
-			    sizeof(struct node_s) + size);
+			/* Create new free node */
+			new = (struct node_s *)((uint8_t *)node + size);
 			new->size = avail;
-			new->next = NULL;
-			new->prev = NULL;
-			new->index = 0;
-			dprintf("add new free %p\n", new);
+			new->flags = size;
 			malloc_addfree(new);
-
 		}
 
-		/* Adjust the size */
-		node->size = size;
-	} else
-		return (NULL);
+		node->flags |= FLAG_ALLOCATED;
+		node->next = 0;
+		node->prev = 0;
 
-finish:
-	res = (void *)((char *)node + sizeof(struct node_s));
-	node->flags = FLAG_ALLOCATED;
+		return ((void *)((uint64_t)node + NODE_S));
+	}
 
-	//printf("node 0x%08x bzero 0x%08x, %d\n", (uint32_t)node,
-	//  (uint32_t)res, node->size);
-	bzero(res, node->size);
-
-	return (res);
+	return (NULL);
 }
 
 void
@@ -243,52 +211,44 @@ kern_free(void *ptr)
 	struct node_s *node;
 	struct node_s *prev;
 	struct node_s *next;
-	struct node_s *n;
+	struct node_s *subseq;
 
 	if (ptr == NULL)
 		return;
 
-	printf("\n%s: %p\n", __func__, ptr);
-
-	node = (struct node_s *)((char *)ptr - sizeof(struct node_s));
+	node = (struct node_s *)((char *)ptr - NODE_S);
 	node->flags &= ~FLAG_ALLOCATED;
 
-	next = ptr + node->size;
-	printf("%s: next is %p, next->flags %d, next->index %d\n",
-	    __func__, next, next->flags, next->index);
-
-	//if (node->next != next)
-	//	printf("node->next %p, next %p\n", node->next, next);
-	//	while (1);
-
-	if ((next->flags & FLAG_ALLOCATED) == 0 && (next->index == 0)) {
-		n = next + next->size + sizeof(struct node_s);
+	next = (struct node_s *)((uint8_t *)node + node->size);
+	if ((next->flags & FLAG_ALLOCATED) == 0) {
+		subseq = (struct node_s *)((uint8_t *)next + next->size);
 
 		/* Remove node */
-		printf("%s: removing next node: %p\n", __func__, next);
 		next->prev->next = next->next;
 		if (next->next)
 			next->next->prev = next->prev;
 
-		/* Merge */
-		node->size += next->size + sizeof(struct node_s);
-		next = n;
+		/* Merge with next */
+		node->size += next->size;
+		subseq->flags &= FLAG_ALLOCATED;
+		subseq->flags |= node->size;
+		next = subseq;
 	}
 
-	prev = node->prev;
-	if ((prev->flags & FLAG_ALLOCATED) == 0 && (prev->index == 0)) {
+	prev = (struct node_s *)((uint8_t *)node - node->flags);
+	if ((prev->flags & FLAG_ALLOCATED) == 0) {
+
 		/* Remove node */
-		printf("%s: removing prev node: %p\n", __func__, prev);
 		prev->prev->next = prev->next;
 		if (prev->next)
 			prev->next->prev = prev->prev;
 
-		/* Merge */
-		prev->size += node->size + sizeof(struct node_s);
+		/* Merge with prev */
+		prev->size += node->size;
+		next->flags &= FLAG_ALLOCATED;
+		next->flags |= prev->size;
 		node = prev;
 	}
 
-	node->next = 0;
-	node->prev = 0;
 	malloc_addfree(node);
 }
