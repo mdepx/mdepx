@@ -27,8 +27,6 @@
 #ifndef _SYS_MALLOC_H_
 #define _SYS_MALLOC_H_
 
-#include <machine/types.h>
-
 void fl_init(void);
 void fl_add_region(uintptr_t base, int size);
 void * fl_alloc(size_t size);

@@ -27,10 +27,13 @@
 /* Free list memory allocator */
 
 #include <sys/cdefs.h>
-#include <sys/fl_alloc.h>
 
+/* For native build */
+#include <sys/types.h>
 #include <string.h>
 #include <stdio.h>
+
+#include "fl_alloc.h"
 
 #define	MAX_REGIONS	10
 #define	DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
