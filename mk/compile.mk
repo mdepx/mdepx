@@ -5,6 +5,5 @@
 compile: objdir machine ${OBJECTS}
 	rm -f ${.CURDIR}/machine
 
-.include "osfive/mk/cflags.mk"
 .include "osfive/mk/objdir.mk"
 .include "osfive/mk/machine.mk"
