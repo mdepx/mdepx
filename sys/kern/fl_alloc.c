@@ -27,7 +27,7 @@
 /* Free list memory allocator */
 
 #include <sys/cdefs.h>
-#include <sys/malloc.h>
+#include <sys/fl_alloc.h>
 
 #include <string.h>
 #include <stdio.h>
