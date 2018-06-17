@@ -24,6 +24,8 @@
  * SUCH DAMAGE.
  */
 
+/* Free list memory allocator */
+
 #include <sys/cdefs.h>
 #include <sys/malloc.h>
 
@@ -73,7 +75,7 @@ size2i(uint32_t size)
 
 
 static void
-malloc_addfree(struct node_s *node)
+fl_add_node(struct node_s *node)
 {
 	struct node_s *next;
 	struct node_s *prev;
@@ -93,7 +95,7 @@ malloc_addfree(struct node_s *node)
 }
 
 static void
-region_init(struct mem_info *region)
+fl_region_init(struct mem_info *region)
 {
 	struct node_s *node;
 
@@ -104,7 +106,7 @@ region_init(struct mem_info *region)
 	node = (struct node_s *)((uint8_t *)region->start + NODE_S);
 	node->size = region->size - 2 * NODE_S;
 	node->flags = NODE_S;
-	malloc_addfree(node);
+	fl_add_node(node);
 
 	node = (struct node_s *)((uint8_t *)region->start +
 	    region->size - NODE_S);
@@ -113,17 +115,17 @@ region_init(struct mem_info *region)
 }
 
 void
-malloc_add_region(uintptr_t base, int size)
+fl_add_region(uintptr_t base, int size)
 {
 
 	regions[nregions].start = base;
 	regions[nregions].size = size;
-	region_init(&regions[nregions]);
+	fl_region_init(&regions[nregions]);
 	nregions++;
 }
 
 void
-malloc_init(void)
+fl_init(void)
 {
 	int i;
 
@@ -137,7 +139,7 @@ malloc_init(void)
 }
 
 void
-dump_mem(void)
+fl_dump(void)
 {
 	struct node_s *node;
 
@@ -153,11 +155,10 @@ dump_mem(void)
 }
 
 void *
-kern_malloc(size_t size)
+fl_alloc(size_t size)
 {
 	struct node_s *node;
 	struct node_s *next;
-	struct node_s *prev;
 	struct node_s *new;
 	int avail;
 	int i;
@@ -192,21 +193,21 @@ kern_malloc(size_t size)
 			new = (struct node_s *)((uint8_t *)node + size);
 			new->size = avail;
 			new->flags = size;
-			malloc_addfree(new);
+			fl_add_node(new);
 		}
 
 		node->flags |= FLAG_ALLOCATED;
 		node->next = 0;
 		node->prev = 0;
 
-		return ((void *)((uint64_t)node + NODE_S));
+		return ((void *)((uint8_t *)node + NODE_S));
 	}
 
 	return (NULL);
 }
 
 void
-kern_free(void *ptr)
+fl_free(void *ptr)
 {
 	struct node_s *node;
 	struct node_s *prev;
@@ -250,5 +251,5 @@ kern_free(void *ptr)
 		node = prev;
 	}
 
-	malloc_addfree(node);
+	fl_add_node(node);
 }
