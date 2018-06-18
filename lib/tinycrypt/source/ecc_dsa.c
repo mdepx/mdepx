@@ -57,7 +57,7 @@
 #include <tinycrypt/ecc.h>
 #include <tinycrypt/ecc_dsa.h>
 
-#if default_RNG_defined
+#ifdef default_RNG_defined
 static uECC_RNG_Function g_rng_function = &default_CSPRNG;
 #else
 static uECC_RNG_Function g_rng_function = 0;
