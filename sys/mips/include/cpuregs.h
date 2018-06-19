@@ -31,7 +31,7 @@
 #define	MIPS_XKPHYS_UNCACHED_BASE	0x9000000000000000ULL
 #endif
 
-/* CP0 status register */
+/* CP0 Status register */
 #define	MIPS_SR_IE	(1 << 0)
 #define	MIPS_SR_EXL	(1 << 1)
 #define	MIPS_SR_ERL	(1 << 2)
@@ -58,7 +58,7 @@
 #define	MIPS_SR_RP	(1 << 27)
 #define	MIPS_SR_CU(n)	(1 << (28 + (n)))
 
-/* CP0 cause register */
+/* CP0 Cause register */
 #define	MIPS_CR_EXC_CODE_S	2
 #define	MIPS_CR_EXC_CODE_M	(0x1f << MIPS_CR_EXC_CODE_S)
 #define	 MIPS_CR_EXC_CODE_INT		0 /* Interrupt */
@@ -92,6 +92,14 @@
 #define	MIPS_CR_CE_M		(0x3 << MIPS_CR_CE_S)
 #define	MIPS_CR_BD		(1 << 31)
 
+/* CP0 Config 0 register */
+#define	MIPS_CR0_K0_S		0	/* Kseg0 coherency algorithm. */
+#define	MIPS_CR0_K0_M		(0x7 << MIPS_CR0_K0_S)
+#define	MIPS_CR0_K0_UNCACHED	(2 << MIPS_CR0_K0_S)
+#define	MIPS_CR0_K0_CACHEABLE	(3 << MIPS_CR0_K0_S)
+#define	MIPS_CR0_BE		(1 << 15)
+
+/* CP0 registers */
 #define	CP0_USERLOCAL	$4,2
 #define	CP0_PAGEMASK	$5,0
 #define	CP0_TLB_SPEC	$5,4
