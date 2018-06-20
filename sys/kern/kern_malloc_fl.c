@@ -133,7 +133,7 @@ fl_dump(void)
 }
 
 void *
-fl_alloc(size_t size)
+fl_malloc(size_t size)
 {
 	struct node_s *node;
 	struct node_s *next;
