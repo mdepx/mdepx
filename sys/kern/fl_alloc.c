@@ -27,13 +27,11 @@
 /* Free list memory allocator */
 
 #include <sys/cdefs.h>
-
-/* For local build */
 #include <sys/types.h>
+#include <sys/malloc.h>
+
 #include <string.h>
 #include <stdio.h>
-
-#include "fl_alloc.h"
 
 struct node_s {
 	struct node_s *next;
