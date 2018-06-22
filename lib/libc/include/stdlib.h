@@ -28,6 +28,11 @@
 #define _INCLUDE_STDLIB_H_
 
 void *malloc(size_t size);
+void *calloc(size_t number, size_t size);
+void *realloc(void *ptr, size_t size);
 void free(void *ptr);
+
+void qsort(void *base, size_t nmemb, size_t size,
+    int (*compar)(const void *, const void *));
 
 #endif /* !_INCLUDE_STDLIB_H_ */

@@ -36,5 +36,30 @@ int snprintf(char * restrict str, size_t size, const char * restrict format, ...
 int vsnprintf(char * restrict str, size_t size, const char * restrict format, va_list ap);
 int kvprintf(char const *fmt, void (*func)(int, void*), void *arg, int radix, va_list ap);
 int sprintf(char *buf, const char *cfmt, ...);
+int puts(const char *str);
+
+#define	stdin	0
+#define	stdout	1
+#define	EOF	(-1)
+
+typedef void * FILE;
+
+FILE * fopen(const char * restrict path, const char * restrict mode);
+int fclose(FILE *stream);
+size_t fread(void * restrict ptr, size_t size, size_t nmemb,
+    FILE * restrict stream);
+size_t fwrite(const void * restrict ptr, size_t size, size_t nmemb,
+    FILE * restrict stream);
+int feof(FILE *stream);
+int ferror(FILE *stream);
+int fseeko(FILE *stream, off_t offset, int whence);
+int fseek(FILE *stream, long offset, int whence);
+off_t ftello(FILE *stream);
+long ftell(FILE *stream);
+int fileno(FILE *stream);
+int fflush(FILE *stream);
+int fputs(const char *str, FILE *stream);
+int fputc(int c, FILE *stream);
+int fprintf(FILE * restrict stream, const char * restrict format, ...);
 
 #endif /* !_INCLUDE_STDIO_H_ */
