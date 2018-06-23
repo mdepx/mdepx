@@ -231,3 +231,112 @@ fl_free(void *ptr)
 
 	fl_add_node(node);
 }
+
+void *
+fl_calloc(size_t number, size_t size)
+{
+	void *res;
+	size_t sz;
+
+	sz = number * size;
+
+	res = fl_malloc(sz);
+	if (res)
+		bzero(res, sz);
+
+	return (res);
+}
+
+void *
+fl_realloc(void *ptr, size_t size)
+{
+	struct node_s *node;
+	struct node_s *next;
+	struct node_s *subs;
+	struct node_s *new;
+	void *newptr;
+
+	if (ptr == NULL)
+		return (fl_malloc(size));
+
+	if (size == 0) {
+		fl_free(ptr);
+		return (NULL);
+	}
+
+	size += NODE_S;
+
+	node = (struct node_s *)((char *)ptr - NODE_S);
+	next = (struct node_s *)((uint8_t *)node + node->size);
+
+	if (size <= node->size) {
+		if ((next->flags & FLAG_ALLOCATED) == 0) {
+			subs = (struct node_s *)((uint8_t *)next + next->size);
+
+			/* Remove node */
+			next->prev->next = next->next;
+			if (next->next)
+				next->next->prev = next->prev;
+
+			/* Merge with next */
+			new = (struct node_s *)((uint8_t *)node + size);
+			new->size = next->size + node->size - size;
+			new->flags = size;
+			node->size = size;
+			subs->flags &= FLAG_ALLOCATED;
+			subs->flags |= node->size;
+			fl_add_node(new);
+		} else if (node->size > (size + sizeof(struct node_s))) {
+			new = (struct node_s *)((uint8_t *)node + size);
+			new->size = node->size - size;
+			new->flags = size;
+			node->size = size;
+			next->flags &= FLAG_ALLOCATED;
+			next->flags |= new->size;
+			fl_add_node(new);
+		}
+	} else {
+		if (((next->flags & FLAG_ALLOCATED) == 0) &&
+		    (node->size + next->size) > (size + sizeof(struct node_s))) {
+			subs = (struct node_s *)((uint8_t *)next + next->size);
+
+			/* Remove node */
+			next->prev->next = next->next;
+			if (next->next)
+				next->next->prev = next->prev;
+
+			/* Merge with next */
+			new = (struct node_s *)((uint8_t *)node + size);
+			new->size = next->size + node->size - size;
+			new->flags = size;
+			node->size = size;
+			subs->flags &= FLAG_ALLOCATED;
+			subs->flags |= node->size;
+			fl_add_node(new);
+
+		} else if (((next->flags & FLAG_ALLOCATED) == 0) &&
+		    (node->size + next->size) == size) {
+			subs = (struct node_s *)((uint8_t *)next + next->size);
+
+			/* Remove node */
+			next->prev->next = next->next;
+			if (next->next)
+				next->next->prev = next->prev;
+
+			/* Merge with next */
+			node->size = size;
+			subs->flags &= FLAG_ALLOCATED;
+			subs->flags |= node->size;
+		} else {
+			newptr = fl_malloc(size);
+			if (newptr) {
+				memcpy(newptr, ptr, node->size);
+				fl_free(ptr);
+			}
+
+			return (newptr);
+		}
+	}
+
+	return (ptr);
+}

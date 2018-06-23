@@ -31,6 +31,8 @@ void fl_init(void);
 void fl_add_region(uintptr_t base, int size);
 void * fl_malloc(size_t size);
 void fl_free(void *ptr);
+void * fl_realloc(void *ptr, size_t size);
 void fl_dump(void);
+void * fl_calloc(size_t number, size_t size);
 
 #endif /* !_SYS_MALLOC_FL_*/
