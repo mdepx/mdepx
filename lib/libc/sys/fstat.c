@@ -24,13 +24,12 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_SYS_LIMITS_H_
-#define	_SYS_LIMITS_H_
+#include <sys/cdefs.h>
+#include <sys/stat.h>
 
-#include <machine/limits.h>
+int
+fstat(int fd, struct stat *sb)
+{
 
-#define	UINT_MAX	__UINT_MAX
-#define	ULONG_MAX	__ULONG_MAX
-#define	SIZE_T_MAX	__SIZE_T_MAX
-
-#endif /* !_SYS_LIMITS_H_ */
+	return (-1);
+}

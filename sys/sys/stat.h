@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2015 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,13 +24,16 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_SYS_LIMITS_H_
-#define	_SYS_LIMITS_H_
+#ifndef	_SYS_STAT_H_
+#define	_SYS_STAT_H_
 
-#include <machine/limits.h>
+#include <sys/types.h>
 
-#define	UINT_MAX	__UINT_MAX
-#define	ULONG_MAX	__ULONG_MAX
-#define	SIZE_T_MAX	__SIZE_T_MAX
+/* TODO */
+struct stat {
+	off_t	st_size;
+};
 
-#endif /* !_SYS_LIMITS_H_ */
+int fstat(int, struct stat *);
+
+#endif /* !_SYS_STAT_H_ */

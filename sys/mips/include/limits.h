@@ -29,4 +29,12 @@
 
 #define	__UINT_MAX	0xffffffff
 
+#ifdef __mips_n64
+#define	__ULONG_MAX	0xffffffffffffffff
+#define	__SIZE_T_MAX	__ULONG_MAX
+#else
+#define	__ULONG_MAX	0xffffffff
+#define	__SIZE_T_MAX	__UINT_MAX
+#endif
+
 #endif	/* !_MACHINE_LIMITS_H_ */
