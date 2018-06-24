@@ -1086,7 +1086,9 @@ FLAC__bool FLAC__bitreader_read_utf8_uint64(FLAC__BitReader *br, FLAC__uint64 *v
  * Unfortunately, the Microsoft VS compiler doesn't pick them up externally. To
  * fix that we add extern declarations here.
  */
+#ifndef __OSFIVE__
 extern FLAC__bool FLAC__bitreader_is_consumed_byte_aligned(const FLAC__BitReader *br);
 extern uint32_t FLAC__bitreader_bits_left_for_byte_alignment(const FLAC__BitReader *br);
 extern uint32_t FLAC__bitreader_get_input_bits_unconsumed(const FLAC__BitReader *br);
 extern FLAC__bool FLAC__bitreader_read_uint32_little_endian(FLAC__BitReader *br, FLAC__uint32 *val);
+#endif
