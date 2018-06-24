@@ -28,6 +28,7 @@
 #define _SYS_TYPES_H_
 
 #include <machine/types.h>
+#include <machine/endian.h>
 
 /*
  * Unusual type definitions.

@@ -71,11 +71,4 @@ typedef	__uint8_t		__u_char_t;
 
 #define	NBBY	8
 
-#define	__INT_MAX		0x7fffffff
-#ifdef __mips_n64
-#define	LONG_BIT	64
-#else
-#define	LONG_BIT	32
-#endif
-
 #endif /* !_MACHINE_TYPES_H_ */
