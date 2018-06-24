@@ -24,9 +24,11 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_SYS_STDDEF_H_
-#define	_SYS_STDDEF_H_
+#ifndef	_STDDEF_H_
+#define	_STDDEF_H_
+
+#include <sys/types.h>
 
 typedef __ptrdiff_t	ptrdiff_t;
 
-#endif /* !_SYS_STDDEF_H_ */
+#endif /* !_STDDEF_H_ */
