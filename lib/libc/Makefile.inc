@@ -13,6 +13,7 @@ LIBC_OBJECTS =			\
 		osfive/lib/libc/string/strlen.o			\
 		osfive/lib/libc/string/memset.o			\
 		osfive/lib/libc/string/memmove.o		\
+		osfive/lib/libc/string/memchr.o			\
 		osfive/lib/libc/string/memcmp.o			\
 		osfive/lib/libc/string/bcopy.o			\
 		osfive/lib/libc/string/bzero.o			\
