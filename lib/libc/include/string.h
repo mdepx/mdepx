@@ -35,5 +35,6 @@ void * memset(void *dest, int c, size_t len);
 void * memmove(void *dst, const void *src, size_t len);
 int memcmp(const void *b1, const void *b2, size_t len);
 void * memchr(const void *b, int c, size_t len);
+char * strsep(char **stringp, const char *delim);
 
 #endif /* !_INCLUDE_STRING_H_ */

@@ -11,6 +11,7 @@ LIBC_OBJECTS =			\
 		osfive/lib/libc/stdio/fileno.o			\
 		osfive/lib/libc/stdlib/qsort.o			\
 		osfive/lib/libc/string/strlen.o			\
+		osfive/lib/libc/string/strsep.o			\
 		osfive/lib/libc/string/memset.o			\
 		osfive/lib/libc/string/memmove.o		\
 		osfive/lib/libc/string/memchr.o			\
