@@ -10,7 +10,9 @@ LIBC_OBJECTS =			\
 		osfive/lib/libc/stdio/ftell.o			\
 		osfive/lib/libc/stdio/fileno.o			\
 		osfive/lib/libc/stdlib/qsort.o			\
+		osfive/lib/libc/string/strcat.o			\
 		osfive/lib/libc/string/strlen.o			\
+		osfive/lib/libc/string/strncat.o		\
 		osfive/lib/libc/string/strsep.o			\
 		osfive/lib/libc/string/memset.o			\
 		osfive/lib/libc/string/memmove.o		\
