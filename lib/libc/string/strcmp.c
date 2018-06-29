@@ -33,7 +33,6 @@
  */
 
 #include <sys/cdefs.h>
-/* __FBSDID("$FreeBSD: head/lib/libc/string/strcmp.c 326025 2017-11-20 19:49:47Z pfg $"); */
 
 #include <string.h>
 
