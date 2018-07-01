@@ -30,10 +30,12 @@
 #include <machine/limits.h>
 
 #define	UINT_MAX	__UINT_MAX
+#define	USHRT_MAX	__USHRT_MAX
 #define	ULONG_MAX	__ULONG_MAX
 #define	SIZE_T_MAX	__SIZE_T_MAX
-#define	USHRT_MAX	__USHRT_MAX
 #define	LONG_BIT	__LONG_BIT
 #define	CHAR_BIT	__CHAR_BIT
+#define	LONG_MAX	__LONG_MAX
+#define	LONG_MIN	__LONG_MIN
 
 #endif /* !_SYS_LIMITS_H_ */

@@ -18,6 +18,7 @@ LIBC_OBJECTS =			\
 		osfive/lib/libc/string/strncmp.o		\
 		osfive/lib/libc/string/strsep.o			\
 		osfive/lib/libc/string/strstr.o			\
+		osfive/lib/libc/string/strtol.o			\
 		osfive/lib/libc/string/memset.o			\
 		osfive/lib/libc/string/memmove.o		\
 		osfive/lib/libc/string/memchr.o			\
