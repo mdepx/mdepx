@@ -10,6 +10,12 @@ LIBC_OBJECTS =			\
 		osfive/lib/libc/stdio/ftell.o			\
 		osfive/lib/libc/stdio/fileno.o			\
 		osfive/lib/libc/stdlib/qsort.o			\
+		osfive/lib/libc/string/ffs.o			\
+		osfive/lib/libc/string/ffsl.o			\
+		osfive/lib/libc/string/ffsll.o			\
+		osfive/lib/libc/string/fls.o			\
+		osfive/lib/libc/string/flsl.o			\
+		osfive/lib/libc/string/flsll.o			\
 		osfive/lib/libc/string/strcasecmp.o		\
 		osfive/lib/libc/string/strcat.o			\
 		osfive/lib/libc/string/strcmp.o			\
