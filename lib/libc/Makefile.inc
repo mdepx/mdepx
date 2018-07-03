@@ -9,6 +9,8 @@ LIBC_OBJECTS =			\
 		osfive/lib/libc/stdio/fseek.o			\
 		osfive/lib/libc/stdio/ftell.o			\
 		osfive/lib/libc/stdio/fileno.o			\
+		osfive/lib/libc/stdlib/atoi.o			\
+		osfive/lib/libc/stdlib/strtol.o			\
 		osfive/lib/libc/stdlib/qsort.o			\
 		osfive/lib/libc/string/ffs.o			\
 		osfive/lib/libc/string/ffsl.o			\
@@ -24,7 +26,6 @@ LIBC_OBJECTS =			\
 		osfive/lib/libc/string/strncmp.o		\
 		osfive/lib/libc/string/strsep.o			\
 		osfive/lib/libc/string/strstr.o			\
-		osfive/lib/libc/string/strtol.o			\
 		osfive/lib/libc/string/memset.o			\
 		osfive/lib/libc/string/memmove.o		\
 		osfive/lib/libc/string/memchr.o			\
