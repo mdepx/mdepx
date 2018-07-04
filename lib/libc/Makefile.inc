@@ -12,6 +12,7 @@ LIBC_OBJECTS =			\
 		osfive/lib/libc/stdlib/atoi.o			\
 		osfive/lib/libc/stdlib/strtol.o			\
 		osfive/lib/libc/stdlib/qsort.o			\
+		osfive/lib/libc/string/bcmp.o			\
 		osfive/lib/libc/string/ffs.o			\
 		osfive/lib/libc/string/ffsl.o			\
 		osfive/lib/libc/string/ffsll.o			\
