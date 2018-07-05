@@ -30,6 +30,7 @@
 #define	__UINT_MAX	0xffffffff
 #define	__INT_MAX	0x7fffffff
 #define	__USHRT_MAX	0xffff
+#define	__UCHAR_MAX	0xff
 
 #ifdef __mips_n64
 #define	__ULONG_MAX	0xffffffffffffffff

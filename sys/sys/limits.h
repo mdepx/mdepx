@@ -29,9 +29,10 @@
 
 #include <machine/limits.h>
 
+#define	ULONG_MAX	__ULONG_MAX
 #define	UINT_MAX	__UINT_MAX
 #define	USHRT_MAX	__USHRT_MAX
-#define	ULONG_MAX	__ULONG_MAX
+#define	UCHAR_MAX	__UCHAR_MAX
 #define	SIZE_T_MAX	__SIZE_T_MAX
 #define	LONG_BIT	__LONG_BIT
 #define	CHAR_BIT	__CHAR_BIT
