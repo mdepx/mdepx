@@ -2,11 +2,15 @@
 .error "APP must be defined"
 .endif
 
-link:	${LDSCRIPT}
+${APP}.elf: ${LDSCRIPT} ${OBJECTS}
 	${LD} -T ${LDSCRIPT} ${OBJECTS:M*} -o ${APP}.elf
 
-binary:
+${APP}.bin: ${APP}.elf
 	${OBJCOPY} -O binary ${APP}.elf ${APP}.bin
 
-srec:
+${APP}.srec: ${APP}.elf
 	${OBJCOPY} -O srec ${APP}.elf ${APP}.srec
+
+link:	${APP}.elf
+binary: ${APP}.bin
+srec:	${APP}.srec
