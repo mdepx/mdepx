@@ -27,7 +27,7 @@
 #include <sys/types.h>
 #include <sys/endian.h>
 
-#include <dev/altera/jtag_uart.h>
+#include <dev/altera/jtag_uart/jtag_uart.h>
 
 #include <machine/cpuregs.h>
 
