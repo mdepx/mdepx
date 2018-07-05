@@ -23,6 +23,7 @@ LIBC_OBJECTS =			\
 		osfive/lib/libc/string/strcat.o			\
 		osfive/lib/libc/string/strchr.o			\
 		osfive/lib/libc/string/strcmp.o			\
+		osfive/lib/libc/string/strcspn.o		\
 		osfive/lib/libc/string/strcpy.o			\
 		osfive/lib/libc/string/strlen.o			\
 		osfive/lib/libc/string/strncat.o		\
