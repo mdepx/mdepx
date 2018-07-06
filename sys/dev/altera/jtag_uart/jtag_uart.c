@@ -43,7 +43,12 @@
 void
 aju_putc(struct aju_softc *sc, int c)
 {
+	uint64_t *addr;
 	uint32_t reg;
+ 
+	/* Debug */
+	addr = (uint64_t *)0xffffffffb0800000;
+	*addr = 0x1515151515121212;
 
 	do {
 		reg = RD4(sc, AJU_CONTROL);
@@ -55,8 +60,15 @@ aju_putc(struct aju_softc *sc, int c)
 int
 aju_init(struct aju_softc *sc, uint32_t base)
 {
+	uint64_t *addr;
+ 
+	/* Debug */
+	addr = (uint64_t *)0xffffffffb0800000;
+	*addr = 0x1515151515141414;
 
 	sc->base = base | MIPS_XKPHYS_UNCACHED_BASE;
+
+	*addr = 0x1515151515141415;
 
 	return (0);
 }

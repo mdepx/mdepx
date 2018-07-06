@@ -92,7 +92,7 @@ mips_exception(struct trapframe *frame)
 			}
 		break;
 	default:
-		printf("%s: missing handler: exc_code %d, badvaddr %x\n",
+		printf("%s: missing handler: exc_code %d, badvaddr %zu\n",
 		    __func__, exc_code, frame->tf_badvaddr);
 	}
 
