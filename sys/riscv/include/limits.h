@@ -27,9 +27,10 @@
 #ifndef _MACHINE_LIMITS_H_
 #define _MACHINE_LIMITS_H_
 
+#define	__UCHAR_MAX	0xff
+#define	__USHRT_MAX	0xffff
 #define	__UINT_MAX	0xffffffff
 #define	__INT_MAX	0x7fffffff
-#define	__USHRT_MAX	0xffff
 
 #define	__ULONG_MAX	0xffffffff
 #define	__SIZE_T_MAX	__UINT_MAX

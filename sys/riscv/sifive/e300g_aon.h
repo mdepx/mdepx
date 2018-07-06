@@ -61,11 +61,13 @@
 #define	AON_PMUCAUSE		0x144
 #define	AON_PMUSLEEP		0x148
 #define	AON_PMUKEY		0x14C
+#define	 PMUKEY_VAL		0x51F15E
 
 struct aon_softc {
 	uint32_t base;
 };
 
 void e300g_aon_init(struct aon_softc *sc, uint32_t base);
+void e300g_aon_sleep(struct aon_softc *sc);
 
 #endif /* !_SYS_RISCV_SIFIVE_E300G_AON_H_ */
