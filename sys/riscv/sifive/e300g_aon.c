@@ -32,6 +32,14 @@
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
+e300g_aon_sleep(struct aon_softc *sc)
+{
+
+	WR4(sc, AON_PMUKEY, PMUKEY_VAL);
+	WR4(sc, AON_PMUSLEEP, 1);
+}
+
+void
 e300g_aon_init(struct aon_softc *sc, uint32_t base)
 {
 	uint32_t reg;
