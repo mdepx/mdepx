@@ -31,6 +31,12 @@
 #include <sys/cdefs.h>
 #include <sys/endian.h>
 
+#include <machine/frame.h>
+#include <machine/cpuregs.h>
+#include <machine/cpufunc.h>
+
+#include <mips/beri/beripic.h>
+
 #define	BERIPIC_DEBUG
 #undef	BERIPIC_DEBUG
 
@@ -39,12 +45,6 @@
 #else
 #define	dprintf(fmt, ...)
 #endif
-
-#include <machine/frame.h>
-#include <machine/cpuregs.h>
-#include <machine/cpufunc.h>
-
-#include <mips/beri/beripic.h>
 
 #define	WR_CFG(_sc, _reg, _val)		\
     *(volatile uint64_t *)((_sc)->res->cfg + _reg) = _val
