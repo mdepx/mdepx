@@ -28,27 +28,40 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_MIPS_BERI_BERI_EPW_
-#define	_MIPS_BERI_BERI_EPW_
+#include <sys/cdefs.h>
 
-#define	EPW_READ_ADDRESS		0x0000	/* read only */
-#define	EPW_READ_FLIT_SIZE		0x0008	/* read only */
-#define	EPW_READ_BURST_COUNT		0x000C	/* read only */
-#define	EPW_READ_RESPONSE_DATA		0x0040	/* read/write */
-#define	EPW_WRITE_ADDRESS		0x1000	/* read only */
-#define	EPW_WRITE_BYTE_ENABLE		0x1008	/* read only */
-#define	EPW_WRITE_DATA			0x1040	/* read only */
-#define	EPW_TIME_STAMP			0x2000	/* read only */
-#define	EPW_REQUEST_ID			0x2004	/* read only */
-#define	EPW_REQUEST_IS_WRITE		0x2006	/* read only */
-#define	EPW_REQUEST_LEVEL_SEND_RESPONSE	0x2007	/* read/write */
-#define	EPW_ENABLE_DEVICE_EMULATION	0x2008	/* read/write */
+#include <mips/beri/beri_epw.h>
 
-struct epw_softc {
-	uint64_t base;
-};
+#define	EPW_DEBUG
+#undef	EPW_DEBUG
 
-void epw_init(struct epw_softc *sc, uint64_t base);
-void epw_control(struct epw_softc *sc, uint8_t enable);
+#ifdef	EPW_DEBUG
+#define	dprintf(fmt, ...)	printf(fmt, ##__VA_ARGS__)
+#else
+#define	dprintf(fmt, ...)
+#endif
 
-#endif /* !_MIPS_BERI_BERI_EPW_ */
+#define	RD8(_sc, _reg)		*(volatile uint64_t *)((_sc)->base + _reg)
+#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
+#define	RD1(_sc, _reg)		*(volatile uint8_t *)((_sc)->base + _reg)
+
+#define	WR8(_sc, _reg, _val)	*(volatile uint64_t *)((_sc)->base + _reg) = _val
+#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+#define	WR1(_sc, _reg, _val)	*(volatile uint8_t *)((_sc)->base + _reg) = _val
+
+void
+epw_control(struct epw_softc *sc, uint8_t enable)
+{
+
+	if (enable)
+		WR1(sc, EPW_ENABLE_DEVICE_EMULATION, 1);
+	else
+		WR1(sc, EPW_ENABLE_DEVICE_EMULATION, 0);
+}
+
+void
+epw_init(struct epw_softc *sc, uint64_t base)
+{
+
+	sc->base = base;
+}
