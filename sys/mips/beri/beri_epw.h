@@ -44,11 +44,22 @@
 #define	EPW_REQUEST_LEVEL_SEND_RESPONSE	0x2007	/* read/write */
 #define	EPW_ENABLE_DEVICE_EMULATION	0x2008	/* read/write */
 
+struct epw_request {
+	uint64_t addr;
+	uint8_t is_write;
+	uint8_t flit_size;
+	uint8_t burst_count;
+	uint8_t byte_enable;
+	uint8_t data[32];
+};
+
 struct epw_softc {
 	uint64_t base;
 };
 
 void epw_init(struct epw_softc *sc, uint64_t base);
 void epw_control(struct epw_softc *sc, uint8_t enable);
+int epw_request(struct epw_softc *sc, struct epw_request *req);
+void epw_reply(struct epw_softc *sc, struct epw_request *req);
 
 #endif /* !_MIPS_BERI_BERI_EPW_ */

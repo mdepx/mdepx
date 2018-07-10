@@ -49,6 +49,44 @@
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 #define	WR1(_sc, _reg, _val)	*(volatile uint8_t *)((_sc)->base + _reg) = _val
 
+int
+epw_request(struct epw_softc *sc, struct epw_request *req)
+{
+	uint8_t val;
+	int i;
+
+	val = RD1(sc, EPW_REQUEST_LEVEL_SEND_RESPONSE);
+	if (val == 0)
+		return (0);
+
+	req->is_write = RD1(sc, EPW_REQUEST_IS_WRITE);
+	if (req->is_write) {
+		req->addr = RD8(sc, EPW_WRITE_ADDRESS);
+		req->byte_enable = RD4(sc, EPW_WRITE_BYTE_ENABLE);
+		for (i = 0; i < req->byte_enable; i++)
+			req->data[i] = RD1(sc, EPW_WRITE_DATA + i);
+	} else {
+		req->addr = RD8(sc, EPW_READ_ADDRESS);
+		req->flit_size = RD4(sc, EPW_READ_FLIT_SIZE);
+		req->burst_count = RD4(sc, EPW_READ_BURST_COUNT);
+	}
+
+	return (1);
+}
+
+void
+epw_reply(struct epw_softc *sc, struct epw_request *req)
+{
+	int i;
+
+	if (req->is_write == 0)
+		for (i = 0; i < req->burst_count; i++)
+			WR1(sc, EPW_READ_RESPONSE_DATA + i,
+			    req->data[i]);
+
+	WR1(sc, EPW_REQUEST_LEVEL_SEND_RESPONSE, 1);
+}
+
 void
 epw_control(struct epw_softc *sc, uint8_t enable)
 {
