@@ -29,6 +29,7 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/systm.h>
 
 #include <mips/beri/beri_epw.h>
 
@@ -63,6 +64,8 @@ epw_request(struct epw_softc *sc, struct epw_request *req)
 	if (req->is_write) {
 		req->addr = RD8(sc, EPW_WRITE_ADDRESS);
 		req->byte_enable = RD4(sc, EPW_WRITE_BYTE_ENABLE);
+		KASSERT(req->byte_enable <= 8,
+		    ("Unexpected byte_enable: %d", req->byte_enable));
 		for (i = 0; i < req->byte_enable; i++)
 			req->data[i] = RD1(sc, EPW_WRITE_DATA + i);
 	} else {

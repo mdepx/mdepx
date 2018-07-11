@@ -24,17 +24,23 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _SYS_SYSTM_H_
-#define _SYS_SYSTM_H_
+#include <sys/cdefs.h>
+#include <sys/systm.h>
 
-void udelay(uint32_t usec);	/* polling delay */
-void usleep(uint32_t usec);	/* interrupt-driven sleep */
+static void
+vpanic(const char *fmt, va_list ap)
+{
 
-void panic(const char *fmt, ...);
+	printf("panic: ");
+	vprintf(fmt, ap);
+	printf("\n");
+}
 
-#define	KASSERT(e, m) do {		\
-	if (__predict_false(!(e)))	\
-		panic m;		\
-} while (0)
+void 
+panic(const char *fmt, ...)
+{
+	va_list ap;
 
-#endif /* !_SYS_SYSTM_H_ */
+	va_start(ap, fmt);
+	vpanic(fmt, ap);
+}

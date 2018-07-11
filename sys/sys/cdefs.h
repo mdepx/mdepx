@@ -5,3 +5,5 @@
 #include <stdlib.h>
 
 #define	__unused
+#define	__predict_true(e)	__builtin_expect((e), 1)
+#define	__predict_false(e)	__builtin_expect((e), 0)
