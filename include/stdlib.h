@@ -35,5 +35,7 @@ long strtol(const char * restrict nptr, char ** restrict endptr, int base);
 void qsort(void *base, size_t nmemb, size_t size,
     int (*compar)(const void *, const void *));
 int atoi(const char *nptr);
+void * bsearch(const void *key, const void *base, size_t nmemb, size_t size,
+    int (*compar) (const void *, const void *));
 
 #endif /* !_INCLUDE_STDLIB_H_ */
