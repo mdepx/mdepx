@@ -30,6 +30,7 @@ LIBC_OBJECTS =			\
 		osfive/lib/libc/string/strlen.o			\
 		osfive/lib/libc/string/strncat.o		\
 		osfive/lib/libc/string/strncmp.o		\
+		osfive/lib/libc/string/strnlen.o		\
 		osfive/lib/libc/string/strsep.o			\
 		osfive/lib/libc/string/strstr.o			\
 		osfive/lib/libc/string/memset.o			\
