@@ -1,5 +1,7 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
+ * Copyright (c) 2009 David Schultz <das@FreeBSD.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,18 +26,16 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _INCLUDE_STDLIB_H_
-#define _INCLUDE_STDLIB_H_
+#include <sys/cdefs.h>
 
-void *malloc(size_t size);
-void *calloc(size_t number, size_t size);
-void *realloc(void *ptr, size_t size);
-void free(void *ptr);
-long strtol(const char * restrict nptr, char ** restrict endptr, int base);
-void qsort(void *base, size_t nmemb, size_t size,
-    int (*compar)(const void *, const void *));
-int atoi(const char *nptr);
-void * bsearch(const void *key, const void *base, size_t nmemb, size_t size,
-    int (*compar) (const void *, const void *));
+size_t
+strnlen(const char *s, size_t maxlen)
+{
+	size_t len;
 
-#endif /* !_INCLUDE_STDLIB_H_ */
+	for (len = 0; len < maxlen; len++, s++) {
+		if (!*s)
+			break;
+	}
+	return (len);
+}
