@@ -35,6 +35,10 @@
 #define	__SIZE_T_MAX	__UINT_MAX
 #define	__LONG_BIT	32
 
+#define	__LONG_MAX	0x7fffffff
+#define	__LONG_MIN	(-0x7fffffff - 1)
+#define	__UCHAR_MAX	0xff
+
 #define	__CHAR_BIT	8
 
 #endif	/* !_MACHINE_LIMITS_H_ */
