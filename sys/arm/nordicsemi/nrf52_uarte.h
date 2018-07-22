@@ -54,12 +54,12 @@
 #define	ERRORSRC		0x480 /* Error source */
 #define	ENABLE			0x500 /* Enable UART */
 #define	 ENABLE_EN		8
-#define	PSEL_RTS		0x508 /* Pin select for RTS signal */
-#define	PSEL_TXD		0x50C /* Pin select for TXD signal */
-#define	PSEL_CTS		0x510 /* Pin select for CTS signal */
-#define	PSEL_RXD		0x514 /* Pin select for RXD signal */
+#define	PSELRTS			0x508 /* Pin select for RTS signal */
+#define	PSELTXD			0x50C /* Pin select for TXD signal */
+#define	PSELCTS			0x510 /* Pin select for CTS signal */
+#define	PSELRXD			0x514 /* Pin select for RXD signal */
 #define	BAUDRATE		0x524 /* Baud rate. Accuracy depends on the HFCLK source selected. */
-#define	 BAUD_115200		0x01D60000
+#define	 BAUD_115200		0x01D7E000
 #define	RXD_PTR			0x534 /* Data pointer */
 #define	RXD_MAXCNT		0x538 /* Maximum number of bytes in receive buffer */
 #define	RXD_AMOUNT		0x53C /* Number of bytes transferred in the last transaction */
@@ -71,9 +71,13 @@
 struct uarte_softc {
 	uint32_t base;
 	uint8_t rx_data[16];
+	uint8_t pin_tx;
+	uint8_t pin_rx;
+	uint32_t baudrate;
 };
 
-void uarte_init(struct uarte_softc *sc, uint32_t base);
+void uarte_init(struct uarte_softc *sc, uint32_t base, uint8_t pin_tx,
+    uint8_t pin_rx, uint32_t baudrate);
 void uarte_putc(struct uarte_softc *sc, char ch);
 void uarte_intr(void *arg, uint32_t irqno);
 

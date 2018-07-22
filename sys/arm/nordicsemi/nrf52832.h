@@ -24,80 +24,11 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
-#include <sys/systm.h>
+#ifndef _ARM_NORDICSEMI_NRF52832_H_
+#define _ARM_NORDICSEMI_NRF52832_H_
 
-#include "nrf52_uarte.h"
+#include <arm/nordicsemi/nrf52_uarte.h>
 
-#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
-#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+#define	UART_BASE	0x40002000
 
-void
-uarte_intr(void *arg, uint32_t irqno)
-{
-	struct uarte_softc *sc;
-
-	sc = arg;
-
-	WR4(sc, EVENTS_RXDRDY, 0);
-	WR4(sc, RXD_MAXCNT, 8);
-	WR4(sc, TASKS_STARTRX, 1);
-}
-
-void
-uarte_putc(struct uarte_softc *sc, char ch)
-{
-	int timeout;
-
-	WR4(sc, EVENTS_ENDTX, 0);
-	WR4(sc, TXD_PTR, (uint32_t)&ch);
-	WR4(sc, TXD_MAXCNT, 1);
-	WR4(sc, TASKS_STARTTX, 1);
-
-	timeout = 1000;
-	do {
-		if (RD4(sc, EVENTS_ENDTX) != 0) {
-			WR4(sc, EVENTS_ENDTX, 0);
-			break;
-		}
-	} while (timeout--);
-}
-
-static void
-uarte_start(struct uarte_softc *sc)
-{
-
-	WR4(sc, INTENSET, RXDRDY);
-
-	WR4(sc, ENABLE, 0);
-	switch (sc->baudrate) {
-	case 115200:
-		WR4(sc, BAUDRATE, BAUD_115200);
-		break;
-	default:
-		panic("Unsupported baud rate");
-	}
-	WR4(sc, PSELTXD, sc->pin_tx);
-	WR4(sc, PSELRXD, sc->pin_rx);
-	WR4(sc, CONFIG, 0);
-	WR4(sc, ENABLE, ENABLE_EN);
-
-	WR4(sc, RXD_PTR, (uint32_t)&sc->rx_data[0]);
-	WR4(sc, RXD_MAXCNT, 8);
-
-	WR4(sc, TASKS_STARTRX, 1);
-}
-
-void
-uarte_init(struct uarte_softc *sc, uint32_t base,
-    uint8_t pin_tx, uint8_t pin_rx,
-    uint32_t baudrate)
-{
-
-	sc->base = base;
-	sc->pin_tx = pin_tx;
-	sc->pin_rx = pin_rx;
-	sc->baudrate = baudrate;
-
-	uarte_start(sc);
-}
+#endif /* !_ARM_NORDICSEMI_NRF52832_H_ */
