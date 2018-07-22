@@ -27,9 +27,30 @@
 #ifndef _ARM_MAXIM_MAX32625_GPIO_H_
 #define _ARM_MAXIM_MAX32625_GPIO_H_
 
+enum pin_mode {
+	MODE_HIGH_Z_WEAK_PULLUP,	/* For out=1, weak pullup. For out=0, high impedance. */
+	MODE_OPEN_DRAIN,		/* For out=1, high impedance. For out=0, open drain. */
+	MODE_OPEN_DRAIN_WEAK_PULLUP,	/* For out=1, weak pullup. For out=0, open drain. */
+	MODE_RSRVD_0,
+	MODE_NORMAL_HIGH_Z,		/* For out=1, high impedance. For out=0, high impedance. */
+	MODE_NORMAL,			/* For out=1, normal drive high. For out=0, normal drive low. */
+	MODE_SLOW_HIGH_Z,		/* For out=1, high impedance. For out=0, high impedance. */
+	MODE_SLOW_DRIVE,		/* For out=1, slow drive high. For out=0, slow drive low. */
+	MODE_FAST_HIGH_Z,		/* For out=1, high impedance. For out=0, high impedance. */
+	MODE_FAST_DRIVE,		/* For out=1, fast drive high. For out=0, fast drive low. */
+	MODE_HIGH_Z_WEAK_PULLDOWN,	/* For out=1, high impedance. For out=0, weak pulldown. */
+	MODE_OPEN_SOURCE,		/* For out=1, normal drive high. For out=0, high impedance. */
+	MODE_OPEN_SOURCE_WEAK_PULLDOWN,	/* For out=1, normal drive high. For out=0, weak pulldown. */
+	MODE_RSRVD_1,
+	MODE_RSRVD_2,
+	MODE_HIGH_Z_INPUT_DISABLED,	/* For out=0/1, high impedance. Input receiver disabled. */
+};
+
 #define	GPIO_RST_MODE_P(n)	(0x000 + 0x4 * (n))	/* Port Pn Default (Power-On Reset) Output Drive Mode */
 #define	GPIO_FREE_P(n)		(0x040 + 0x4 * (n))	/* Port Pn Free for GPIO Operation Flags */
 #define	GPIO_OUT_MODE_P(n)	(0x080 + 0x4 * (n))	/* Port Pn GPIO Output Drive Mode */
+#define	 OUT_MODE_PIN_S(n)	(0x4 * (n))
+#define	 OUT_MODE_PIN_M(n)	(0xf << OUT_MODE_PIN_S(n))
 #define	GPIO_OUT_VAL_P(n)	(0x0C0 + 0x4 * (n))	/* Port Pn GPIO Output Value */
 #define	GPIO_FUNC_SEL_P(n)	(0x100 + 0x4 * (n))	/* Port Pn GPIO Function Select */
 #define	GPIO_IN_MODE_P(n)	(0x140 + 0x4 * (n))	/* Port Pn GPIO Input Monitoring Mode */
@@ -43,5 +64,9 @@ struct max32625_gpio_softc {
 };
 
 void max32625_gpio_init(struct max32625_gpio_softc *sc, uint32_t base);
+void max32625_gpio_mode(struct max32625_gpio_softc *sc,
+    uint8_t port, uint8_t pin, enum pin_mode mode);
+void max32625_gpio_out_val(struct max32625_gpio_softc *sc,
+    uint8_t port, uint8_t pin, uint8_t val);
 
 #endif /* !_ARM_MAXIM_MAX32625_GPIO_H_ */

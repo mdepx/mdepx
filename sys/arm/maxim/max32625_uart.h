@@ -51,7 +51,13 @@
 #define	 CTRL_RTS_LEVEL_S	20
 #define	 CTRL_RTS_LEVEL_M	(0x3f << CTRL_RTS_LEVEL_S)
 #define	UART_BAUD		0x04	/* Baud Control Register */
+#define	 BAUD_DIVISOR_S		0
+#define	 BAUD_DIVISOR_M		(0xff << BAUD_BAUD_DIVISOR_S)
+#define	 BAUD_MODE_S		8
+#define	 BAUD_MODE_M		(0x3 << BAUD_BAUD_MODE_S)
 #define	UART_TX_FIFO_CTRL	0x08	/* TX FIFO Control Register */
+#define	 TX_FIFO_CTRL_FIFO_ENTRY_S	0
+#define	 TX_FIFO_CTRL_FIFO_ENTRY_M	(0x3f << TX_FIFO_CTRL_FIFO_ENTRY_S)
 #define	UART_RX_FIFO_CTRL	0x0C	/* RX FIFO Control Register */
 #define	UART_MD_CTRL		0x10	/* Multidrop Control Register */
 #define	UART_INTFL		0x14	/* Interrupt Flags */
@@ -63,7 +69,8 @@ struct max32625_uart_softc {
 	uint32_t rx;
 };
 
-void max32625_uart_init(struct max32625_uart_softc *sc, uint32_t base, uint32_t tx, uint32_t rx);
+void max32625_uart_init(struct max32625_uart_softc *sc, uint32_t base,
+    uint32_t tx, uint32_t rx, uint32_t uart_freq, uint32_t baud_rate);
 void max32625_uart_putc(struct max32625_uart_softc *sc, char ch);
 void max32625_uart_intr(void *arg, uint32_t irqno);
 
