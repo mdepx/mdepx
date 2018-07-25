@@ -27,13 +27,13 @@
 #ifndef _ARM_STM_STM32F4_GPIO_H_
 #define _ARM_STM_STM32F4_GPIO_H_
 
-#define	GPIO_MODER(n)	(0x00 + 0x400 * n)
-#define	GPIO_OTYPER(n)	(0x04 + 0x400 * n)
-#define	GPIO_OSPEEDR(n)	(0x08 + 0x400 * n)
-#define	GPIO_BSSR(n)	(0x18 + 0x400 * n)
-#define	GPIO_AFRL(n)	(0x20 + 0x400 * n)
-#define	GPIO_AFRH(n)	(0x24 + 0x400 * n)
-#define	GPIO_PUPDR(n)	(0x0C + 0x400 * n)
+#define	GPIO_MODER(n)	(0x00 + 0x400 * (n))
+#define	GPIO_OTYPER(n)	(0x04 + 0x400 * (n))
+#define	GPIO_OSPEEDR(n)	(0x08 + 0x400 * (n))
+#define	GPIO_BSSR(n)	(0x18 + 0x400 * (n))
+#define	GPIO_AFRL(n)	(0x20 + 0x400 * (n))
+#define	GPIO_AFRH(n)	(0x24 + 0x400 * (n))
+#define	GPIO_PUPDR(n)	(0x0C + 0x400 * (n))
 
 #define	MODE_INP	0
 #define	MODE_OUT	1
