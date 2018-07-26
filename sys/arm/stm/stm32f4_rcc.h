@@ -34,19 +34,19 @@
 #define	 ETHMACRXEN	(1 << 27) /* Ethernet Reception clock enable */
 #define	 ETHMACTXEN	(1 << 26) /* Ethernet Transmission clock enable */
 #define	 ETHMACEN	(1 << 25) /* Ethernet MAC clock enable */
-#define	 DMA1EN		(1 << 21)
 #define	 DMA2EN		(1 << 22)
-#define	 RCCAEN		(1 << 0)
-#define	 RCCBEN		(1 << 1)
-#define	 RCCCEN		(1 << 2)
-#define	 RCCDEN		(1 << 3)
-#define	 RCCEEN		(1 << 4)
-#define	 RCCFEN		(1 << 5)
-#define	 RCCGEN		(1 << 6)
-#define	 RCCHEN		(1 << 7)
-#define	 RCCIEN		(1 << 8)
-#define	 RCCJEN		(1 << 9)
-#define	 RCCKEN		(1 << 10)
+#define	 DMA1EN		(1 << 21)
+#define	 GPIOKEN	(1 << 10)
+#define	 GPIOJEN	(1 << 9)
+#define	 GPIOIEN	(1 << 8)
+#define	 GPIOHEN	(1 << 7)
+#define	 GPIOGEN	(1 << 6)
+#define	 GPIOFEN	(1 << 5)
+#define	 GPIOEEN	(1 << 4)
+#define	 GPIODEN	(1 << 3)
+#define	 GPIOCEN	(1 << 2)
+#define	 GPIOBEN	(1 << 1)
+#define	 GPIOAEN	(1 << 0)
 #define	 OTGHSULPIEN	(1 << 30) /* USB OTG HSULPI clock enable */
 #define	 OTGHSEN	(1 << 29) /* USB OTG HS clock enable */
 #define	RCC_AHB2ENR	0x34
