@@ -27,86 +27,19 @@
 #ifndef _ARM_STM_STM32F4_RCC_H_
 #define _ARM_STM_STM32F4_RCC_H_
 
-#define	RCC_AHB1RSTR	0x10
-#define	 ETHMACRST	(1 << 25) /* Ethernet MAC reset */
-#define	RCC_AHB1ENR	0x30
-#define	 ETHMACPTPEN	(1 << 28) /* Ethernet PTP clock enable */
-#define	 ETHMACRXEN	(1 << 27) /* Ethernet Reception clock enable */
-#define	 ETHMACTXEN	(1 << 26) /* Ethernet Transmission clock enable */
-#define	 ETHMACEN	(1 << 25) /* Ethernet MAC clock enable */
-#define	 DMA2EN		(1 << 22)
-#define	 DMA1EN		(1 << 21)
-#define	 GPIOKEN	(1 << 10)
-#define	 GPIOJEN	(1 << 9)
-#define	 GPIOIEN	(1 << 8)
-#define	 GPIOHEN	(1 << 7)
-#define	 GPIOGEN	(1 << 6)
-#define	 GPIOFEN	(1 << 5)
-#define	 GPIOEEN	(1 << 4)
-#define	 GPIODEN	(1 << 3)
-#define	 GPIOCEN	(1 << 2)
-#define	 GPIOBEN	(1 << 1)
-#define	 GPIOAEN	(1 << 0)
-#define	 OTGHSULPIEN	(1 << 30) /* USB OTG HSULPI clock enable */
-#define	 OTGHSEN	(1 << 29) /* USB OTG HS clock enable */
-#define	RCC_AHB2ENR	0x34
-#define	 OTGFSEN	(1 << 7) /* USB OTG FS clock enable */
-#define	RCC_AHB3ENR	0x38
-#define	 FMCEN		(1 << 0) /* FMC module clock enabled */
-#define	RCC_APB1ENR	0x40
-#define	 PWREN		(1 << 28) /* Power interface clock enable */
-#define	 I2C3EN		(1 << 23) /* I2C3 clock enable */
-#define	 SPI2EN		(1 << 14) /* SPI2 clock enable */
-#define	 TIM2EN		(1 << 0)
-#define	RCC_APB2ENR	0x44
-#define	 DSIEN		(1 << 27) /* DSI clocks enable */
-#define	 LTDCEN		(1 << 26) /* LTDC clock enable */
-#define	 SAI2EN		(1 << 23) /* SAI2 clock enable */
-#define	 SPI5EN		(1 << 20)
-#define	 SYSCFGEN	(1 << 14) /* System configuration controller clock enable */
-#define	 SDMMC1EN	(1 << 11)
-#define	 USART6EN	(1 << 5)
-#define	 USART1EN	(1 << 4)
-#define	 TIM1EN		(1 << 0)
-#define	RCC_CFGR	0x08
-#define	 CFGR_PPRE2_S	13 /* APB high-speed prescaler (APB2) */
-#define	 CFGR_PPRE2_M	(0x7 << CFGR_PPRE2_S)
-#define	 CFGR_PPRE2_2	(0x4 << CFGR_PPRE2_S)
-#define	 CFGR_PPRE2_4	(0x5 << CFGR_PPRE2_S)
-#define	 CFGR_PPRE2_8	(0x6 << CFGR_PPRE2_S)
-#define	 CFGR_PPRE2_16	(0x7 << CFGR_PPRE2_S)
-#define	 CFGR_PPRE1_S	10 /* APB Low speed prescaler (APB1) */
-#define	 CFGR_PPRE1_M	(0x7 << CFGR_PPRE1_S)
-#define	 CFGR_PPRE1_2	(0x4 << CFGR_PPRE1_S)
-#define	 CFGR_PPRE1_4	(0x5 << CFGR_PPRE1_S)
-#define	 CFGR_PPRE1_8	(0x6 << CFGR_PPRE1_S)
-#define	 CFGR_PPRE1_16	(0x7 << CFGR_PPRE1_S)
-#define	 CFGR_HPRE_S	4 /* AHB prescaler */
-#define	 CFGR_HPRE_M	(0xf << CFGR_HPRE_S)
-#define	 CFGR_SWS_S	2 /* System clock switch status */
-#define	 CFGR_SWS_M	(0x3 << CFGR_SWS_S)
-#define	 CFGR_SWS_PLL	(0x2 << CFGR_SWS_S)
-#define	 CFGR_SWS_HSE	(0x1 << CFGR_SWS_S)
-#define	 CFGR_SWS_HSI	(0x0 << CFGR_SWS_S)
-#define	 CFGR_SW_S	0 /* System clock switch */
-#define	 CFGR_SW_M	(0x3 << CFGR_SW_S)
-#define	 CFGR_SW_PLLR	(0x3 << CFGR_SW_S)
-#define	 CFGR_SW_PLLP	(0x2 << CFGR_SW_S)
-#define	 CFGR_SW_HSE	(0x1 << CFGR_SW_S)
-#define	 CFGR_SW_HSI	(0x0 << CFGR_SW_S)
-#define	RCC_CR		0x00
-#define	 PLLSAIRDY	(1 << 29)
-#define	 PLLSAION	(1 << 28)
-#define	 HSEBYP		(1 << 18) /* HSE clock bypass */
-#define	 HSION		(1 << 0)
-#define	 HSEON		(1 << 16)
-#define	 CR_PLLI2SRDY	(1 << 27) /* PLLI2S clock ready flag */
-#define	 CR_PLLI2SON	(1 << 26) /* PLLI2S enable */
-#define	 PLLON		(1 << 24)
-#define	 CSSON		(1 << 19) /* Clock security system enable */
-#define	 PLLRDY		(1 << 25)
-#define	 HSERDY		(1 << 17) /* HSE clock ready flag */
-#define	 HSIRDY		(1 << 1) /* HSI clock ready flag */
+#define	RCC_CR			0x00
+#define	 CR_PLLSAIRDY		(1 << 29)
+#define	 CR_PLLSAION		(1 << 28)
+#define	 CR_HSEBYP		(1 << 18) /* HSE clock bypass */
+#define	 CR_HSION		(1 << 0)
+#define	 CR_HSEON		(1 << 16)
+#define	 CR_PLLI2SRDY		(1 << 27) /* PLLI2S clock ready flag */
+#define	 CR_PLLI2SON		(1 << 26) /* PLLI2S enable */
+#define	 CR_PLLON		(1 << 24)
+#define	 CR_CSSON		(1 << 19) /* Clock security system enable */
+#define	 CR_PLLRDY		(1 << 25)
+#define	 CR_HSERDY		(1 << 17) /* HSE clock ready flag */
+#define	 CR_HSIRDY		(1 << 1) /* HSI clock ready flag */
 #define	RCC_PLLCFGR		0x04
 #define	 PLLCFGR_PLLR_S		28
 #define	 PLLCFGR_PLLQ_S		24
@@ -114,27 +47,95 @@
 #define	 PLLCFGR_PLLP_S		16
 #define	 PLLCFGR_PLLN_S		6
 #define	 PLLCFGR_PLLM_S		0
-#define	RCC_PLLSAICFGR	0x88
-#define	RCC_CIR		0x0C
-#define	RCC_PLLI2SCFGR	0x84
-#define	 PLLI2SR_S	28
-#define	 PLLI2SQ_S	24
-#define	 PLLI2SP_S	16
-#define	 PLLI2SN_S	6
-#define	RCC_DCKCFGR	0x8C
-#define	 PLLSAIDIVR_S	16
-#define	 SAI2SEL_S	22
-#define	 SAI2SEL_PLLI2S	1
-#define	 PLLI2SDIV_S	0
-#define	RCC_DCKCFGR2	0x90
-#define	 I2C3SEL_S	20
-#define	 USART6SEL_S	10
-#define	 SDMMCSEL_S	28 /* SDMMC clock source selection */
-#define	 SDMMCSEL_PLL48	0
-#define	 SDMMCSEL_SYS	1
-#define	RCC_APB1RSTR	0x20
-#define	 I2C3RST	(1 << 23)	/* I2C3 reset */
-#define	 SPI2RST	(1 << 14)	/* SPI2 reset */
+#define	RCC_CFGR		0x08
+#define	 CFGR_PPRE2_S		13 /* APB high-speed prescaler (APB2) */
+#define	 CFGR_PPRE2_M		(0x7 << CFGR_PPRE2_S)
+#define	 CFGR_PPRE2_2		(0x4 << CFGR_PPRE2_S)
+#define	 CFGR_PPRE2_4		(0x5 << CFGR_PPRE2_S)
+#define	 CFGR_PPRE2_8		(0x6 << CFGR_PPRE2_S)
+#define	 CFGR_PPRE2_16		(0x7 << CFGR_PPRE2_S)
+#define	 CFGR_PPRE1_S		10 /* APB Low speed prescaler (APB1) */
+#define	 CFGR_PPRE1_M		(0x7 << CFGR_PPRE1_S)
+#define	 CFGR_PPRE1_2		(0x4 << CFGR_PPRE1_S)
+#define	 CFGR_PPRE1_4		(0x5 << CFGR_PPRE1_S)
+#define	 CFGR_PPRE1_8		(0x6 << CFGR_PPRE1_S)
+#define	 CFGR_PPRE1_16		(0x7 << CFGR_PPRE1_S)
+#define	 CFGR_HPRE_S		4 /* AHB prescaler */
+#define	 CFGR_HPRE_M		(0xf << CFGR_HPRE_S)
+#define	 CFGR_SWS_S		2 /* System clock switch status */
+#define	 CFGR_SWS_M		(0x3 << CFGR_SWS_S)
+#define	 CFGR_SWS_PLL		(0x2 << CFGR_SWS_S)
+#define	 CFGR_SWS_HSE		(0x1 << CFGR_SWS_S)
+#define	 CFGR_SWS_HSI		(0x0 << CFGR_SWS_S)
+#define	 CFGR_SW_S		0 /* System clock switch */
+#define	 CFGR_SW_M		(0x3 << CFGR_SW_S)
+#define	 CFGR_SW_PLLR		(0x3 << CFGR_SW_S)
+#define	 CFGR_SW_PLLP		(0x2 << CFGR_SW_S)
+#define	 CFGR_SW_HSE		(0x1 << CFGR_SW_S)
+#define	 CFGR_SW_HSI		(0x0 << CFGR_SW_S)
+#define	RCC_CIR			0x0C
+#define	RCC_AHB1RSTR		0x10
+#define	 ETHMACRST		(1 << 25) /* Ethernet MAC reset */
+#define	RCC_APB1RSTR		0x20
+#define	 I2C3RST		(1 << 23)	/* I2C3 reset */
+#define	 SPI2RST		(1 << 14)	/* SPI2 reset */
+#define	RCC_AHB1ENR		0x30
+#define	 ETHMACPTPEN		(1 << 28) /* Ethernet PTP clock enable */
+#define	 ETHMACRXEN		(1 << 27) /* Ethernet Reception clock enable */
+#define	 ETHMACTXEN		(1 << 26) /* Ethernet Transmission clock enable */
+#define	 ETHMACEN		(1 << 25) /* Ethernet MAC clock enable */
+#define	 DMA2EN			(1 << 22)
+#define	 DMA1EN			(1 << 21)
+#define	 GPIOKEN		(1 << 10)
+#define	 GPIOJEN		(1 << 9)
+#define	 GPIOIEN		(1 << 8)
+#define	 GPIOHEN		(1 << 7)
+#define	 GPIOGEN		(1 << 6)
+#define	 GPIOFEN		(1 << 5)
+#define	 GPIOEEN		(1 << 4)
+#define	 GPIODEN		(1 << 3)
+#define	 GPIOCEN		(1 << 2)
+#define	 GPIOBEN		(1 << 1)
+#define	 GPIOAEN		(1 << 0)
+#define	 OTGHSULPIEN		(1 << 30) /* USB OTG HSULPI clock enable */
+#define	 OTGHSEN		(1 << 29) /* USB OTG HS clock enable */
+#define	RCC_AHB2ENR		0x34
+#define	 OTGFSEN		(1 << 7) /* USB OTG FS clock enable */
+#define	RCC_AHB3ENR		0x38
+#define	 FMCEN			(1 << 0) /* FMC module clock enabled */
+#define	RCC_APB1ENR		0x40
+#define	 PWREN			(1 << 28) /* Power interface clock enable */
+#define	 I2C3EN			(1 << 23) /* I2C3 clock enable */
+#define	 SPI2EN			(1 << 14) /* SPI2 clock enable */
+#define	 TIM2EN			(1 << 0)
+#define	RCC_APB2ENR		0x44
+#define	 DSIEN			(1 << 27) /* DSI clocks enable */
+#define	 LTDCEN			(1 << 26) /* LTDC clock enable */
+#define	 SAI2EN			(1 << 23) /* SAI2 clock enable */
+#define	 SPI5EN			(1 << 20)
+#define	 SYSCFGEN		(1 << 14) /* System configuration controller clock enable */
+#define	 SDMMC1EN		(1 << 11)
+#define	 USART6EN		(1 << 5)
+#define	 USART1EN		(1 << 4)
+#define	 TIM1EN			(1 << 0)
+#define	RCC_PLLI2SCFGR		0x84
+#define	 PLLI2SR_S		28
+#define	 PLLI2SQ_S		24
+#define	 PLLI2SP_S		16
+#define	 PLLI2SN_S		6
+#define	RCC_PLLSAICFGR		0x88
+
+#define	RCC_DCKCFGR			0x8C
+#define	 DCKCFGR_PLLSAIDIVR_S		16
+#define	 DCKCFGR_SAI2SEL_S		22
+#define	 DCKCFGR_SAI2SEL_PLLI2S		1
+#define	 DCKCFGR_PLLI2SDIV_S		0
+#define	RCC_DCKCFGR2			0x90
+#define	 DCKCFGR2_I2C3SEL_S		20
+#define	 DCKCFGR2_USART6SEL_S		10
+#define	 DCKCFGR2_SDMMCSEL_S		28 /* SDMMC clock source selection */
+#define	 DCKCFGR2_SDMMCSEL_PLL48	0
+#define	 DCKCFGR2_SDMMCSEL_SYS		1
 
 struct stm32f4_rcc_softc {
 	uint32_t base;
