@@ -24,27 +24,42 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ARM_STM_STM32F4_H_
-#define _ARM_STM_STM32F4_H_
-
-#include <arm/stm/stm32f4_usart.h>
-#include <arm/stm/stm32f4_flash.h>
-#include <arm/stm/stm32f4_gpio.h>
-#include <arm/stm/stm32f4_pwr.h>
-#include <arm/stm/stm32f4_timer.h>
-
+#include <sys/cdefs.h>
 #include <arm/stm/stm32l4_rcc.h>
 
-#define	USART1_BASE	0x40013800
-#define	USART2_BASE	0x40004400
-#define	USART3_BASE	0x40004800
-#define	USART4_BASE	0x40004C00
+#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-#define	FLASH_BASE	0x40022000
-#define	PWR_BASE	0x40007000
-#define	GPIO_BASE	0x48000000
-#define	NVIC_BASE	0xE000E000
-#define	RCC_BASE	0x40021000
-#define	TIM1_BASE	0x40012C00
+void
+stm32l4_rcc_pll_configure(struct stm32l4_rcc_softc *sc,
+    int pllm, int plln, int pllq, int pllp, uint8_t external,
+    uint32_t rcc_cfgr)
+{
 
-#endif	/* !_ARM_STM_STM32F4_H_ */
+	/* TODO */
+}
+
+int
+stm32l4_rcc_setup(struct stm32l4_rcc_softc *sc,
+    uint32_t ahb1enr, uint32_t ahb2enr, uint32_t ahb3enr,
+    uint32_t apb1enr1, uint32_t apb1enr2, uint32_t apb2enr)
+{
+
+	WR4(sc, RCC_AHB1ENR, ahb1enr);
+	WR4(sc, RCC_AHB2ENR, ahb2enr);
+	WR4(sc, RCC_AHB3ENR, ahb3enr);
+	WR4(sc, RCC_APB1ENR1, apb1enr1);
+	WR4(sc, RCC_APB1ENR2, apb1enr2);
+	WR4(sc, RCC_APB2ENR, apb2enr);
+
+	return (0);
+}
+
+int
+stm32l4_rcc_init(struct stm32l4_rcc_softc *sc, uint32_t base)
+{
+
+	sc->base = base;
+
+	return (0);
+}
