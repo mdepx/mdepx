@@ -32,6 +32,7 @@
 #include <arm/stm/stm32f4_gpio.h>
 #include <arm/stm/stm32f4_pwr.h>
 #include <arm/stm/stm32f4_timer.h>
+#include <arm/stm/stm32f4_spi.h>
 
 #include <arm/stm/stm32l4_rcc.h>
 
@@ -46,5 +47,6 @@
 #define	NVIC_BASE	0xE000E000
 #define	RCC_BASE	0x40021000
 #define	TIM1_BASE	0x40012C00
+#define	SPI1_BASE	0x40013000
 
 #endif	/* !_ARM_STM_STM32F4_H_ */

@@ -52,6 +52,9 @@
 #define	 CR2_TXDMAEN	(1 << 1) /* Tx buffer DMA enable */
 #define	 CR2_RXDMAEN	(1 << 0) /* Rx buffer DMA enable */
 #define	SPI_SR		0x08 /* SPI status register */
+#define	 SR_FTLVL_S	11	/* FIFO Transmission Level */
+#define	 SR_FTLVL_M	(0x3 << SR_FTLVL_S)
+#define	 SR_FTLVL_FULL	(0x3 << SR_FTLVL_S)
 #define	 SR_TXE		(1 << 1) /* Transmit buffer empty */
 #define	 SR_RXNE	(1 << 0) /* Receive buffer not empty */
 #define	SPI_DR		0x0C /* SPI data register */
@@ -64,5 +67,11 @@
 struct stm32f4_spi_softc {
 	uint32_t base;
 };
+
+void stm32f4_spi_init(struct spi_device *dev, struct stm32f4_spi_softc *sc,
+    uint32_t base);
+int stm32f4_spi_transfer(struct spi_device *dev, uint8_t *txcmd,
+    uint8_t *rxcmd, uint32_t nmsg);
+void stm32f4_spi_intr(void *arg);
 
 #endif /* !_ARM_STM_STM32F4_SPI_H_ */
