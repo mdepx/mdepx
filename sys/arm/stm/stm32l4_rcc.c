@@ -25,10 +25,45 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/systm.h>
 #include <arm/stm/stm32l4_rcc.h>
 
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+
+/* MSI (multispeed internal) RC oscillator clock configuration */
+void
+stm32l4_rcc_msi_configure(struct stm32l4_rcc_softc *sc,
+    uint32_t freq)
+{
+	uint32_t reg;
+
+	do {
+		reg = RD4(sc, RCC_CR);
+	} while ((reg & CR_MSIRDY) == 0);
+
+	reg &= ~CR_MSIRANGE_M;
+
+	switch (freq) {
+	case 48000000:
+		reg |= CR_MSIRANGE_48MHZ;
+		break;
+	case 24000000:
+		reg |= CR_MSIRANGE_24MHZ;
+		break;
+	default:
+		panic("Unsupported range\n");
+	}
+
+	reg |= CR_MSIRGSEL | CR_MSION;
+	WR4(sc, RCC_CR, reg);
+
+	do {
+		reg = RD4(sc, RCC_CR);
+	} while ((reg & CR_MSIRDY) == 0);
+
+	printf("msi %x\n", RD4(sc, RCC_CR));
+}
 
 void
 stm32l4_rcc_pll_configure(struct stm32l4_rcc_softc *sc,

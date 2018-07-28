@@ -38,6 +38,23 @@
 #define	 CR_HSEON		(1 << 16)
 #define	 CR_HSIRDY		(1 << 10) /* HSI clock ready flag */
 #define	 CR_HSION		(1 << 8)
+#define	 CR_MSIRANGE_S		4 /* MSI clock ranges */
+#define	 CR_MSIRANGE_M		(0xf << CR_MSIRANGE_S)
+#define	 CR_MSIRANGE_100KHZ	(0 << CR_MSIRANGE_S)
+#define	 CR_MSIRANGE_200KHZ	(1 << CR_MSIRANGE_S)
+#define	 CR_MSIRANGE_400KHZ	(2 << CR_MSIRANGE_S)
+#define	 CR_MSIRANGE_800KHZ	(3 << CR_MSIRANGE_S)
+#define	 CR_MSIRANGE_1MHZ	(4 << CR_MSIRANGE_S)
+#define	 CR_MSIRANGE_2MHZ	(5 << CR_MSIRANGE_S)
+#define	 CR_MSIRANGE_4MHZ	(6 << CR_MSIRANGE_S)
+#define	 CR_MSIRANGE_8MHZ	(7 << CR_MSIRANGE_S)
+#define	 CR_MSIRANGE_16MHZ	(8 << CR_MSIRANGE_S)
+#define	 CR_MSIRANGE_24MHZ	(9 << CR_MSIRANGE_S)
+#define	 CR_MSIRANGE_32MHZ	(10 << CR_MSIRANGE_S)
+#define	 CR_MSIRANGE_48MHZ	(11 << CR_MSIRANGE_S)
+#define	 CR_MSIRGSEL		(1 << 3) /* MSI clock range selection */
+#define	 CR_MSIRDY		(1 << 1) /* MSI clock ready flag */
+#define	 CR_MSION		(1 << 0) /* MSI clock enable */
 #define	RCC_CFGR		0x08
 #define	 CFGR_PPRE2_S		11 /* APB high-speed prescaler (APB2) */
 #define	 CFGR_PPRE2_M		(0x7 << CFGR_PPRE2_S)
@@ -113,5 +130,6 @@ void stm32l4_rcc_pll_configure(struct stm32l4_rcc_softc *sc,
 int stm32l4_rcc_setup(struct stm32l4_rcc_softc *sc,
     uint32_t ahb1enr, uint32_t ahb2enr, uint32_t ahb3enr,
     uint32_t apb1enr1, uint32_t apb1enr2, uint32_t apb2enr);
+void stm32l4_rcc_msi_configure(struct stm32l4_rcc_softc *sc, uint32_t freq);
 
 #endif /* !_ARM_STM_STM32L4_RCC_H_ */
