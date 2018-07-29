@@ -51,6 +51,33 @@ stm32l4_rcc_msi_configure(struct stm32l4_rcc_softc *sc,
 	case 24000000:
 		reg |= CR_MSIRANGE_24MHZ;
 		break;
+	case 16000000:
+		reg |= CR_MSIRANGE_16MHZ;
+		break;
+	case 8000000:
+		reg |= CR_MSIRANGE_8MHZ;
+		break;
+	case 4000000:
+		reg |= CR_MSIRANGE_4MHZ;
+		break;
+	case 2000000:
+		reg |= CR_MSIRANGE_2MHZ;
+		break;
+	case 1000000:
+		reg |= CR_MSIRANGE_1MHZ;
+		break;
+	case 800000:
+		reg |= CR_MSIRANGE_800KHZ;
+		break;
+	case 400000:
+		reg |= CR_MSIRANGE_400KHZ;
+		break;
+	case 200000:
+		reg |= CR_MSIRANGE_200KHZ;
+		break;
+	case 100000:
+		reg |= CR_MSIRANGE_100KHZ;
+		break;
 	default:
 		panic("Unsupported range\n");
 	}
