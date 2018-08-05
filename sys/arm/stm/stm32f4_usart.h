@@ -27,19 +27,19 @@
 #ifndef _ARM_STM_STM32F4_USART_H_
 #define _ARM_STM_STM32F4_USART_H_
 
-#define	USART_SR		0x00 /*   */
-#define	 USART_SR_RXNE		(1 << 5)
+#define	USART_SR		0x00 /* Status register */
+#define	 USART_SR_RXNE		(1 << 5) /* Read data register not empty */
 #define	 USART_SR_TXE		(1 << 7) /* Transmit data register empty */
-#define	USART_DR		0x04 /*   */
-#define	USART_BRR		0x08 /*   */
-#define	USART_CR1		0x0C /*   */
+#define	USART_DR		0x04 /* Data register */
+#define	USART_BRR		0x08 /* Baud rate register */
+#define	USART_CR1		0x0C /* Control register 1 */
 #define	 USART_CR1_UE		(1 << 13) /* USART enable */
 #define	 USART_CR1_RXNEIE	(1 << 5) /* RXNE interrupt enable */
 #define	 USART_CR1_TE		(1 << 3) /* Transmitter enable */
 #define	 USART_CR1_RE		(1 << 2) /* Receiver enable */
-#define	USART_CR2		0x10 /*   */
-#define	USART_CR3		0x14 /*   */
-#define	USART_GTPR		0x18 /*   */
+#define	USART_CR2		0x10 /* Control register 2 */
+#define	USART_CR3		0x14 /* Control register 3 */
+#define	USART_GTPR		0x18 /* Guard time and prescaler register */
 
 struct stm32f4_usart_softc {
 	uint32_t base;
