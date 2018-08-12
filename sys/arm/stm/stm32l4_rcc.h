@@ -111,6 +111,7 @@
 #define	 APB1ENR1_PWREN		(1 << 28) /* Power interface clock enable */
 #define	 APB1ENR1_USART2EN	(1 << 17) /* USART2 clock enable */
 #define	 APB1ENR1_I2C3EN	(1 << 23) /* I2C3 clock enable */
+#define	 APB1ENR1_SPI3EN	(1 << 15) /* SPI3 clock enable */
 #define	 APB1ENR1_SPI2EN	(1 << 14) /* SPI2 clock enable */
 #define	 APB1ENR1_TIM2EN	(1 << 0)
 #define	RCC_APB1ENR2		0x5C
