@@ -62,6 +62,10 @@ stm32f4_spi_setup(struct stm32f4_spi_softc *sc)
 
 	RD2(sc, SPI_SR);
 
+	reg = RD2(sc, SPI_CR2);
+	reg |= CR2_FRXTH;
+	WR2(sc, SPI_CR2, reg);
+
 	reg = RD2(sc, SPI_CR1);
 	reg |= (CR1_MSTR);
 	reg |= (CR1_SSI);

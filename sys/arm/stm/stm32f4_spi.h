@@ -44,6 +44,7 @@
 #define	 CR1_CPOL	(1 << 1) /* Clock polarity */
 #define	 CR1_CPHA	(1 << 0) /* Clock phase */
 #define	SPI_CR2		0x04 /* SPI control register 2 */
+#define	 CR2_FRXTH	(1 << 12) /* FIFO reception threshold */
 #define	 CR2_TXEIE	(1 << 7) /* Tx buffer empty interrupt enable */
 #define	 CR2_RXNEIE	(1 << 6) /* RX buffer not empty interrupt enable */
 #define	 CR2_ERRIE	(1 << 5) /* Error interrupt enable */
