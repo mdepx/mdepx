@@ -31,7 +31,7 @@
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
-stm32f4_usart_putc(struct stm32f4_usart_softc *sc, char c)
+stm32l4_usart_putc(struct stm32l4_usart_softc *sc, char c)
 {
 
 	while ((RD4(sc, USART_ISR) & USART_ISR_TXE) == 0)
@@ -41,7 +41,7 @@ stm32f4_usart_putc(struct stm32f4_usart_softc *sc, char c)
 }
 
 int
-stm32f4_usart_init(struct stm32f4_usart_softc *sc, uint32_t base,
+stm32l4_usart_init(struct stm32l4_usart_softc *sc, uint32_t base,
     uint32_t cpu_freq, uint32_t baud_rate)
 {
 	uint32_t reg;

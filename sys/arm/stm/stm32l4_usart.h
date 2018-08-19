@@ -42,12 +42,12 @@
 #define	USART_RDR		0x24 /* Receive data register */
 #define	USART_TDR		0x28 /* Transmit data register */
 
-struct stm32f4_usart_softc {
+struct stm32l4_usart_softc {
 	uint32_t base;
 };
 
-int stm32f4_usart_init(struct stm32f4_usart_softc *sc, uint32_t base,
+int stm32l4_usart_init(struct stm32l4_usart_softc *sc, uint32_t base,
     uint32_t cpu_freq, uint32_t baud_rate);
-void stm32f4_usart_putc(struct stm32f4_usart_softc *sc, char c);
+void stm32l4_usart_putc(struct stm32l4_usart_softc *sc, char c);
 
 #endif /* !_ARM_STM_STM32L4_USART_H_ */
