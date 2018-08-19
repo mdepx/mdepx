@@ -104,11 +104,25 @@ stm32f4_rcc_setup(struct stm32f4_rcc_softc *sc, uint32_t ahb1enr,
 	while ((RD4(sc, RCC_CFGR) & CFGR_SWS_M) != CFGR_SWS_PLL)
 		;
 
-	WR4(sc, RCC_AHB1ENR, ahb1enr);
-	WR4(sc, RCC_AHB2ENR, ahb2enr);
-	WR4(sc, RCC_AHB3ENR, ahb3enr);
-	WR4(sc, RCC_APB1ENR, apb1enr);
-	WR4(sc, RCC_APB2ENR, apb2enr);
+	reg = RD4(sc, RCC_AHB1ENR);
+	reg |= ahb1enr;
+	WR4(sc, RCC_AHB1ENR, reg);
+
+	reg = RD4(sc, RCC_AHB2ENR);
+	reg |= ahb2enr;
+	WR4(sc, RCC_AHB2ENR, reg);
+
+	reg = RD4(sc, RCC_AHB3ENR);
+	reg |= ahb3enr;
+	WR4(sc, RCC_AHB3ENR, reg);
+
+	reg = RD4(sc, RCC_APB1ENR);
+	reg |= apb1enr;
+	WR4(sc, RCC_APB1ENR, reg);
+
+	reg = RD4(sc, RCC_APB2ENR);
+	reg |= apb2enr;
+	WR4(sc, RCC_APB2ENR, reg);
 
 	return (0);
 }
