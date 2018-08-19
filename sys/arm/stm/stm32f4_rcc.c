@@ -40,13 +40,13 @@ stm32f4_rcc_pllsai(struct stm32f4_rcc_softc *sc)
 	reg = (192 << 6) | (7 << 24) | (4 << 28);
 	WR4(sc, RCC_PLLSAICFGR, reg);
 
-	reg = (0x2 << PLLSAIDIVR_S);
+	reg = (0x2 << DCKCFGR_PLLSAIDIVR_S);
 	WR4(sc, RCC_DCKCFGR, reg);
 
 	reg = RD4(sc, RCC_CR);
-	reg |= PLLSAION;
+	reg |= CR_PLLSAION;
 	WR4(sc, RCC_CR, reg);
-	while ((RD4(sc, RCC_CR) & PLLSAIRDY) == 0)
+	while ((RD4(sc, RCC_CR) & CR_PLLSAIRDY) == 0)
 		;
 }
 
@@ -60,15 +60,15 @@ stm32f4_rcc_pll_configure(struct stm32f4_rcc_softc *sc,
 	if (external) {
 		/* Use external ocsillator */
 		reg = RD4(sc, RCC_CR);
-		reg |= HSEON;
+		reg |= CR_HSEON;
 		WR4(sc, RCC_CR, reg);
-		while ((RD4(sc, RCC_CR) & HSERDY) == 0)
+		while ((RD4(sc, RCC_CR) & CR_HSERDY) == 0)
 			;
 	} else {
 		reg = RD4(sc, RCC_CR);
-		reg |= (HSION);
+		reg |= (CR_HSION);
 		WR4(sc, RCC_CR, reg);
-		while ((RD4(sc, RCC_CR) & HSIRDY) == 0)
+		while ((RD4(sc, RCC_CR) & CR_HSIRDY) == 0)
 			;
 	}
 
@@ -83,9 +83,9 @@ stm32f4_rcc_pll_configure(struct stm32f4_rcc_softc *sc,
 	WR4(sc, RCC_PLLCFGR, reg);
 
 	reg = RD4(sc, RCC_CR);
-	reg |= PLLON;
+	reg |= CR_PLLON;
 	WR4(sc, RCC_CR, reg);
-	while ((RD4(sc, RCC_CR) & PLLRDY) == 0)
+	while ((RD4(sc, RCC_CR) & CR_PLLRDY) == 0)
 		;
 }
 
