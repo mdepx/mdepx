@@ -124,6 +124,14 @@
 #define	 PLLI2SP_S		16
 #define	 PLLI2SN_S		6
 #define	RCC_PLLSAICFGR		0x88
+#define	 PLLSAICFGR_PLLSAIR_S	28	/* PLLSAI division factor for LCD clock */
+#define	 PLLSAICFGR_PLLSAIR_M	(0x7 << PLLSAICFGR_PLLSAIR_S)
+#define	 PLLSAICFGR_PLLSAIQ_S	24	/* PLLSAI division factor for SAI clock */
+#define	 PLLSAICFGR_PLLSAIQ_M	(0xf << PLLSAICFGR_PLLSAIQ_S)
+#define	 PLLSAICFGR_PLLSAIP_S	16	/* PLLSAI division factor for 48MHz clock */
+#define	 PLLSAICFGR_PLLSAIP_M	(0x3 << PLLSAICFGR_PLLSAIP_S)
+#define	 PLLSAICFGR_PLLSAIN_S	6	/* PLLSAI division factor for VCO */
+#define	 PLLSAICFGR_PLLSAIN_M	(0x1ff << PLLSAICFGR_PLLSAIN_S)
 
 #define	RCC_DCKCFGR			0x8C
 #define	 DCKCFGR_PLLSAIDIVR_S		16
@@ -147,6 +155,7 @@ void stm32f4_rcc_pll_configure(struct stm32f4_rcc_softc *sc,
 int stm32f4_rcc_setup(struct stm32f4_rcc_softc *sc, uint32_t ahb1enr,  
     uint32_t ahb2enr, uint32_t ahb3enr, uint32_t apb1enr,
     uint32_t apb2enr);
-void stm32f4_rcc_pllsai(struct stm32f4_rcc_softc *sc);
+void stm32f4_rcc_pllsai(struct stm32f4_rcc_softc *sc,
+    uint32_t sain, uint32_t saiq, uint32_t sair);
 
 #endif /* !_ARM_STM_STM32F4_RCC_H_ */
