@@ -48,6 +48,8 @@
 #define	PULLUP		1
 #define	PULLDOWN	2
 
+#define	PINS_END	{ -1, -1, -1, -1, -1 }
+
 enum {
 	PORT_A,
 	PORT_B,
