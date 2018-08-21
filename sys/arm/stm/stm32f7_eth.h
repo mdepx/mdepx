@@ -101,4 +101,10 @@
 #define	ETH_DMACHTBAR	0x1050 /* Ethernet DMA current host transmit buffer address */
 #define	ETH_DMACHRBAR	0x1054 /* Ethernet DMA current host receive buffer address */
 
+struct stm32f7_eth_softc {
+	uint32_t base;
+};
+
+void stm32f7_eth_init(struct stm32f7_eth_softc *sc, uint32_t base);
+
 #endif /* !_ARM_STM_STM32F7_ETH_H_ */
