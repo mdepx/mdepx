@@ -48,5 +48,6 @@
 #define	LTDC_BASE	0x40016800
 #define	NVIC_BASE	0xE000E000
 #define	TIM2_BASE	0x40000000
+#define	ETH_BASE	0x40028000
 
 #endif	/* !_ARM_STM_STM32F7_H_ */
