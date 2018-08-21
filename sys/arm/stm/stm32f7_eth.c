@@ -72,12 +72,21 @@ dwc_set_hwaddr(struct stm32f7_eth_softc *sc, uint8_t *hwaddr)
 }
 
 void
+stm32f7_eth_setup(struct stm32f7_eth_softc *sc,
+    uint8_t *new_hwaddr)
+{
+
+	if (new_hwaddr != NULL)
+		dwc_set_hwaddr(sc, new_hwaddr);
+	else
+		dwc_set_hwaddr(sc, sc->hwaddr);
+}
+
+void
 stm32f7_eth_init(struct stm32f7_eth_softc *sc, uint32_t base)
 {
-	uint8_t hwaddr[ETHER_ADDR_LEN];
 
 	sc->base = base;
 
-	dwc_get_hwaddr(sc, hwaddr);
-	dwc_set_hwaddr(sc, hwaddr);
+	dwc_get_hwaddr(sc, sc->hwaddr);
 }
