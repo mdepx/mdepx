@@ -25,12 +25,29 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/systm.h>
 #include <arm/stm/stm32f4_flash.h>
 #include <arm/stm/stm32f4_pwr.h>
 #include <arm/stm/stm32f4_rcc.h>
 
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+
+void
+stm32f4_rcc_eth_reset(struct stm32f4_rcc_softc *sc)
+{
+	uint32_t reg;
+
+	/* Reset ethernet controller */
+	reg = RD4(sc, RCC_AHB1RSTR);
+	reg |= (ETHMACRST);
+	WR4(sc, RCC_AHB1RSTR, reg);
+
+	udelay(10000);
+
+	reg &= ~(ETHMACRST);
+	WR4(sc, RCC_AHB1RSTR, reg);
+}
 
 void
 stm32f4_rcc_pllsai(struct stm32f4_rcc_softc *sc,
