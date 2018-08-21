@@ -14,7 +14,7 @@
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * ARE DISCLAIMED.  IN NO SPI SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -24,23 +24,26 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ARM_STM_STM32F7_SYSCFG_H_
-#define _ARM_STM_STM32F7_SYSCFG_H_
+#include <sys/cdefs.h>
 
-#define	SYSCFG_MEMRMP		0x00	/* Memory remap register */
-#define	SYSCFG_PMC		0x04	/* Peripheral mode configuration register */
-#define	 PMC_MII_RMII_SEL	(1 << 23) /* Ethernet PHY interface selection */
-#define	SYSCFG_EXTICR1		0x08	/* External interrupt configuration register 1 */
-#define	SYSCFG_EXTICR2		0x0C	/* External interrupt configuration register 2 */
-#define	SYSCFG_EXTICR3		0x10	/* External interrupt configuration register 3 */
-#define	SYSCFG_EXTICR4		0x14	/* External interrupt configuration register 4 */
-#define	SYSCFG_CMPCR		0x20	/* Compensation cell control register */
+#include "stm32f7_syscfg.h"
 
-struct stm32f7_syscfg_softc {
-	uint32_t base;
-};
+#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-void stm32f7_syscfg_init(struct stm32f7_syscfg_softc *sc, uint32_t base);
-void stm32f7_syscfg_eth_rmii(struct stm32f7_syscfg_softc *sc);
+void
+stm32f7_syscfg_eth_rmii(struct stm32f7_syscfg_softc *sc)
+{
+	uint32_t reg;
 
-#endif /* !_ARM_STM_STM32F7_SYSCFG_H_ */
+	reg = RD4(sc, SYSCFG_PMC);
+	reg |= PMC_MII_RMII_SEL;
+	WR4(sc, SYSCFG_PMC, reg);
+}
+
+void
+stm32f7_syscfg_init(struct stm32f7_syscfg_softc *sc, uint32_t base)
+{
+
+	sc->base = base;
+}
