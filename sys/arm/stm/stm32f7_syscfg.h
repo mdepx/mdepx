@@ -24,29 +24,16 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ARM_STM_STM32F7_H_
-#define _ARM_STM_STM32F7_H_
+#ifndef _ARM_STM_STM32F7_SYSCFG_H_
+#define _ARM_STM_STM32F7_SYSCFG_H_
 
-#include <arm/stm/stm32l4_usart.h>
-#include <arm/stm/stm32f4_flash.h>
-#include <arm/stm/stm32f4_gpio.h>
-#include <arm/stm/stm32f4_pwr.h>
-#include <arm/stm/stm32f4_rcc.h>
-#include <arm/stm/stm32f4_fmc.h>
-#include <arm/stm/stm32f4_ltdc.h>
-#include <arm/stm/stm32f4_dsi.h>
-#include <arm/stm/stm32f4_timer.h>
-#include <arm/stm/stm32f7_eth.h>
-#include <arm/stm/stm32f7_syscfg.h>
+#define	SYSCFG_MEMRMP		0x00	/* Memory remap register */
+#define	SYSCFG_PMC		0x04	/* Peripheral mode configuration register */
+#define	 PMC_MII_RMII_SEL	(1 << 23) /* Ethernet PHY interface selection */
+#define	SYSCFG_EXTICR1		0x08	/* External interrupt configuration register 1 */
+#define	SYSCFG_EXTICR2		0x0C	/* External interrupt configuration register 2 */
+#define	SYSCFG_EXTICR3		0x10	/* External interrupt configuration register 3 */
+#define	SYSCFG_EXTICR4		0x14	/* External interrupt configuration register 4 */
+#define	SYSCFG_CMPCR		0x20	/* Compensation cell control register */
 
-#define	USART6_BASE	0x40011400
-#define	FLASH_BASE	0x40023C00
-#define	PWR_BASE	0x40007000
-#define	RCC_BASE	0x40023800
-#define	GPIO_BASE	0x40020000
-#define	FMC_BASE	0xA0000000
-#define	LTDC_BASE	0x40016800
-#define	NVIC_BASE	0xE000E000
-#define	TIM2_BASE	0x40000000
-
-#endif	/* !_ARM_STM_STM32F7_H_ */
+#endif /* !_ARM_STM_STM32F7_SYSCFG_H_ */
