@@ -25,6 +25,7 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/systm.h>
 #include <net/ethernet.h>
 
 #include "stm32f7_eth.h"
@@ -75,11 +76,46 @@ void
 stm32f7_eth_setup(struct stm32f7_eth_softc *sc,
     uint8_t *new_hwaddr)
 {
+	uint32_t reg;
+	int timeout;
+
+	/* Unreset DMA bus */
+	reg = RD4(sc, ETH_DMABMR);
+	reg &= ~(DMABMR_SR);
+	WR4(sc, ETH_DMABMR, reg);
+
+	udelay(10000);
+
+	/* Reset DMA bus */
+	reg = RD4(sc, ETH_DMABMR);
+	if (reg & DMABMR_SR)
+		printf("Device is in reset\n");
+	reg |= (DMABMR_SR);
+	WR4(sc, ETH_DMABMR, reg);
+
+	timeout = 100;
+	do {
+		if ((RD4(sc, ETH_DMABMR) & DMABMR_SR) == 0)
+			break;
+		udelay(10000);
+	} while (timeout--);
+
+	if (timeout == 0)
+		printf("Can't reset\n");
 
 	if (new_hwaddr != NULL)
 		dwc_set_hwaddr(sc, new_hwaddr);
 	else
 		dwc_set_hwaddr(sc, sc->hwaddr);
+
+	reg = RD4(sc, ETH_DMABMR);
+	reg |= (32 << DMABMR_PBL_S);
+	WR4(sc, ETH_DMABMR, reg);
+
+	/* DMA must be halted while changing descriptor list addresses. */
+	reg = RD4(sc, ETH_DMAOMR);
+	reg &= ~(DMAOMR_ST | DMAOMR_SR);
+	WR4(sc, ETH_DMAOMR, reg);
 }
 
 void
