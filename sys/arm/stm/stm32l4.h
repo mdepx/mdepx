@@ -27,7 +27,7 @@
 #ifndef _ARM_STM_STM32F4_H_
 #define _ARM_STM_STM32F4_H_
 
-#include <arm/stm/stm32f4_usart.h>
+#include <arm/stm/stm32l4_usart.h>
 #include <arm/stm/stm32f4_flash.h>
 #include <arm/stm/stm32f4_gpio.h>
 #include <arm/stm/stm32f4_pwr.h>
