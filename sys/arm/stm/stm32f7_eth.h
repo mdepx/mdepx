@@ -101,14 +101,44 @@
 #define	ETH_DMACHTBAR	0x1050 /* Ethernet DMA current host transmit buffer address */
 #define	ETH_DMACHRBAR	0x1054 /* Ethernet DMA current host receive buffer address */
 
+struct dwc_hwdesc {
+	uint32_t tdes0;
+	uint32_t tdes1;
+#define	DDESC_TDES0_OWN			(1 << 31)
+#define	DDESC_TDES0_TXINT		(1 << 30)
+#define	DDESC_TDES0_TXLAST		(1 << 29)
+#define	DDESC_TDES0_TXFIRST		(1 << 28)
+#define	DDESC_TDES0_TXCRCDIS		(1 << 27)
+#define	DDESC_TDES0_DP			(1 << 26) /* Disable pad */
+#define	DDESC_TDES0_TXRINGEND		(1 << 21)
+#define	DDESC_TDES0_TXCHAIN		(1 << 20)
+#define	DDESC_RDES0_OWN			(1 << 31)
+#define	DDESC_RDES0_FL_SHIFT		16	/* Frame Length */
+#define	DDESC_RDES0_FL_MASK		(0x3fff << DDESC_RDES0_FL_SHIFT)
+#define	DDESC_RDES1_CHAINED		(1 << 14)
+	uint32_t addr;		/* Pointer to buffer data */
+	uint32_t addr_next;	/* Link to the next descriptor */
+};
+
+#define	RX_DESC_COUNT	32
+#define	TX_DESC_COUNT	32
+
 struct stm32f7_eth_softc {
 	uint32_t base;
 	uint8_t hwaddr[ETHER_ADDR_LEN];
 	uint8_t mii_clk;
+	struct dwc_hwdesc	*txdesc_ring;
+	struct dwc_hwdesc	*rxdesc_ring;
+	int	tx_idx_head;
+	int	tx_idx_tail;
+	struct mbuf		*rxbuf[RX_DESC_COUNT];
+	struct mbuf		*txbuf[TX_DESC_COUNT];
 };
 
 void stm32f7_eth_init(struct stm32f7_eth_softc *sc, uint32_t base);
 int stm32f7_eth_setup(struct stm32f7_eth_softc *sc,
     uint8_t *new_hwaddr);
+void stm32f7_eth_intr(void *arg, struct trapframe *tf, int irq);
+void stm32f7_eth_wkup_intr(void *arg, struct trapframe *tf, int irq);
 
 #endif /* !_ARM_STM_STM32F7_ETH_H_ */

@@ -26,14 +26,22 @@
 
 #include <sys/cdefs.h>
 #include <sys/systm.h>
+#include <sys/mbuf.h>
 #include <net/ethernet.h>
 
+#include <machine/frame.h>
 #include <dev/mii/mii.h>
 
 #include "stm32f7_eth.h"
 
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+
+#define	RX_DESC_SIZE	(sizeof(struct dwc_hwdesc) * RX_DESC_COUNT)
+#define	TX_DESC_SIZE	(sizeof(struct dwc_hwdesc) * TX_DESC_COUNT)
+
+struct dwc_hwdesc	txdesc_ring[TX_DESC_COUNT] __aligned(32);
+struct dwc_hwdesc	rxdesc_ring[RX_DESC_COUNT] __aligned(32);
 
 static void
 dwc_get_hwaddr(struct stm32f7_eth_softc *sc, uint8_t *hwaddr)
@@ -72,6 +80,20 @@ dwc_set_hwaddr(struct stm32f7_eth_softc *sc, uint8_t *hwaddr)
 	WR4(sc, ETH_MACALR(0), lo);
 	WR4(sc, ETH_MACAHR(0), hi);
 	WR4(sc, ETH_MACFFR, (MACFFR_PM | MACFFR_RA));
+}
+
+void
+stm32f7_eth_intr(void *arg, struct trapframe *tf, int irq)
+{
+
+	printf("%s\n", __func__);
+}
+
+void
+stm32f7_eth_wkup_intr(void *arg, struct trapframe *tf, int irq)
+{
+
+	printf("%s\n", __func__);
 }
 
 static int
@@ -179,12 +201,12 @@ smsc_lan8742a_init(struct stm32f7_eth_softc *sc)
 	/* Force auto-negotiation */
 	dwc_miibus_write_reg(sc, phy_addr, MII_BMCR, BMCR_AUTOEN);
 
-	timeout = 100;
+	timeout = 50;
 	do {
 		reg = dwc_miibus_read_reg(sc, phy_addr, MII_BMSR);
 		if (reg & BMSR_ACOMP)
 			break;
-		udelay(500000);
+		udelay(50000);
 	} while (--timeout);
 	if (timeout == 0) {
 		printf("%s: auto-negotiation failed\n", __func__);
@@ -215,6 +237,66 @@ smsc_lan8742a_init(struct stm32f7_eth_softc *sc)
 	}
 
 	return (0);
+}
+
+static inline uint32_t
+next_txidx(struct stm32f7_eth_softc *sc, uint32_t curidx)
+{
+
+	return ((curidx + 1) % TX_DESC_COUNT);
+}
+
+static inline uint32_t
+next_rxidx(struct stm32f7_eth_softc *sc, uint32_t curidx)
+{
+
+	return ((curidx + 1) % RX_DESC_COUNT);
+}
+
+static void
+setup_txdesc(struct stm32f7_eth_softc *sc)
+{
+	uint16_t nidx;
+	uint16_t idx;
+
+	sc->tx_idx_head = 0;
+	sc->tx_idx_tail = 0;
+
+	for (idx = 0; idx < TX_DESC_COUNT; idx++) {
+		sc->txdesc_ring[idx].tdes0 = DDESC_TDES0_TXCHAIN;
+		sc->txdesc_ring[idx].tdes1 = 0;
+		nidx = next_txidx(sc, idx);
+		sc->txdesc_ring[idx].addr_next = (uint32_t)(sc->txdesc_ring) +
+		    (nidx * sizeof(struct dwc_hwdesc));
+	}
+}
+
+static void
+setup_rxdesc0(struct stm32f7_eth_softc *sc, int idx)
+{
+	struct mbuf *m;
+	uint16_t nidx;
+	uint16_t len;
+
+	len = 2050;
+
+	m = m_alloc(len);
+	sc->rxbuf[idx] = m;
+	sc->rxdesc_ring[idx].addr = (uint32_t)m->m_data;
+	nidx = next_rxidx(sc, idx);
+	sc->rxdesc_ring[idx].addr_next = (uint32_t)sc->rxdesc_ring +
+	    (nidx * sizeof(struct dwc_hwdesc));
+	sc->rxdesc_ring[idx].tdes1 = (DDESC_RDES1_CHAINED | len);
+	sc->rxdesc_ring[idx].tdes0 = (DDESC_RDES0_OWN);
+}
+
+static void
+setup_rxdesc(struct stm32f7_eth_softc *sc)
+{
+	uint16_t i;
+
+	for (i = 0; i < RX_DESC_COUNT; i++)
+		setup_rxdesc0(sc, i);
 }
 
 int
@@ -268,6 +350,22 @@ stm32f7_eth_setup(struct stm32f7_eth_softc *sc,
 
 	if (smsc_lan8742a_init(sc) != 0)
 		return (-1);
+
+	/* Setup descriptors */
+
+	/* Stop DMA */
+	reg = RD4(sc, ETH_DMAOMR);
+	reg &= ~(DMAOMR_ST | DMAOMR_SR);
+	WR4(sc, ETH_DMAOMR, reg);
+
+	sc->txdesc_ring = &txdesc_ring[0];
+	sc->rxdesc_ring = &rxdesc_ring[0];
+
+	setup_txdesc(sc);
+	setup_rxdesc(sc);
+
+	WR4(sc, ETH_DMATDLAR, (uint32_t)sc->txdesc_ring);
+	WR4(sc, ETH_DMARDLAR, (uint32_t)sc->rxdesc_ring);
 
 	return (0);
 }
