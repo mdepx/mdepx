@@ -31,6 +31,8 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 
+#include <machine/cpuregs.h>
+
 #include <mips/beri/beri_epw.h>
 
 #define	EPW_DEBUG
@@ -56,9 +58,14 @@ epw_request(struct epw_softc *sc, struct epw_request *req)
 	uint8_t val;
 	int i;
 
+	dprintf("%s: issuing a byte-width read to %lx\n",
+	    __func__, (sc->base + EPW_REQUEST_LEVEL_SEND_RESPONSE));
+
 	val = RD1(sc, EPW_REQUEST_LEVEL_SEND_RESPONSE);
 	if (val == 0)
 		return (0);
+
+	dprintf("%s: val %d\n", __func__, val);
 
 	req->is_write = RD1(sc, EPW_REQUEST_IS_WRITE);
 	if (req->is_write) {
@@ -101,8 +108,9 @@ epw_control(struct epw_softc *sc, uint8_t enable)
 }
 
 void
-epw_init(struct epw_softc *sc, uint64_t base)
+epw_init(struct epw_softc *sc, uint64_t base, uint64_t window)
 {
 
-	sc->base = base;
+	sc->base = base | MIPS_XKPHYS_UNCACHED_BASE;
+	sc->window = window | MIPS_XKPHYS_UNCACHED_BASE;
 }
