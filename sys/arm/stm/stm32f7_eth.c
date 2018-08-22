@@ -75,11 +75,14 @@ dwc_set_hwaddr(struct stm32f7_eth_softc *sc, uint8_t *hwaddr)
 }
 
 static int
-dwc_miibus_read_reg(struct stm32f7_eth_softc *sc, int phy, int reg)
+dwc_miibus_read_reg(void *arg, uint32_t phy, uint32_t reg)
 {
+	struct stm32f7_eth_softc *sc;
 	uint16_t timeout;
 	uint16_t mii;
 	uint32_t rv;
+
+	sc = arg;
 
 	mii = ((phy << MACMIIAR_PA_S)
 	    | (reg << MACMIIAR_MR_S)
@@ -106,10 +109,13 @@ dwc_miibus_read_reg(struct stm32f7_eth_softc *sc, int phy, int reg)
 }
 
 static int
-dwc_miibus_write_reg(struct stm32f7_eth_softc *sc, int phy, int reg, int val)
+dwc_miibus_write_reg(void *arg, uint32_t phy, uint32_t reg, uint32_t val)
 {
+	struct stm32f7_eth_softc *sc;
 	uint16_t timeout;
 	uint16_t mii;
+
+	sc = arg;
 
 	mii = ((phy << MACMIIAR_PA_S)
 	    | (reg << MACMIIAR_MR_S)
@@ -135,7 +141,7 @@ dwc_miibus_write_reg(struct stm32f7_eth_softc *sc, int phy, int reg, int val)
 }
 
 static int
-dwc_phy_init(struct stm32f7_eth_softc *sc)
+smsc_lan8742a_init(struct stm32f7_eth_softc *sc)
 {
 	uint32_t phy_addr;
 	uint32_t reg;
@@ -173,16 +179,39 @@ dwc_phy_init(struct stm32f7_eth_softc *sc)
 	/* Force auto-negotiation */
 	dwc_miibus_write_reg(sc, phy_addr, MII_BMCR, BMCR_AUTOEN);
 
-	timeout = 10;
+	timeout = 100;
 	do {
 		reg = dwc_miibus_read_reg(sc, phy_addr, MII_BMSR);
 		if (reg & BMSR_ACOMP)
 			break;
-		udelay(50000);
+		udelay(500000);
 	} while (--timeout);
 	if (timeout == 0) {
 		printf("%s: auto-negotiation failed\n", __func__);
 		return (-1);
+	}
+
+	printf("%s: auto-negotiation succeded (timeout %d)\n",
+	    __func__, timeout);
+
+	reg = dwc_miibus_read_reg(sc, phy_addr, 0x1f);
+	printf("%s: status register: 0x%08x\n", __func__, reg);
+
+	switch(reg & 0x001c) {
+	case 0x04:
+		printf("10 Half Duplex\n");
+		break;
+	case 0x08:
+		printf("100 Half Duplex\n");
+		break;
+	case 0x14:
+		printf("10 Full Duplex\n");
+		break;
+	case 0x18:
+		printf("100 Full Duplex\n");
+		break;
+	default:
+		printf("Unknown speed\n");
 	}
 
 	return (0);
@@ -237,7 +266,7 @@ stm32f7_eth_setup(struct stm32f7_eth_softc *sc,
 	reg &= ~(DMAOMR_ST | DMAOMR_SR);
 	WR4(sc, ETH_DMAOMR, reg);
 
-	if (dwc_phy_init(sc) != 0)
+	if (smsc_lan8742a_init(sc) != 0)
 		return (-1);
 
 	return (0);
