@@ -104,10 +104,11 @@
 struct stm32f7_eth_softc {
 	uint32_t base;
 	uint8_t hwaddr[ETHER_ADDR_LEN];
+	uint8_t mii_clk;
 };
 
 void stm32f7_eth_init(struct stm32f7_eth_softc *sc, uint32_t base);
-void stm32f7_eth_setup(struct stm32f7_eth_softc *sc,
+int stm32f7_eth_setup(struct stm32f7_eth_softc *sc,
     uint8_t *new_hwaddr);
 
 #endif /* !_ARM_STM_STM32F7_ETH_H_ */

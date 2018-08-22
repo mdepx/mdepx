@@ -28,6 +28,8 @@
 #include <sys/systm.h>
 #include <net/ethernet.h>
 
+#include <dev/mii/mii.h>
+
 #include "stm32f7_eth.h"
 
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
@@ -72,12 +74,126 @@ dwc_set_hwaddr(struct stm32f7_eth_softc *sc, uint8_t *hwaddr)
 	WR4(sc, ETH_MACFFR, (MACFFR_PM | MACFFR_RA));
 }
 
-void
+static int
+dwc_miibus_read_reg(struct stm32f7_eth_softc *sc, int phy, int reg)
+{
+	uint16_t timeout;
+	uint16_t mii;
+	uint32_t rv;
+
+	mii = ((phy << MACMIIAR_PA_S)
+	    | (reg << MACMIIAR_MR_S)
+	    | (sc->mii_clk << MACMIIAR_CR_S)
+	    | MACMIIAR_MB); /* Busy flag */
+	WR4(sc, ETH_MACMIIAR, mii);
+
+	timeout = 1000;
+	rv = 0;
+	do {
+		if ((RD4(sc, ETH_MACMIIAR) & MACMIIAR_MB) == 0) {
+			rv = RD4(sc, ETH_MACMIIDR);
+			break;
+		}
+		udelay(10000);
+	} while (--timeout);
+
+	if (timeout == 0) {
+		printf("%s: failed to read MII reg\n");
+		return (-1);
+	}
+
+	return (rv);
+}
+
+static int
+dwc_miibus_write_reg(struct stm32f7_eth_softc *sc, int phy, int reg, int val)
+{
+	uint16_t timeout;
+	uint16_t mii;
+
+	mii = ((phy << MACMIIAR_PA_S)
+	    | (reg << MACMIIAR_MR_S)
+	    | (sc->mii_clk << MACMIIAR_CR_S)
+	    | MACMIIAR_MB | MACMIIAR_MW);
+
+	WR4(sc, ETH_MACMIIDR, val);
+	WR4(sc, ETH_MACMIIAR, mii);
+
+	timeout = 1000;
+	do {
+		if ((RD4(sc, ETH_MACMIIAR) & MACMIIAR_MB) == 0)
+			break;
+		udelay(10000);
+	} while (--timeout);
+
+	if (timeout == 0) {
+		printf("%s: failed to write MII reg\n");
+		return (-1);
+	}
+
+	return (0);
+}
+
+static int
+dwc_phy_init(struct stm32f7_eth_softc *sc)
+{
+	uint32_t phy_addr;
+	uint32_t reg;
+	uint16_t timeout;
+
+	phy_addr = 0;
+
+	reg = dwc_miibus_read_reg(sc, phy_addr, MII_BMCR);
+	printf("%s: MII_BMCR 0x%08x\n", __func__, reg);
+
+	reg = dwc_miibus_read_reg(sc, phy_addr, MII_BMSR);
+	printf("%s: MII_BMSR 0x%08x\n", __func__, reg);
+
+	/* Reset PHY */
+	timeout = 1000;
+	dwc_miibus_write_reg(sc, phy_addr, MII_BMCR, BMCR_RESET);
+	do {
+		reg = dwc_miibus_read_reg(sc, phy_addr, MII_BMCR);
+		if ((reg & BMCR_RESET) == 0)
+			break;
+		udelay(10000);
+	} while (--timeout);
+
+	if (timeout == 0) {
+		printf("%s: failed to reset PHY\n");
+		return (-1);
+	}
+
+	reg = dwc_miibus_read_reg(sc, phy_addr, MII_BMSR);
+	if (reg & BMSR_LINK)
+		printf("%s: link found reg 0x%08x\n", __func__, reg);
+	else
+		printf("%s: link not found reg 0x%08x\n", __func__, reg);
+
+	/* Force auto-negotiation */
+	dwc_miibus_write_reg(sc, phy_addr, MII_BMCR, BMCR_AUTOEN);
+
+	timeout = 10;
+	do {
+		reg = dwc_miibus_read_reg(sc, phy_addr, MII_BMSR);
+		if (reg & BMSR_ACOMP)
+			break;
+		udelay(50000);
+	} while (--timeout);
+	if (timeout == 0) {
+		printf("%s: auto-negotiation failed\n", __func__);
+		return (-1);
+	}
+
+	return (0);
+}
+
+int
 stm32f7_eth_setup(struct stm32f7_eth_softc *sc,
     uint8_t *new_hwaddr)
 {
 	uint32_t reg;
-	int timeout;
+	uint16_t timeout;
 
 	/* Unreset DMA bus */
 	reg = RD4(sc, ETH_DMABMR);
@@ -88,8 +204,10 @@ stm32f7_eth_setup(struct stm32f7_eth_softc *sc,
 
 	/* Reset DMA bus */
 	reg = RD4(sc, ETH_DMABMR);
-	if (reg & DMABMR_SR)
-		printf("Device is in reset\n");
+	if (reg & DMABMR_SR) {
+		printf("%s: Device is in reset\n", __func__);
+		return (-1);
+	}
 	reg |= (DMABMR_SR);
 	WR4(sc, ETH_DMABMR, reg);
 
@@ -100,8 +218,10 @@ stm32f7_eth_setup(struct stm32f7_eth_softc *sc,
 		udelay(10000);
 	} while (timeout--);
 
-	if (timeout == 0)
-		printf("Can't reset\n");
+	if (timeout == 0) {
+		printf("%s: Can't reset DMA bus\n", __func__);
+		return (-1);
+	}
 
 	if (new_hwaddr != NULL)
 		dwc_set_hwaddr(sc, new_hwaddr);
@@ -116,6 +236,11 @@ stm32f7_eth_setup(struct stm32f7_eth_softc *sc,
 	reg = RD4(sc, ETH_DMAOMR);
 	reg &= ~(DMAOMR_ST | DMAOMR_SR);
 	WR4(sc, ETH_DMAOMR, reg);
+
+	if (dwc_phy_init(sc) != 0)
+		return (-1);
+
+	return (0);
 }
 
 void
@@ -123,6 +248,7 @@ stm32f7_eth_init(struct stm32f7_eth_softc *sc, uint32_t base)
 {
 
 	sc->base = base;
+	sc->mii_clk = 4;
 
 	dwc_get_hwaddr(sc, sc->hwaddr);
 }
