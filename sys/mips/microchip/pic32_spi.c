@@ -64,7 +64,7 @@ pic32_spi_transfer(struct spi_device *dev,
 			do {
 				if (RD4(sc, SPISTAT) & SPISTAT_SPIRBF)
 					break;
-			} while (timeout--);
+			} while (--timeout);
 			if (timeout == 0)
 				return (-1);
 

@@ -60,7 +60,7 @@ uarte_putc(struct uarte_softc *sc, char ch)
 			WR4(sc, EVENTS_ENDTX, 0);
 			break;
 		}
-	} while (timeout--);
+	} while (--timeout);
 }
 
 static void
