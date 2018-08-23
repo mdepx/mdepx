@@ -65,8 +65,8 @@ typedef	__uint32_t		__vm_paddr_t;
 typedef	__uint32_t		__vm_size_t;
 #endif
 
-typedef	__uint32_t		__uintmax_t;
-typedef	__int32_t		__intmax_t;
+typedef	__uint64_t		__uintmax_t;
+typedef	__int64_t		__intmax_t;
 typedef	__uint8_t		__u_char_t;
 
 #define	NBBY	8
