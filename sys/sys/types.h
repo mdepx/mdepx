@@ -74,6 +74,9 @@ typedef	unsigned long	u_long;
 typedef	__int64_t	off_t;
 typedef	__register_t	register_t;
 
+typedef	__uint8_t	__sa_family_t;
+typedef	__uint32_t	__socklen_t;
+
 #define	INT_MAX		__INT_MAX
 #define	NULL		((void *)0)
 
