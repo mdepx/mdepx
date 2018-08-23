@@ -82,11 +82,136 @@ dwc_set_hwaddr(struct stm32f7_eth_softc *sc, uint8_t *hwaddr)
 	WR4(sc, ETH_MACFFR, (MACFFR_PM | MACFFR_RA));
 }
 
+static inline uint32_t
+next_txidx(struct stm32f7_eth_softc *sc, uint32_t curidx)
+{
+
+	return ((curidx + 1) % TX_DESC_COUNT);
+}
+
+static inline uint32_t
+next_rxidx(struct stm32f7_eth_softc *sc, uint32_t curidx)
+{
+
+	return ((curidx + 1) % RX_DESC_COUNT);
+}
+
+static void
+setup_txdesc(struct stm32f7_eth_softc *sc)
+{
+	uint16_t nidx;
+	uint16_t idx;
+
+	sc->tx_idx_head = 0;
+	sc->tx_idx_tail = 0;
+
+	for (idx = 0; idx < TX_DESC_COUNT; idx++) {
+		sc->txdesc_ring[idx].tdes0 = DDESC_TDES0_TXCHAIN;
+		sc->txdesc_ring[idx].tdes1 = 0;
+		nidx = next_txidx(sc, idx);
+		sc->txdesc_ring[idx].addr_next = (uint32_t)(sc->txdesc_ring) +
+		    (nidx * sizeof(struct dwc_hwdesc));
+	}
+}
+
+static int
+setup_rxdesc0(struct stm32f7_eth_softc *sc, int idx)
+{
+	struct mbuf *m;
+	uint16_t nidx;
+	uint16_t len;
+
+	len = 2050;
+
+	m = m_alloc(len);
+	if (m == NULL) {
+		printf("%s: can't allocate mbuf\n", __func__);
+		return (-1);
+	}
+	sc->rxbuf[idx] = m;
+	sc->rxdesc_ring[idx].addr = (uint32_t)m->m_data;
+	nidx = next_rxidx(sc, idx);
+	sc->rxdesc_ring[idx].addr_next = (uint32_t)sc->rxdesc_ring +
+	    (nidx * sizeof(struct dwc_hwdesc));
+	sc->rxdesc_ring[idx].tdes1 = (DDESC_RDES1_CHAINED | len);
+	sc->rxdesc_ring[idx].tdes0 = (DDESC_RDES0_OWN);
+
+	return (0);
+}
+
+static void
+dwc_txfinish_locked(struct stm32f7_eth_softc *sc)
+{
+	struct dwc_hwdesc *desc;
+	struct mbuf *m;
+
+	while (sc->tx_idx_tail != sc->tx_idx_head) {
+		desc = &sc->txdesc_ring[sc->tx_idx_tail];
+		if ((desc->tdes0 & DDESC_TDES0_OWN) != 0)
+			break;
+		m = sc->txbuf[sc->tx_idx_tail];
+		m_free(m);
+		sc->tx_idx_tail = next_txidx(sc, sc->tx_idx_tail);
+	}
+}
+
+static void
+dwc_rxfinish_locked(struct stm32f7_eth_softc *sc)
+{
+	struct mbuf *m;
+	int rdes0;
+	int idx;
+	int len;
+
+	for (;;) {
+		idx = sc->rx_idx;
+		rdes0 = sc->rxdesc_ring[idx].tdes0;
+		if ((rdes0 & DDESC_RDES0_OWN) != 0)
+			break;
+		m = sc->rxbuf[idx];
+
+		len = ((rdes0 & DDESC_RDES0_FL_MASK) >> DDESC_RDES0_FL_SHIFT);
+		if (len != 0) {
+			m->m_len = len;
+			/* Input m here */
+		}
+		m_free(m);
+		setup_rxdesc0(sc, idx);
+
+		sc->rx_idx = next_rxidx(sc, sc->rx_idx);
+	}
+}
+
 void
 stm32f7_eth_intr(void *arg, struct trapframe *tf, int irq)
 {
+	struct stm32f7_eth_softc *sc;
+	uint32_t reg;
+
+	sc = arg;
 
 	printf("%s\n", __func__);
+
+	reg = RD4(sc, ETH_MACSR);
+	if (reg)
+		printf("MACSR 0x%08x\n", reg);
+
+	reg = RD4(sc, ETH_DMASR);
+	if (reg & DMASR_NIS) {
+		/* Normal interrupt status */
+		if (reg & DMASR_RS)
+			dwc_rxfinish_locked(sc);
+		if (reg & DMASR_TS)
+			dwc_txfinish_locked(sc);
+	}
+
+	if (reg & DMASR_AIS) {
+		/* Abnormal interrupt status */
+		if (reg & DMASR_FBES)
+			printf("Fatal bus error\n");
+	}
+
+	WR4(sc, ETH_DMASR, reg);
 }
 
 void
@@ -239,64 +364,21 @@ smsc_lan8742a_init(struct stm32f7_eth_softc *sc)
 	return (0);
 }
 
-static inline uint32_t
-next_txidx(struct stm32f7_eth_softc *sc, uint32_t curidx)
-{
-
-	return ((curidx + 1) % TX_DESC_COUNT);
-}
-
-static inline uint32_t
-next_rxidx(struct stm32f7_eth_softc *sc, uint32_t curidx)
-{
-
-	return ((curidx + 1) % RX_DESC_COUNT);
-}
-
-static void
-setup_txdesc(struct stm32f7_eth_softc *sc)
-{
-	uint16_t nidx;
-	uint16_t idx;
-
-	sc->tx_idx_head = 0;
-	sc->tx_idx_tail = 0;
-
-	for (idx = 0; idx < TX_DESC_COUNT; idx++) {
-		sc->txdesc_ring[idx].tdes0 = DDESC_TDES0_TXCHAIN;
-		sc->txdesc_ring[idx].tdes1 = 0;
-		nidx = next_txidx(sc, idx);
-		sc->txdesc_ring[idx].addr_next = (uint32_t)(sc->txdesc_ring) +
-		    (nidx * sizeof(struct dwc_hwdesc));
-	}
-}
-
-static void
-setup_rxdesc0(struct stm32f7_eth_softc *sc, int idx)
-{
-	struct mbuf *m;
-	uint16_t nidx;
-	uint16_t len;
-
-	len = 2050;
-
-	m = m_alloc(len);
-	sc->rxbuf[idx] = m;
-	sc->rxdesc_ring[idx].addr = (uint32_t)m->m_data;
-	nidx = next_rxidx(sc, idx);
-	sc->rxdesc_ring[idx].addr_next = (uint32_t)sc->rxdesc_ring +
-	    (nidx * sizeof(struct dwc_hwdesc));
-	sc->rxdesc_ring[idx].tdes1 = (DDESC_RDES1_CHAINED | len);
-	sc->rxdesc_ring[idx].tdes0 = (DDESC_RDES0_OWN);
-}
-
-static void
+static int
 setup_rxdesc(struct stm32f7_eth_softc *sc)
 {
 	uint16_t i;
+	int ret;
 
-	for (i = 0; i < RX_DESC_COUNT; i++)
-		setup_rxdesc0(sc, i);
+	sc->rx_idx = 0;
+
+	for (i = 0; i < RX_DESC_COUNT; i++) {
+		ret = setup_rxdesc0(sc, i);
+		if (ret != 0)
+			return (-1);
+	}
+
+	return (0);
 }
 
 int
@@ -362,10 +444,37 @@ stm32f7_eth_setup(struct stm32f7_eth_softc *sc,
 	sc->rxdesc_ring = &rxdesc_ring[0];
 
 	setup_txdesc(sc);
-	setup_rxdesc(sc);
+	if (setup_rxdesc(sc) != 0) {
+		printf("%s: can't setup rx desc\n", __func__);
+		return (-1);
+	}
 
 	WR4(sc, ETH_DMATDLAR, (uint32_t)sc->txdesc_ring);
 	WR4(sc, ETH_DMARDLAR, (uint32_t)sc->rxdesc_ring);
+
+	/* Register IFP here */
+
+	/* Initializa DMA and enable transmitters */
+	reg = RD4(sc, ETH_DMAOMR);
+	reg |= (DMAOMR_TSF | DMAOMR_OSF | DMAOMR_FUGF);
+	reg &= ~(DMAOMR_RSF);
+	reg |= (DMAOMR_RTC_32 << DMAOMR_RTC_S);
+	WR4(sc, ETH_DMAOMR, reg);
+
+	WR4(sc, ETH_DMAIER, 0xffffffff);
+
+	/* Start DMA */
+	reg = RD4(sc, ETH_DMAOMR);
+	reg |= (DMAOMR_ST | DMAOMR_SR);
+	WR4(sc, ETH_DMAOMR, reg);
+
+	/* Enable transmitters */
+	reg = RD4(sc, ETH_MACCR);
+	reg |= (MACCR_JD | MACCR_APCS);
+	reg |= (MACCR_TE | MACCR_RE);
+	reg |= (MACCR_DM); /* duplex */
+	reg |= (MACCR_FES); /* 100 mbit */
+	WR4(sc, ETH_MACCR, reg);
 
 	return (0);
 }

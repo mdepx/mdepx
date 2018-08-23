@@ -131,6 +131,7 @@ struct stm32f7_eth_softc {
 	struct dwc_hwdesc	*rxdesc_ring;
 	int	tx_idx_head;
 	int	tx_idx_tail;
+	int	rx_idx;
 	struct mbuf		*rxbuf[RX_DESC_COUNT];
 	struct mbuf		*txbuf[TX_DESC_COUNT];
 };
