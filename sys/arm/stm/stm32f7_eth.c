@@ -174,7 +174,7 @@ dwc_rxfinish_locked(struct stm32f7_eth_softc *sc)
 		len = ((rdes0 & DDESC_RDES0_FL_MASK) >> DDESC_RDES0_FL_SHIFT);
 		if (len != 0) {
 			m->m_len = len;
-			/* Input m here */
+			if_input(sc->ifp, m);
 		}
 		m_free(m);
 		setup_rxdesc0(sc, idx);
@@ -386,8 +386,9 @@ int
 stm32f7_eth_setup(struct stm32f7_eth_softc *sc,
     uint8_t *new_hwaddr)
 {
-	uint32_t reg;
 	uint16_t timeout;
+	struct ifnet *ifp;
+	uint32_t reg;
 
 	/* Unreset DMA bus */
 	reg = RD4(sc, ETH_DMABMR);
@@ -418,9 +419,8 @@ stm32f7_eth_setup(struct stm32f7_eth_softc *sc,
 	}
 
 	if (new_hwaddr != NULL)
-		dwc_set_hwaddr(sc, new_hwaddr);
-	else
-		dwc_set_hwaddr(sc, sc->hwaddr);
+		bcopy(new_hwaddr, sc->hwaddr, ETHER_ADDR_LEN);
+	dwc_set_hwaddr(sc, sc->hwaddr);
 
 	reg = RD4(sc, ETH_DMABMR);
 	reg |= (32 << DMABMR_PBL_S);
@@ -453,7 +453,9 @@ stm32f7_eth_setup(struct stm32f7_eth_softc *sc,
 	WR4(sc, ETH_DMATDLAR, (uint32_t)sc->txdesc_ring);
 	WR4(sc, ETH_DMARDLAR, (uint32_t)sc->rxdesc_ring);
 
-	/* Register IFP here */
+	sc->ifp = ifp = if_alloc(IFT_ETHER);
+	ifp->if_start = NULL;
+	if_attach(ifp, sc->hwaddr);
 
 	/* Initializa DMA and enable transmitters */
 	reg = RD4(sc, ETH_DMAOMR);
