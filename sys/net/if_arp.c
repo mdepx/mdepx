@@ -29,6 +29,14 @@
 #include <sys/mbuf.h>
 #include <net/if.h>
 #include <net/if_arp.h>
+#include <net/ethernet.h>
+
+static void
+arp_request(struct ifnet *ifp, struct mbuf *m)
+{
+
+	printf("arp request\n");
+}
 
 void    
 arp_input(struct ifnet *ifp, struct mbuf *m)
@@ -39,9 +47,18 @@ arp_input(struct ifnet *ifp, struct mbuf *m)
 	ah = (struct arphdr *)(m->m_data);
 	op = ntohs(ah->ar_op);
 
+	if (ah->ar_hrd != htons(ARPHRD_ETHER))
+		return;
+
+	if (ah->ar_pro != htons(ETHERTYPE_IP))
+		return;
+
+	if (ah->ar_hln != ETHER_ADDR_LEN)
+		return;
+
 	switch (op) {
 	case ARPOP_REQUEST:
-		printf("arp request\n");
+		arp_request(ifp, m);
 		break;
 	case ARPOP_REPLY:
 		printf("arp reply\n");
