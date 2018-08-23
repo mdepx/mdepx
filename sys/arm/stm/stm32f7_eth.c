@@ -27,6 +27,7 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 #include <sys/mbuf.h>
+#include <net/if.h>
 #include <net/ethernet.h>
 
 #include <machine/frame.h>
