@@ -24,31 +24,54 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_NET_IF_H_
-#define	_NET_IF_H_
+#include <sys/cdefs.h>
+#include <sys/param.h>
+#include <sys/mbuf.h>
+#include <net/ethernet.h>
+#include <net/if.h>
+#include <net/if_arp.h>
+#include <netinet/in.h>
 
-#include <sys/socket.h>
-#include <net/route.h>
-#include <net/if_types.h>
+static void
+ether_input(struct ifnet *ifp, struct mbuf *m)
+{
+	struct ether_header *eh;
+	int type;
 
-typedef struct ifnet * if_t;
-typedef void (*if_start_fn_t)(if_t);
+	eh = mtod(m, struct ether_header *);
 
-struct ifnet {
-	uint8_t		if_type;
-	uint8_t		if_addrlen;
-	uint8_t		if_hdrlen;
-	uint8_t		if_link_state;
-	uint32_t	if_mtu;
-	int	(*if_output)(struct ifnet *, struct mbuf *,
-		    const struct sockaddr *, struct route *);
-	void	(*if_input)(struct ifnet *, struct mbuf *);
-	if_start_fn_t	if_start;
-};
+	type = ntohs(eh->ether_type);
 
-struct ifnet * if_alloc(u_char type);
-int if_attach(struct ifnet *ifp, uint8_t *hwaddr);
-void if_input(struct ifnet *ifp, struct mbuf *m);
-int ether_ifattach(struct ifnet *ifp, uint8_t *hwaddr);
+	/* Trim ethernet header */
+	m_adj(m, ETHER_HDR_LEN);
 
-#endif /* !_NET_IF_H_ */
+	switch(type) {
+	case ETHERTYPE_ARP:
+		arp_input(ifp, m);
+		break;
+	case ETHERTYPE_IP:
+		ip_input(ifp, m);
+		break;
+	}
+}
+
+static int
+ether_output(struct ifnet *ifp, struct mbuf *m,
+    const struct sockaddr *dst, struct route *ro)
+{
+
+	return (0);
+}
+
+int
+ether_ifattach(struct ifnet *ifp, uint8_t *hwaddr)
+{
+
+	ifp->if_addrlen = ETHER_ADDR_LEN;
+	ifp->if_hdrlen = ETHER_HDR_LEN;
+	ifp->if_mtu = ETHERMTU;
+	ifp->if_output = ether_output;
+	ifp->if_input = ether_input;
+
+	return (0);
+}

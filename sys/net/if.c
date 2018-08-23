@@ -38,3 +38,27 @@ if_alloc(u_char type)
 
 	return (ifp);
 }
+
+int
+if_attach(struct ifnet *ifp, uint8_t *hwaddr)
+{
+	int ret;
+
+	ret = -1;
+
+	switch (ifp->if_type) {
+	case IFT_ETHER:
+		ret = ether_ifattach(ifp, hwaddr);
+	default:
+		break;
+	}
+
+	return (ret);
+}
+
+void
+if_input(struct ifnet *ifp, struct mbuf *m)
+{
+
+	ifp->if_input(ifp, m);
+}

@@ -24,31 +24,13 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_NET_IF_H_
-#define	_NET_IF_H_
+#ifndef	_NETINET_IN_H_
+#define	_NETINET_IN_H_
 
 #include <sys/socket.h>
 #include <net/route.h>
 #include <net/if_types.h>
 
-typedef struct ifnet * if_t;
-typedef void (*if_start_fn_t)(if_t);
+void ip_input(struct ifnet *ifp, struct mbuf *m);
 
-struct ifnet {
-	uint8_t		if_type;
-	uint8_t		if_addrlen;
-	uint8_t		if_hdrlen;
-	uint8_t		if_link_state;
-	uint32_t	if_mtu;
-	int	(*if_output)(struct ifnet *, struct mbuf *,
-		    const struct sockaddr *, struct route *);
-	void	(*if_input)(struct ifnet *, struct mbuf *);
-	if_start_fn_t	if_start;
-};
-
-struct ifnet * if_alloc(u_char type);
-int if_attach(struct ifnet *ifp, uint8_t *hwaddr);
-void if_input(struct ifnet *ifp, struct mbuf *m);
-int ether_ifattach(struct ifnet *ifp, uint8_t *hwaddr);
-
-#endif /* !_NET_IF_H_ */
+#endif /* !_NETINET_IN_H_ */
