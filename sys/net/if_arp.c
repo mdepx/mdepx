@@ -34,8 +34,16 @@
 static void
 arp_request(struct ifnet *ifp, struct mbuf *m)
 {
+	struct arphdr *ah;
 
-	printf("arp request\n");
+	ah = (struct arphdr *)(m->m_data);
+
+	caddr_t spa, tpa;
+	spa = ar_spa(ah);
+	tpa = ar_tpa(ah);
+	printf("%s: %d.%d.%d.%d -> %d.%d.%d.%d\n", __func__,
+	    spa[0], spa[1], spa[2], spa[3],
+	    tpa[0], tpa[1], tpa[2], tpa[3]);
 }
 
 void    
@@ -47,13 +55,10 @@ arp_input(struct ifnet *ifp, struct mbuf *m)
 	ah = (struct arphdr *)(m->m_data);
 	op = ntohs(ah->ar_op);
 
-	if (ah->ar_hrd != htons(ARPHRD_ETHER))
-		return;
-
-	if (ah->ar_pro != htons(ETHERTYPE_IP))
-		return;
-
-	if (ah->ar_hln != ETHER_ADDR_LEN)
+	if ((ah->ar_hrd != htons(ARPHRD_ETHER)) ||
+	    (ah->ar_pro != htons(ETHERTYPE_IP)) ||
+	    (ah->ar_hln != ETHER_ADDR_LEN) ||
+	    (ah->ar_pln != 4))
 		return;
 
 	switch (op) {
