@@ -52,6 +52,9 @@ ether_input(struct ifnet *ifp, struct mbuf *m)
 	case ETHERTYPE_IP:
 		ip_input(ifp, m);
 		break;
+	case ETHERTYPE_IPV6:
+		printf("%s: ipv6\n", __func__);
+		break;
 	}
 }
 
