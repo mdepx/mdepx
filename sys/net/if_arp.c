@@ -30,6 +30,7 @@
 #include <net/if.h>
 #include <net/if_arp.h>
 #include <net/ethernet.h>
+#include <netinet/in.h>
 
 #define	ARP_TABLE_SIZE	1024
 
@@ -44,15 +45,20 @@ static void
 arp_request(struct ifnet *ifp, struct mbuf *m)
 {
 	struct arphdr *ah;
+	struct in_addr in;
+	caddr_t spa, tpa;
 
 	ah = (struct arphdr *)(m->m_data);
 
-	caddr_t spa, tpa;
 	spa = ar_spa(ah);
 	tpa = ar_tpa(ah);
 	printf("%s: %d.%d.%d.%d -> %d.%d.%d.%d\n", __func__,
 	    spa[0], spa[1], spa[2], spa[3],
 	    tpa[0], tpa[1], tpa[2], tpa[3]);
+
+	in.s_addr = *tpa;
+	if (!in_ifhasaddr(ifp, in))
+		return;
 }
 
 void    
