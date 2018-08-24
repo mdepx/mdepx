@@ -77,6 +77,9 @@ typedef	__register_t	register_t;
 typedef	__uint8_t	__sa_family_t;
 typedef	__uint32_t	__socklen_t;
 
+typedef	__uint16_t	in_port_t;
+typedef	__uint32_t	in_addr_t;
+
 typedef char *		caddr_t; /* core address */
 
 #define	INT_MAX		__INT_MAX
