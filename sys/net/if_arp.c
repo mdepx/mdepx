@@ -31,6 +31,15 @@
 #include <net/if_arp.h>
 #include <net/ethernet.h>
 
+#define	ARP_TABLE_SIZE	1024
+
+struct arp_table_entry {
+	char	hwaddr[ETHER_ADDR_LEN];
+	uint8_t	ipaddr[4];
+};
+
+struct arp_table_entry arp_table[ARP_TABLE_SIZE];
+
 static void
 arp_request(struct ifnet *ifp, struct mbuf *m)
 {
