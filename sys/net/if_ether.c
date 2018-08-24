@@ -75,6 +75,8 @@ ether_ifattach(struct ifnet *ifp, uint8_t *hwaddr)
 	ifp->if_mtu = ETHERMTU;
 	ifp->if_output = ether_output;
 	ifp->if_input = ether_input;
+	ifp->if_hw_addr = malloc(ifp->if_addrlen);
+	bcopy(hwaddr, ifp->if_hw_addr, ifp->if_addrlen);
 
 	return (0);
 }

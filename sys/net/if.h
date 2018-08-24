@@ -55,6 +55,7 @@ struct ifnet {
 	void	(*if_input)(struct ifnet *, struct mbuf *);
 	if_start_fn_t		if_start;
 	struct ifaddrhead	if_addrhead;
+	void			*if_hw_addr;
 };
 
 void if_init(void);
