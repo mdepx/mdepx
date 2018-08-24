@@ -28,22 +28,30 @@
 #define	_NET_IF_H_
 
 #include <sys/socket.h>
+#include <sys/queue.h>
 #include <net/route.h>
 #include <net/if_types.h>
 
 typedef struct ifnet * if_t;
 typedef void (*if_start_fn_t)(if_t);
 
+struct ifaddr {
+	struct sockaddr *ifa_addr;
+};
+
+STAILQ_HEAD(ifaddrhead, ifaddr);
+
 struct ifnet {
-	uint8_t		if_type;
-	uint8_t		if_addrlen;
-	uint8_t		if_hdrlen;
-	uint8_t		if_link_state;
-	uint32_t	if_mtu;
+	uint8_t			if_type;
+	uint8_t			if_addrlen;
+	uint8_t			if_hdrlen;
+	uint8_t			if_link_state;
+	uint32_t		if_mtu;
 	int	(*if_output)(struct ifnet *, struct mbuf *,
 		    const struct sockaddr *, struct route *);
 	void	(*if_input)(struct ifnet *, struct mbuf *);
-	if_start_fn_t	if_start;
+	if_start_fn_t		if_start;
+	struct ifaddrhead	if_addrhead;
 };
 
 struct ifnet * if_alloc(u_char type);
