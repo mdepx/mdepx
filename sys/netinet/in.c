@@ -26,52 +26,42 @@
 
 #include <sys/cdefs.h>
 #include <sys/mbuf.h>
+#include <sys/socket.h>
 #include <net/if.h>
+#include <netinet/in.h>
 
 STAILQ_HEAD(, ifnet) g_ifnet;
 
-void
-if_init(void)
-{
-
-	STAILQ_INIT(&g_ifnet);
-}
-
-struct ifnet *
-if_alloc(u_char type)
-{
-	struct ifnet *ifp;
-
-	ifp = malloc(sizeof(struct ifnet));
-	ifp->if_type = type;
-	STAILQ_INIT(&ifp->if_addrhead);
-
-	return (ifp);
-}
-
 int
-if_attach(struct ifnet *ifp, uint8_t *hwaddr)
+in_ifhasaddr(struct ifnet *ifp, struct in_addr in)  
 {
-	int ret;
+	struct ifaddr *ifa;
+	struct in_ifaddr *ia;
 
-	ret = -1;
-
-	switch (ifp->if_type) {
-	case IFT_ETHER:
-		ret = ether_ifattach(ifp, hwaddr);
-	default:
-		break;
+	STAILQ_FOREACH(ifa, &ifp->if_addrhead, ifa_link) {
+		ia = (struct in_ifaddr *)ifa;
+		if (ia->ia_addr.sin_addr.s_addr == in.s_addr)
+			return (1);
 	}
 
-	if (ret == 0)
-		STAILQ_INSERT_TAIL(&g_ifnet, ifp, if_link);
-
-	return (ret);
+	return (0);
 }
 
-void
-if_input(struct ifnet *ifp, struct mbuf *m)
+/* Add interface address */
+int
+in_aifaddr(struct ifnet *ifp, struct in_addr in, u_long mask)
 {
+	struct ifaddr *ifa;
+	struct in_ifaddr *ia;
 
-	ifp->if_input(ifp, m);
+	if (in_ifhasaddr(ifp, in))
+		return (-1);
+
+	ifa = malloc(sizeof(struct ifaddr));
+	ia = (struct in_ifaddr *)ifa;
+	ia->ia_addr.sin_addr.s_addr = in.s_addr;
+	ia->ia_subnetmask = mask;
+	STAILQ_INSERT_TAIL(&ifp->if_addrhead, ifa, ifa_link);
+
+	return (0);
 }

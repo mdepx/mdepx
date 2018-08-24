@@ -37,11 +37,14 @@ typedef void (*if_start_fn_t)(if_t);
 
 struct ifaddr {
 	struct sockaddr *ifa_addr;
+	struct sockaddr *ifa_netmask;
+	STAILQ_ENTRY(ifaddr) ifa_link;
 };
 
 STAILQ_HEAD(ifaddrhead, ifaddr);
 
 struct ifnet {
+	STAILQ_ENTRY(ifnet)	if_link;
 	uint8_t			if_type;
 	uint8_t			if_addrlen;
 	uint8_t			if_hdrlen;
@@ -54,6 +57,7 @@ struct ifnet {
 	struct ifaddrhead	if_addrhead;
 };
 
+void if_init(void);
 struct ifnet * if_alloc(u_char type);
 int if_attach(struct ifnet *ifp, uint8_t *hwaddr);
 void if_input(struct ifnet *ifp, struct mbuf *m);

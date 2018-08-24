@@ -31,6 +31,28 @@
 #include <net/route.h>
 #include <net/if_types.h>
 
+struct in_addr {
+	in_addr_t s_addr;
+};
+
+/* Socket address, internet style. */
+struct sockaddr_in {
+	uint8_t		sin_len;
+	sa_family_t	sin_family;
+	in_port_t	sin_port;
+	struct in_addr	sin_addr;
+	char		sin_zero[8];
+};
+
+struct in_ifaddr {
+	struct ifaddr ia_ifa;
+	u_long ia_subnet;
+	u_long ia_subnetmask;
+	struct sockaddr_in ia_addr;
+};
+
 void ip_input(struct ifnet *ifp, struct mbuf *m);
+int in_aifaddr(struct ifnet *ifp, struct in_addr in, u_long mask);
+int in_ifhasaddr(struct ifnet *ifp, struct in_addr in);
 
 #endif /* !_NETINET_IN_H_ */
