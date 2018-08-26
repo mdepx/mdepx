@@ -35,4 +35,8 @@ struct sockaddr {
 	char		sa_data[14];
 };
 
+#define	AF_INET		2
+#define	AF_INET6	28
+#define	AF_ARP		35
+
 #endif /* !_SYS_SOCKET_H_ */
