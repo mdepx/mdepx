@@ -30,9 +30,9 @@
 #include <sys/mbuf.h>
 #include <net/ethernet.h>
 #include <net/if.h>
+#include <net/if_arp.h>
 #include <netinet/in.h>
 #include <netinet/if_ether.h>
-#include <net/if_arp.h>
 
 static const u_char etherbroadcastaddr[ETHER_ADDR_LEN] =
     { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };

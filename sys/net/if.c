@@ -27,8 +27,8 @@
 #include <sys/cdefs.h>
 #include <sys/mbuf.h>
 #include <net/if.h>
-#include <netinet/in.h>
 #include <net/if_llatbl.h>
+#include <netinet/in.h>
 
 STAILQ_HEAD(, ifnet) g_ifnet;
 
