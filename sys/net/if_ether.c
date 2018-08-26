@@ -88,6 +88,7 @@ ether_output(struct ifnet *ifp, struct mbuf *m,
 	void *phdr;
 	char linkhdr[ETHER_HDR_LEN];
 	int error;
+	int avail;
 
 	phdr = NULL;
 	if (ro != NULL)
@@ -99,8 +100,16 @@ ether_output(struct ifnet *ifp, struct mbuf *m,
 			return (error == EWOULDBLOCK ? 0 : error);
 	}
 
-	m0 = m_alloc(ETHER_HDR_LEN);
-	m0->m_next = m;
+	avail = m->m_data - m->m_data0;
+	if (avail >= ETHER_HDR_LEN) {
+		m_adj(m, -ETHER_HDR_LEN);
+		m0 = m;
+		m0->m_next = NULL;
+	} else {
+		m0 = m_alloc(ETHER_HDR_LEN);
+		m0->m_next = m;
+	}
+
 	eh = (struct ether_header *)m0->m_data;
 	memcpy(eh, phdr, ETHER_HDR_LEN);
 

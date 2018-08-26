@@ -59,8 +59,13 @@ void
 m_adj(struct mbuf *m, int size)
 {
 
-	if (m->m_len > size) {
-		m->m_data += size;
-		m->m_len -= size;
+	if (size > 0) {
+		if (m->m_len > size) {
+			m->m_data += size;
+			m->m_len -= size;
+		}
+	} else {
+		m->m_data -= -size;
+		m->m_len += -size;
 	}
 }
