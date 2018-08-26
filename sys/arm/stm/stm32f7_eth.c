@@ -27,6 +27,7 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 #include <sys/mbuf.h>
+#include <sys/lock.h>
 #include <net/if.h>
 #include <net/ethernet.h>
 
@@ -60,9 +61,9 @@ dwc_get_hwaddr(struct stm32f7_eth_softc *sc, uint8_t *hwaddr)
 		hwaddr[4] = (hi >>  0) & 0xff;
 		hwaddr[5] = (hi >>  8) & 0xff;
 	} else {
-		hwaddr[0] = 'o';
+		hwaddr[0] = 'b';
 		hwaddr[1] = 's';
-		hwaddr[2] = 'f';
+		hwaddr[2] = 'd';
 		hwaddr[3] = 'i';
 		hwaddr[4] = 'v';
 		hwaddr[5] = 'e';
@@ -122,7 +123,7 @@ setup_rxdesc0(struct stm32f7_eth_softc *sc, int idx)
 	uint16_t nidx;
 	uint16_t len;
 
-	len = 2050;
+	len = 2048;
 
 	m = m_alloc(len);
 	if (m == NULL) {
@@ -146,6 +147,8 @@ dwc_txfinish_locked(struct stm32f7_eth_softc *sc)
 	struct dwc_hwdesc *desc;
 	struct mbuf *m;
 
+	spinlock_enter();
+
 	while (sc->tx_idx_tail != sc->tx_idx_head) {
 		desc = &sc->txdesc_ring[sc->tx_idx_tail];
 		if ((desc->tdes0 & DDESC_TDES0_OWN) != 0)
@@ -154,6 +157,8 @@ dwc_txfinish_locked(struct stm32f7_eth_softc *sc)
 		m_free(m);
 		sc->tx_idx_tail = next_txidx(sc, sc->tx_idx_tail);
 	}
+
+	spinlock_exit();
 }
 
 static void
@@ -176,7 +181,6 @@ dwc_rxfinish_locked(struct stm32f7_eth_softc *sc)
 			m->m_len = len;
 			if_input(sc->ifp, m);
 		}
-		m_free(m);
 		setup_rxdesc0(sc, idx);
 
 		sc->rx_idx = next_rxidx(sc, sc->rx_idx);
@@ -190,8 +194,6 @@ stm32f7_eth_intr(void *arg, struct trapframe *tf, int irq)
 	uint32_t reg;
 
 	sc = arg;
-
-	printf("%s\n", __func__);
 
 	reg = RD4(sc, ETH_MACSR);
 	if (reg)
@@ -382,6 +384,47 @@ setup_rxdesc(struct stm32f7_eth_softc *sc)
 	return (0);
 }
 
+static int
+stm32f7_eth_transmit(struct ifnet *ifp, struct mbuf *m0)
+{
+	struct stm32f7_eth_softc *sc;
+	struct mbuf *m;
+	int enqueued;
+	int flags;
+	int idx;
+
+	sc = ifp->if_softc;
+
+	spinlock_enter();
+
+	enqueued = 0;
+
+	for (m = m0; m != NULL; m = m->m_next) {
+		idx = sc->tx_idx_head;
+		sc->txbuf[idx] = m;
+		flags = DDESC_TDES0_TXCHAIN | DDESC_TDES0_TXFIRST
+		    | DDESC_TDES0_TXLAST | DDESC_TDES0_TXINT | DDESC_TDES0_TXCRCDIS;
+		flags = DDESC_TDES0_TXCHAIN;
+		if (enqueued == 0)
+			flags |= DDESC_TDES0_TXFIRST;
+		if (m->m_next == NULL)
+			flags |= DDESC_TDES0_TXLAST | DDESC_TDES0_TXINT;
+		sc->txdesc_ring[idx].addr = (uint32_t)m->m_data;
+		sc->txdesc_ring[idx].tdes0 = flags;
+		sc->txdesc_ring[idx].tdes1 = m->m_len;
+		sc->txdesc_ring[idx].tdes0 |= DDESC_TDES0_OWN;
+		sc->tx_idx_head = next_txidx(sc, sc->tx_idx_head);
+		enqueued++;
+	}
+
+	if (enqueued)
+		WR4(sc, ETH_DMATPDR, 0x1);
+
+	spinlock_exit();
+
+	return (0);
+}
+
 int
 stm32f7_eth_setup(struct stm32f7_eth_softc *sc,
     uint8_t *new_hwaddr)
@@ -454,7 +497,9 @@ stm32f7_eth_setup(struct stm32f7_eth_softc *sc,
 	WR4(sc, ETH_DMARDLAR, (uint32_t)sc->rxdesc_ring);
 
 	sc->ifp = ifp = if_alloc(IFT_ETHER);
+	ifp->if_softc = sc;
 	ifp->if_start = NULL;
+	ifp->if_transmit = stm32f7_eth_transmit;
 	if_attach(ifp, sc->hwaddr);
 
 	/* Initializa DMA and enable transmitters */
