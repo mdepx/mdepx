@@ -165,7 +165,7 @@ arprequest(struct ifnet *ifp, const struct in_addr *sip,
 	linkhdrsize = sizeof(linkhdr);
 	error = arp_fillheader(ifp, ah, 1, linkhdr, &linkhdrsize);
 	if (error != 0 && error != EAFNOSUPPORT) {
-#if __FreeBSD__
+#ifdef __FreeBSD__
 		ARP_LOG(LOG_ERR, "Failed to calculate ARP header on %s: %d\n",
 		    if_name(ifp), error);
 #endif
