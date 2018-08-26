@@ -42,6 +42,7 @@ m_alloc(int size)
 	}
 	m->m_data = m->m_data0;
 	m->m_len = size;
+	m->m_next = NULL;
 
 	return (m);
 }
