@@ -27,61 +27,69 @@
 #include <sys/cdefs.h>
 #include <sys/param.h>
 #include <sys/mbuf.h>
+#include <sys/endian.h>
 #include <net/if.h>
-#include <net/if_arp.h>
 #include <net/ethernet.h>
 #include <netinet/in.h>
-
-#define	ARP_TABLE_SIZE	1024
-
-struct arp_table_entry {
-	char	hwaddr[ETHER_ADDR_LEN];
-	uint8_t	ipaddr[4];
-};
-
-struct arp_table_entry arp_table[ARP_TABLE_SIZE];
+#include <netinet/ip.h>
+#include <netinet/ip_icmp.h>
 
 static void
-arp_request(struct ifnet *ifp, struct mbuf *m)
+echo_reply(struct ifnet *ifp, struct mbuf *m,
+    int hlen, int icmplen)
 {
-	struct arphdr *ah;
-	struct in_addr in;
-	caddr_t spa, tpa;
+	struct icmphdr *hdr;
+	struct in_addr t;
+	struct ip *ip;
 
-	ah = (struct arphdr *)(m->m_data);
+	ip = mtod(m, struct ip *);
+	t = ip->ip_dst;
+	ip->ip_dst = ip->ip_src;
+	ip->ip_src = t;
 
-	spa = ar_spa(ah);
-	tpa = ar_tpa(ah);
-	printf("%s: %d.%d.%d.%d -> %d.%d.%d.%d\n", __func__,
-	    spa[0], spa[1], spa[2], spa[3],
-	    tpa[0], tpa[1], tpa[2], tpa[3]);
+	m->m_len -= hlen;
+	m->m_data += hlen;
 
-	in.s_addr = *tpa;
-	if (!in_ifhasaddr(ifp, in))
-		return;
+	hdr = mtod(m, struct icmphdr *);
+	hdr->icmp_type = ICMP_ECHOREPLY;
+	hdr->icmp_cksum = 0;
+	hdr->icmp_cksum = in_cksum(m, icmplen);
+
+	m->m_len += hlen;
+	m->m_data -= hlen;
+
+	ip_output(ifp, m, NULL);
 }
 
-void    
-arp_input(struct ifnet *ifp, struct mbuf *m)
+void
+icmp_input(struct ifnet *ifp, int hlen, struct mbuf *m)
 {
-	struct arphdr *ah;
-	short op;
+	struct icmphdr *hdr;
+	struct ip *ip;
+	int iplen;
+	int iphlen;
+	int icmplen;
 
-	ah = (struct arphdr *)(m->m_data);
-	op = ntohs(ah->ar_op);
+	ip = mtod(m, struct ip *);
+	m->m_len -= hlen;
+	m->m_data += hlen;
+	hdr = mtod(m, struct icmphdr *);
 
-	if ((ah->ar_hrd != htons(ARPHRD_ETHER)) ||
-	    (ah->ar_pro != htons(ETHERTYPE_IP)) ||
-	    (ah->ar_hln != ETHER_ADDR_LEN) ||
-	    (ah->ar_pln != 4))
+	iplen = ntohs(ip->ip_len);
+	iphlen = (ip->ip_hl << 2);
+	icmplen = (iplen - iphlen);
+	if (in_cksum(m, icmplen))
 		return;
 
-	switch (op) {
-	case ARPOP_REQUEST:
-		arp_request(ifp, m);
+	m->m_len += hlen;
+	m->m_data -= hlen;
+
+	switch (hdr->icmp_type) {
+	case ICMP_ECHO:
+		echo_reply(ifp, m, hlen, icmplen);
 		break;
-	case ARPOP_REPLY:
-		printf("arp reply\n");
+	default:
+		m_free(m);
 		break;
 	}
 }

@@ -26,12 +26,33 @@
 
 #include <sys/cdefs.h>
 #include <sys/mbuf.h>
+#include <sys/endian.h>
 #include <net/if.h>
+#include <net/ethernet.h>
 #include <netinet/in.h>
+#include <netinet/ip.h>
+#include <netinet/ip_icmp.h>
 
 void
 ip_input(struct ifnet *ifp, struct mbuf *m)
 {
+	struct ip *hdr;
+	int iphlen;
 
-	printf("%s\n", __func__);
+	/* Trim ethernet header */
+	m_adj(m, ETHER_HDR_LEN);
+
+	hdr = mtod(m, struct ip *);
+	iphlen = (hdr->ip_hl << 2);
+
+	switch (hdr->ip_p) {
+	case IPPROTO_ICMP:
+		icmp_input(ifp, iphlen, m);
+		break;
+	case IPPROTO_UDP:
+	case IPPROTO_TCP:
+	default:
+		m_free(m);
+		break;
+	}
 }

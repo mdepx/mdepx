@@ -28,7 +28,10 @@
 #define _NET_ROUTE_H_
 
 struct route {
-	struct sockaddr ro_dst;
+	char		*ro_prepend;
+	uint16_t	ro_plen;
+	uint16_t	ro_flags;
+	struct sockaddr	ro_dst;
 };
 
 #endif /* !_NET_ROUTE_H_ */

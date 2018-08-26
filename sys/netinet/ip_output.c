@@ -26,46 +26,39 @@
 
 #include <sys/cdefs.h>
 #include <sys/mbuf.h>
-#include <sys/socket.h>
+#include <sys/endian.h>
 #include <net/if.h>
+#include <net/ethernet.h>
 #include <netinet/in.h>
+#include <netinet/ip.h>
+#include <netinet/ip_icmp.h>
 
-STAILQ_HEAD(, ifnet) g_ifnet;
-
-int
-in_ifhasaddr(struct ifnet *ifp, struct in_addr in)  
+void
+ip_output(struct ifnet *ifp, struct mbuf *m, struct route *ro)
 {
-	struct ifaddr *ifa;
-	struct in_ifaddr *ia;
+	const struct sockaddr_in *gw;
+	struct ip *ip;
+	struct sockaddr_in *dst;
+	struct route iproute;
+	int hlen;
 
-	STAILQ_FOREACH(ifa, &ifp->if_addrhead, ifa_link) {
-		ia = (struct in_ifaddr *)ifa;
-		printf("%x %x\n", ia->ia_addr.sin_addr.s_addr, in.s_addr);
-		if (ia->ia_addr.sin_addr.s_addr == in.s_addr)
-			return (1);
+	ip = mtod(m, struct ip *);
+
+	gw = dst = (struct sockaddr_in *)&ro->ro_dst;
+
+	bzero(dst, sizeof(*dst));
+	dst->sin_family = AF_INET;
+	dst->sin_len = sizeof(*dst);
+	dst->sin_addr = ip->ip_dst;
+
+	if (ro == NULL) {
+		ro = &iproute;
+		bzero(ro, sizeof (*ro));
 	}
 
-	return (0);
-}
+	ip->ip_sum = 0;
+	hlen = (ip->ip_hl << 2);
+	ip->ip_sum = in_cksum(m, hlen);
 
-/* Add interface address */
-int
-in_aifaddr(struct ifnet *ifp, struct in_addr in, u_long mask)
-{
-	struct ifaddr *ifa;
-	struct in_ifaddr *ia;
-
-	if (in_ifhasaddr(ifp, in))
-		return (-1);
-
-	ifa = malloc(sizeof(struct in_ifaddr));
-	ifa->ifa_addr->sa_family = AF_INET;
-	ia = (struct in_ifaddr *)ifa;
-	ia->ia_addr.sin_addr.s_addr = in.s_addr;
-	ia->ia_addr.sin_family = AF_INET;
-	ia->ia_subnetmask = mask;
-	ia->ia_sockmask.sin_addr.s_addr = mask;
-	STAILQ_INSERT_TAIL(&ifp->if_addrhead, ifa, ifa_link);
-
-	return (0);
+	ifp->if_output(ifp, m, (const struct sockaddr *)gw, NULL);
 }

@@ -25,12 +25,17 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/errno.h>
 #include <sys/param.h>
 #include <sys/mbuf.h>
 #include <net/ethernet.h>
 #include <net/if.h>
-#include <net/if_arp.h>
 #include <netinet/in.h>
+#include <netinet/if_ether.h>
+#include <net/if_arp.h>
+
+static const u_char etherbroadcastaddr[ETHER_ADDR_LEN] =
+    { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
 static void
 ether_input(struct ifnet *ifp, struct mbuf *m)
@@ -39,31 +44,67 @@ ether_input(struct ifnet *ifp, struct mbuf *m)
 	int type;
 
 	eh = mtod(m, struct ether_header *);
-
 	type = ntohs(eh->ether_type);
-
-	/* Trim ethernet header */
-	m_adj(m, ETHER_HDR_LEN);
 
 	switch(type) {
 	case ETHERTYPE_ARP:
 		arp_input(ifp, m);
+		m_free(m);
 		break;
 	case ETHERTYPE_IP:
 		ip_input(ifp, m);
 		break;
 	case ETHERTYPE_IPV6:
-		printf("%s: ipv6\n", __func__);
+	default:
+		m_free(m);
 		break;
 	}
+}
+
+static int
+ether_resolve_addr(struct ifnet *ifp, struct mbuf *m,
+    const struct sockaddr *dst, struct route *ro, u_char *phdr)
+{
+	int error;
+
+	error = -1;
+
+	switch (dst->sa_family) {
+	case AF_INET:
+		error = arpresolve(ifp, 0, m, dst, phdr);
+	default:
+		break;
+	};
+
+	return (error);
 }
 
 static int
 ether_output(struct ifnet *ifp, struct mbuf *m,
     const struct sockaddr *dst, struct route *ro)
 {
+	struct ether_header *eh;
+	struct mbuf *m0;
+	void *phdr;
+	char linkhdr[ETHER_HDR_LEN];
+	int error;
 
-	return (0);
+	phdr = NULL;
+	if (ro != NULL)
+		phdr = ro->ro_prepend;
+	if (phdr == NULL) {
+		phdr = linkhdr;
+		error = ether_resolve_addr(ifp, m, dst, ro, phdr);
+		if (error != 0)
+			return (error == EWOULDBLOCK ? 0 : error);
+	}
+
+	m0 = m_alloc(ETHER_HDR_LEN);
+	m0->m_next = m;
+	eh = (struct ether_header *)m0->m_data;
+	memcpy(eh, phdr, ETHER_HDR_LEN);
+
+	return ((ifp->if_transmit)(ifp, m0));
 }
 
 int
@@ -75,8 +116,10 @@ ether_ifattach(struct ifnet *ifp, uint8_t *hwaddr)
 	ifp->if_mtu = ETHERMTU;
 	ifp->if_output = ether_output;
 	ifp->if_input = ether_input;
+	ifp->if_requestencap = ether_requestencap;
 	ifp->if_hw_addr = malloc(ifp->if_addrlen);
 	bcopy(hwaddr, ifp->if_hw_addr, ifp->if_addrlen);
+	ifp->if_broadcastaddr = etherbroadcastaddr;
 
 	return (0);
 }

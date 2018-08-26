@@ -24,48 +24,30 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
-#include <sys/mbuf.h>
+#ifndef	_NET_IF_LLATBL_H_
+#define	_NET_IF_LLATBL_H_
+
 #include <sys/socket.h>
-#include <net/if.h>
+#include <net/route.h>
+#include <net/if_types.h>
 #include <netinet/in.h>
 
-STAILQ_HEAD(, ifnet) g_ifnet;
+struct llentry {
+	LIST_ENTRY(llentry)	lle_next;
+	char			r_linkdata[LLE_MAX_LINKHDR];
+	uint8_t			r_hdrlen;
+	struct in_addr		addr4;
+	struct lltable		*lle_tbl;
+	struct llentries	*lle_head;
+	char			*ll_addr;
+};
 
-int
-in_ifhasaddr(struct ifnet *ifp, struct in_addr in)  
-{
-	struct ifaddr *ifa;
-	struct in_ifaddr *ia;
+LIST_HEAD(llentries, llentry);
 
-	STAILQ_FOREACH(ifa, &ifp->if_addrhead, ifa_link) {
-		ia = (struct in_ifaddr *)ifa;
-		printf("%x %x\n", ia->ia_addr.sin_addr.s_addr, in.s_addr);
-		if (ia->ia_addr.sin_addr.s_addr == in.s_addr)
-			return (1);
-	}
+struct lltable {
+	SLIST_ENTRY(lltable)	llt_link;
+	struct llentries	lle_head;
+	struct ifnet		*llt_ifp;
+};
 
-	return (0);
-}
-
-/* Add interface address */
-int
-in_aifaddr(struct ifnet *ifp, struct in_addr in, u_long mask)
-{
-	struct ifaddr *ifa;
-	struct in_ifaddr *ia;
-
-	if (in_ifhasaddr(ifp, in))
-		return (-1);
-
-	ifa = malloc(sizeof(struct in_ifaddr));
-	ifa->ifa_addr->sa_family = AF_INET;
-	ia = (struct in_ifaddr *)ifa;
-	ia->ia_addr.sin_addr.s_addr = in.s_addr;
-	ia->ia_addr.sin_family = AF_INET;
-	ia->ia_subnetmask = mask;
-	ia->ia_sockmask.sin_addr.s_addr = mask;
-	STAILQ_INSERT_TAIL(&ifp->if_addrhead, ifa, ifa_link);
-
-	return (0);
-}
+#endif /* !_NET_IF_LLATBL_H_ */

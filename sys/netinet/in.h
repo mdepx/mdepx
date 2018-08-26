@@ -31,6 +31,11 @@
 #include <net/route.h>
 #include <net/if_types.h>
 
+#define	IPPROTO_IP	0
+#define	IPPROTO_ICMP	1
+#define	IPPROTO_TCP	6
+#define	IPPROTO_UDP	17
+
 struct in_addr {
 	in_addr_t s_addr;
 };
@@ -48,10 +53,27 @@ struct in_ifaddr {
 	struct ifaddr ia_ifa;
 	u_long ia_subnet;
 	u_long ia_subnetmask;
+	struct sockaddr_in ia_sockmask;
 	struct sockaddr_in ia_addr;
 };
 
+struct lltable;
+
+/*
+ * IPv4 per-interface state.
+ */
+struct in_ifinfo {
+	struct lltable		*ii_llt;	/* ARP state */
+};
+
+#define	LLTABLE(ifp)	\
+	((struct in_ifinfo *)(ifp)->if_afdata[AF_INET])->ii_llt
+#define	IA_SIN(ia)	(&(((struct in_ifaddr *)(ia))->ia_addr))
+#define	IA_MASKSIN(ia)	(&(((struct in_ifaddr *)(ia))->ia_sockmask))
+
 void ip_input(struct ifnet *ifp, struct mbuf *m);
+void ip_output(struct ifnet *ifp, struct mbuf *m, struct route *ro);
+
 int in_aifaddr(struct ifnet *ifp, struct in_addr in, u_long mask);
 int in_ifhasaddr(struct ifnet *ifp, struct in_addr in);
 

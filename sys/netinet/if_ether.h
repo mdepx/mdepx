@@ -24,48 +24,23 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
-#include <sys/mbuf.h>
+#ifndef	_NET_IF_ETHER_H_
+#define	_NET_IF_ETHER_H_
+
 #include <sys/socket.h>
-#include <net/if.h>
-#include <netinet/in.h>
+#include <sys/queue.h>
+#include <net/route.h>
+#include <net/if_arp.h>
+#include <net/if_types.h>
 
-STAILQ_HEAD(, ifnet) g_ifnet;
+void arp_request(struct ifnet *ifp, const struct in_addr *sip,
+    const struct in_addr *tip, u_char *enaddr);
+int arpresolve(struct ifnet *ifp, int is_gw, struct mbuf *m, const struct sockaddr *dst,
+    u_char *desten);
+int arp_fillheader(struct ifnet *ifp, struct arphdr *ah, int bcast, u_char *buf,
+    size_t *bufsize);
+void arprequest(struct ifnet *ifp, const struct in_addr *sip,
+    const struct in_addr *tip, u_char *enaddr);
 
-int
-in_ifhasaddr(struct ifnet *ifp, struct in_addr in)  
-{
-	struct ifaddr *ifa;
-	struct in_ifaddr *ia;
 
-	STAILQ_FOREACH(ifa, &ifp->if_addrhead, ifa_link) {
-		ia = (struct in_ifaddr *)ifa;
-		printf("%x %x\n", ia->ia_addr.sin_addr.s_addr, in.s_addr);
-		if (ia->ia_addr.sin_addr.s_addr == in.s_addr)
-			return (1);
-	}
-
-	return (0);
-}
-
-/* Add interface address */
-int
-in_aifaddr(struct ifnet *ifp, struct in_addr in, u_long mask)
-{
-	struct ifaddr *ifa;
-	struct in_ifaddr *ia;
-
-	if (in_ifhasaddr(ifp, in))
-		return (-1);
-
-	ifa = malloc(sizeof(struct in_ifaddr));
-	ifa->ifa_addr->sa_family = AF_INET;
-	ia = (struct in_ifaddr *)ifa;
-	ia->ia_addr.sin_addr.s_addr = in.s_addr;
-	ia->ia_addr.sin_family = AF_INET;
-	ia->ia_subnetmask = mask;
-	ia->ia_sockmask.sin_addr.s_addr = mask;
-	STAILQ_INSERT_TAIL(&ifp->if_addrhead, ifa, ifa_link);
-
-	return (0);
-}
+#endif /* !_NET_IF_ETHER_H_ */

@@ -27,6 +27,8 @@
 #include <sys/cdefs.h>
 #include <sys/mbuf.h>
 #include <net/if.h>
+#include <netinet/in.h>
+#include <net/if_llatbl.h>
 
 STAILQ_HEAD(, ifnet) g_ifnet;
 
@@ -40,11 +42,17 @@ if_init(void)
 struct ifnet *
 if_alloc(u_char type)
 {
+	struct lltable *llt;
 	struct ifnet *ifp;
 
 	ifp = malloc(sizeof(struct ifnet));
 	ifp->if_type = type;
 	STAILQ_INIT(&ifp->if_addrhead);
+
+	/* Initialize linked list table */
+	ifp->if_afdata[AF_INET] = malloc(sizeof(struct in_ifinfo));
+	llt = LLTABLE(ifp) = malloc(sizeof(struct lltable));
+	LIST_INIT(&llt->lle_head);
 
 	return (ifp);
 }
