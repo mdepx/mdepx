@@ -25,10 +25,33 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/systm.h>
 #include <machine/frame.h>
 #include <arm/arm/nvic.h>
 
 void arm_exception(int irq, struct trapframe *tf);
+
+static void
+dump_frame(struct trapframe *tf)
+{
+
+	printf("tf->hwregs->r0 == %x\n", tf->hwregs->r0);
+	printf("tf->hwregs->r1 == %x\n", tf->hwregs->r1);
+	printf("tf->hwregs->r2 == %x\n", tf->hwregs->r2);
+	printf("tf->hwregs->r3 == %x\n", tf->hwregs->r3);
+	printf("tf->hwregs->r12 == %x\n", tf->hwregs->r12);
+	printf("tf->hwregs->r14 == %x\n", tf->hwregs->r14);
+	printf("tf->hwregs->r15 == %x\n", tf->hwregs->r15);
+	printf("tf->tf_r4 == %x\n", tf->tf_r4);
+	printf("tf->tf_r5 == %x\n", tf->tf_r5);
+	printf("tf->tf_r6 == %x\n", tf->tf_r6);
+	printf("tf->tf_r7 == %x\n", tf->tf_r7);
+	printf("tf->tf_r8 == %x\n", tf->tf_r8);
+	printf("tf->tf_r9 == %x\n", tf->tf_r9);
+	printf("tf->tf_r10 == %x\n", tf->tf_r10);
+	printf("tf->tf_r11 == %x\n", tf->tf_r11);
+	printf("tf->tf_r14 == %x\n", tf->tf_r14);
+}
 
 void
 arm_exception(int exc_code, struct trapframe *tf)
@@ -38,6 +61,8 @@ arm_exception(int exc_code, struct trapframe *tf)
 	if (exc_code >= 16) {
 		irq = exc_code - 16;
 		arm_nvic_intr(irq, tf);
-	} else
-		printf("unhandled exception %d\n", exc_code);
+	} else {
+		dump_frame(tf);
+		panic("unhandled exception %d\n", exc_code);
+	}
 }
