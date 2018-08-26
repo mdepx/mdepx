@@ -135,6 +135,7 @@ struct stm32f7_eth_softc {
 	struct mbuf		*rxbuf[RX_DESC_COUNT];
 	struct mbuf		*txbuf[TX_DESC_COUNT];
 	struct ifnet *ifp;
+	int txcount;
 };
 
 void stm32f7_eth_init(struct stm32f7_eth_softc *sc, uint32_t base);

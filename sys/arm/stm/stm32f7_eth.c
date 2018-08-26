@@ -155,6 +155,7 @@ dwc_txfinish_locked(struct stm32f7_eth_softc *sc)
 			break;
 		m = sc->txbuf[sc->tx_idx_tail];
 		m_free(m);
+		sc->txcount--;
 		sc->tx_idx_tail = next_txidx(sc, sc->tx_idx_tail);
 	}
 
@@ -392,6 +393,7 @@ stm32f7_eth_transmit(struct ifnet *ifp, struct mbuf *m0)
 	int enqueued;
 	int flags;
 	int idx;
+	int len;
 
 	sc = ifp->if_softc;
 
@@ -399,7 +401,17 @@ stm32f7_eth_transmit(struct ifnet *ifp, struct mbuf *m0)
 
 	enqueued = 0;
 
+	len = 0;
+	for (m = m0; m != NULL; m = m->m_next)
+		len += 1;
+	if (sc->txcount >= (TX_DESC_COUNT - len - 1)) {
+		for (m = m0; m != NULL; m = m->m_next)
+			m_free(m);
+		return (-1);
+	}
+
 	for (m = m0; m != NULL; m = m->m_next) {
+		sc->txcount++;
 		idx = sc->tx_idx_head;
 		sc->txbuf[idx] = m;
 		flags = DDESC_TDES0_TXCHAIN | DDESC_TDES0_TXFIRST
@@ -486,6 +498,7 @@ stm32f7_eth_setup(struct stm32f7_eth_softc *sc,
 
 	sc->txdesc_ring = &txdesc_ring[0];
 	sc->rxdesc_ring = &rxdesc_ring[0];
+	sc->txcount = 0;
 
 	setup_txdesc(sc);
 	if (setup_rxdesc(sc) != 0) {
