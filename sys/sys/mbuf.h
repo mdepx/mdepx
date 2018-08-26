@@ -30,9 +30,14 @@
 struct mbuf {
 	struct mbuf *m_next;
 	uint32_t m_len;
-	uint8_t *m_data;
-	uint8_t *m_data0;
+	uint32_t m_type:8,
+		 m_flags:24;
+	uint8_t	*m_data;
+	uint8_t	*m_data0;
 };
+
+/* Flags */
+#define	M_BCAST	0x00000010
 
 struct mbuf * m_alloc(int);
 void m_free(struct mbuf *);
