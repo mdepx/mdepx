@@ -146,6 +146,9 @@ fl_malloc(size_t size)
 
 	size += NODE_S;
 
+	while (size & 0x3)
+		size += 1;
+
 	i = size2i(size);
 
 	for (node = nodelist[i].next;
