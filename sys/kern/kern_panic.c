@@ -43,4 +43,6 @@ panic(const char *fmt, ...)
 
 	va_start(ap, fmt);
 	vpanic(fmt, ap);
+
+	while (1);
 }
