@@ -78,8 +78,10 @@ icmp_input(struct ifnet *ifp, int hlen, struct mbuf *m)
 	iplen = ntohs(ip->ip_len);
 	iphlen = (ip->ip_hl << 2);
 	icmplen = (iplen - iphlen);
-	if (in_cksum(m, icmplen))
+	if (in_cksum(m, icmplen)) {
+		m_free(m);
 		return;
+	}
 
 	m->m_len += hlen;
 	m->m_data -= hlen;
