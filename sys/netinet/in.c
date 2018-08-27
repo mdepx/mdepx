@@ -59,6 +59,7 @@ in_aifaddr(struct ifnet *ifp, struct in_addr in, u_long mask)
 		return (-1);
 
 	ifa = malloc(sizeof(struct in_ifaddr));
+	ifa->ifa_addr = malloc(sizeof(struct sockaddr));
 	ifa->ifa_addr->sa_family = AF_INET;
 	ia = (struct in_ifaddr *)ifa;
 	ia->ia_addr.sin_addr.s_addr = in.s_addr;
