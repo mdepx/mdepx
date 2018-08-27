@@ -32,6 +32,7 @@
 #define	NVIC_VTOR	0xD08	/* Vector Table Offset Register */
 #define	NVIC_CCR	0xD14	/* Configuration Control Register */
 #define	NVIC_ISER(n)	(0x100 + 0x4 * n)
+#define	NVIC_ICER(n)	(0x180 + 0x4 * n)
 #define	NVIC_ICPR(n)	(0x280 + 0x4 * n)
 
 struct nvic_intr_entry {
@@ -45,6 +46,7 @@ struct arm_nvic_softc {
 
 int arm_nvic_init(struct arm_nvic_softc *sc, uint32_t base);
 void arm_nvic_enable_intr(struct arm_nvic_softc *sc, uint32_t intr);
+void arm_nvic_disable_intr(struct arm_nvic_softc *sc, uint32_t n);
 void arm_nvic_intr(uint32_t irq, struct trapframe *frame);
 void arm_nvic_install_intr_map(struct arm_nvic_softc *sc, const struct nvic_intr_entry *m);
 

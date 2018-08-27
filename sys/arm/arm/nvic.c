@@ -60,6 +60,13 @@ arm_nvic_enable_intr(struct arm_nvic_softc *sc, uint32_t n)
 	WR4(sc, NVIC_ISER((n / 32)), (1 << (n % 32)));
 }
 
+void
+arm_nvic_disable_intr(struct arm_nvic_softc *sc, uint32_t n)
+{
+
+	WR4(sc, NVIC_ICER((n / 32)), (1 << (n % 32)));
+}
+
 int
 arm_nvic_init(struct arm_nvic_softc *sc, uint32_t base)
 {
