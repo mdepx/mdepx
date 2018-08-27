@@ -3,7 +3,7 @@
 .endif
 
 objdump:
-	${CROSS_COMPILE}objdump -d ${APP}.elf | less
+	${CROSS_COMPILE}objdump -d ${.OBJDIR}/${APP}.elf ${ARGS} | less
 
 readelf:
-	${CROSS_COMPILE}readelf -a ${APP}.elf | less
+	${CROSS_COMPILE}readelf -a ${.OBJDIR}/${APP}.elf ${ARGS} | less
