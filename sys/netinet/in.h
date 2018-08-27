@@ -72,7 +72,7 @@ struct in_ifinfo {
 #define	IA_MASKSIN(ia)	(&(((struct in_ifaddr *)(ia))->ia_sockmask))
 
 void ip_input(struct ifnet *ifp, struct mbuf *m);
-void ip_output(struct ifnet *ifp, struct mbuf *m, struct route *ro);
+int ip_output(struct ifnet *ifp, struct mbuf *m, struct route *ro);
 
 int in_aifaddr(struct ifnet *ifp, struct in_addr in, u_long mask);
 int in_ifhasaddr(struct ifnet *ifp, struct in_addr in);

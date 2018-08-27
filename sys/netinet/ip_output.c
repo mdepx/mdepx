@@ -33,13 +33,14 @@
 #include <netinet/ip.h>
 #include <netinet/ip_icmp.h>
 
-void
+int
 ip_output(struct ifnet *ifp, struct mbuf *m, struct route *ro)
 {
 	const struct sockaddr_in *gw;
 	struct ip *ip;
 	struct sockaddr_in *dst;
 	struct route iproute;
+	int error;
 	int hlen;
 
 	ip = mtod(m, struct ip *);
@@ -60,5 +61,6 @@ ip_output(struct ifnet *ifp, struct mbuf *m, struct route *ro)
 	hlen = (ip->ip_hl << 2);
 	ip->ip_sum = in_cksum(m, hlen);
 
-	ifp->if_output(ifp, m, (const struct sockaddr *)gw, NULL);
+	error = ifp->if_output(ifp, m, (const struct sockaddr *)gw, NULL);
+	return (error);
 }
