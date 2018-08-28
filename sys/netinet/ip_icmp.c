@@ -41,6 +41,7 @@ echo_reply(struct ifnet *ifp, struct mbuf *m,
 	struct icmphdr *hdr;
 	struct in_addr t;
 	struct ip *ip;
+	int error;
 
 	ip = mtod(m, struct ip *);
 	t = ip->ip_dst;
@@ -58,7 +59,9 @@ echo_reply(struct ifnet *ifp, struct mbuf *m,
 	m->m_len += hlen;
 	m->m_data -= hlen;
 
-	ip_output(ifp, m, NULL);
+	error = ip_output(ifp, m, NULL);
+	if (error != 0)
+		m_free(m);
 }
 
 void

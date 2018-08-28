@@ -25,6 +25,7 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/errno.h>
 #include <sys/systm.h>
 #include <sys/mbuf.h>
 #include <sys/lock.h>
@@ -404,11 +405,8 @@ stm32f7_eth_transmit(struct ifnet *ifp, struct mbuf *m0)
 	len = 0;
 	for (m = m0; m != NULL; m = m->m_next)
 		len += 1;
-	if (sc->txcount >= (TX_DESC_COUNT - len - 1)) {
-		for (m = m0; m != NULL; m = m->m_next)
-			m_free(m);
-		return (-1);
-	}
+	if (sc->txcount >= (TX_DESC_COUNT - len - 1))
+		return (ENOBUFS);
 
 	for (m = m0; m != NULL; m = m->m_next) {
 		sc->txcount++;
