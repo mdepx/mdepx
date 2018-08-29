@@ -24,60 +24,25 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_NETINET_IN_H_
-#define	_NETINET_IN_H_
+#include <sys/cdefs.h>
+#include <sys/mbuf.h>
+#include <sys/endian.h>
+#include <net/if.h>
+#include <net/ethernet.h>
+#include <netinet/in.h>
+#include <netinet/ip6.h>
+#include <netinet/icmp6.h>
+#include <netinet6/ip6_var.h>
 
-#include <sys/socket.h>
-#include <net/route.h>
-#include <net/if_types.h>
+void
+ip6_input(struct ifnet *ifp, struct mbuf *m)
+{
+	struct ip6_hdr *ip6;
 
-#define	IPPROTO_IP	0
-#define	IPPROTO_ICMP	1
-#define	IPPROTO_TCP	6
-#define	IPPROTO_UDP	17
+	/* Trim ethernet header */
+	m_adj(m, ETHER_HDR_LEN);
 
-struct in_addr {
-	in_addr_t s_addr;
-};
+	ip6 = mtod(m, struct ip6_hdr *);
 
-/* Socket address, internet style. */
-struct sockaddr_in {
-	uint8_t		sin_len;
-	sa_family_t	sin_family;
-	in_port_t	sin_port;
-	struct in_addr	sin_addr;
-	char		sin_zero[8];
-};
-
-struct in_ifaddr {
-	struct ifaddr ia_ifa;
-	u_long ia_subnet;
-	u_long ia_subnetmask;
-	struct sockaddr_in ia_sockmask;
-	struct sockaddr_in ia_addr;
-};
-
-struct lltable;
-
-/*
- * IPv4 per-interface state.
- */
-struct in_ifinfo {
-	struct lltable		*ii_llt;	/* ARP state */
-};
-
-#define	LLTABLE(ifp)	\
-	((struct in_ifinfo *)(ifp)->if_afdata[AF_INET])->ii_llt
-#define	IA_SIN(ia)	(&(((struct in_ifaddr *)(ia))->ia_addr))
-#define	IA_MASKSIN(ia)	(&(((struct in_ifaddr *)(ia))->ia_sockmask))
-
-void ip_input(struct ifnet *ifp, struct mbuf *m);
-int ip_output(struct ifnet *ifp, struct mbuf *m, struct route *ro);
-
-int in_aifaddr(struct ifnet *ifp, struct in_addr in, u_long mask);
-int in_ifhasaddr(struct ifnet *ifp, struct in_addr in);
-
-#define	__KAME_NETINET_IN_H_INCLUDED_
-#include <netinet6/in6.h>
-
-#endif /* !_NETINET_IN_H_ */
+	printf("nxt %d\n", ip6->ip6_nxt);
+}

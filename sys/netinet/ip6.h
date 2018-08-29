@@ -74,12 +74,12 @@
 struct ip6_hdr {
 	union {
 		struct ip6_hdrctl {
-			u_int32_t ip6_un1_flow;	/* 20 bits of flow-ID */
-			u_int16_t ip6_un1_plen;	/* payload length */
-			u_int8_t  ip6_un1_nxt;	/* next header */
-			u_int8_t  ip6_un1_hlim;	/* hop limit */
+			uint32_t ip6_un1_flow;	/* 20 bits of flow-ID */
+			uint16_t ip6_un1_plen;	/* payload length */
+			uint8_t  ip6_un1_nxt;	/* next header */
+			uint8_t  ip6_un1_hlim;	/* hop limit */
 		} ip6_un1;
-		u_int8_t ip6_un2_vfc;	/* 4 bits version, top 4 bits class */
+		uint8_t ip6_un2_vfc;	/* 4 bits version, top 4 bits class */
 	} ip6_ctlun;
 	struct in6_addr ip6_src;	/* source address */
 	struct in6_addr ip6_dst;	/* destination address */
@@ -95,14 +95,14 @@ struct ip6_hdr {
 #define IPV6_VERSION		0x60
 #define IPV6_VERSION_MASK	0xf0
 
-#if BYTE_ORDER == BIG_ENDIAN
+#if _BYTE_ORDER == _BIG_ENDIAN
 #define IPV6_FLOWINFO_MASK	0x0fffffff	/* flow info (28 bits) */
 #define IPV6_FLOWLABEL_MASK	0x000fffff	/* flow label (20 bits) */
 #else
-#if BYTE_ORDER == LITTLE_ENDIAN
+#if _BYTE_ORDER == _LITTLE_ENDIAN
 #define IPV6_FLOWINFO_MASK	0xffffff0f	/* flow info (28 bits) */
 #define IPV6_FLOWLABEL_MASK	0xffff0f00	/* flow label (20 bits) */
-#endif /* LITTLE_ENDIAN */
+#endif /* _LITTLE_ENDIAN */
 #endif
 #define IPV6_FLOWLABEL_LEN	20
 #if 1
@@ -116,23 +116,23 @@ struct ip6_hdr {
  */
 
 struct	ip6_ext {
-	u_int8_t ip6e_nxt;
-	u_int8_t ip6e_len;
+	uint8_t ip6e_nxt;
+	uint8_t ip6e_len;
 } __packed;
 
 /* Hop-by-Hop options header */
 /* XXX should we pad it to force alignment on an 8-byte boundary? */
 struct ip6_hbh {
-	u_int8_t ip6h_nxt;	/* next header */
-	u_int8_t ip6h_len;	/* length in units of 8 octets */
+	uint8_t ip6h_nxt;	/* next header */
+	uint8_t ip6h_len;	/* length in units of 8 octets */
 	/* followed by options */
 } __packed;
 
 /* Destination options header */
 /* XXX should we pad it to force alignment on an 8-byte boundary? */
 struct ip6_dest {
-	u_int8_t ip6d_nxt;	/* next header */
-	u_int8_t ip6d_len;	/* length in units of 8 octets */
+	uint8_t ip6d_nxt;	/* next header */
+	uint8_t ip6d_len;	/* length in units of 8 octets */
 	/* followed by options */
 } __packed;
 
@@ -165,90 +165,90 @@ struct ip6_dest {
 
 /* IPv6 options: common part */
 struct ip6_opt {
-	u_int8_t ip6o_type;
-	u_int8_t ip6o_len;
+	uint8_t ip6o_type;
+	uint8_t ip6o_len;
 } __packed;
 
 /* Jumbo Payload Option */
 struct ip6_opt_jumbo {
-	u_int8_t ip6oj_type;
-	u_int8_t ip6oj_len;
-	u_int8_t ip6oj_jumbo_len[4];
+	uint8_t ip6oj_type;
+	uint8_t ip6oj_len;
+	uint8_t ip6oj_jumbo_len[4];
 } __packed;
 #define IP6OPT_JUMBO_LEN	6
 
 /* NSAP Address Option */
 struct ip6_opt_nsap {
-	u_int8_t ip6on_type;
-	u_int8_t ip6on_len;
-	u_int8_t ip6on_src_nsap_len;
-	u_int8_t ip6on_dst_nsap_len;
+	uint8_t ip6on_type;
+	uint8_t ip6on_len;
+	uint8_t ip6on_src_nsap_len;
+	uint8_t ip6on_dst_nsap_len;
 	/* followed by source NSAP */
 	/* followed by destination NSAP */
 } __packed;
 
 /* Tunnel Limit Option */
 struct ip6_opt_tunnel {
-	u_int8_t ip6ot_type;
-	u_int8_t ip6ot_len;
-	u_int8_t ip6ot_encap_limit;
+	uint8_t ip6ot_type;
+	uint8_t ip6ot_len;
+	uint8_t ip6ot_encap_limit;
 } __packed;
 
 /* Router Alert Option */
 struct ip6_opt_router {
-	u_int8_t ip6or_type;
-	u_int8_t ip6or_len;
-	u_int8_t ip6or_value[2];
+	uint8_t ip6or_type;
+	uint8_t ip6or_len;
+	uint8_t ip6or_value[2];
 } __packed;
 /* Router alert values (in network byte order) */
-#if BYTE_ORDER == BIG_ENDIAN
+#if _BYTE_ORDER == _BIG_ENDIAN
 #define IP6_ALERT_MLD	0x0000
 #define IP6_ALERT_RSVP	0x0001
 #define IP6_ALERT_AN	0x0002
 #else
-#if BYTE_ORDER == LITTLE_ENDIAN
+#if _BYTE_ORDER == _LITTLE_ENDIAN
 #define IP6_ALERT_MLD	0x0000
 #define IP6_ALERT_RSVP	0x0100
 #define IP6_ALERT_AN	0x0200
-#endif /* LITTLE_ENDIAN */
+#endif /* _LITTLE_ENDIAN */
 #endif
 
 /* Routing header */
 struct ip6_rthdr {
-	u_int8_t  ip6r_nxt;	/* next header */
-	u_int8_t  ip6r_len;	/* length in units of 8 octets */
-	u_int8_t  ip6r_type;	/* routing type */
-	u_int8_t  ip6r_segleft;	/* segments left */
+	uint8_t  ip6r_nxt;	/* next header */
+	uint8_t  ip6r_len;	/* length in units of 8 octets */
+	uint8_t  ip6r_type;	/* routing type */
+	uint8_t  ip6r_segleft;	/* segments left */
 	/* followed by routing type specific data */
 } __packed;
 
 /* Type 0 Routing header, deprecated by RFC 5095. */
 struct ip6_rthdr0 {
-	u_int8_t  ip6r0_nxt;		/* next header */
-	u_int8_t  ip6r0_len;		/* length in units of 8 octets */
-	u_int8_t  ip6r0_type;		/* always zero */
-	u_int8_t  ip6r0_segleft;	/* segments left */
-	u_int32_t  ip6r0_reserved;	/* reserved field */
+	uint8_t  ip6r0_nxt;		/* next header */
+	uint8_t  ip6r0_len;		/* length in units of 8 octets */
+	uint8_t  ip6r0_type;		/* always zero */
+	uint8_t  ip6r0_segleft;	/* segments left */
+	uint32_t  ip6r0_reserved;	/* reserved field */
 	/* followed by up to 127 struct in6_addr */
 } __packed;
 
 /* Fragment header */
 struct ip6_frag {
-	u_int8_t  ip6f_nxt;		/* next header */
-	u_int8_t  ip6f_reserved;	/* reserved field */
-	u_int16_t ip6f_offlg;		/* offset, reserved, and flag */
-	u_int32_t ip6f_ident;		/* identification */
+	uint8_t  ip6f_nxt;		/* next header */
+	uint8_t  ip6f_reserved;	/* reserved field */
+	uint16_t ip6f_offlg;		/* offset, reserved, and flag */
+	uint32_t ip6f_ident;		/* identification */
 } __packed;
 
-#if BYTE_ORDER == BIG_ENDIAN
+#if _BYTE_ORDER == _BIG_ENDIAN
 #define IP6F_OFF_MASK		0xfff8	/* mask out offset from _offlg */
 #define IP6F_RESERVED_MASK	0x0006	/* reserved bits in ip6f_offlg */
 #define IP6F_MORE_FRAG		0x0001	/* more-fragments flag */
-#else /* BYTE_ORDER == LITTLE_ENDIAN */
+#else /* _BYTE_ORDER == _LITTLE_ENDIAN */
 #define IP6F_OFF_MASK		0xf8ff	/* mask out offset from _offlg */
 #define IP6F_RESERVED_MASK	0x0600	/* reserved bits in ip6f_offlg */
 #define IP6F_MORE_FRAG		0x0100	/* more-fragments flag */
-#endif /* BYTE_ORDER == LITTLE_ENDIAN */
+#endif /* _BYTE_ORDER == _LITTLE_ENDIAN */
 
 /*
  * Internet implementation parameters.

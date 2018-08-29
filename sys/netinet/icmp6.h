@@ -70,13 +70,13 @@
 					   - sizeof(struct icmp6_hdr) */
 
 struct icmp6_hdr {
-	u_int8_t	icmp6_type;	/* type field */
-	u_int8_t	icmp6_code;	/* code field */
-	u_int16_t	icmp6_cksum;	/* checksum field */
+	uint8_t	icmp6_type;	/* type field */
+	uint8_t	icmp6_code;	/* code field */
+	uint16_t	icmp6_cksum;	/* checksum field */
 	union {
-		u_int32_t	icmp6_un_data32[1]; /* type-specific field */
-		u_int16_t	icmp6_un_data16[2]; /* type-specific field */
-		u_int8_t	icmp6_un_data8[4];  /* type-specific field */
+		uint32_t	icmp6_un_data32[1]; /* type-specific field */
+		uint16_t	icmp6_un_data16[2]; /* type-specific field */
+		uint8_t	icmp6_un_data8[4];  /* type-specific field */
 	} icmp6_dataun;
 } __packed;
 
@@ -219,8 +219,8 @@ struct nd_router_solicit {	/* router solicitation */
 
 struct nd_router_advert {	/* router advertisement */
 	struct icmp6_hdr	nd_ra_hdr;
-	u_int32_t		nd_ra_reachable;	/* reachable time */
-	u_int32_t		nd_ra_retransmit;	/* retransmit timer */
+	uint32_t		nd_ra_reachable;	/* reachable time */
+	uint32_t		nd_ra_retransmit;	/* retransmit timer */
 	/* could be followed by options */
 } __packed;
 
@@ -267,12 +267,12 @@ struct nd_neighbor_advert {	/* neighbor advertisement */
 #define nd_na_code		nd_na_hdr.icmp6_code
 #define nd_na_cksum		nd_na_hdr.icmp6_cksum
 #define nd_na_flags_reserved	nd_na_hdr.icmp6_data32[0]
-#if BYTE_ORDER == BIG_ENDIAN
+#if _BYTE_ORDER == _BIG_ENDIAN
 #define ND_NA_FLAG_ROUTER		0x80000000
 #define ND_NA_FLAG_SOLICITED		0x40000000
 #define ND_NA_FLAG_OVERRIDE		0x20000000
 #else
-#if BYTE_ORDER == LITTLE_ENDIAN
+#if _BYTE_ORDER == _LITTLE_ENDIAN
 #define ND_NA_FLAG_ROUTER		0x80
 #define ND_NA_FLAG_SOLICITED		0x40
 #define ND_NA_FLAG_OVERRIDE		0x20
@@ -292,8 +292,8 @@ struct nd_redirect {		/* redirect */
 #define nd_rd_reserved		nd_rd_hdr.icmp6_data32[0]
 
 struct nd_opt_hdr {		/* Neighbor discovery option header */
-	u_int8_t	nd_opt_type;
-	u_int8_t	nd_opt_len;
+	uint8_t	nd_opt_type;
+	uint8_t	nd_opt_len;
 	/* followed by option specific data*/
 } __packed;
 
@@ -309,13 +309,13 @@ struct nd_opt_hdr {		/* Neighbor discovery option header */
 #define ND_OPT_MAX			31
 
 struct nd_opt_prefix_info {	/* prefix information */
-	u_int8_t	nd_opt_pi_type;
-	u_int8_t	nd_opt_pi_len;
-	u_int8_t	nd_opt_pi_prefix_len;
-	u_int8_t	nd_opt_pi_flags_reserved;
-	u_int32_t	nd_opt_pi_valid_time;
-	u_int32_t	nd_opt_pi_preferred_time;
-	u_int32_t	nd_opt_pi_reserved2;
+	uint8_t	nd_opt_pi_type;
+	uint8_t	nd_opt_pi_len;
+	uint8_t	nd_opt_pi_prefix_len;
+	uint8_t	nd_opt_pi_flags_reserved;
+	uint32_t	nd_opt_pi_valid_time;
+	uint32_t	nd_opt_pi_preferred_time;
+	uint32_t	nd_opt_pi_reserved2;
 	struct in6_addr	nd_opt_pi_prefix;
 } __packed;
 
@@ -323,18 +323,18 @@ struct nd_opt_prefix_info {	/* prefix information */
 #define ND_OPT_PI_FLAG_AUTO		0x40
 
 struct nd_opt_rd_hdr {		/* redirected header */
-	u_int8_t	nd_opt_rh_type;
-	u_int8_t	nd_opt_rh_len;
-	u_int16_t	nd_opt_rh_reserved1;
-	u_int32_t	nd_opt_rh_reserved2;
+	uint8_t	nd_opt_rh_type;
+	uint8_t	nd_opt_rh_len;
+	uint16_t	nd_opt_rh_reserved1;
+	uint32_t	nd_opt_rh_reserved2;
 	/* followed by IP header and data */
 } __packed;
 
 struct nd_opt_mtu {		/* MTU option */
-	u_int8_t	nd_opt_mtu_type;
-	u_int8_t	nd_opt_mtu_len;
-	u_int16_t	nd_opt_mtu_reserved;
-	u_int32_t	nd_opt_mtu_mtu;
+	uint8_t	nd_opt_mtu_type;
+	uint8_t	nd_opt_mtu_len;
+	uint16_t	nd_opt_mtu_reserved;
+	uint32_t	nd_opt_mtu_mtu;
 } __packed;
 
 #define	ND_OPT_NONCE_LEN	((1 * 8) - 2)
@@ -342,33 +342,33 @@ struct nd_opt_mtu {		/* MTU option */
 #error "(ND_OPT_NONCE_LEN + 2) must be a multiple of 8."
 #endif 
 struct nd_opt_nonce {		/* nonce option */
-	u_int8_t	nd_opt_nonce_type;
-	u_int8_t	nd_opt_nonce_len;
-	u_int8_t	nd_opt_nonce[ND_OPT_NONCE_LEN];
+	uint8_t	nd_opt_nonce_type;
+	uint8_t	nd_opt_nonce_len;
+	uint8_t	nd_opt_nonce[ND_OPT_NONCE_LEN];
 } __packed;
 
 struct nd_opt_route_info {	/* route info */
-	u_int8_t	nd_opt_rti_type;
-	u_int8_t	nd_opt_rti_len;
-	u_int8_t	nd_opt_rti_prefixlen;
-	u_int8_t	nd_opt_rti_flags;
-	u_int32_t	nd_opt_rti_lifetime;
+	uint8_t	nd_opt_rti_type;
+	uint8_t	nd_opt_rti_len;
+	uint8_t	nd_opt_rti_prefixlen;
+	uint8_t	nd_opt_rti_flags;
+	uint32_t	nd_opt_rti_lifetime;
 	/* prefix follows */
 } __packed;
 
 struct nd_opt_rdnss {		/* RDNSS option (RFC 6106) */
-	u_int8_t	nd_opt_rdnss_type;
-	u_int8_t	nd_opt_rdnss_len;
-	u_int16_t	nd_opt_rdnss_reserved;
-	u_int32_t	nd_opt_rdnss_lifetime;
+	uint8_t	nd_opt_rdnss_type;
+	uint8_t	nd_opt_rdnss_len;
+	uint16_t	nd_opt_rdnss_reserved;
+	uint32_t	nd_opt_rdnss_lifetime;
 	/* followed by list of recursive DNS servers */
 } __packed;
 
 struct nd_opt_dnssl {		/* DNSSL option (RFC 6106) */
-	u_int8_t	nd_opt_dnssl_type;
-	u_int8_t	nd_opt_dnssl_len;
-	u_int16_t	nd_opt_dnssl_reserved;
-	u_int32_t	nd_opt_dnssl_lifetime;
+	uint8_t	nd_opt_dnssl_type;
+	uint8_t	nd_opt_dnssl_len;
+	uint16_t	nd_opt_dnssl_reserved;
+	uint32_t	nd_opt_dnssl_lifetime;
 	/* followed by list of DNS search domains */
 } __packed;
 
@@ -378,11 +378,11 @@ struct nd_opt_dnssl {		/* DNSSL option (RFC 6106) */
 
 struct icmp6_namelookup {
 	struct icmp6_hdr 	icmp6_nl_hdr;
-	u_int8_t	icmp6_nl_nonce[8];
+	uint8_t	icmp6_nl_nonce[8];
 	int32_t		icmp6_nl_ttl;
 #if 0
-	u_int8_t	icmp6_nl_len;
-	u_int8_t	icmp6_nl_name[3];
+	uint8_t	icmp6_nl_len;
+	uint8_t	icmp6_nl_name[3];
 #endif
 	/* could be followed by options */
 } __packed;
@@ -392,7 +392,7 @@ struct icmp6_namelookup {
  */
 struct icmp6_nodeinfo {
 	struct icmp6_hdr icmp6_ni_hdr;
-	u_int8_t icmp6_ni_nonce[8];
+	uint8_t icmp6_ni_nonce[8];
 	/* could be followed by reply data */
 } __packed;
 
@@ -409,23 +409,23 @@ struct icmp6_nodeinfo {
 #define NI_QTYPE_NODEADDR	3 /* Node Addresses */
 #define NI_QTYPE_IPV4ADDR	4 /* IPv4 Addresses */
 
-#if BYTE_ORDER == BIG_ENDIAN
+#if _BYTE_ORDER == _BIG_ENDIAN
 #define NI_SUPTYPE_FLAG_COMPRESS	0x1
 #define NI_FQDN_FLAG_VALIDTTL		0x1
-#elif BYTE_ORDER == LITTLE_ENDIAN
+#elif _BYTE_ORDER == _LITTLE_ENDIAN
 #define NI_SUPTYPE_FLAG_COMPRESS	0x0100
 #define NI_FQDN_FLAG_VALIDTTL		0x0100
 #endif
 
 #ifdef NAME_LOOKUPS_04
-#if BYTE_ORDER == BIG_ENDIAN
+#if _BYTE_ORDER == _BIG_ENDIAN
 #define NI_NODEADDR_FLAG_LINKLOCAL	0x1
 #define NI_NODEADDR_FLAG_SITELOCAL	0x2
 #define NI_NODEADDR_FLAG_GLOBAL		0x4
 #define NI_NODEADDR_FLAG_ALL		0x8
 #define NI_NODEADDR_FLAG_TRUNCATE	0x10
 #define NI_NODEADDR_FLAG_ANYCAST	0x20 /* just experimental. not in spec */
-#elif BYTE_ORDER == LITTLE_ENDIAN
+#elif _BYTE_ORDER == _LITTLE_ENDIAN
 #define NI_NODEADDR_FLAG_LINKLOCAL	0x0100
 #define NI_NODEADDR_FLAG_SITELOCAL	0x0200
 #define NI_NODEADDR_FLAG_GLOBAL		0x0400
@@ -434,7 +434,7 @@ struct icmp6_nodeinfo {
 #define NI_NODEADDR_FLAG_ANYCAST	0x2000 /* just experimental. not in spec */
 #endif
 #else  /* draft-ietf-ipngwg-icmp-name-lookups-05 (and later?) */
-#if BYTE_ORDER == BIG_ENDIAN
+#if _BYTE_ORDER == _BIG_ENDIAN
 #define NI_NODEADDR_FLAG_TRUNCATE	0x1
 #define NI_NODEADDR_FLAG_ALL		0x2
 #define NI_NODEADDR_FLAG_COMPAT		0x4
@@ -442,7 +442,7 @@ struct icmp6_nodeinfo {
 #define NI_NODEADDR_FLAG_SITELOCAL	0x10
 #define NI_NODEADDR_FLAG_GLOBAL		0x20
 #define NI_NODEADDR_FLAG_ANYCAST	0x40 /* just experimental. not in spec */
-#elif BYTE_ORDER == LITTLE_ENDIAN
+#elif _BYTE_ORDER == _LITTLE_ENDIAN
 #define NI_NODEADDR_FLAG_TRUNCATE	0x0100
 #define NI_NODEADDR_FLAG_ALL		0x0200
 #define NI_NODEADDR_FLAG_COMPAT		0x0400
@@ -454,9 +454,9 @@ struct icmp6_nodeinfo {
 #endif
 
 struct ni_reply_fqdn {
-	u_int32_t ni_fqdn_ttl;	/* TTL */
-	u_int8_t ni_fqdn_namelen; /* length in octets of the FQDN */
-	u_int8_t ni_fqdn_name[3]; /* XXX: alignment */
+	uint32_t ni_fqdn_ttl;	/* TTL */
+	uint8_t ni_fqdn_namelen; /* length in octets of the FQDN */
+	uint8_t ni_fqdn_name[3]; /* XXX: alignment */
 } __packed;
 
 /*
@@ -464,10 +464,10 @@ struct ni_reply_fqdn {
  */
 struct icmp6_router_renum {	/* router renumbering header */
 	struct icmp6_hdr	rr_hdr;
-	u_int8_t	rr_segnum;
-	u_int8_t	rr_flags;
-	u_int16_t	rr_maxdelay;
-	u_int32_t	rr_reserved;
+	uint8_t	rr_segnum;
+	uint8_t	rr_flags;
+	uint16_t	rr_maxdelay;
+	uint32_t	rr_reserved;
 } __packed;
 
 #define ICMP6_RR_FLAGS_TEST		0x80
@@ -482,13 +482,13 @@ struct icmp6_router_renum {	/* router renumbering header */
 #define rr_seqnum 	rr_hdr.icmp6_data32[0]
 
 struct rr_pco_match {		/* match prefix part */
-	u_int8_t	rpm_code;
-	u_int8_t	rpm_len;
-	u_int8_t	rpm_ordinal;
-	u_int8_t	rpm_matchlen;
-	u_int8_t	rpm_minlen;
-	u_int8_t	rpm_maxlen;
-	u_int16_t	rpm_reserved;
+	uint8_t	rpm_code;
+	uint8_t	rpm_len;
+	uint8_t	rpm_ordinal;
+	uint8_t	rpm_matchlen;
+	uint8_t	rpm_minlen;
+	uint8_t	rpm_maxlen;
+	uint16_t	rpm_reserved;
 	struct	in6_addr	rpm_prefix;
 } __packed;
 
@@ -498,37 +498,37 @@ struct rr_pco_match {		/* match prefix part */
 #define RPM_PCO_MAX		4
 
 struct rr_pco_use {		/* use prefix part */
-	u_int8_t	rpu_uselen;
-	u_int8_t	rpu_keeplen;
-	u_int8_t	rpu_ramask;
-	u_int8_t	rpu_raflags;
-	u_int32_t	rpu_vltime;
-	u_int32_t	rpu_pltime;
-	u_int32_t	rpu_flags;
+	uint8_t	rpu_uselen;
+	uint8_t	rpu_keeplen;
+	uint8_t	rpu_ramask;
+	uint8_t	rpu_raflags;
+	uint32_t	rpu_vltime;
+	uint32_t	rpu_pltime;
+	uint32_t	rpu_flags;
 	struct	in6_addr rpu_prefix;
 } __packed;
 #define ICMP6_RR_PCOUSE_RAFLAGS_ONLINK	0x80
 #define ICMP6_RR_PCOUSE_RAFLAGS_AUTO	0x40
 
-#if BYTE_ORDER == BIG_ENDIAN
+#if _BYTE_ORDER == _BIG_ENDIAN
 #define ICMP6_RR_PCOUSE_FLAGS_DECRVLTIME     0x80000000
 #define ICMP6_RR_PCOUSE_FLAGS_DECRPLTIME     0x40000000
-#elif BYTE_ORDER == LITTLE_ENDIAN
+#elif _BYTE_ORDER == _LITTLE_ENDIAN
 #define ICMP6_RR_PCOUSE_FLAGS_DECRVLTIME     0x80
 #define ICMP6_RR_PCOUSE_FLAGS_DECRPLTIME     0x40
 #endif
 
 struct rr_result {		/* router renumbering result message */
-	u_int16_t	rrr_flags;
-	u_int8_t	rrr_ordinal;
-	u_int8_t	rrr_matchedlen;
-	u_int32_t	rrr_ifid;
+	uint16_t	rrr_flags;
+	uint8_t	rrr_ordinal;
+	uint8_t	rrr_matchedlen;
+	uint32_t	rrr_ifid;
 	struct	in6_addr rrr_prefix;
 } __packed;
-#if BYTE_ORDER == BIG_ENDIAN
+#if _BYTE_ORDER == _BIG_ENDIAN
 #define ICMP6_RR_RESULT_FLAGS_OOB		0x0002
 #define ICMP6_RR_RESULT_FLAGS_FORBIDDEN		0x0001
-#elif BYTE_ORDER == LITTLE_ENDIAN
+#elif _BYTE_ORDER == _LITTLE_ENDIAN
 #define ICMP6_RR_RESULT_FLAGS_OOB		0x0200
 #define ICMP6_RR_RESULT_FLAGS_FORBIDDEN		0x0100
 #endif
@@ -538,7 +538,7 @@ struct rr_result {		/* router renumbering result message */
  */
 
 struct icmp6_filter {
-	u_int32_t icmp6_filt[8];
+	uint32_t icmp6_filt[8];
 };
 
 #ifdef _KERNEL
