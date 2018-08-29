@@ -33,6 +33,7 @@
 #include <net/if_arp.h>
 #include <netinet/in.h>
 #include <netinet/if_ether.h>
+#include <netinet6/ip6_var.h>
 
 static const u_char etherbroadcastaddr[ETHER_ADDR_LEN] =
     { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
@@ -55,6 +56,8 @@ ether_input(struct ifnet *ifp, struct mbuf *m)
 		ip_input(ifp, m);
 		break;
 	case ETHERTYPE_IPV6:
+		ip6_input(ifp, m);
+		break;
 	default:
 		m_free(m);
 		break;
