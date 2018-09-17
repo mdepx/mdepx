@@ -79,5 +79,6 @@ void pic32_port_init(struct pic32_port_softc *sc, uint32_t base);
 void pic32_port_ansel(struct pic32_port_softc *sc, uint32_t port, uint32_t pin, int digital);
 void pic32_port_tris(struct pic32_port_softc *sc, uint32_t port, uint32_t pin, enum port_state st);
 void pic32_port_lat(struct pic32_port_softc *sc, uint32_t port, uint32_t pin, uint8_t enable);
+int pic32_port_port(struct pic32_port_softc *sc, uint32_t port, uint32_t pin);
 
 #endif /* !_MIPS_MICROCHIP_PIC32_PORT_H_ */

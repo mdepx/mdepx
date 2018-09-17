@@ -81,6 +81,19 @@ pic32_port_lat(struct pic32_port_softc *sc,
 	WR4(sc, PORT_LAT(port), reg);
 }
 
+int
+pic32_port_port(struct pic32_port_softc *sc,
+    uint32_t port, uint32_t pin)
+{
+	uint32_t reg;
+
+	reg = RD4(sc, PORT_PORT(port));
+	if (reg & (1 << pin))
+		return (1);
+
+	return (0);
+}
+
 void
 pic32_port_init(struct pic32_port_softc *sc,
     uint32_t base)
