@@ -30,6 +30,7 @@
 
 #include <sys/cdefs.h>
 #include <sys/systm.h>
+#include <sys/endian.h>
 
 #include <machine/cpuregs.h>
 
@@ -46,39 +47,93 @@
 
 #define	RD8(_sc, _reg)		*(volatile uint64_t *)((_sc)->base + _reg)
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
+#define	RD2(_sc, _reg)		*(volatile uint16_t *)((_sc)->base + _reg)
 #define	RD1(_sc, _reg)		*(volatile uint8_t *)((_sc)->base + _reg)
 
 #define	WR8(_sc, _reg, _val)	*(volatile uint64_t *)((_sc)->base + _reg) = _val
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+#define	WR2(_sc, _reg, _val)	*(volatile uint16_t *)((_sc)->base + _reg) = _val
 #define	WR1(_sc, _reg, _val)	*(volatile uint8_t *)((_sc)->base + _reg) = _val
 
 int
 epw_request(struct epw_softc *sc, struct epw_request *req)
 {
-	uint8_t val;
+	uint64_t val;
 	int i;
-
-	dprintf("%s: issuing a byte-width read to %lx\n",
-	    __func__, (sc->base + EPW_REQUEST_LEVEL_SEND_RESPONSE));
+	int n;
 
 	val = RD1(sc, EPW_REQUEST_LEVEL_SEND_RESPONSE);
 	if (val == 0)
 		return (0);
 
-	dprintf("%s: val %d\n", __func__, val);
+	dprintf("%s\n", __func__);
 
 	req->is_write = RD1(sc, EPW_REQUEST_IS_WRITE);
+	dprintf("%s: req->is_write %d\n", __func__, req->is_write);
+
+	/* Read/Write */
+	val = RD4(sc, EPW_WRITE_BYTE_ENABLE);
+	req->byte_enable = bswap32(val);
+
+	KASSERT(req->byte_enable != 0,
+	    ("Unexpected byte_enable: %d", req->byte_enable));
+
 	if (req->is_write) {
-		req->addr = RD8(sc, EPW_WRITE_ADDRESS);
-		req->byte_enable = RD4(sc, EPW_WRITE_BYTE_ENABLE);
-		KASSERT(req->byte_enable <= 8,
-		    ("Unexpected byte_enable: %d", req->byte_enable));
-		for (i = 0; i < req->byte_enable; i++)
-			req->data[i] = RD1(sc, EPW_WRITE_DATA + i);
+		val = RD8(sc, EPW_WRITE_ADDRESS);
+		req->addr = bswap64(val);
 	} else {
-		req->addr = RD8(sc, EPW_READ_ADDRESS);
-		req->flit_size = RD4(sc, EPW_READ_FLIT_SIZE);
-		req->burst_count = RD4(sc, EPW_READ_BURST_COUNT);
+		val = RD8(sc, EPW_READ_ADDRESS);
+		req->addr = bswap64(val);
+	}
+
+	/* Fix the address */
+	for (i = 0; i < sizeof(uint64_t); i++) {
+		if ((req->byte_enable & (1 << i)) == 0)
+			req->addr += 1;
+		else
+			break;
+	}
+
+	/* Get access width */
+	req->data_len = 0;
+	for (i = 0; i < sizeof(uint64_t); i++) {
+		if (req->byte_enable & (1 << (7 - i)))
+			req->data_len += 1;
+	}
+
+	dprintf("%s: addr %lx\n", __func__, req->addr);
+
+	if (req->is_write) {
+		n = 0;
+		for (i = 0; i < sizeof(uint64_t); i++) {
+			if (req->byte_enable & (1 << (7 - i)))
+				req->data[n++] = RD1(sc, EPW_WRITE_DATA + (7 - i));
+		}
+
+		switch (req->data_len) {
+		case 8:
+			printf("%s: val %lx\n", __func__, *(uint64_t *)req->data);
+			break;
+		case 4:
+			printf("%s: val %x\n", __func__, *(uint32_t *)req->data);
+			break;
+		case 2:
+			printf("%s: val %x\n", __func__, *(uint16_t *)req->data);
+			break;
+		case 1:
+			printf("%s: val %x\n", __func__, *(uint8_t *)req->data);
+			break;
+		default:
+			break;
+		};
+	} else {
+		val = RD8(sc, EPW_READ_FLIT_SIZE);
+		req->flit_size = bswap64(val);
+		val = RD4(sc, EPW_READ_BURST_COUNT);
+		req->burst_count = bswap32(val);
+
+		printf("%s: read, byte enable %x\n", __func__, req->byte_enable);
+		printf("%s: read %lx %lx %x\n", __func__, req->addr, req->flit_size, req->burst_count);
 	}
 
 	return (1);
@@ -87,12 +142,44 @@ epw_request(struct epw_softc *sc, struct epw_request *req)
 void
 epw_reply(struct epw_softc *sc, struct epw_request *req)
 {
+	uint64_t val;
+	uint32_t offs;
 	int i;
 
-	if (req->is_write == 0)
-		for (i = 0; i < req->burst_count; i++)
-			WR1(sc, EPW_READ_RESPONSE_DATA + i,
-			    req->data[i]);
+	dprintf("%s\n", __func__);
+
+	if (req->is_write == 0) {
+		dprintf("flit_size %d\n", req->flit_size);
+
+		for (i = 0; i < (req->burst_count + 1); i++) {
+			switch (req->flit_size) {
+			case 1:
+				val = (uint8_t)req->data[i * 1];
+				offs = EPW_READ_RESPONSE_DATA + i * 1;
+				printf("write1 to %x, val %x\n", offs, val);
+				WR1(sc, offs, val);
+				break;
+			case 2:
+				val = (uint16_t)req->data[i * 2];
+				offs = EPW_READ_RESPONSE_DATA + i * 2;
+				printf("write2 to %x, val %x\n", offs, val);
+				WR2(sc, offs, val);
+				break;
+			case 4:
+				val = (uint32_t)req->data[i * 4];
+				offs = (EPW_READ_RESPONSE_DATA + i * 4);
+				printf("write4 to %x, val %x\n", offs, val);
+				WR4(sc, offs, val);
+			case 8:
+				val = (uint64_t)req->data[i * 8];
+				offs = (EPW_READ_RESPONSE_DATA + i * 8);
+				printf("write8 to %x, val %x\n", offs, val);
+				WR8(sc, offs, val);
+			default:
+				break;
+			};
+		}
+	}
 
 	WR1(sc, EPW_REQUEST_LEVEL_SEND_RESPONSE, 1);
 }

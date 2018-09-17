@@ -47,10 +47,11 @@
 struct epw_request {
 	uint64_t addr;
 	uint8_t is_write;
-	uint8_t flit_size;
-	uint8_t burst_count;
-	uint8_t byte_enable;
+	uint64_t flit_size;
+	uint32_t burst_count;
+	uint32_t byte_enable;
 	uint8_t data[32];
+	uint8_t data_len;
 };
 
 struct epw_softc {
