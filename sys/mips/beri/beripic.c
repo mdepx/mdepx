@@ -100,6 +100,19 @@ beripic_install_intr_map(struct beripic_softc *sc,
 }
 
 void
+beripic_disable(struct beripic_softc *sc,
+    uint32_t beripic_irq)
+{
+	int tid;
+
+	tid = 0;
+
+	WR_CFG(sc, (beripic_irq + tid) * 8, 0);
+
+	WR_IP_CLEAR(sc, 0, (1 << beripic_irq));
+}
+
+void
 beripic_enable(struct beripic_softc *sc,
     uint32_t beripic_irq, uint32_t hard_irq)
 {
