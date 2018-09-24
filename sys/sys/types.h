@@ -55,11 +55,13 @@ typedef	__uint32_t	uint32_t;
 typedef	__uint64_t	uint64_t;
 
 typedef	__uintptr_t	uintptr_t;
+typedef	__intptr_t	intptr_t;
 typedef	__size_t	size_t;
 typedef	__ssize_t	ssize_t;
 typedef	__uintmax_t	uintmax_t;
 typedef	__intmax_t	intmax_t;
 typedef	__vm_paddr_t	vm_paddr_t;
+typedef	__vm_offset_t	vm_offset_t;
 typedef	__vm_size_t	vm_size_t;
 
 typedef	__uint64_t	u_quad_t;

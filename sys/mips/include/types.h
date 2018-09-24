@@ -50,8 +50,10 @@ typedef	__uint64_t		__size_t;
 typedef	__int64_t		__ssize_t;
 typedef	__uint64_t		__uintfptr_t;
 typedef	__uint64_t		__uintptr_t;
+typedef	__int64_t		__intptr_t;
 typedef	__uint64_t		__register_t;
 typedef	__uint64_t		__vm_paddr_t;
+typedef	__uint64_t		__vm_offset_t;
 typedef	__uint64_t		__vm_size_t;
 #else
 typedef	__int32_t		__ptrdiff_t;
@@ -60,8 +62,10 @@ typedef	__uint32_t		__size_t;
 typedef	__int32_t		__ssize_t;
 typedef	__uint32_t		__uintfptr_t;
 typedef	__uint32_t		__uintptr_t;
+typedef	__int32_t		__intptr_t;
 typedef	__uint32_t		__register_t;
 typedef	__uint32_t		__vm_paddr_t;
+typedef	__uint32_t		__vm_offset_t;
 typedef	__uint32_t		__vm_size_t;
 #endif
 
