@@ -126,4 +126,21 @@
 #define	CP0_WATCHHI	$19,0
 #define	CP0_ERRCTL	$26,0
 
+#define	MIPS_KUSEG_START		0x00000000
+#define	MIPS_KSEG0_START		((intptr_t)(int32_t)0x80000000)
+#define	MIPS_KSEG0_END			((intptr_t)(int32_t)0x9fffffff)
+#define	MIPS_KSEG1_START		((intptr_t)(int32_t)0xa0000000)
+#define	MIPS_KSEG1_END			((intptr_t)(int32_t)0xbfffffff)
+#define	MIPS_KSSEG_START		((intptr_t)(int32_t)0xc0000000)
+#define	MIPS_KSSEG_END			((intptr_t)(int32_t)0xdfffffff)
+#define	MIPS_KSEG3_START		((intptr_t)(int32_t)0xe0000000)
+#define	MIPS_KSEG3_END			((intptr_t)(int32_t)0xffffffff)
+#define	MIPS_KSEG2_START		MIPS_KSSEG_START
+#define	MIPS_KSEG2_END			MIPS_KSSEG_END
+
+#define	MIPS_PHYS_TO_KSEG0(x)		((uintptr_t)(x) | MIPS_KSEG0_START)
+#define	MIPS_PHYS_TO_KSEG1(x)		((uintptr_t)(x) | MIPS_KSEG1_START)
+#define	MIPS_KSEG0_TO_PHYS(x)		((uintptr_t)(x) & MIPS_KSEG0_PHYS_MASK)
+#define	MIPS_KSEG1_TO_PHYS(x)		((uintptr_t)(x) & MIPS_KSEG0_PHYS_MASK)
+
 #endif /* !_MACHINE_CPUREGS_H_ */
