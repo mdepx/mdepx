@@ -68,23 +68,24 @@ beripic_intr(void *arg, struct trapframe *frame, int irq)
 
 	sc = arg;
 
-	dprintf("%s\n", __func__);
-
 	hard_irq = (irq - 2);
 
 	intr = RD_IP_READ(sc, 0);
+
+	dprintf("%s: intr %lx (hard_irq %d)\n", __func__, intr, hard_irq);
+
 	for (i = 0; i < 32; i++) {
 		if (intr & (1 << i)) {
+			dprintf("%s: intr %d\n", __func__, i);
+
 			reg = RD_CFG(sc, (i * 8));
 			if ((reg & BP_CFG_IRQ_M) != hard_irq)
 				continue;
 			if ((reg & BP_CFG_ENABLE) == 0)
 				continue;
 
-			if (sc->map[i].handler != NULL) {
+			if (sc->map[i].handler != NULL)
 				sc->map[i].handler(sc->map[i].arg);
-				dprintf("%s: intr %d\n", __func__, i);
-			}
 
 			WR_IP_CLEAR(sc, 0, (1 << i));
 		}
