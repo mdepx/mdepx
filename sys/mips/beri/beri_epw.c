@@ -65,15 +65,11 @@ epw_request(struct epw_softc *sc, struct epw_request *req)
 	if (val == 0)
 		return (0);
 
-	dprintf("%s\n", __func__);
-
 	req->is_write = RD1(sc, EPW_REQUEST_IS_WRITE);
-	dprintf("%s: req->is_write %d\n", __func__, req->is_write);
-
 	if (req->is_write) {
 		val = RD8(sc, EPW_WRITE_ADDRESS);
 		req->addr = bswap64(val);
-		dprintf("%s: address %lx\n", __func__, req->addr);
+		dprintf("%s: (write) address %lx\n", __func__, req->addr);
 
 		val = RD4(sc, EPW_WRITE_BYTE_ENABLE);
 		req->byte_enable = bswap32(val);
@@ -99,16 +95,16 @@ epw_request(struct epw_softc *sc, struct epw_request *req)
 
 		switch (req->data_len) {
 		case 8:
-			printf("%s: val %lx\n", __func__, *(uint64_t *)req->data);
+			dprintf("%s: val %lx\n", __func__, *(uint64_t *)req->data);
 			break;
 		case 4:
-			printf("%s: val %x\n", __func__, *(uint32_t *)req->data);
+			dprintf("%s: val %x\n", __func__, *(uint32_t *)req->data);
 			break;
 		case 2:
-			printf("%s: val %x\n", __func__, *(uint16_t *)req->data);
+			dprintf("%s: val %x\n", __func__, *(uint16_t *)req->data);
 			break;
 		case 1:
-			printf("%s: val %x\n", __func__, *(uint8_t *)req->data);
+			dprintf("%s: val %x\n", __func__, *(uint8_t *)req->data);
 			break;
 		default:
 			break;
@@ -116,15 +112,15 @@ epw_request(struct epw_softc *sc, struct epw_request *req)
 	} else {
 		val = RD8(sc, EPW_READ_ADDRESS);
 		req->addr = bswap64(val);
-		dprintf("%s: address %lx\n", __func__, req->addr);
+		dprintf("%s: (read) address %lx\n", __func__, req->addr);
 
 		val = RD8(sc, EPW_READ_FLIT_SIZE);
 		req->flit_size = bswap64(val);
 		val = RD4(sc, EPW_READ_BURST_COUNT);
 		req->burst_count = bswap32(val);
 
-		printf("%s: read, byte enable %x\n", __func__, req->byte_enable);
-		printf("%s: read %lx %lx %x\n", __func__, req->addr, req->flit_size, req->burst_count);
+		dprintf("%s: read, byte enable %x\n", __func__, req->byte_enable);
+		dprintf("%s: read %lx %lx %x\n", __func__, req->addr, req->flit_size, req->burst_count);
 	}
 
 	return (1);
