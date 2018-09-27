@@ -81,6 +81,20 @@ pic32_port_lat(struct pic32_port_softc *sc,
 	WR4(sc, PORT_LAT(port), reg);
 }
 
+void
+pic32_port_cnpu(struct pic32_port_softc *sc,
+    uint32_t port, uint32_t pin, uint8_t enable)
+{
+	uint32_t reg;
+
+	reg = RD4(sc, PORT_CNPU(port));
+	if (enable)
+		reg |= (1 << pin);
+	else
+		reg &= ~(1 << pin);
+	WR4(sc, PORT_CNPU(port), reg);
+}
+
 int
 pic32_port_port(struct pic32_port_softc *sc,
     uint32_t port, uint32_t pin)
