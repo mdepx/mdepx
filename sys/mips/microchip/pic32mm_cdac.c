@@ -25,91 +25,13 @@
  */
 
 #include <sys/types.h>
-
-#include <mips/microchip/pic32_port.h>
+#include <mips/microchip/pic32mm_cdac.h>
 
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
-pic32_port_ansel(struct pic32_port_softc *sc,
-    uint32_t port, uint32_t pin, int digital)
-{
-	uint32_t reg;
-
-	reg = RD4(sc, PORT_ANSEL(port));
-	if (digital)
-		reg &= ~(1 << pin);
-	else /* analog */
-		reg |= (1 << pin);
-	WR4(sc, PORT_ANSEL(port), reg);
-}
-
-void
-pic32_port_tris(struct pic32_port_softc *sc,
-    uint32_t port, uint32_t pin, enum port_state st)
-{
-	uint32_t reg;
-
-	reg = RD4(sc, PORT_TRIS(port));
-
-	switch (st) {
-	case PORT_INPUT:
-		reg |= (1 << pin);
-		break;
-	case PORT_OUTPUT:
-		reg &= ~(1 << pin);
-		break;
-	default:
-		break;
-	};
-
-	WR4(sc, PORT_TRIS(port), reg);
-}
-
-void
-pic32_port_lat(struct pic32_port_softc *sc,
-    uint32_t port, uint32_t pin, uint8_t enable)
-{
-	uint32_t reg;
-
-	reg = RD4(sc, PORT_LAT(port));
-	if (enable)
-		reg |= (1 << pin);
-	else
-		reg &= ~(1 << pin);
-	WR4(sc, PORT_LAT(port), reg);
-}
-
-void
-pic32_port_odc(struct pic32_port_softc *sc,
-    uint32_t port, uint32_t pin, uint8_t enable)
-{
-	uint32_t reg;
-
-	reg = RD4(sc, PORT_ODC(port));
-	if (enable)
-		reg |= (1 << pin);
-	else
-		reg &= ~(1 << pin);
-	WR4(sc, PORT_ODC(port), reg);
-}
-
-int
-pic32_port_port(struct pic32_port_softc *sc,
-    uint32_t port, uint32_t pin)
-{
-	uint32_t reg;
-
-	reg = RD4(sc, PORT_PORT(port));
-	if (reg & (1 << pin))
-		return (1);
-
-	return (0);
-}
-
-void
-pic32_port_init(struct pic32_port_softc *sc,
+pic32_cdac_init(struct pic32_cdac_softc *sc,
     uint32_t base)
 {
 
