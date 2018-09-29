@@ -44,5 +44,6 @@ struct pic32_cdac_softc {
 };
 
 void pic32_cdac_init(struct pic32_cdac_softc *sc, uint32_t base);
+void pic32_cdac_control(struct pic32_cdac_softc *sc, uint32_t val);
 
 #endif /* !_MIPS_MICROCHIP_PIC32_CDAC_H_ */
