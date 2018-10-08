@@ -41,7 +41,20 @@ pin_set(struct stm32f4_gpio_softc *sc, uint32_t port,
 	else
 		reg = (1 << (pin + 16));
 
-	WR4(sc, GPIO_BSSR(port), reg);
+	WR4(sc, GPIO_BSRR(port), reg);
+}
+
+int
+pin_get(struct stm32f4_gpio_softc *sc, uint32_t port,
+    uint32_t pin)
+{
+	uint32_t reg;
+
+	reg = RD4(sc, GPIO_IDR(port));
+	if (reg & (1 << pin))
+		return (1);
+
+	return (0);
 }
 
 void

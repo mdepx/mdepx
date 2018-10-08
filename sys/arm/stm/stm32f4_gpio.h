@@ -27,26 +27,26 @@
 #ifndef _ARM_STM_STM32F4_GPIO_H_
 #define _ARM_STM_STM32F4_GPIO_H_
 
-#define	GPIO_MODER(n)	(0x00 + 0x400 * (n))
-#define	GPIO_OTYPER(n)	(0x04 + 0x400 * (n))
-#define	GPIO_OSPEEDR(n)	(0x08 + 0x400 * (n))
-#define	GPIO_PUPDR(n)	(0x0C + 0x400 * (n))
-#define	GPIO_IDR(n)	(0x10 + 0x400 * (n))
-#define	GPIO_ODR(n)	(0x14 + 0x400 * (n))
-#define	GPIO_BSSR(n)	(0x18 + 0x400 * (n))
-#define	GPIO_LCKR(n)	(0x1C + 0x400 * (n))
-#define	GPIO_AFRL(n)	(0x20 + 0x400 * (n))
-#define	GPIO_AFRH(n)	(0x24 + 0x400 * (n))
-#define	GPIO_BRR(n)	(0x28 + 0x400 * (n))
-
-#define	MODE_INP	0
-#define	MODE_OUT	1
-#define	MODE_ALT	2
-#define	MODE_ANA	3
-
-#define	FLOAT		0
-#define	PULLUP		1
-#define	PULLDOWN	2
+#define	GPIO_MODER(n)	(0x00 + 0x400 * (n))	/* GPIO port mode register */
+#define	 MODE_INP	0	/* Input mode */
+#define	 MODE_OUT	1	/* General purpose output mode */
+#define	 MODE_ALT	2	/* Alternate function mode */
+#define	 MODE_ANA	3	/* Analog mode (reset state) */
+#define	GPIO_OTYPER(n)	(0x04 + 0x400 * (n))	/* GPIO port output type register */
+#define	 OT_PUSHPULL	0
+#define	 OT_OPENDRAIN	1
+#define	GPIO_OSPEEDR(n)	(0x08 + 0x400 * (n))	/* GPIO port output speed register */
+#define	GPIO_PUPDR(n)	(0x0C + 0x400 * (n))	/* GPIO port pull-up/pull-down register */
+#define	 FLOAT		0	/* No pull-up, pull-down */
+#define	 PULLUP		1
+#define	 PULLDOWN	2
+#define	GPIO_IDR(n)	(0x10 + 0x400 * (n))	/* GPIO port input data register */
+#define	GPIO_ODR(n)	(0x14 + 0x400 * (n))	/* GPIO port output data register */
+#define	GPIO_BSRR(n)	(0x18 + 0x400 * (n))	/* GPIO port bit set/reset register */
+#define	GPIO_LCKR(n)	(0x1C + 0x400 * (n))	/* GPIO port configuration lock register */
+#define	GPIO_AFRL(n)	(0x20 + 0x400 * (n))	/* GPIO alternate function low register */
+#define	GPIO_AFRH(n)	(0x24 + 0x400 * (n))	/* GPIO alternate function high register */
+#define	GPIO_BRR(n)	(0x28 + 0x400 * (n))	/* GPIO port bit reset register */
 
 #define	PINS_END	{ -1, -1, -1, -1, -1 }
 
@@ -80,5 +80,6 @@ int stm32f4_gpio_init(struct stm32f4_gpio_softc *sc, uint32_t base);
 void pin_configure(struct stm32f4_gpio_softc *sc, const struct gpio_pin *pins);
 void pin_set(struct stm32f4_gpio_softc *sc, uint32_t port,
     uint32_t pin, uint32_t enable);
+int pin_get(struct stm32f4_gpio_softc *sc, uint32_t port, uint32_t pin);
 
 #endif /* !_ARM_STM_STM32F4_GPIO_H_ */
