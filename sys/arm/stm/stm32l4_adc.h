@@ -24,32 +24,7 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ARM_STM_STM32F4_H_
-#define _ARM_STM_STM32F4_H_
+#ifndef _ARM_STM_STM32F4_ADC_H_
+#define _ARM_STM_STM32F4_ADC_H_
 
-#include <arm/stm/stm32l4_usart.h>
-#include <arm/stm/stm32f4_flash.h>
-#include <arm/stm/stm32f4_gpio.h>
-#include <arm/stm/stm32f4_pwr.h>
-#include <arm/stm/stm32f4_timer.h>
-#include <arm/stm/stm32f4_spi.h>
-
-#include <arm/stm/stm32l4_rcc.h>
-
-#define	USART1_BASE	0x40013800
-#define	USART2_BASE	0x40004400
-#define	USART3_BASE	0x40004800
-#define	USART4_BASE	0x40004C00
-
-#define	ADC_BASE	0x50040000
-#define	FLASH_BASE	0x40022000
-#define	PWR_BASE	0x40007000
-#define	GPIO_BASE	0x48000000
-#define	NVIC_BASE	0xE000E000
-#define	RCC_BASE	0x40021000
-#define	TIM1_BASE	0x40012C00
-#define	SPI1_BASE	0x40013000
-#define	SPI2_BASE	0x40003800
-#define	SPI3_BASE	0x40003C00
-
-#endif	/* !_ARM_STM_STM32F4_H_ */
+#endif /* !_ARM_STM_STM32F4_ADC_H_ */
