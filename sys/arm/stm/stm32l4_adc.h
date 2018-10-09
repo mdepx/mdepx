@@ -75,4 +75,10 @@
 #define	ADC_CSR		(0x00 + CREGS_OFFS) /* ADC Common status register */
 #define	ADC_CCR		(0x08 + CREGS_OFFS) /* ADC common control register */
 
+struct stm32l4_adc_softc {
+	uint32_t base;
+};
+
+void stm32l4_adc_init(struct stm32l4_adc_softc *sc, uint32_t base);
+
 #endif /* !_ARM_STM_STM32L4_ADC_H_ */
