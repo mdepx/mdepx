@@ -34,7 +34,7 @@ void
 stm32l4_usart_putc(struct stm32l4_usart_softc *sc, char c)
 {
 
-	while ((RD4(sc, USART_ISR) & USART_ISR_TXE) == 0)
+	while ((RD4(sc, USART_ISR) & ISR_TXE) == 0)
 		;
 
 	WR4(sc, USART_TDR, c);
@@ -52,7 +52,7 @@ stm32l4_usart_init(struct stm32l4_usart_softc *sc, uint32_t base,
 	WR4(sc, USART_BRR, reg);
 
 	reg = RD4(sc, USART_CR1);
-	reg |= (USART_CR1_UE | USART_CR1_TE | USART_CR1_RE);
+	reg |= (CR1_UE | CR1_TE | CR1_RE);
 	WR4(sc, USART_CR1, reg);
 
 	return (0);
