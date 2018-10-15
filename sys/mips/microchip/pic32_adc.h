@@ -47,20 +47,19 @@
 #define	 ADCON1_ASAM		(1 << 2) /* ADC Sample Auto-Start bit */
 #define	 ADCON1_SAMP		(1 << 1) /* ADC Sample Enable bit */
 #define	 ADCON1_DONE		(1 << 0) /* ADC Conversion Status bit */
-#define	ADCON2		(0x110)
-#define	 BUFREGEN	(1 << 11) /* ADC Buffer Register Enable bit */
-
-#define	ADCON3		(0x120)
-#define	ADCON5		(0x170)
-
-#define	ADCHS		(0x140)
-#define	 ADCHS_CH0NA_S	5	/* Negative Input Select bits */
-#define	 ADCHS_CH0NA_M	(0x7 << ADCHS_CH0NA_S)
-#define	 ADCHS_CH0SA_S	0	/* Positive Input Select bits */
-#define	 ADCHS_CH0SA_M	(0x1f << ADCHS_CH0SA_S)
-
-#define	ADCSS		(0x150)
-#define	ADCHIT		(0x180)
+#define	ADCON2			(0x110)
+#define	 ADCON2_CSCNA		(1 << 10) /* Scan Mode bit */
+#define	 ADCON2_BUFREGEN	(1 << 11) /* ADC Buffer Register Enable bit */
+#define	ADCON3			(0x120)
+#define	ADCHS			(0x140)
+#define	 ADCHS_CH0NA_S		5	/* Negative Input Select bits */
+#define	 ADCHS_CH0NA_M		(0x7 << ADCHS_CH0NA_S)
+#define	 ADCHS_CH0SA_S		0	/* Positive Input Select bits */
+#define	 ADCHS_CH0SA_M		(0x1f << ADCHS_CH0SA_S)
+#define	ADCSS			(0x150)
+#define	ADCON5			(0x170)
+#define	 ADCON5_ASEN		(1 << 15) /* Auto-Scan Enable bit */
+#define	ADCHIT			(0x180)
 
 struct pic32_adc_softc {
 	uint32_t base;

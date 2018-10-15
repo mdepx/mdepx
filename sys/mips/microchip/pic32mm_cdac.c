@@ -31,6 +31,20 @@
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
+pic32_cdac_control(struct pic32_cdac_softc *sc, uint32_t val)
+{
+	uint32_t reg;
+
+	reg = (val << DACCON_DACDAT_S);
+	reg |= DACCON_DACOE;
+	reg |= DACCON_REFSEL_AVDD;
+	WR4(sc, DACCON, reg);
+
+	reg |= DACCON_ON;
+	WR4(sc, DACCON, reg);
+}
+
+void
 pic32_cdac_init(struct pic32_cdac_softc *sc,
     uint32_t base)
 {
