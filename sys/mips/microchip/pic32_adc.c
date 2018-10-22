@@ -42,19 +42,29 @@ pic32_adc_convert(struct pic32_adc_softc *sc, int channel)
 	uint32_t reg;
 	uint32_t val;
 
-	WR4(sc, ADCHS, (channel << ADCHS_CH0SA_S));
+	WR4(sc, ADCHS, (1 << channel));
+
+	reg = ADCON2_BUFREGEN;
+	reg |= ADCON2_CSCNA;
+	WR4(sc, ADCON2, reg);
 
 	/* TODO: unmagic */
 	WR4(sc, ADCON3, 0x402);
 	WR4(sc, ADCHIT, 0);
-	WR4(sc, ADCON1, (ADCON1_ON | ADCON1_MODE12 | ADCON1_FORM_I32));
+
+	reg = (ADCON1_MODE12 | ADCON1_FORM_I32);
+	WR4(sc, ADCON1, reg);
+
+	reg = RD4(sc, ADCON1);
+	reg |= ADCON1_ON;
+	WR4(sc, ADCON1, reg);
 
 	/* Start */
 	reg = RD4(sc, ADCON1);
 	reg |= ADCON1_SAMP;
 	WR4(sc, ADCON1, reg);
 
-	udelay(100000);
+	udelay(100);
 
 	reg = RD4(sc, ADCON1);
 	reg &= ~ADCON1_SAMP;
@@ -63,7 +73,7 @@ pic32_adc_convert(struct pic32_adc_softc *sc, int channel)
 	while ((RD4(sc, ADCON1) & ADCON1_DONE) == 0)
 		;
 
-	val = RD2(sc, ADCBUF(0));
+	val = RD4(sc, ADCBUF(channel));
 
 	WR4(sc, ADCON1, 0);
 
@@ -74,6 +84,7 @@ void
 pic32_adc_init(struct pic32_adc_softc *sc,
     uint32_t base)
 {
+	uint32_t reg;
 
 	sc->base = base;
 }

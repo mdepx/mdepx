@@ -31,6 +31,19 @@
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
+uint8_t
+pic32_getc(struct pic32_uart_softc *sc)
+{
+	uint8_t c;
+
+	if ((RD4(sc, UART_STA) & STA_URXDA) == 0)
+		return (0);
+
+	c = RD4(sc, UART_RXREG);
+
+	return (c);
+}
+
 void
 pic32_putc(struct pic32_uart_softc *sc, char c)
 {
@@ -61,7 +74,7 @@ pic32_uart_init(struct pic32_uart_softc *sc, uint32_t base,
 	WR4(sc, UART_BRG, freq);
 
 	reg = (STA_URXEN | STA_UTXEN);
-	reg = (STA_UTXEN);
 	WR4(sc, UART_STA, reg);
+
 	WR4(sc, UART_MODE, MODE_ON);
 }

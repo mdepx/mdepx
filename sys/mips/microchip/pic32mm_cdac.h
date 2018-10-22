@@ -24,32 +24,26 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ARM_STM_STM32F4_H_
-#define _ARM_STM_STM32F4_H_
+#ifndef _MIPS_MICROCHIP_PIC32_CDAC_H_
+#define	_MIPS_MICROCHIP_PIC32_CDAC_H_
 
-#include <arm/stm/stm32l4_usart.h>
-#include <arm/stm/stm32f4_flash.h>
-#include <arm/stm/stm32f4_gpio.h>
-#include <arm/stm/stm32f4_pwr.h>
-#include <arm/stm/stm32f4_timer.h>
-#include <arm/stm/stm32f4_spi.h>
+#define	DACCON			0x00
+#define	 DACCON_DACDAT_S	16 /* CDAC Voltage Reference Selection bits */
+#define	 DACCON_DACDAT_M	(0x3f << DACCON_DACDAT_S)
+#define	 DACCON_ON		(1 << 15) /* Voltage Reference Enable bit */
+#define	 DACCON_DACOE		(1 << 8) /* CDAC Voltage Reference Output Enable bit */
+#define	 DACCON_REFSEL_S	0 /* CDAC Voltage Reference Source Select bits */
+#define	 DACCON_REFSEL_M	(0x3 << DACCON_REFSEL_S)
+#define	 DACCON_REFSEL_AVDD	(0x3 << DACCON_REFSEL_S) /* Reference voltage is AVDD */
+#define	 DACCON_REFSEL_AVSS	(0x2 << DACCON_REFSEL_S) /* No reference is selected ­ output is AVSS */
+#define	 DACCON_REFSEL_VREF_P	(0x1 << DACCON_REFSEL_S) /* Reference voltage is the VREF+ input pin voltage */
+#define	 DACCON_REFSEL_AVSS_1	(0x0 << DACCON_REFSEL_S) /* No reference is selected ­ output is AVSS */
 
-#include <arm/stm/stm32l4_rcc.h>
+struct pic32_cdac_softc {
+	uint32_t base;
+};
 
-#define	USART1_BASE	0x40013800
-#define	USART2_BASE	0x40004400
-#define	USART3_BASE	0x40004800
-#define	USART4_BASE	0x40004C00
+void pic32_cdac_init(struct pic32_cdac_softc *sc, uint32_t base);
+void pic32_cdac_control(struct pic32_cdac_softc *sc, uint32_t val);
 
-#define	ADC_BASE	0x50040000
-#define	FLASH_BASE	0x40022000
-#define	PWR_BASE	0x40007000
-#define	GPIO_BASE	0x48000000
-#define	NVIC_BASE	0xE000E000
-#define	RCC_BASE	0x40021000
-#define	TIM1_BASE	0x40012C00
-#define	SPI1_BASE	0x40013000
-#define	SPI2_BASE	0x40003800
-#define	SPI3_BASE	0x40003C00
-
-#endif	/* !_ARM_STM_STM32F4_H_ */
+#endif /* !_MIPS_MICROCHIP_PIC32_CDAC_H_ */

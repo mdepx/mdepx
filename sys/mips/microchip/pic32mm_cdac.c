@@ -24,84 +24,30 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
-#include <arm/stm/stm32f4_gpio.h>
+#include <sys/types.h>
+#include <mips/microchip/pic32mm_cdac.h>
 
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
-pin_set(struct stm32f4_gpio_softc *sc, uint32_t port,
-    uint32_t pin, uint32_t enable)
+pic32_cdac_control(struct pic32_cdac_softc *sc, uint32_t val)
 {
 	uint32_t reg;
 
-	if (enable)
-		reg = (1 << pin);
-	else
-		reg = (1 << (pin + 16));
+	reg = (val << DACCON_DACDAT_S);
+	reg |= DACCON_DACOE;
+	reg |= DACCON_REFSEL_AVDD;
+	WR4(sc, DACCON, reg);
 
-	WR4(sc, GPIO_BSRR(port), reg);
-}
-
-int
-pin_get(struct stm32f4_gpio_softc *sc, uint32_t port,
-    uint32_t pin)
-{
-	uint32_t reg;
-
-	reg = RD4(sc, GPIO_IDR(port));
-	if (reg & (1 << pin))
-		return (1);
-
-	return (0);
+	reg |= DACCON_ON;
+	WR4(sc, DACCON, reg);
 }
 
 void
-pin_configure(struct stm32f4_gpio_softc *sc, const struct gpio_pin *pins)
-{
-	const struct gpio_pin *cfg;
-	uint32_t afr;
-	uint32_t reg;
-	int i;
-
-	for (i = 0; pins[i].pin != -1; i++) {
-		cfg = &pins[i];
-
-		reg = RD4(sc, GPIO_MODER(cfg->port));
-		reg &= ~(0x3 << (cfg->pin * 2));
-		reg |= (cfg->mode << (cfg->pin * 2));
-		WR4(sc, GPIO_MODER(cfg->port), reg);
-
-		if (cfg->mode == MODE_ALT) {
-			if (cfg->pin > 7)
-				afr = GPIO_AFRH(cfg->port);
-			else
-				afr = GPIO_AFRL(cfg->port);
-
-			reg = RD4(sc, afr);
-			reg &= ~(0xf << ((cfg->pin % 8) * 4));
-			reg |= (cfg->alt << ((cfg->pin % 8) * 4));
-			WR4(sc, afr, reg);
-		}
-
-		reg = RD4(sc, GPIO_OSPEEDR(cfg->port));
-		reg &= ~(3 << (cfg->pin * 2));
-		reg |= (3 << (cfg->pin * 2));
-		WR4(sc, GPIO_OSPEEDR(cfg->port), reg);
-
-		reg = RD4(sc, GPIO_PUPDR(cfg->port));
-		reg &= ~(3 << (cfg->pin * 2));
-		reg |= (cfg->pupdr << (cfg->pin * 2));
-		WR4(sc, GPIO_PUPDR(cfg->port), reg);
-	}
-}
-
-int
-stm32f4_gpio_init(struct stm32f4_gpio_softc *sc, uint32_t base)
+pic32_cdac_init(struct pic32_cdac_softc *sc,
+    uint32_t base)
 {
 
 	sc->base = base;
-
-	return (0);
 }

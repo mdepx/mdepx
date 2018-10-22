@@ -37,6 +37,7 @@
 #define	 STA_UTXEN	(1 << 10)	/* Transmit Enable */
 #define	 STA_UTXBRK	(1 << 11)	/* Transmit Break bit */
 #define	 STA_URXEN	(1 << 12)	/* Receiver Enable */
+#define	 STA_URXDA	(1 << 0)	/* Receive Buffer Data Available bit (read-only) */
 #define	UART_TXREG	0x20
 #define	UART_RXREG	0x30
 #define	UART_BRG	0x40
@@ -47,5 +48,6 @@ struct pic32_uart_softc {
 
 void pic32_uart_init(struct pic32_uart_softc *sc, uint32_t base, uint32_t speed, uint32_t cpu_freq, uint32_t div);
 void pic32_putc(struct pic32_uart_softc *sc, char c);
+uint8_t pic32_getc(struct pic32_uart_softc *sc);
 
 #endif /* !_MIPS_MICROCHIP_PIC32_UART_H_ */
