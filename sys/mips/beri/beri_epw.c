@@ -119,8 +119,8 @@ epw_request(struct epw_softc *sc, struct epw_request *req)
 		val = RD4(sc, EPW_READ_BURST_COUNT);
 		req->burst_count = bswap32(val);
 
-		dprintf("%s: read, byte enable %x\n", __func__, req->byte_enable);
-		dprintf("%s: read %lx %lx %x\n", __func__, req->addr, req->flit_size, req->burst_count);
+		dprintf("%s: read %lx, flit_size %lx, burst count %x\n",
+		    __func__, req->addr, req->flit_size, req->burst_count);
 	}
 
 	return (1);
