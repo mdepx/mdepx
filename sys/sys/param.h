@@ -32,4 +32,6 @@
 #define	ntohl(x)	__ntohl(x)
 #define	ntohs(x)	__ntohs(x)
 
+#define	roundup2(x, y)	(((x)+((y)-1))&(~((y)-1)))
+
 #endif /* !_SYS_PARAM_H_ */
