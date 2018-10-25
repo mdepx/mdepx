@@ -73,7 +73,8 @@ typedef	unsigned short	u_short;
 typedef	unsigned int	u_int;
 typedef	unsigned long	u_long;
 
-typedef	__int64_t	off_t;
+typedef	__int64_t	__off_t;
+typedef	__off_t		off_t;
 typedef	__register_t	register_t;
 
 typedef	__uint8_t	__sa_family_t;
