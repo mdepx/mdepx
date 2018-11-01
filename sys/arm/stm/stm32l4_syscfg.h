@@ -24,35 +24,25 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ARM_STM_STM32F4_H_
-#define _ARM_STM_STM32F4_H_
+#ifndef _ARM_STM_STM32L4_SYSCFG_H_
+#define _ARM_STM_STM32L4_SYSCFG_H_
 
-#include <arm/stm/stm32l4_exti.h>
-#include <arm/stm/stm32l4_usart.h>
-#include <arm/stm/stm32f4_flash.h>
-#include <arm/stm/stm32f4_gpio.h>
-#include <arm/stm/stm32f4_pwr.h>
-#include <arm/stm/stm32f4_timer.h>
-#include <arm/stm/stm32f4_spi.h>
-#include <arm/stm/stm32l4_syscfg.h>
-#include <arm/stm/stm32l4_rcc.h>
+#define	SYSCFG_MEMRMP		0x00	/* Memory remap register */
+#define	SYSCFG_CFGR1		0x04	/* SYSCFG configuration register 1 */
+#define	SYSCFG_EXTICR1		0x08	/* External interrupt configuration register 1 */
+#define	SYSCFG_EXTICR2		0x0C	/* External interrupt configuration register 2 */
+#define	SYSCFG_EXTICR3		0x10	/* External interrupt configuration register 3 */
+#define	SYSCFG_EXTICR4		0x14	/* External interrupt configuration register 4 */
+#define	SYSCFG_SCSR		0x18	/* SYSCFG SRAM2 control and status register */
+#define	SYSCFG_CFGR2		0x1C	/* SYSCFG configuration register 2 */
+#define	SYSCFG_SWPR		0x20	/* SYSCFG SRAM2 write protection register */
+#define	SYSCFG_SKR		0x24	/* SYSCFG SRAM2 key register */
 
-#define	USART1_BASE	0x40013800
-#define	USART2_BASE	0x40004400
-#define	USART3_BASE	0x40004800
-#define	USART4_BASE	0x40004C00
+struct stm32l4_syscfg_softc {
+	uint32_t base;
+};
 
-#define	ADC_BASE	0x50040000
-#define	FLASH_BASE	0x40022000
-#define	PWR_BASE	0x40007000
-#define	GPIO_BASE	0x48000000
-#define	NVIC_BASE	0xE000E000
-#define	RCC_BASE	0x40021000
-#define	TIM1_BASE	0x40012C00
-#define	SPI1_BASE	0x40013000
-#define	SPI2_BASE	0x40003800
-#define	SPI3_BASE	0x40003C00
-#define	EXTI_BASE	0x40010400
-#define	SYSCFG_BASE	0x40010000
+void stm32l4_syscfg_init(struct stm32l4_syscfg_softc *sc, uint32_t base);
+void stm32l4_syscfg_eth_rmii(struct stm32l4_syscfg_softc *sc);
 
-#endif	/* !_ARM_STM_STM32F4_H_ */
+#endif /* !_ARM_STM_STM32L4_SYSCFG_H_ */

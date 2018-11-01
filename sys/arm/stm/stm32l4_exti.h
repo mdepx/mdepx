@@ -24,35 +24,23 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ARM_STM_STM32F4_H_
-#define _ARM_STM_STM32F4_H_
+#ifndef _ARM_STM_STM32L4_EXTI_H_
+#define _ARM_STM_STM32L4_EXTI_H_
 
-#include <arm/stm/stm32l4_exti.h>
-#include <arm/stm/stm32l4_usart.h>
-#include <arm/stm/stm32f4_flash.h>
-#include <arm/stm/stm32f4_gpio.h>
-#include <arm/stm/stm32f4_pwr.h>
-#include <arm/stm/stm32f4_timer.h>
-#include <arm/stm/stm32f4_spi.h>
-#include <arm/stm/stm32l4_syscfg.h>
-#include <arm/stm/stm32l4_rcc.h>
+#include <machine/frame.h>
 
-#define	USART1_BASE	0x40013800
-#define	USART2_BASE	0x40004400
-#define	USART3_BASE	0x40004800
-#define	USART4_BASE	0x40004C00
+#define	EXTI_IMR(n)	((n) < 32 ? 0x00 : 0x20)	/* Interrupt mask register */
+#define	EXTI_EMR(n)	((n) < 32 ? 0x04 : 0x24)	/* Event mask register */
+#define	EXTI_RTSR(n)	((n) < 32 ? 0x08 : 0x28)	/* Rising trigger selection register */
+#define	EXTI_FTSR(n)	((n) < 32 ? 0x0C : 0x2C)	/* Falling trigger selection register */
+#define	EXTI_SWIER(n)	((n) < 32 ? 0x10 : 0x30)	/* Software interrupt event register */
+#define	EXTI_PR(n)	((n) < 32 ? 0x14 : 0x34)	/* Pending register */
 
-#define	ADC_BASE	0x50040000
-#define	FLASH_BASE	0x40022000
-#define	PWR_BASE	0x40007000
-#define	GPIO_BASE	0x48000000
-#define	NVIC_BASE	0xE000E000
-#define	RCC_BASE	0x40021000
-#define	TIM1_BASE	0x40012C00
-#define	SPI1_BASE	0x40013000
-#define	SPI2_BASE	0x40003800
-#define	SPI3_BASE	0x40003C00
-#define	EXTI_BASE	0x40010400
-#define	SYSCFG_BASE	0x40010000
+struct stm32l4_exti_softc {
+	uint32_t base;
+};
 
-#endif	/* !_ARM_STM_STM32F4_H_ */
+int stm32l4_exti_init(struct stm32l4_exti_softc *sc, uint32_t base);
+void stm32l4_exti_intr(void *arg, struct trapframe *tf, int irq);
+
+#endif /* !_ARM_STM_STM32L4_EXTI_H_ */
