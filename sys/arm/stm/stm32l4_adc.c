@@ -24,14 +24,15 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _SYS_PARAM_H_
-#define _SYS_PARAM_H_
+#include <sys/cdefs.h>
+#include <arm/stm/stm32l4_adc.h>
 
-#define	htonl(x)	__htonl(x)
-#define	htons(x)	__htons(x)
-#define	ntohl(x)	__ntohl(x)
-#define	ntohs(x)	__ntohs(x)
+#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-#define	roundup2(x, y)	(((x)+((y)-1))&(~((y)-1)))
+void
+stm32l4_adc_init(struct stm32l4_adc_softc *sc, uint32_t base)
+{
 
-#endif /* !_SYS_PARAM_H_ */
+	sc->base = base;
+}

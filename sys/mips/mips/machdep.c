@@ -24,14 +24,32 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _SYS_PARAM_H_
-#define _SYS_PARAM_H_
+#include <sys/cdefs.h>
+#include <sys/systm.h>
+#include <sys/lock.h>
+#include <machine/frame.h>
+#include <machine/cpuregs.h>
+#include <machine/cpufunc.h>
 
-#define	htonl(x)	__htonl(x)
-#define	htons(x)	__htons(x)
-#define	ntohl(x)	__ntohl(x)
-#define	ntohs(x)	__ntohs(x)
+uint32_t val;
+uint32_t count;
 
-#define	roundup2(x, y)	(((x)+((y)-1))&(~((y)-1)))
+void
+spinlock_enter(void)
+{
 
-#endif /* !_SYS_PARAM_H_ */
+	if (count == 0) {
+		count = 1;
+		val = intr_disable();
+	} else
+		count++;
+}
+
+void
+spinlock_exit(void)
+{
+
+	count--;
+	if (count == 0)
+		intr_restore(val);
+}

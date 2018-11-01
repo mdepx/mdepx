@@ -28,17 +28,36 @@
 #define _ARM_STM_STM32L4_USART_H_
 
 #define	USART_CR1		0x00 /* Control register 1 */
-#define	 USART_CR1_RXNEIE	(1 << 5) /* RXNE interrupt enable */
-#define	 USART_CR1_TE		(1 << 3) /* Transmitter enable */
-#define	 USART_CR1_RE		(1 << 2) /* Receiver enable */
-#define	 USART_CR1_UE		(1 << 0) /* USART enable */
+#define	 CR1_M1			(1 << 28) /* Word length */
+#define	 CR1_EOBIE		(1 << 27) /* End of Block interrupt enable */
+#define	 CR1_RTOIE		(1 << 26) /* Receiver timeout interrupt enable */
+#define	 CR1_DEAT_S		21 /* Driver Enable assertion time */
+#define	 CR1_DEAT_M		(0x1f << CR1_DEAT_S)
+#define	 CR1_DEDT_S		16 /* Driver Enable de-assertion time */
+#define	 CR1_DEDT_M		(0x1f << CR1_DEDT_S)
+#define	 CR1_OVER8		(1 << 15) /* Oversampling mode */
+#define	 CR1_CMIE		(1 << 14) /* Character match interrupt enable */
+#define	 CR1_MME		(1 << 13) /* Mute mode enable */
+#define	 CR1_M0			(1 << 12) /* Word length */
+#define	 CR1_WAKE		(1 << 11) /* Receiver wakeup method */
+#define	 CR1_PCE		(1 << 10) /* Parity control enable */
+#define	 CR1_PS_ODD		(1 << 9) /* Parity selection */
+#define	 CR1_PEIE		(1 << 8) /* PE interrupt enable */
+#define	 CR1_TXEIE		(1 << 7) /* interrupt enable */
+#define	 CR1_TCIE		(1 << 6) /* Transmission complete interrupt enable */
+#define	 CR1_RXNEIE		(1 << 5) /* RXNE interrupt enable */
+#define	 CR1_IDLEIE		(1 << 4) /* IDLE interrupt enable */
+#define	 CR1_TE			(1 << 3) /* Transmitter enable */
+#define	 CR1_RE			(1 << 2) /* Receiver enable */
+#define	 CR1_UESM		(1 << 1) /* USART enable in Stop mode */
+#define	 CR1_UE			(1 << 0) /* USART enable */
 #define	USART_CR2		0x04 /* Control register 2 */
 #define	USART_CR3		0x08 /* Control register 3 */
 #define	USART_BRR		0x0C /* Baud rate register */
 #define	USART_GTPR		0x10 /* Guard time and prescaler register */
 #define	USART_ISR		0x1C /* Interrupt and status register */
-#define	 USART_ISR_RXNE		(1 << 5) /* Read data register not empty */
-#define	 USART_ISR_TXE		(1 << 7) /* Transmit data register empty */
+#define	 ISR_RXNE		(1 << 5) /* Read data register not empty */
+#define	 ISR_TXE		(1 << 7) /* Transmit data register empty */
 #define	USART_RDR		0x24 /* Receive data register */
 #define	USART_TDR		0x28 /* Transmit data register */
 

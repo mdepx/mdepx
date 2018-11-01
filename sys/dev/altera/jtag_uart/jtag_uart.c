@@ -31,8 +31,6 @@
 
 #include <machine/cpuregs.h>
 
-#define	MIPS_XKPHYS_UNCACHED_BASE	0x9000000000000000ULL
-
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 #define	RD2(_sc, _reg)		*(volatile uint16_t *)((_sc)->base + _reg)
