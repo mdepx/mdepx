@@ -14,7 +14,7 @@
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * ARE DISCLAIMED.  IN NO SPI SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -24,27 +24,32 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ARM_STM_STM32L4_SYSCFG_H_
-#define _ARM_STM_STM32L4_SYSCFG_H_
+#include <sys/cdefs.h>
 
-#define	SYSCFG_MEMRMP		0x00	/* Memory remap register */
-#define	SYSCFG_CFGR1		0x04	/* SYSCFG configuration register 1 */
-#define	SYSCFG_EXTICR1		0x08	/* External interrupt configuration register 1 */
-#define	SYSCFG_EXTICR2		0x0C	/* External interrupt configuration register 2 */
-#define	SYSCFG_EXTICR3		0x10	/* External interrupt configuration register 3 */
-#define	SYSCFG_EXTICR4		0x14	/* External interrupt configuration register 4 */
-#define	SYSCFG_EXTICR(n)	(0x8 + ((n) - 1) * 0x4)
-#define	SYSCFG_SCSR		0x18	/* SYSCFG SRAM2 control and status register */
-#define	SYSCFG_CFGR2		0x1C	/* SYSCFG configuration register 2 */
-#define	SYSCFG_SWPR		0x20	/* SYSCFG SRAM2 write protection register */
-#define	SYSCFG_SKR		0x24	/* SYSCFG SRAM2 key register */
+#include "stm32l4_syscfg.h"
+#include "stm32f4_gpio.h"
 
-struct stm32l4_syscfg_softc {
-	uint32_t base;
-};
+#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-void stm32l4_syscfg_init(struct stm32l4_syscfg_softc *sc, uint32_t base);
-void stm32l4_syscfg_eth_rmii(struct stm32l4_syscfg_softc *sc);
-void stm32l4_syscfg_setup(struct stm32l4_syscfg_softc *sc, int port, int pin);
+void
+stm32l4_syscfg_init(struct stm32l4_syscfg_softc *sc, uint32_t base)
+{
 
-#endif /* !_ARM_STM_STM32L4_SYSCFG_H_ */
+	sc->base = base;
+}
+
+void
+stm32l4_syscfg_setup(struct stm32l4_syscfg_softc *sc, int port, int pin)
+{
+	uint32_t offset;
+	uint32_t val;
+	uint32_t reg;
+
+	offset = SYSCFG_EXTICR((port / 4) + 1);
+	val = (port << ((port % 4) * 3));
+
+	reg = RD4(sc, offset);
+	reg |= val;
+	WR4(sc, offset, reg);
+}

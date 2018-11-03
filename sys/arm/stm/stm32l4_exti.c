@@ -24,34 +24,72 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ARM_STM_STM32L4_EXTI_H_
-#define _ARM_STM_STM32L4_EXTI_H_
+#include <sys/cdefs.h>
+#include <sys/systm.h>
+#include <arm/stm/stm32l4_exti.h>
 
 #include <machine/frame.h>
 
-#define	EXTI_IMR(n)	((n) < 32 ? 0x00 : 0x20)	/* Interrupt mask register */
-#define	EXTI_EMR(n)	((n) < 32 ? 0x04 : 0x24)	/* Event mask register */
-#define	EXTI_RTSR(n)	((n) < 32 ? 0x08 : 0x28)	/* Rising trigger selection register */
-#define	EXTI_FTSR(n)	((n) < 32 ? 0x0C : 0x2C)	/* Falling trigger selection register */
-#define	EXTI_SWIER(n)	((n) < 32 ? 0x10 : 0x30)	/* Software interrupt event register */
-#define	EXTI_PR(n)	((n) < 32 ? 0x14 : 0x34)	/* Pending register */
+#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-#define	EXTI_NUM_INT	39
+void
+stm32l4_exti_intr(void *arg, struct trapframe *tf, int irq)
+{
+	struct stm32l4_exti_softc *sc;
+	uint32_t reg;
+	int i;
 
-struct exti_intr_entry {
-	void (*handler) (void *arg);
-	void *arg;
-};
+	sc = arg;
 
-struct stm32l4_exti_softc {
-	uint32_t base;
-	const struct exti_intr_entry *map;
-};
+	reg = RD4(sc, EXTI_PR(0));
+	for (i = 0; i < 32; i++)
+		if (reg & (1 << i))
+			if (sc->map[i].handler != NULL)
+				sc->map[i].handler(sc->map[i].arg);
+	WR4(sc, EXTI_PR(0), reg);
 
-void stm32l4_exti_init(struct stm32l4_exti_softc *sc, uint32_t base);
-void stm32l4_exti_intr(void *arg, struct trapframe *tf, int irq);
-void stm32l4_exti_install_intr_map(struct stm32l4_exti_softc *sc,
-    const struct exti_intr_entry *map);
-void stm32l4_exti_setup(struct stm32l4_exti_softc *sc, uint32_t n);
+	reg = RD4(sc, EXTI_PR(32));
+	for (i = 0; i < 7; i++)
+		if (reg & (1 << i))
+			if (sc->map[32 + i].handler != NULL)
+				sc->map[32 + i].handler(sc->map[32 + i].arg);
+	WR4(sc, EXTI_PR(32), reg);
+}
 
-#endif /* !_ARM_STM_STM32L4_EXTI_H_ */
+void
+stm32l4_exti_install_intr_map(struct stm32l4_exti_softc *sc,
+    const struct exti_intr_entry *map)
+{
+
+	sc->map = map;
+}
+
+void
+stm32l4_exti_setup(struct stm32l4_exti_softc *sc, uint32_t n)
+{
+	uint32_t reg;
+
+	reg = RD4(sc, EXTI_IMR(n));
+	reg |= (1 << n);
+	WR4(sc, EXTI_IMR(n), reg);
+
+	reg = RD4(sc, EXTI_EMR(n));
+	reg |= (1 << n);
+	WR4(sc, EXTI_EMR(n), reg);
+
+	reg = RD4(sc, EXTI_RTSR(n));
+	reg |= (1 << n);
+	WR4(sc, EXTI_RTSR(n), reg);
+
+	reg = RD4(sc, EXTI_FTSR(n));
+	reg |= (1 << n);
+	WR4(sc, EXTI_FTSR(n), reg);
+}
+
+void
+stm32l4_exti_init(struct stm32l4_exti_softc *sc, uint32_t base)
+{
+
+	sc->base = base;
+}
