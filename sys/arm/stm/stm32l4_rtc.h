@@ -31,6 +31,8 @@
 #define	RTC_DR		0x04
 #define	RTC_CR		0x08
 #define	RTC_ISR		0x0C
+#define	 ISR_INIT	(1 << 7)	/* Initialization mode */
+#define	 ISR_INITF	(1 << 6)	/* Initialization flag */
 #define	RTC_PRER	0x10
 #define	RTC_WUTR	0x14
 #define	RTC_ALRMAR	0x1C
