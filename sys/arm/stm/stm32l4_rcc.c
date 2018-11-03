@@ -103,16 +103,16 @@ stm32l4_rcc_pll_configure(struct stm32l4_rcc_softc *sc,
 
 int
 stm32l4_rcc_setup(struct stm32l4_rcc_softc *sc,
-    uint32_t ahb1enr, uint32_t ahb2enr, uint32_t ahb3enr,
-    uint32_t apb1enr1, uint32_t apb1enr2, uint32_t apb2enr)
+    struct rcc_config *cfg)
 {
 
-	WR4(sc, RCC_AHB1ENR, ahb1enr);
-	WR4(sc, RCC_AHB2ENR, ahb2enr);
-	WR4(sc, RCC_AHB3ENR, ahb3enr);
-	WR4(sc, RCC_APB1ENR1, apb1enr1);
-	WR4(sc, RCC_APB1ENR2, apb1enr2);
-	WR4(sc, RCC_APB2ENR, apb2enr);
+	WR4(sc, RCC_AHB1ENR, cfg->ahb1enr);
+	WR4(sc, RCC_AHB2ENR, cfg->ahb2enr);
+	WR4(sc, RCC_AHB3ENR, cfg->ahb3enr);
+	WR4(sc, RCC_APB1ENR1, cfg->apb1enr1);
+	WR4(sc, RCC_APB1ENR2, cfg->apb1enr2);
+	WR4(sc, RCC_APB2ENR, cfg->apb2enr);
+	WR4(sc, RCC_BDCR, cfg->bdcr);
 
 	return (0);
 }
