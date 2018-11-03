@@ -121,6 +121,8 @@
 #define	 APB2ENR_SDMMC1EN	(1 << 10)
 #define	 APB2ENR_SYSCFGEN	(1 << 0)
 #define	RCC_CCIPR		0x88	/* Peripherals independent clock configuration register */
+#define	RCC_BDCR		0x90	/* Backup domain control register */
+#define	 BDCR_RTCEN		(1 << 15)	/* RTC clock enable */
 
 struct stm32l4_rcc_softc {
 	uint32_t base;
