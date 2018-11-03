@@ -27,6 +27,27 @@
 #ifndef _ARM_STM_STM32L4_RTC_H_
 #define _ARM_STM_STM32L4_RTC_H_
 
+#define	RTC_TR		0x00
+#define	RTC_DR		0x04
+#define	RTC_CR		0x08
+#define	RTC_ISR		0x0C
+#define	RTC_PRER	0x10
+#define	RTC_WUTR	0x14
+#define	RTC_ALRMAR	0x1C
+#define	RTC_ALRMBR	0x20
+#define	RTC_WPR		0x24
+#define	RTC_SSR		0x28
+#define	RTC_SHIFTR	0x2C
+#define	RTC_TSTR	0x30
+#define	RTC_TSDR	0x34
+#define	RTC_TSSSR	0x38
+#define	RTC_CALR	0x3C
+#define	RTC_TAMPCR	0x40
+#define	RTC_ALRMASSR	0x44
+#define	RTC_ALRMBSSR	0x48
+#define	RTC_OR		0x4C
+#define	RTC_BKPR(n)	(0x50 + 0x4 * (n))
+
 struct stm32l4_rtc_softc {
 	uint32_t base;
 };
