@@ -119,6 +119,7 @@
 #define	 APB2ENR_USART1EN	(1 << 14)
 #define	 APB2ENR_SPI1EN		(1 << 12) /* SPI1 clock enable */
 #define	 APB2ENR_SDMMC1EN	(1 << 10)
+#define	 APB2ENR_SYSCFGEN	(1 << 0)
 #define	RCC_CCIPR		0x88	/* Peripherals independent clock configuration register */
 
 struct stm32l4_rcc_softc {
