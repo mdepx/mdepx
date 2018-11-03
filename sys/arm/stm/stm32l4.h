@@ -31,11 +31,12 @@
 #include <arm/stm/stm32l4_usart.h>
 #include <arm/stm/stm32f4_flash.h>
 #include <arm/stm/stm32f4_gpio.h>
-#include <arm/stm/stm32f4_pwr.h>
+#include <arm/stm/stm32l4_pwr.h>
 #include <arm/stm/stm32f4_timer.h>
 #include <arm/stm/stm32f4_spi.h>
 #include <arm/stm/stm32l4_syscfg.h>
 #include <arm/stm/stm32l4_rcc.h>
+#include <arm/stm/stm32l4_rtc.h>
 
 #define	USART1_BASE	0x40013800
 #define	USART2_BASE	0x40004400
