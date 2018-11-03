@@ -28,6 +28,7 @@
 #define _ARM_STM_STM32L4_PWR_H_
 
 #define	PWR_CR1		0x00
+#define	 CR1_DBP	(1 << 8)	/* Disable backup domain write protection */
 #define	PWR_CR2		0x04
 #define	PWR_CR3		0x08
 #define	PWR_CR4		0x0C

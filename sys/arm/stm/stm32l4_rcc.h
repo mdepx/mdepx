@@ -123,6 +123,11 @@
 #define	RCC_CCIPR		0x88	/* Peripherals independent clock configuration register */
 #define	RCC_BDCR		0x90	/* Backup domain control register */
 #define	 BDCR_RTCEN		(1 << 15)	/* RTC clock enable */
+#define	 BDCR_RTCSEL_S		8	/* RTC clock source selection */
+#define	 BDCR_RTCSEL_M		(0x3 << BDCR_RTCSEL_S)
+#define	 BDCR_RTCSEL_LSE	(1 << BDCR_RTCSEL_S) /* LSE oscillator clock */
+#define	 BDCR_RTCSEL_LSI	(2 << BDCR_RTCSEL_S) /* LSI oscillator clock */
+#define	 BDCR_RTCSEL_HSE	(3 << BDCR_RTCSEL_S) /* HSE oscillator clock divided by 32 */
 
 struct rcc_config {
 	uint32_t ahb1enr;
