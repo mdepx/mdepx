@@ -113,6 +113,7 @@
 #define	 APB1ENR1_I2C3EN	(1 << 23) /* I2C3 clock enable */
 #define	 APB1ENR1_SPI3EN	(1 << 15) /* SPI3 clock enable */
 #define	 APB1ENR1_SPI2EN	(1 << 14) /* SPI2 clock enable */
+#define	 APB1ENR1_RTCAPBEN	(1 << 10) /* RTC APB clock enable */
 #define	 APB1ENR1_TIM2EN	(1 << 0)
 #define	RCC_APB1ENR2		0x5C
 #define	RCC_APB2ENR		0x60
@@ -128,6 +129,9 @@
 #define	 BDCR_RTCSEL_LSE	(1 << BDCR_RTCSEL_S) /* LSE oscillator clock */
 #define	 BDCR_RTCSEL_LSI	(2 << BDCR_RTCSEL_S) /* LSI oscillator clock */
 #define	 BDCR_RTCSEL_HSE	(3 << BDCR_RTCSEL_S) /* HSE oscillator clock divided by 32 */
+#define	RCC_CSR			0x94	/* Control/status register */
+#define	 CSR_LSION		(1 << 0) /* LSI oscillator enable */
+#define	 CSR_LSIRDY		(1 << 1) /* LSI oscillator ready */
 
 struct rcc_config {
 	uint32_t ahb1enr;
@@ -148,5 +152,6 @@ void stm32l4_rcc_pll_configure(struct stm32l4_rcc_softc *sc,
     int pllm, int plln, int pllq, int pllp, uint8_t external, uint32_t rcc_cfgr);
 int stm32l4_rcc_setup(struct stm32l4_rcc_softc *sc, struct rcc_config *cfg);
 void stm32l4_rcc_msi_configure(struct stm32l4_rcc_softc *sc, uint32_t freq);
+int stm32l4_rcc_lsi_enable(struct stm32l4_rcc_softc *sc);
 
 #endif /* !_ARM_STM_STM32L4_RCC_H_ */

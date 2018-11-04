@@ -92,6 +92,31 @@ stm32l4_rcc_msi_configure(struct stm32l4_rcc_softc *sc,
 	printf("msi %x\n", RD4(sc, RCC_CR));
 }
 
+int
+stm32l4_rcc_lsi_enable(struct stm32l4_rcc_softc *sc)
+{
+	int timeout;
+	int reg;
+
+	reg = RD4(sc, RCC_CSR);
+	reg |= CSR_LSION;
+	WR4(sc, RCC_CSR, reg);
+
+	timeout = 1000;	/* ~480 on stm32l431kc */
+	do {
+		reg = RD4(sc, RCC_CSR);
+		if (reg & CSR_LSIRDY)
+			break;
+	} while (timeout--);
+
+	if (timeout <= 0) {
+		printf("Can't enable LSI clock\n");
+		return (-1);
+	}
+
+	return (0);
+}
+
 void
 stm32l4_rcc_pll_configure(struct stm32l4_rcc_softc *sc,
     int pllm, int plln, int pllq, int pllp, uint8_t external,
