@@ -126,7 +126,7 @@ stm32l4_rcc_pll_configure(struct stm32l4_rcc_softc *sc,
 	/* TODO */
 }
 
-int
+void
 stm32l4_rcc_setup(struct stm32l4_rcc_softc *sc,
     struct rcc_config *cfg)
 {
@@ -137,9 +137,14 @@ stm32l4_rcc_setup(struct stm32l4_rcc_softc *sc,
 	WR4(sc, RCC_APB1ENR1, cfg->apb1enr1);
 	WR4(sc, RCC_APB1ENR2, cfg->apb1enr2);
 	WR4(sc, RCC_APB2ENR, cfg->apb2enr);
-	WR4(sc, RCC_BDCR, cfg->bdcr);
+}
 
-	return (0);
+void
+stm32l4_rcc_bdcr_setup(struct stm32l4_rcc_softc *sc,
+    uint32_t bdcr)
+{
+
+	WR4(sc, RCC_BDCR, bdcr);
 }
 
 int

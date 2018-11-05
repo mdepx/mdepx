@@ -140,7 +140,6 @@ struct rcc_config {
 	uint32_t apb1enr1;
 	uint32_t apb1enr2;
 	uint32_t apb2enr;
-	uint32_t bdcr;
 };
 
 struct stm32l4_rcc_softc {
@@ -150,8 +149,9 @@ struct stm32l4_rcc_softc {
 int stm32l4_rcc_init(struct stm32l4_rcc_softc *sc, uint32_t base);
 void stm32l4_rcc_pll_configure(struct stm32l4_rcc_softc *sc,
     int pllm, int plln, int pllq, int pllp, uint8_t external, uint32_t rcc_cfgr);
-int stm32l4_rcc_setup(struct stm32l4_rcc_softc *sc, struct rcc_config *cfg);
+void stm32l4_rcc_setup(struct stm32l4_rcc_softc *sc, struct rcc_config *cfg);
 void stm32l4_rcc_msi_configure(struct stm32l4_rcc_softc *sc, uint32_t freq);
 int stm32l4_rcc_lsi_enable(struct stm32l4_rcc_softc *sc);
+void stm32l4_rcc_bdcr_setup(struct stm32l4_rcc_softc *sc, uint32_t bdcr);
 
 #endif /* !_ARM_STM_STM32L4_RCC_H_ */
