@@ -39,3 +39,33 @@ stm32l4_rtc_init(struct stm32l4_rtc_softc *sc, uint32_t base)
 
 	sc->base = base;
 }
+
+int
+stm32l4_rtc_enable(struct stm32l4_rtc_softc *sc)
+{
+	int timeout;
+	int reg;
+
+	/* Remove write protection */
+	WR4(sc, RTC_WPR, 0xca);
+	WR4(sc, RTC_WPR, 0x53);
+
+	WR4(sc, RTC_ISR, ISR_INIT);
+
+	timeout = 1000;
+	do {
+		reg = RD4(sc, RTC_ISR);
+		if (reg & ISR_INITF)
+			break;
+	} while (--timeout);
+
+	if (timeout == 0) {
+		printf("%s: Failed to enter INIT mode\n", __func__);
+		return (-1);
+	}
+
+	printf("%s: ISR %x\n", __func__, RD4(sc, RTC_ISR));
+	printf("%s: TR %x\n", __func__, RD4(sc, RTC_TR));
+
+	return (0);
+}

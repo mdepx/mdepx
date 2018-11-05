@@ -55,5 +55,6 @@ struct stm32l4_rtc_softc {
 };
 
 void stm32l4_rtc_init(struct stm32l4_rtc_softc *sc, uint32_t base);
+int stm32l4_rtc_enable(struct stm32l4_rtc_softc *sc);
 
 #endif /* !_ARM_STM_STM32L4_RTC_H_ */
