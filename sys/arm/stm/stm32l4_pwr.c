@@ -30,10 +30,17 @@
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
+/*
+ * Disable backup domain write protection
+ */
 void
-stm32l4_pwr_setup(struct stm32l4_pwr_softc *sc)
+stm32l4_pwr_backup_domain_enable(struct stm32l4_pwr_softc *sc)
 {
+	uint32_t reg;
 
+	reg = RD4(sc, PWR_CR1);
+	reg |= CR1_DBP;
+	WR4(sc, PWR_CR1, reg);
 }
 
 int

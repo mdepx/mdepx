@@ -53,6 +53,6 @@ struct stm32l4_pwr_softc {
 };
 
 int stm32l4_pwr_init(struct stm32l4_pwr_softc *sc, uint32_t base);
-void stm32l4_pwr_setup(struct stm32l4_pwr_softc *sc);
+void stm32l4_pwr_backup_domain_enable(struct stm32l4_pwr_softc *sc);
 
 #endif /* !_ARM_STM_STM32L4_PWR_H_ */
