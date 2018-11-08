@@ -34,7 +34,7 @@
 #include <machine/cache_mipsNN.h>
 #include <machine/cache_r4k.h>
 
-#include "a_api.h"
+#include "fifo.h"
 
 #define	ALTERA_FIFO_DEBUG
 #undef	ALTERA_FIFO_DEBUG

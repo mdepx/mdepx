@@ -36,8 +36,8 @@
  * UG-01085-11.0.
  */
 
-#ifndef _DEV_ALTERA_FIFO_A_API_H_
-#define _DEV_ALTERA_FIFO_A_API_H_
+#ifndef _DEV_ALTERA_FIFO_FIFO_H_
+#define _DEV_ALTERA_FIFO_FIFO_H_
 
 /* Table 16-1. Memory Map. */
 #define	A_ONCHIP_FIFO_MEM_CORE_DATA		0x00
@@ -151,4 +151,4 @@ int fifo_process_tx_one(struct altera_fifo_softc *sc,
 
 #define	AVALON_FIFO_TX_BASIC_OPTS_DEPTH	16
 
-#endif /* _DEV_ALTERA_FIFO_A_API_H_ */
+#endif /* _DEV_ALTERA_FIFO_FIFO_H_ */
