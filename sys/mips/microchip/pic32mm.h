@@ -27,6 +27,14 @@
 #ifndef	_MIPS_MICROCHIP_PIC32MM_H_
 #define	_MIPS_MICROCHIP_PIC32MM_H_
 
+#include <mips/microchip/pic32_adc.h>
+#include <mips/microchip/pic32_uart.h>
+#include <mips/microchip/pic32_spi.h>
+#include <mips/microchip/pic32_port.h>
+#include <mips/microchip/pic32_ccp.h>
+#include <mips/microchip/pic32mm_pps.h>
+#include <mips/microchip/pic32mm_cdac.h>
+
 #define	PORTS_BASE	0xBF802600
 #define	PPS_BASE	0xBF802400
 #define	UART1_BASE	0xBF800600
