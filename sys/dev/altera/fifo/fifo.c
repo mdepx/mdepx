@@ -71,6 +71,35 @@ fifo_fill_level_wait(struct altera_fifo_softc *sc)
 	return (val);
 }
 
+void
+altera_fifo_intr(void *arg)
+{
+	struct altera_fifo_softc *sc;
+	uint32_t reg;
+	uint32_t err;
+
+	sc = arg;
+
+	reg = RD4_FIFO_MEMC(sc, A_ONCHIP_FIFO_MEM_CORE_STATUS_REG_EVENT);
+	reg = le32toh(reg);
+
+	dprintf("%s: reg %x\n", __func__, reg);
+
+	if (reg & (A_ONCHIP_FIFO_MEM_CORE_EVENT_OVERFLOW |
+	    A_ONCHIP_FIFO_MEM_CORE_EVENT_UNDERFLOW)) {
+		/* Errors */
+		err = (((reg & A_ONCHIP_FIFO_MEM_CORE_ERROR_MASK) >> \
+		    A_ONCHIP_FIFO_MEM_CORE_ERROR_SHIFT) & 0xff);
+		dprintf("%s: reg %x err %x\n", __func__, reg, err);
+	}
+
+	if (reg != 0) {
+		if (sc->cb != NULL)
+			sc->cb(sc->cb_arg);
+		WR4_FIFO_MEMC(sc, A_ONCHIP_FIFO_MEM_CORE_STATUS_REG_EVENT, htole32(reg));
+	}
+}
+
 int
 fifo_process_rx_one(struct altera_fifo_softc *sc,
     uint64_t read_lo, uint64_t write_lo, uint32_t len)

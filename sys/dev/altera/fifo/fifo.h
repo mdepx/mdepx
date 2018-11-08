@@ -98,6 +98,8 @@
 struct altera_fifo_softc {
 	uint64_t fifo_base_mem;
 	uint64_t fifo_base_ctrl;
+	void (*cb)(void *arg);
+	void *cb_arg;
 };
 
 uint32_t fifo_fill_level(struct altera_fifo_softc *sc);
@@ -107,6 +109,7 @@ int fifo_process_rx_one(struct altera_fifo_softc *sc,
 int fifo_process_tx_one(struct altera_fifo_softc *sc,
     int sop, int eop, uint64_t read_lo,
     uint64_t write_lo, uint32_t len);
+void altera_fifo_intr(void *arg);
 
 #define	WR4_FIFO_MEM(_sc, _reg, _val) ({	\
 	uint64_t _r;				\
