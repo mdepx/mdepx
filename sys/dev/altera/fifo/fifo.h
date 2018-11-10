@@ -100,6 +100,7 @@ struct altera_fifo_softc {
 	uint64_t fifo_base_ctrl;
 	void (*cb)(void *arg);
 	void *cb_arg;
+	int unit;
 };
 
 uint32_t fifo_fill_level(struct altera_fifo_softc *sc);
