@@ -27,6 +27,7 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 #include <sys/endian.h>
+#include <sys/uio.h>
 
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
@@ -206,7 +207,8 @@ fifo_process_tx_one(struct altera_fifo_softc *sc,
 	uint32_t reg;
 	uint32_t val;
 
-	dprintf("%s: copy %x -> %x, %d bytes\n", __func__, read_lo, write_lo, len);
+	dprintf("%s: copy %lx -> %lx, %d bytes, sop %d, eop %d\n",
+	    __func__, read_lo, write_lo, len, sop, eop);
 	read_lo |= MIPS_XKPHYS_UNCACHED_BASE;
 
 	uint32_t fill_level;
@@ -279,4 +281,106 @@ fifo_process_tx_one(struct altera_fifo_softc *sc,
 	WR4_FIFO_MEM(sc, A_ONCHIP_FIFO_MEM_CORE_DATA, val);
 
 	return (transferred);
+}
+
+int
+fifo_process_tx(struct altera_fifo_softc *sc,
+    struct iovec *iov, int iovcnt)
+{
+	uint32_t fill_level;
+	uint64_t read_lo;
+	uint64_t read_buf;
+	uint32_t missing;
+	uint32_t word;
+	uint32_t len;
+	int got_bits;
+	int reg;
+	int i;
+
+	/* Set start of packet */
+	WR4_FIFO_MEM(sc, A_ONCHIP_FIFO_MEM_CORE_METADATA,
+	    htole32(A_ONCHIP_FIFO_MEM_CORE_SOP));
+
+	read_buf = 0;
+	got_bits = 0;
+
+	for (i = 0; i < iovcnt; i++) {
+		read_lo = (uint64_t)iov[i].iov_base;
+		len = iov[i].iov_len;
+
+		if (read_lo & 1) {
+			read_buf = (read_buf << 8) | *(uint8_t *)read_lo;
+			got_bits += 8;
+			read_lo += 1;
+			len -= 1;
+		}
+
+		if (len >= 2 && read_lo & 2) {
+			read_buf = (read_buf << 16) | *(uint16_t *)read_lo;
+			got_bits += 16;
+			read_lo += 2;
+			len -= 2;
+		}
+
+		if (got_bits >= 32) {
+			got_bits -= 32;
+			word = (uint32_t)((read_buf >> got_bits) & 0xffffffff);
+			fill_level = fifo_fill_level_wait(sc);
+			if (len == 0 && (i == (iovcnt - 1)) && (got_bits == 0))
+				WR4_FIFO_MEM(sc, A_ONCHIP_FIFO_MEM_CORE_METADATA,
+				    htole32(A_ONCHIP_FIFO_MEM_CORE_EOP));
+			WR4_FIFO_MEM(sc, A_ONCHIP_FIFO_MEM_CORE_DATA, word);
+		}
+
+		while (len >= 4) {
+			read_buf = (read_buf << 32) | (uint64_t)*(uint32_t *)read_lo;
+			read_lo += 4;
+			len -= 4;
+			word = (uint32_t)((read_buf >> got_bits) & 0xffffffff);
+			fill_level = fifo_fill_level_wait(sc);
+			if (len == 0 && (i == (iovcnt - 1)) && (got_bits == 0))
+				WR4_FIFO_MEM(sc, A_ONCHIP_FIFO_MEM_CORE_METADATA,
+				    htole32(A_ONCHIP_FIFO_MEM_CORE_EOP));
+			WR4_FIFO_MEM(sc, A_ONCHIP_FIFO_MEM_CORE_DATA, word);
+		}
+
+		if (len & 2) {
+			read_buf = (read_buf << 16) | *(uint16_t *)read_lo;
+			got_bits += 16;
+			read_lo += 2;
+			len -= 2;
+		}
+
+		if (len & 1) {
+			read_buf = (read_buf << 8) | *(uint8_t *)read_lo;
+			got_bits += 8;
+			read_lo += 1;
+			len -= 1;
+		}
+
+		if (got_bits >= 32) {
+			got_bits -= 32;
+			word = (uint32_t)((read_buf >> got_bits) & 0xffffffff);
+			fill_level = fifo_fill_level_wait(sc);
+			if (len == 0 && (i == (iovcnt - 1)) && (got_bits == 0))
+				WR4_FIFO_MEM(sc, A_ONCHIP_FIFO_MEM_CORE_METADATA,
+				    htole32(A_ONCHIP_FIFO_MEM_CORE_EOP));
+			WR4_FIFO_MEM(sc, A_ONCHIP_FIFO_MEM_CORE_DATA, word);
+		}
+	}
+
+	if (got_bits) {
+		missing = 32 - got_bits;
+		got_bits /= 8;
+		fill_level = fifo_fill_level_wait(sc);
+		
+		reg = A_ONCHIP_FIFO_MEM_CORE_EOP | ((4 - got_bits) << A_ONCHIP_FIFO_MEM_CORE_EMPTY_SHIFT);
+		WR4_FIFO_MEM(sc, A_ONCHIP_FIFO_MEM_CORE_METADATA,
+		    htole32(reg));
+
+		word = (uint32_t)((read_buf << missing) & 0xFFFFFFFF);
+		WR4_FIFO_MEM(sc, A_ONCHIP_FIFO_MEM_CORE_DATA, word);
+	}
+
+	return (0);
 }
