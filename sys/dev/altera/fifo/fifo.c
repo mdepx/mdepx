@@ -49,6 +49,22 @@
 #define	CACHE_FIFO_MEM_INV(_sc, _reg)		\
 	mipsNN_pdcache_inv_range_128(((_sc)->fifo_base_mem + _reg), 4);
 
+void
+fifo_interrupts_disable(struct altera_fifo_softc *sc)
+{
+
+	WR4_FIFO_MEMC(sc, A_ONCHIP_FIFO_MEM_CORE_STATUS_REG_INT_ENABLE, 0);
+}
+
+void
+fifo_interrupts_enable(struct altera_fifo_softc *sc, int mask)
+{
+
+	WR4_FIFO_MEMC(sc, A_ONCHIP_FIFO_MEM_CORE_STATUS_REG_EVENT, 0);
+	WR4_FIFO_MEMC(sc, A_ONCHIP_FIFO_MEM_CORE_STATUS_REG_INT_ENABLE,
+	    htole32(mask));
+}
+
 uint32_t
 fifo_fill_level(struct altera_fifo_softc *sc)
 {
@@ -383,4 +399,17 @@ fifo_process_tx(struct altera_fifo_softc *sc,
 	}
 
 	return (0);
+}
+
+int
+fifo_process_rx(struct altera_fifo_softc *sc,
+    struct iovec *iov, int iovcnt)
+{
+	int len;
+
+	len = fifo_process_rx_one(sc, 0, (uint64_t)iov->iov_base, iov->iov_len);
+	if (len != 0)
+		printf("%s: iovcnt %d, read %d\n", __func__, iovcnt, len);
+
+	return (len);
 }

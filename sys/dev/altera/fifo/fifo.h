@@ -115,6 +115,10 @@ int fifo_process_tx_one(struct altera_fifo_softc *sc,
 void altera_fifo_intr(void *arg);
 int fifo_process_tx(struct altera_fifo_softc *sc,
     struct iovec *iov, int iovcnt);
+int fifo_process_rx(struct altera_fifo_softc *sc,
+    struct iovec *iov, int iovcnt);
+void fifo_interrupts_disable(struct altera_fifo_softc *sc);
+void fifo_interrupts_enable(struct altera_fifo_softc *sc, int mask);
 
 #define	WR4_FIFO_MEM(_sc, _reg, _val) ({	\
 	uint64_t _r;				\
