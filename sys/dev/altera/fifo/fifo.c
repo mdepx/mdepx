@@ -110,11 +110,10 @@ altera_fifo_intr(void *arg)
 		dprintf("%s: reg %x err %x\n", __func__, reg, err);
 	}
 
-	if (reg != 0) {
-		if (sc->cb != NULL)
-			sc->cb(sc->cb_arg);
-		WR4_FIFO_MEMC(sc, A_ONCHIP_FIFO_MEM_CORE_STATUS_REG_EVENT, htole32(reg));
-	}
+	if (sc->cb != NULL)
+		sc->cb(sc->cb_arg);
+
+	WR4_FIFO_MEMC(sc, A_ONCHIP_FIFO_MEM_CORE_STATUS_REG_EVENT, htole32(reg));
 }
 
 int
@@ -125,7 +124,6 @@ fifo_process_rx_one(struct altera_fifo_softc *sc,
 	uint32_t fill_level;
 	uint32_t data;
 	uint32_t meta;
-	int timeout;
 	int error;
 	int sop_rcvd;
 	int eop_rcvd;
@@ -192,17 +190,7 @@ fifo_process_rx_one(struct altera_fifo_softc *sc,
 		if (meta & A_ONCHIP_FIFO_MEM_CORE_EOP)
 			break;
 
-		timeout = 100;
-		do {
-			fill_level = fifo_fill_level(sc);
-		} while (fill_level == 0 && timeout--);
-
-		if (timeout <= 0) {
-			printf("%s: eop not received\n", __func__);
-			/* No EOP received. Broken packet. */
-			error = -3;
-			break;
-		}
+		fill_level = fifo_fill_level(sc);
 	}
 
 	if (error != 0)
@@ -322,7 +310,10 @@ fifo_process_tx(struct altera_fifo_softc *sc,
 
 	for (i = 0; i < iovcnt; i++) {
 		read_lo = (uint64_t)iov[i].iov_base;
+		read_lo |= MIPS_XKPHYS_UNCACHED_BASE;
 		len = iov[i].iov_len;
+
+		dprintf("%s: copy %lx -> 0, %d bytes\n", __func__, read_lo, len);
 
 		if (read_lo & 1) {
 			read_buf = (read_buf << 8) | *(uint8_t *)read_lo;
@@ -398,7 +389,7 @@ fifo_process_tx(struct altera_fifo_softc *sc,
 		WR4_FIFO_MEM(sc, A_ONCHIP_FIFO_MEM_CORE_DATA, word);
 	}
 
-	return (0);
+	return (1);
 }
 
 int
@@ -406,10 +397,14 @@ fifo_process_rx(struct altera_fifo_softc *sc,
     struct iovec *iov, int iovcnt)
 {
 	int len;
+	uint8_t buffer[4096];
 
-	len = fifo_process_rx_one(sc, 0, (uint64_t)iov->iov_base, iov->iov_len);
-	if (len != 0)
+	len = fifo_process_rx_one(sc, 0, (uint64_t)buffer, iov->iov_len + 2);
+	if (len != 0) {
 		printf("%s: iovcnt %d, read %d\n", __func__, iovcnt, len);
+		memcpy(iov->iov_base, (void *)&buffer[2], len - 2);
+		return (len - 2);
+	}
 
-	return (len);
+	return (0);
 }
