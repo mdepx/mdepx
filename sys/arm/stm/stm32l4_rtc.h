@@ -28,7 +28,40 @@
 #define _ARM_STM_STM32L4_RTC_H_
 
 #define	RTC_TR		0x00
+#define	 TR_SU_S	0	/* Second units in BCD format */
+#define	 TR_SU_M	(0xf << TR_SU_S)
+#define	 TR_ST_S	4	/* Second tens in BCD format */
+#define	 TR_ST_M	(0x7 << TR_ST_S)
+#define	 TR_MNU_S	8	/* Minute units in BCD format */
+#define	 TR_MNU_M	(0xf << TR_MNU_S)
+#define	 TR_MNT_S	12	/* Minute tens in BCD format */
+#define	 TR_MNT_M	(0x7 << TR_MNT_S)
+#define	 TR_HU_S	16	/* Hour units in BCD format */
+#define	 TR_HU_M	(0xf << TR_HU_S)
+#define	 TR_HT_S	20	/* Hour tens in BCD format */
+#define	 TR_HT_M	(0x3 << TR_HT_S)
+#define	 TR_PM		(1 << 22)	/* AM/PM notation */
 #define	RTC_DR		0x04
+#define	 DR_DU_S	0	/* Date units in BCD format */
+#define	 DR_DU_M	(0xf << DR_DU_S)
+#define	 DR_DT_S	4	/* Date tens in BCD format */
+#define	 DR_DT_M	(0x3 << DR_DT_S)
+#define	 DR_MU_S	8	/* Month units in BCD format */
+#define	 DR_MU_M	(0xf << DR_MU_S)
+#define	 DR_MT		(1 << 12)
+#define	 DR_WDU_S	13	/* Week day units */
+#define	 DR_WDU_M	(0x7 << DR_WDU_S)
+#define	 DR_WDU_MON	(1 << DR_WDU_S)
+#define	 DR_WDU_TUE	(2 << DR_WDU_S)
+#define	 DR_WDU_WED	(3 << DR_WDU_S)
+#define	 DR_WDU_THU	(4 << DR_WDU_S)
+#define	 DR_WDU_FRI	(5 << DR_WDU_S)
+#define	 DR_WDU_SAT	(6 << DR_WDU_S)
+#define	 DR_WDU_SUN	(7 << DR_WDU_S)
+#define	 DR_YU_S	16	/* Year units in BCD format */
+#define	 DR_YU_M	(0xf << DR_YU_S)
+#define	 DR_YT_S	20	/* Year tens in BCD format */
+#define	 DR_YT_M	(0xf << DR_YT_S)
 #define	RTC_CR		0x08
 #define	RTC_ISR		0x0C
 #define	 ISR_INIT	(1 << 7)	/* Initialization mode */
