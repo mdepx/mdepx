@@ -39,6 +39,8 @@
 #ifndef _DEV_ALTERA_FIFO_FIFO_H_
 #define _DEV_ALTERA_FIFO_FIFO_H_
 
+#include <sys/uio.h>
+
 /* Table 16-1. Memory Map. */
 #define	A_ONCHIP_FIFO_MEM_CORE_DATA		0x00
 #define	A_ONCHIP_FIFO_MEM_CORE_METADATA		0x04
@@ -100,6 +102,7 @@ struct altera_fifo_softc {
 	uint64_t fifo_base_ctrl;
 	void (*cb)(void *arg);
 	void *cb_arg;
+	int unit;
 };
 
 uint32_t fifo_fill_level(struct altera_fifo_softc *sc);
@@ -110,6 +113,12 @@ int fifo_process_tx_one(struct altera_fifo_softc *sc,
     int sop, int eop, uint64_t read_lo,
     uint64_t write_lo, uint32_t len);
 void altera_fifo_intr(void *arg);
+int fifo_process_tx(struct altera_fifo_softc *sc,
+    struct iovec *iov, int iovcnt);
+int fifo_process_rx(struct altera_fifo_softc *sc,
+    struct iovec *iov, int iovcnt);
+void fifo_interrupts_disable(struct altera_fifo_softc *sc);
+void fifo_interrupts_enable(struct altera_fifo_softc *sc, int mask);
 
 #define	WR4_FIFO_MEM(_sc, _reg, _val) ({	\
 	uint64_t _r;				\
