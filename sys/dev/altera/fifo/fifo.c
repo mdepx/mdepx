@@ -401,7 +401,7 @@ fifo_process_rx(struct altera_fifo_softc *sc,
 
 	len = fifo_process_rx_one(sc, 0, (uint64_t)buffer, iov->iov_len + 2);
 	if (len != 0) {
-		printf("%s: iovcnt %d, read %d\n", __func__, iovcnt, len);
+		dprintf("%s: iovcnt %d, read %d\n", __func__, iovcnt, len);
 		memcpy(iov->iov_base, (void *)&buffer[2], len - 2);
 		return (len - 2);
 	}
