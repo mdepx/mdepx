@@ -113,7 +113,7 @@ void altera_fifo_intr(void *arg);
 int fifo_process_tx(struct altera_fifo_softc *sc,
     struct iovec *iov, int iovcnt);
 int fifo_process_rx(struct altera_fifo_softc *sc,
-    struct iovec *iov, int iovcnt);
+    struct iovec *iov, int iovcnt, int strip_len);
 void fifo_interrupts_disable(struct altera_fifo_softc *sc);
 void fifo_interrupts_enable(struct altera_fifo_softc *sc, int mask);
 

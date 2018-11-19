@@ -309,17 +309,124 @@ fifo_process_tx(struct altera_fifo_softc *sc,
 
 int
 fifo_process_rx(struct altera_fifo_softc *sc,
-    struct iovec *iov, int iovcnt)
+    struct iovec *iov, int iovcnt, int strip_len)
 {
-	int len;
-	uint8_t buffer[4096];
+	uint32_t data;
+	uint32_t transferred;
+	uint32_t fill_level;
+	uint32_t meta;
+	int error;
+	int sop_rcvd;
+	int eop_rcvd;
+	int empty;
+	uint64_t write_lo;
+	int got_bits;
+	int data_bits;
+	uint64_t read_buf;
+	uint32_t word;
 
-	len = fifo_process_rx_one(sc, 0, (uint64_t)buffer, iov->iov_len + 2);
-	if (len != 0) {
-		dprintf("%s: iovcnt %d, read %d\n", __func__, iovcnt, len);
-		memcpy(iov->iov_base, (void *)&buffer[2], len - 2);
-		return (len - 2);
+	fill_level = fifo_fill_level(sc);
+	if (fill_level == 0)
+		return (0);
+
+	dprintf("%s(%d): fill_level %d\n", __func__, sc->unit, fill_level);
+	dprintf("%s: copy %x -> %x, %d bytes\n", __func__, read_lo, write_lo, len);
+
+	write_lo = (uint64_t)iov->iov_base;
+	write_lo |= MIPS_XKPHYS_UNCACHED_BASE;
+	error = 0;
+	sop_rcvd = 0;
+	eop_rcvd = 0;
+	empty = 0;
+	transferred = 0;
+
+	read_buf = 0;
+	got_bits = 0;
+	while (fill_level) {
+		data = RD4_FIFO_MEM_CACHED(sc, A_ONCHIP_FIFO_MEM_CORE_DATA);
+		data_bits = 32;
+		CACHE_FIFO_MEM_INV(sc, A_ONCHIP_FIFO_MEM_CORE_DATA);
+		dprintf("%s1: data %x, data_bits %d\n", __func__, data, data_bits);
+
+		if (strip_len) {
+			//data = data >> (strip_len * 8);
+			data_bits -= (strip_len * 8);
+			strip_len = 0;
+		}
+
+		dprintf("%s2: data %x, data_bits %d\n", __func__, data, data_bits);
+
+		meta = RD4_FIFO_MEM(sc, A_ONCHIP_FIFO_MEM_CORE_METADATA);
+		meta = le32toh(meta);
+		if ((meta & A_ONCHIP_FIFO_MEM_CORE_ERROR_MASK) ||
+		    (meta & A_ONCHIP_FIFO_MEM_CORE_CHANNEL_MASK) != 0) {
+			printf("error\n");
+			error = -1;
+			break;
+		}
+
+		/* Check for the start of the packet */
+		if (meta & A_ONCHIP_FIFO_MEM_CORE_SOP)
+			sop_rcvd = 1;
+		if (sop_rcvd == 0) {
+			printf("%s: sop not received\n", __func__);
+			error = -2;
+			break;
+		}
+
+		empty = 0;
+		if (meta & A_ONCHIP_FIFO_MEM_CORE_EOP) {
+			eop_rcvd = 1;
+			empty = (meta & A_ONCHIP_FIFO_MEM_CORE_EMPTY_MASK) >>
+			    A_ONCHIP_FIFO_MEM_CORE_EMPTY_SHIFT;
+			data_bits -= empty * 8;
+		}
+
+		dprintf("%s3: data %x, data_bits %d\n", __func__, data, data_bits);
+
+		read_buf = (read_buf << data_bits);
+
+		switch (data_bits) {
+		case 32:
+			read_buf |= data;
+			break;
+		case 16:
+			read_buf |= (data & 0xffff);
+			break;
+		case 8:
+			read_buf |= (data & 0x00ff);
+			break;
+		}
+		got_bits += data_bits;
+		dprintf("%s4: read_buf %lx, got_bits %d\n", __func__, read_buf, got_bits);
+
+		if (got_bits >= 32) {
+			got_bits -= 32;
+			word = (uint32_t)((read_buf >> got_bits) & 0xffffffff);
+			dprintf("%s5: writing word %x\n", __func__, word);
+			*(uint32_t *)(write_lo) = word;
+			write_lo += 4;
+			transferred += 4;
+		}
+
+		if (meta & A_ONCHIP_FIFO_MEM_CORE_EOP)
+			break;
+
+		fill_level = fifo_fill_level(sc);
 	}
 
-	return (0);
+	if (got_bits) {
+		word = (uint32_t)(read_buf << (32 - got_bits)) & 0xffffffff;
+		dprintf("%s6: writing word %x (finish)\n", __func__, word);
+		*(uint32_t *)(write_lo) = word;
+		transferred += got_bits * 8;
+	}
+
+	if (error != 0)
+		return (error);
+
+	dprintf("%s: packet received, %d bytes (sop_rcvd %d eop_rcvd %d fill_level %d)\n",
+	    __func__, transferred, sop_rcvd, eop_rcvd, fill_level);
+
+	return (transferred);
 }
