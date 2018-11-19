@@ -109,9 +109,6 @@ uint32_t fifo_fill_level(struct altera_fifo_softc *sc);
 uint32_t fifo_fill_level_wait(struct altera_fifo_softc *sc);
 int fifo_process_rx_one(struct altera_fifo_softc *sc,
     uint64_t read_lo, uint64_t write_lo, uint32_t len);
-int fifo_process_tx_one(struct altera_fifo_softc *sc,
-    int sop, int eop, uint64_t read_lo,
-    uint64_t write_lo, uint32_t len);
 void altera_fifo_intr(void *arg);
 int fifo_process_tx(struct altera_fifo_softc *sc,
     struct iovec *iov, int iovcnt);
