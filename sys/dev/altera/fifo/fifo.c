@@ -210,7 +210,8 @@ fifo_process_tx(struct altera_fifo_softc *sc,
 		got_bits /= 8;
 		fill_level = fifo_fill_level_wait(sc);
 		
-		reg = A_ONCHIP_FIFO_MEM_CORE_EOP | ((4 - got_bits) << A_ONCHIP_FIFO_MEM_CORE_EMPTY_SHIFT);
+		reg = A_ONCHIP_FIFO_MEM_CORE_EOP |
+		    ((4 - got_bits) << A_ONCHIP_FIFO_MEM_CORE_EMPTY_SHIFT);
 		WR4_FIFO_MEM(sc, A_ONCHIP_FIFO_MEM_CORE_METADATA,
 		    htole32(reg));
 
@@ -225,6 +226,9 @@ int
 fifo_process_rx(struct altera_fifo_softc *sc,
     struct iovec *iov, int iovcnt, int strip_len)
 {
+	uint64_t write_lo;
+	uint64_t read_buf;
+	uint32_t word;
 	uint32_t data;
 	uint32_t transferred;
 	uint32_t fill_level;
@@ -233,11 +237,8 @@ fifo_process_rx(struct altera_fifo_softc *sc,
 	int sop_rcvd;
 	int eop_rcvd;
 	int empty;
-	uint64_t write_lo;
 	int got_bits;
 	int data_bits;
-	uint64_t read_buf;
-	uint32_t word;
 
 	fill_level = fifo_fill_level(sc);
 	if (fill_level == 0)
@@ -260,15 +261,16 @@ fifo_process_rx(struct altera_fifo_softc *sc,
 		data = RD4_FIFO_MEM_CACHED(sc, A_ONCHIP_FIFO_MEM_CORE_DATA);
 		data_bits = 32;
 		CACHE_FIFO_MEM_INV(sc, A_ONCHIP_FIFO_MEM_CORE_DATA);
-		dprintf("%s1: data %x, data_bits %d\n", __func__, data, data_bits);
+		dprintf("%s1: data %x, data_bits %d\n",
+		    __func__, data, data_bits);
 
 		if (strip_len) {
-			//data = data >> (strip_len * 8);
 			data_bits -= (strip_len * 8);
 			strip_len = 0;
 		}
 
-		dprintf("%s2: data %x, data_bits %d\n", __func__, data, data_bits);
+		dprintf("%s2: data %x, data_bits %d\n",
+		    __func__, data, data_bits);
 
 		meta = RD4_FIFO_MEM(sc, A_ONCHIP_FIFO_MEM_CORE_METADATA);
 		meta = le32toh(meta);
@@ -296,7 +298,8 @@ fifo_process_rx(struct altera_fifo_softc *sc,
 			data_bits -= empty * 8;
 		}
 
-		dprintf("%s3: data %x, data_bits %d\n", __func__, data, data_bits);
+		dprintf("%s3: data %x, data_bits %d\n",
+		    __func__, data, data_bits);
 
 		read_buf = (read_buf << data_bits);
 
@@ -312,7 +315,8 @@ fifo_process_rx(struct altera_fifo_softc *sc,
 			break;
 		}
 		got_bits += data_bits;
-		dprintf("%s4: read_buf %lx, got_bits %d\n", __func__, read_buf, got_bits);
+		dprintf("%s4: read_buf %lx, got_bits %d\n",
+		    __func__, read_buf, got_bits);
 
 		if (got_bits >= 32) {
 			got_bits -= 32;
