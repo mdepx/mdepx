@@ -38,5 +38,6 @@
 #define	CHAR_BIT	__CHAR_BIT
 #define	LONG_MAX	__LONG_MAX
 #define	LONG_MIN	__LONG_MIN
+#define	OFF_MAX		__OFF_MAX
 
 #endif /* !_SYS_LIMITS_H_ */

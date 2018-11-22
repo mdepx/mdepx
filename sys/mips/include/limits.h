@@ -31,6 +31,7 @@
 #define	__INT_MAX	0x7fffffff
 #define	__USHRT_MAX	0xffff
 #define	__UCHAR_MAX	0xff
+#define	__LLONG_MAX	0x7fffffffffffffffLL
 
 #ifdef __mips_n64
 #define	__ULONG_MAX	0xffffffffffffffff
@@ -38,12 +39,14 @@
 #define	__LONG_BIT	64
 #define	__LONG_MAX	0x7fffffffffffffff
 #define	__LONG_MIN	(-0x7fffffffffffffff - 1)
+#define	__OFF_MAX	__LONG_MAX
 #else
 #define	__ULONG_MAX	0xffffffff
 #define	__SIZE_T_MAX	__UINT_MAX
 #define	__LONG_BIT	32
 #define	__LONG_MAX	0x7fffffff
 #define	__LONG_MIN	(-0x7fffffff - 1)
+#define	__OFF_MAX	__LLONG_MAX
 #endif
 
 #define	__CHAR_BIT	8
