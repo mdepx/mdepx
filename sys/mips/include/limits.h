@@ -40,6 +40,7 @@
 #define	__LONG_MAX	0x7fffffffffffffff
 #define	__LONG_MIN	(-0x7fffffffffffffff - 1)
 #define	__OFF_MAX	__LONG_MAX
+#define	__OFF_MIN	__LONG_MIN
 #else
 #define	__ULONG_MAX	0xffffffff
 #define	__SIZE_T_MAX	__UINT_MAX
@@ -47,6 +48,7 @@
 #define	__LONG_MAX	0x7fffffff
 #define	__LONG_MIN	(-0x7fffffff - 1)
 #define	__OFF_MAX	__LLONG_MAX
+#define	__OFF_MIN	__LLONG_MIN
 #endif
 
 #define	__CHAR_BIT	8
