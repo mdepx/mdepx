@@ -91,9 +91,13 @@ mips_exception(struct trapframe *frame)
 					printf("%s: spurious intr %d\n", __func__, i);
 			}
 		break;
+	case MIPS_CR_EXC_CODE_RI:
+		printf("%s: reserved instruction at pc %zx, badvaddr %zx\n",
+		    __func__, frame->tf_pc, frame->tf_badvaddr);
+		break;
 	default:
-		printf("%s: missing handler: exc_code %d, badvaddr %zu\n",
-		    __func__, exc_code, frame->tf_badvaddr);
+		printf("%s: missing handler: exc_code %d, pc %zx, badvaddr %zx\n",
+		    __func__, exc_code, frame->tf_pc, frame->tf_badvaddr);
 	}
 
 	dprintf("Exception cause: %x, code %d\n", cause, exc_code);
