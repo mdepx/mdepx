@@ -63,6 +63,35 @@
 #define	 DR_YT_S	20	/* Year tens in BCD format */
 #define	 DR_YT_M	(0xf << DR_YT_S)
 #define	RTC_CR		0x08
+#define	 CR_ITSE	(1 << 24)	/* timestamp on internal event enable */
+#define	 CR_COE		(1 << 23)	/* Calibration output enable */
+#define	 CR_OSEL_S	21	/* Output selection */
+#define	 CR_OSEL_M	(0x3 << CR_OSEL_S)
+#define	 CR_POL		(1 << 20)	/* Output polarity */
+#define	 CR_COSEL	(1 << 19)	/* Calibration output selection */
+#define	 CR_BKP		(1 << 18)	/* Backup */
+#define	 CR_SUB1H	(1 << 17)	/* Subtract 1 hour (winter time change) */
+#define	 CR_ADD1H	(1 << 16)	/* Add 1 hour (summer time change) */
+#define	 CR_TSIE	(1 << 15)	/* Time-stamp interrupt enable */
+#define	 CR_WUTIE	(1 << 14)	/* Wakeup timer interrupt enable */
+#define	 CR_ALRBIE	(1 << 13)	/* Alarm B interrupt enable */
+#define	 CR_ALRAIE	(1 << 12)	/* Alarm A interrupt enable */
+#define	 CR_TSE		(1 << 11)	/* timestamp enable */
+#define	 CR_WUTE	(1 << 10)	/* Wakeup timer enable */
+#define	 CR_ALRBE	(1 << 9)	/* Alarm B enable */
+#define	 CR_ALRAE	(1 << 8)	/* Alarm A enable */
+#define	 CR_FMT		(1 << 6)	/* Hour format: AM/PM hour format */
+#define	 CR_BYPSHAD	(1 << 5)	/* Bypass the shadow registers */
+#define	 CR_REFCKON	(1 << 4)	/* RTC_REFIN reference clock detection enable (50 or 60 Hz) */
+#define	 CR_TSEDGE	(1 << 3)	/* Time-stamp event active edge */
+#define	 CR_WUCKSEL_S	0	/* Wakeup clock selection */
+#define	 CR_WUCKSEL_M	(0x7 << CR_WUCKSEL_S)
+#define	 CR_WUCKSEL_RTC16	(0 << CR_WUCKSEL_S)
+#define	 CR_WUCKSEL_RTC8	(1 << CR_WUCKSEL_S)
+#define	 CR_WUCKSEL_RTC4	(2 << CR_WUCKSEL_S)
+#define	 CR_WUCKSEL_RTC2	(3 << CR_WUCKSEL_S)
+#define	 CR_WUCKSEL_CK_SPRE	(4 << CR_WUCKSEL_S)
+#define	 CR_WUCKSEL_CK_SPRE_WUT	(6 << CR_WUCKSEL_S)
 #define	RTC_ISR		0x0C
 #define	 ISR_INIT	(1 << 7)	/* Initialization mode */
 #define	 ISR_INITF	(1 << 6)	/* Initialization flag */
