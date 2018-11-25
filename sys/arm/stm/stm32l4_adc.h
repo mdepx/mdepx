@@ -28,7 +28,29 @@
 #define _ARM_STM_STM32L4_ADC_H_
 
 #define	ADC_ISR		0x00 /* ADC interrupt and status register */
+#define	 ISR_JQOVF	(1 << 10) /* Injected context queue overflow */
+#define	 ISR_AWD3	(1 << 9) /* Analog watchdog 3 flag */
+#define	 ISR_AWD2	(1 << 8) /* Analog watchdog 2 flag */
+#define	 ISR_AWD1	(1 << 7) /* Analog watchdog 1 flag */
+#define	 ISR_JEOS	(1 << 6) /* Injected channel end of sequence flag */
+#define	 ISR_JEOC	(1 << 5) /* Injected channel end of conversion flag */
+#define	 ISR_OVR	(1 << 4) /* ADC overrun */
+#define	 ISR_EOS	(1 << 3) /* End of regular sequence flag */
+#define	 ISR_EOC	(1 << 2) /* End of conversion flag */
+#define	 ISR_EOSMP	(1 << 1) /* End of sampling flag */
+#define	 ISR_ADRDY	(1 << 0) /* ADC ready */
 #define	ADC_IER		0x04 /* ADC interrupt enable register */
+#define	 IER_JQOVFIE	(1 << 10) /* Injected context queue overflow IE */
+#define	 IER_AWD3IE	(1 << 9) /* Analog watchdog 3 interrupt enable */
+#define	 IER_AWD2IE	(1 << 8) /* Analog watchdog 2 interrupt enable */
+#define	 IER_AWD1IE	(1 << 7) /* Analog watchdog 1 interrupt enable */
+#define	 IER_JEOSIE	(1 << 6) /* End of injected sequence of conversions IE */
+#define	 IER_JEOCIE	(1 << 5) /* End of injected conversion interrupt enable */
+#define	 IER_OVRIE	(1 << 4) /* Overrun interrupt enable */
+#define	 IER_EOSIE	(1 << 3) /* End of regular sequence of conversions IE */
+#define	 IER_EOCIE	(1 << 2) /* End of regular conversion interrupt enable */
+#define	 IER_EOSMPIE	(1 << 1) /* End of sampling flag interrupt enable for regular conversions */
+#define	 IER_ADRDYIE	(1 << 0) /* ADC ready interrupt enable */
 #define	ADC_CR		0x08 /* ADC control register */
 #define	 CR_ADCAL	(1 << 31) /* ADC calibration */
 #define	 CR_ADCALDIF	(1 << 30) /* Differential mode for calibration */
@@ -41,14 +63,35 @@
 #define	 CR_ADDIS	(1 << 1) /* ADC disable command */
 #define	 CR_ADEN	(1 << 0) /* ADC enable control */
 #define	ADC_CFGR	0x0C /* ADC configuration register */
+#define	 CFGR_JQDIS	(1 << 31) /* Injected Queue disable */
+#define	 CFGR_AWD1CH_S	26	/* Analog watchdog 1 channel selection */
+#define	 CFGR_AWD1CH_M	(0x1f << CFGR_AWD1CH_S)
+#define	 CFGR_JAUTO	(1 << 25) /* Automatic injected group conversion */
+#define	 CFGR_JAWD1EN	(1 << 24) /* Analog watchdog 1 enable on injected channels */
+#define	 CFGR_AWD1EN	(1 << 23)/* Analog watchdog 1 enable on regular channels */
+#define	 CFGR_AWD1SGL	(1 << 22) /* Enable the watchdog 1 on a single channel or on all channels */
+#define	 CFGR_JQM	(1 << 21) /* JSQR queue mode */
+#define	 CFGR_JDISCEN	(1 << 20) /* Discontinuous mode on injected channels */
+#define	 CFGR_DISCNUM_S	17	/* Discontinuous mode channel count */
+#define	 CFGR_DISCNUM_M	(0x7 << CFGR_DISCNUM_S)
+#define	 CFGR_DISCEN	(1 << 16) /* Discontinuous mode for regular channels */
+#define	 CFGR_AUTDLY	(1 << 14) /* Delayed conversion mode */
+#define	 CFGR_CONT	(1 << 13) /* Single / continuous conversion mode for regular conversions */
+#define	 CFGR_OVRMOD	(1 << 12) /* Overrun mode */
+#define	 CFGR_EXTEN_S	10 /* External trigger enable and polarity selection for regular channels */
+#define	 CFGR_EXTEN_M	(0x3 << CFGR_EXTEN_S)
+#define	 CFGR_EXTSEL_S	6 /* External trigger selection for regular group */
+#define	 CFGR_EXTSEL_M	(0xf << CFGR_EXTSEL_S)
+#define	 CFGR_ALIGN	(1 << 5)	/* Data alignment */
 #define	 CFGR_RES_S	3 /* Data resolution */
 #define	 CFGR_RES_M	(0x3 << CFGR_RES_S)
 #define	 CFGR_RES_12	(0 << CFGR_RES_S)
 #define	 CFGR_RES_10	(1 << CFGR_RES_S)
 #define	 CFGR_RES_8	(2 << CFGR_RES_S)
 #define	 CFGR_RES_6	(3 << CFGR_RES_S)
+#define	 CFGR_DFSDMCFG	(1 << 2) /* DFSDM mode configuration */
+#define	 CFGR_DMACFG	(1 << 1) /* Direct memory access configuration */
 #define	 CFGR_DMAEN	(1 << 0) /* Direct memory access enable */
-#define	 CFGR_DMACFG	(1 << 1) /* DMA Circular mode selected */
 #define	ADC_CFGR2	0x10 /* ADC configuration register 2 */
 #define	ADC_SMPR1	0x14 /* ADC sample time register 1 */
 #define	ADC_SMPR2	0x18 /* ADC sample time register 2 */
