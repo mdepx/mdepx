@@ -93,30 +93,138 @@
 #define	 CFGR_DMACFG	(1 << 1) /* Direct memory access configuration */
 #define	 CFGR_DMAEN	(1 << 0) /* Direct memory access enable */
 #define	ADC_CFGR2	0x10 /* ADC configuration register 2 */
+#define	 CFGR2_ROVSM	(1 << 10) /* Regular Oversampling mode */
+#define	 CFGR2_TROVS	(1 << 9) /* Triggered Regular Oversampling */
+#define	 CFGR2_OVSS_S	5	/* Oversampling shift */
+#define	 CFGR2_OVSS_M	(0xf << CFGR2_OVSS_S)
+#define	 CFGR2_OVSR_S	2	/* Oversampling ratio */
+#define	 CFGR2_OVSR_M	(0x7 << CFGR2_OVSR_S)
+#define	 CFGR2_JOVSE	(1 << 1) /* Injected Oversampling Enable */
+#define	 CFGR2_ROVSE	(1 << 0) /* Regular Oversampling Enable */
 #define	ADC_SMPR1	0x14 /* ADC sample time register 1 */
+#define	 SMPR1_SMPx_S	0	/* Channel x sampling time selection */
+#define	 SMPR1_SMPx_M	(0x3fffffff << SMPR1_SMPx_S)
 #define	ADC_SMPR2	0x18 /* ADC sample time register 2 */
+#define	 SMPR2_SMPx_S	0	/* Channel x sampling time selection */
+#define	 SMPR2_SMPx_M	(0x7ffffff << SMPR2_SMPx_S)
 #define	ADC_TR1		0x20 /* ADC watchdog threshold register 1 */
+#define	 TR1_HT1_S	16	/* Analog watchdog 1 higher threshold */
+#define	 TR1_HT1_M	(0xfff << TR1_HT1_S)
+#define	 TR1_LT1_S	0	/* Analog watchdog 1 lower threshold */
+#define	 TR1_LT1_M	(0xfff << TR1_LT1_S)
 #define	ADC_TR2		0x24 /* ADC watchdog threshold register 2 */
+#define	 TR2_HT2_S	16	/* Analog watchdog 2 higher threshold */
+#define	 TR2_HT2_M	(0xff << TR2_HT2_S)
+#define	 TR2_LT2_S	0	/* Analog watchdog 2 lower threshold */
+#define	 TR2_LT2_M	(0xff << TR2_LT2_S)
 #define	ADC_TR3		0x28 /* ADC watchdog threshold register 3 */
+#define	 TR3_HT3_S	16	/* Analog watchdog 3 higher threshold */
+#define	 TR3_HT3_M	(0xff << TR3_HT3_S)
+#define	 TR3_LT3_S	0	/* Analog watchdog 3 lower threshold */
+#define	 TR3_LT3_M	(0xff << TR3_LT3_S)
 #define	ADC_SQR1	0x30 /* ADC regular sequence register 1 */
+#define	 SQR1_SQ4_S	24	/* 4th conversion in regular sequence */
+#define	 SQR1_SQ4_M	(0x1f << SQR1_SQ4_S)
+#define	 SQR1_SQ3_S	18	/* 3rd conversion in regular sequence */
+#define	 SQR1_SQ3_M	(0x1f << SQR1_SQ3_S)
+#define	 SQR1_SQ2_S	12	/* 2nd conversion in regular sequence */
+#define	 SQR1_SQ2_M	(0x1f << SQR1_SQ2_S)
+#define	 SQR1_SQ1_S	6	/* 1st conversion in regular sequence */
+#define	 SQR1_SQ1_M	(0x1f << SQR1_SQ1_S)
+#define	 SQR1_L_S	0	/* Regular channel sequence length */
+#define	 SQR1_L_M	(0xf << SQR1_L_S)
 #define	ADC_SQR2	0x34 /* ADC regular sequence register 2 */
+#define	 SQR2_SQ9_S	24	/* 9th conversion in regular sequence */
+#define	 SQR2_SQ9_M	(0x1f << SQR2_SQ9_S)
+#define	 SQR2_SQ8_S	18	/* 8th conversion in regular sequence */
+#define	 SQR2_SQ8_M	(0x1f << SQR2_SQ8_S)
+#define	 SQR2_SQ7_S	12	/* 7th conversion in regular sequence */
+#define	 SQR2_SQ7_M	(0x1f << SQR2_SQ7_S)
+#define	 SQR2_SQ6_S	6	/* 6th conversion in regular sequence */
+#define	 SQR2_SQ6_M	(0x1f << SQR2_SQ6_S)
+#define	 SQR2_SQ5_S	0	/* 5th conversion in regular sequence */
+#define	 SQR2_SQ5_M	(0x1f << SQR2_SQ5_S)
 #define	ADC_SQR3	0x38 /* ADC regular sequence register 3 */
+#define	 SQR3_SQ14_S	24	/* 14th conversion in regular sequence */
+#define	 SQR3_SQ14_M	(0x1f << SQR3_SQ14_S)
+#define	 SQR3_SQ13_S	18	/* 13th conversion in regular sequence */
+#define	 SQR3_SQ13_M	(0x1f << SQR3_SQ13_S)
+#define	 SQR3_SQ12_S	12	/* 12th conversion in regular sequence */
+#define	 SQR3_SQ12_M	(0x1f << SQR3_SQ12_S)
+#define	 SQR3_SQ11_S	6	/* 11th conversion in regular sequence */
+#define	 SQR3_SQ11_M	(0x1f << SQR3_SQ11_S)
+#define	 SQR3_SQ10_S	0	/* 10th conversion in regular sequence */
+#define	 SQR3_SQ10_M	(0x1f << SQR3_SQ10_S)
 #define	ADC_SQR4	0x3C /* ADC regular sequence register 4 */
+#define	 SQR4_SQ16_S	6	/* 16th conversion in regular sequence */
+#define	 SQR4_SQ16_M	(0x1f << SQR4_SQ16_S)
+#define	 SQR4_SQ15_S	0	/* 15th conversion in regular sequence */
+#define	 SQR4_SQ15_M	(0x1f << SQR4_SQ15_S)
 #define	ADC_DR		0x40 /* ADC regular Data Register */
+#define	 DR_RDATA_S	0	/* Regular Data converted */
+#define	 DR_RDATA_M	(0xffff << DR_RDATA_S)
 #define	ADC_JSQR	0x4C /* ADC injected sequence register */
+#define	 JSQR_JSQ4_S	26	/* 4th conversion in the injected sequence */
+#define	 JSQR_JSQ4_M	(0x1f << JSQR_JSQ4_S)
+#define	 JSQR_JSQ3_S	20	/* 3rd conversion in the injected sequence */
+#define	 JSQR_JSQ3_M	(0x1f << JSQR_JSQ3_S)
+#define	 JSQR_JSQ2_S	14	/* 2nd conversion in the injected sequence */
+#define	 JSQR_JSQ2_M	(0x1f << JSQR_JSQ2_S)
+#define	 JSQR_JSQ1_S	8	/* 1st conversion in the injected sequence */
+#define	 JSQR_JSQ1_M	(0x1f << JSQR_JSQ1_S)
+#define	 JSQR_JEXTEN_S	6	/* External Trigger Enable and Polarity Selection for injected channels */
+#define	 JSQR_JEXTEN_M	(0x3 << JSQR_JEXTEN_S)
+#define	 JSQR_JEXTSEL_S	2	/* External Trigger Selection for injected group */
+#define	 JSQR_JEXTSEL_M	(0xf << JSQR_JEXTSEL_S)
+#define	 JSQR_JL_S	0	/* Injected channel sequence length */
+#define	 JSQR_JL_M	(0x3 << JSQR_JL_S)
 #define	ADC_OFR(n)	(0x60 + 0x4 * ((n) - 1)) /* ADC offset register 1,2,3,4 */
+#define	 OFR_OFFSETy_EN	(1 << 31)	/* Offset y Enable */
+#define	 OFR_OFFSETy_CH_S	26	/* Channel selection for the Data offset y */
+#define	 OFR_OFFSETy_CH_M	(0x1f << OFR_OFFSETy_CH_S)
 #define	ADC_JDR(n)	(0x80 + 0x4 * ((n) - 1)) /* ADC injected data register */
+#define	 JDR_JDATA_S	0	/* Injected data */
+#define	 JDR_JDATA_M	(0xffff << JDR_JDATA_S)
 #define	ADC_AWD2CR	0xA0 /* ADC Analog Watchdog 2 Configuration Register */
-#define	 AWD2CR_AWD2CH_S	0 /* Analog watchdog 2 channel selection */
+#define	 AWD2CR_AWD2CH_S	0	/* Analog watchdog 2 channel selection */
 #define	 AWD2CR_AWD2CH_M	(0x7ffff << AWD2CR_AWD2CH_S)
 #define	 AWD2CR_AWD2CH(n)	((n) << AWD2CR_AWD2CH_S)
 #define	ADC_AWD3CR	0xA4 /* ADC Analog Watchdog 3 Configuration Register */
+#define	 AWD3CR_AWD2CH_S	0	/* Analog watchdog 2 channel selection */
+#define	 AWD3CR_AWD2CH_M	(0x7ffff << AWD3CR_AWD2CH_S)
 #define	ADC_DIFSEL	0xB0 /* ADC Differential mode Selection Register */
+#define	 DIFSEL_DIFSEL_S	16	/* Differential mode for channels 18 to 16. */
+#define	 DIFSEL_DIFSEL_M	(0x7 << DIFSEL_DIFSEL_S)
+#define	 DIFSEL_DIFSEL_S	1	/* Differential mode for channels 15 to 1 */
+#define	 DIFSEL_DIFSEL_M	(0x7fff << DIFSEL_DIFSEL_S)
 #define	ADC_CALFACT	0xB4 /* ADC Calibration Factors */
+#define	 CALFACT_CALFACT_D_S	16	/* Calibration Factors in differential mode */
+#define	 CALFACT_CALFACT_D_M	(0x7f << CALFACT_CALFACT_D_S)
+#define	 CALFACT_CALFACT_S_S	0	/* Calibration Factors In single-ended mode */
+#define	 CALFACT_CALFACT_S_M	(0x7f << CALFACT_CALFACT_S_S)
 
+/* Common registers */
 #define	CREGS_OFFS	0x300
 #define	ADC_CSR		(0x00 + CREGS_OFFS) /* ADC Common status register */
+#define	 CSR_JQOVF_MST	(1 << 10)	/* Injected Context Queue Overflow flag of the master ADC */
+#define	 CSR_AWD3_MST	(1 << 9)	/* Analog watchdog 3 flag of the master ADC */
+#define	 CSR_AWD2_MST	(1 << 8)	/* Analog watchdog 2 flag of the master ADC */
+#define	 CSR_AWD1_MST	(1 << 7)	/* Analog watchdog 1 flag of the master ADC */
+#define	 CSR_JEOS_MST	(1 << 6)	/* End of injected sequence flag of the master ADC */
+#define	 CSR_JEOC_MST	(1 << 5)	/* End of injected conversion flag of the master ADC */
+#define	 CSR_OVR_MST	(1 << 4)	/* Overrun flag of the master ADC */
+#define	 CSR_EOS_MST	(1 << 3)	/* End of regular sequence flag of the master ADC */
+#define	 CSR_EOC_MST	(1 << 2)	/* End of regular conversion of the master ADC */
+#define	 CSR_EOSMP_MST	(1 << 1)	/* End of Sampling phase flag of the master ADC */
+#define	 CSR_ADRDY_MST	(1 << 0)	/* Master ADC ready */
 #define	ADC_CCR		(0x08 + CREGS_OFFS) /* ADC common control register */
+#define	 CCR_CH18SEL	(1 << 24)	/* CH18 selection */
+#define	 CCR_CH17SEL	(1 << 23)	/* CH17 selection */
+#define	 CCR_VREFEN	(1 << 22)	/* VREFINT enable */
+#define	 CCR_PRESC_S	18	/* ADC prescaler */
+#define	 CCR_PRESC_M	(0xf << CCR_PRESC_S)
+#define	 CCR_CKMODE_S	16	/* ADC clock mode */
+#define	 CCR_CKMODE_M	(0x3 << CCR_CKMODE_S)
 
 struct stm32l4_adc_softc {
 	uint32_t base;
