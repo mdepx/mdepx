@@ -102,11 +102,12 @@
 #define	 CFGR2_JOVSE	(1 << 1) /* Injected Oversampling Enable */
 #define	 CFGR2_ROVSE	(1 << 0) /* Regular Oversampling Enable */
 #define	ADC_SMPR1	0x14 /* ADC sample time register 1 */
-#define	 SMPR1_SMPx_S	0	/* Channel x sampling time selection */
-#define	 SMPR1_SMPx_M	(0x3fffffff << SMPR1_SMPx_S)
 #define	ADC_SMPR2	0x18 /* ADC sample time register 2 */
-#define	 SMPR2_SMPx_S	0	/* Channel x sampling time selection */
-#define	 SMPR2_SMPx_M	(0x7ffffff << SMPR2_SMPx_S)
+#define	ADC_SMPR(n)	((n) > 9 ? ADC_SMPR2 : ADC_SMPR1)
+				/* ADC sample time register */
+#define	 SMPR_SMP_S(n)	((n) > 9 ? ((n) - 10) * 3 : (n) * 3)
+				/* Channel x sampling time selection */
+#define	 SMPR_SMP_M(n)	(0x7 << SMPR_SMP_S(n))
 #define	ADC_TR1		0x20 /* ADC watchdog threshold register 1 */
 #define	 TR1_HT1_S	16	/* Analog watchdog 1 higher threshold */
 #define	 TR1_HT1_M	(0xfff << TR1_HT1_S)
@@ -198,29 +199,31 @@
 #define	 DIFSEL_DIFSEL_S	1	/* Differential mode for channels 15 to 1 */
 #define	 DIFSEL_DIFSEL_M	(0x7fff << DIFSEL_DIFSEL_S)
 #define	ADC_CALFACT	0xB4 /* ADC Calibration Factors */
-#define	 CALFACT_CALFACT_D_S	16	/* Calibration Factors in differential mode */
+#define	 CALFACT_CALFACT_D_S	16 /* Calibration Factors in differential mode */
 #define	 CALFACT_CALFACT_D_M	(0x7f << CALFACT_CALFACT_D_S)
-#define	 CALFACT_CALFACT_S_S	0	/* Calibration Factors In single-ended mode */
+#define	 CALFACT_CALFACT_S_S	0 /* Calibration Factors In single-ended mode */
 #define	 CALFACT_CALFACT_S_M	(0x7f << CALFACT_CALFACT_S_S)
 
 /* Common registers */
-#define	CREGS_OFFS	0x300
-#define	ADC_CSR		(0x00 + CREGS_OFFS) /* ADC Common status register */
-#define	 CSR_JQOVF_MST	(1 << 10)	/* Injected Context Queue Overflow flag of the master ADC */
-#define	 CSR_AWD3_MST	(1 << 9)	/* Analog watchdog 3 flag of the master ADC */
-#define	 CSR_AWD2_MST	(1 << 8)	/* Analog watchdog 2 flag of the master ADC */
-#define	 CSR_AWD1_MST	(1 << 7)	/* Analog watchdog 1 flag of the master ADC */
-#define	 CSR_JEOS_MST	(1 << 6)	/* End of injected sequence flag of the master ADC */
-#define	 CSR_JEOC_MST	(1 << 5)	/* End of injected conversion flag of the master ADC */
-#define	 CSR_OVR_MST	(1 << 4)	/* Overrun flag of the master ADC */
-#define	 CSR_EOS_MST	(1 << 3)	/* End of regular sequence flag of the master ADC */
-#define	 CSR_EOC_MST	(1 << 2)	/* End of regular conversion of the master ADC */
-#define	 CSR_EOSMP_MST	(1 << 1)	/* End of Sampling phase flag of the master ADC */
-#define	 CSR_ADRDY_MST	(1 << 0)	/* Master ADC ready */
-#define	ADC_CCR		(0x08 + CREGS_OFFS) /* ADC common control register */
-#define	 CCR_CH18SEL	(1 << 24)	/* CH18 selection */
-#define	 CCR_CH17SEL	(1 << 23)	/* CH17 selection */
-#define	 CCR_VREFEN	(1 << 22)	/* VREFINT enable */
+#define	COMMON_REGS_OFFSET	0x300
+#define	ADC_CSR		(0x00 + COMMON_REGS_OFFSET) /* ADC Common status register */
+#define	 CSR_JQOVF_MST	(1 << 10)
+		/* Injected Context Queue Overflow flag of the master ADC */
+#define	 CSR_AWD3_MST	(1 << 9) /* Analog watchdog 3 flag of the master ADC */
+#define	 CSR_AWD2_MST	(1 << 8) /* Analog watchdog 2 flag of the master ADC */
+#define	 CSR_AWD1_MST	(1 << 7) /* Analog watchdog 1 flag of the master ADC */
+#define	 CSR_JEOS_MST	(1 << 6) /* End of injected sequence flag of the master ADC */
+#define	 CSR_JEOC_MST	(1 << 5)
+		/* End of injected conversion flag of the master ADC */
+#define	 CSR_OVR_MST	(1 << 4) /* Overrun flag of the master ADC */
+#define	 CSR_EOS_MST	(1 << 3) /* End of regular sequence flag of the master ADC */
+#define	 CSR_EOC_MST	(1 << 2) /* End of regular conversion of the master ADC */
+#define	 CSR_EOSMP_MST	(1 << 1) /* End of Sampling phase flag of the master ADC */
+#define	 CSR_ADRDY_MST	(1 << 0) /* Master ADC ready */
+#define	ADC_CCR		(0x08 + COMMON_REGS_OFFSET) /* ADC common control register */
+#define	 CCR_CH18SEL	(1 << 24) /* CH18 selection */
+#define	 CCR_CH17SEL	(1 << 23) /* CH17 selection */
+#define	 CCR_VREFEN	(1 << 22) /* VREFINT enable */
 #define	 CCR_PRESC_S	18	/* ADC prescaler */
 #define	 CCR_PRESC_M	(0xf << CCR_PRESC_S)
 #define	 CCR_CKMODE_S	16	/* ADC clock mode */
