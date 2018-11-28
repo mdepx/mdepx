@@ -1,6 +1,8 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
- * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright (c) 1992, 1993
+ *	The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -10,11 +12,14 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -24,14 +29,26 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/stdarg.h>
+#include <sys/cdefs.h>
 
-#ifndef	_INCLUDE_ASSERT_H_
-#define	_INCLUDE_ASSERT_H_
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-#define	assert(n)	((n) ? (void)0 : __assert(__func__, __FILE__, __LINE__, #n))
-#define	static_assert	_Static_assert
-
-void __assert(const char *, const char *, int, const char *);
-
-#endif	/* !_INCLUDE_ASSERT_H_ */
+void
+__assert(const char *func, const char *file, int line, const char *failedexpr)
+{
+	if (func == NULL)
+		(void)printf("Assertion failed: (%s), file %s, line %d.\n",
+		    failedexpr, file, line);
+	else
+		(void)printf(
+		    "Assertion failed: (%s), function %s, file %s, line %d.\n",
+		    failedexpr, func, file, line);
+#if 0
+	abort();
+#else
+	while (1);
+#endif
+	/* NOTREACHED */
+}
