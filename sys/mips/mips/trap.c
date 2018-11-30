@@ -29,6 +29,7 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/systm.h>
 #include <machine/frame.h>
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
@@ -92,11 +93,10 @@ mips_exception(struct trapframe *frame)
 			}
 		break;
 	case MIPS_CR_EXC_CODE_RI:
-		printf("%s: reserved instruction at pc %zx, badvaddr %zx\n",
+		panic("%s: reserved instruction at pc %zx, badvaddr %zx\n",
 		    __func__, frame->tf_pc, frame->tf_badvaddr);
-		break;
 	default:
-		printf("%s: missing handler: exc_code %d, pc %zx, badvaddr %zx\n",
+		panic("%s: missing handler: exc_code %d, pc %zx, badvaddr %zx\n",
 		    __func__, exc_code, frame->tf_pc, frame->tf_badvaddr);
 	}
 
