@@ -24,8 +24,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _INCLUDE_STDLIB_H_
-#define _INCLUDE_STDLIB_H_
+#ifndef _STDLIB_H_
+#define _STDLIB_H_
 
 void *malloc(size_t size);
 void *calloc(size_t number, size_t size);
@@ -38,4 +38,4 @@ int atoi(const char *nptr);
 void * bsearch(const void *key, const void *base, size_t nmemb, size_t size,
     int (*compar) (const void *, const void *));
 
-#endif /* !_INCLUDE_STDLIB_H_ */
+#endif /* !_STDLIB_H_ */

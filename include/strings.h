@@ -24,8 +24,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _INCLUDE_STRINGS_H_
-#define _INCLUDE_STRINGS_H_
+#ifndef _STRINGS_H_
+#define _STRINGS_H_
 
 void bzero(void *b, size_t len);
 void bcopy(const void *src, void *dst, size_t len);
@@ -39,4 +39,4 @@ int fls(int value);
 int flsl(long value);
 int flsll(long long value);
 
-#endif /* !_INCLUDE_STRINGS_H_ */
+#endif /* !_STRINGS_H_ */

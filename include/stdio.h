@@ -26,8 +26,8 @@
 
 #include <sys/stdarg.h>
 
-#ifndef	_INCLUDE_STDIO_H_
-#define	_INCLUDE_STDIO_H_
+#ifndef	_STDIO_H_
+#define	_STDIO_H_
 
 int printf(const char * restrict format, ...);
 int vsprintf(char * restrict str, const char * restrict format, va_list ap);
@@ -62,4 +62,4 @@ int fputs(const char *str, FILE *stream);
 int fputc(int c, FILE *stream);
 int fprintf(FILE * restrict stream, const char * restrict format, ...);
 
-#endif /* !_INCLUDE_STDIO_H_ */
+#endif /* !_STDIO_H_ */
