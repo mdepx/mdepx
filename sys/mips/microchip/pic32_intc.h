@@ -37,7 +37,8 @@
 #define	INTC_OFF(n)	(0x540 + ((n) * 0x10))
 
 struct intc_intr_entry {
-	void (*handler) (void *arg, struct trapframe *frame, int irq);
+	void (*handler) (void *arg, struct trapframe *frame,
+	    int mips_irq, int intc_irq);
 	void *arg;
 };
 

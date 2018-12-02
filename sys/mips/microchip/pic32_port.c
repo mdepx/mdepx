@@ -24,12 +24,43 @@
  * SUCH DAMAGE.
  */
 
+#include <sys/cdefs.h>
+#include <sys/systm.h>
 #include <sys/types.h>
+
+#include <machine/frame.h>
 
 #include <mips/microchip/pic32_port.h>
 
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+
+void
+pic32_port_install_intr_map(struct pic32_port_softc *sc,
+    const struct port_intr_entry *m)
+{
+
+	sc->map = m;
+}
+
+void
+pic32_port_intr(void *arg, struct trapframe *frame,
+    int mips_irq, int intc_irq)
+{
+	struct pic32_port_softc *sc;
+	const struct port_intr_entry *entry;
+	int i, j;
+	int reg;
+
+	sc = arg;
+
+	KASSERT(sc->map != NULL, ("Interrupt map is not installed."));
+
+	entry = &sc->map[intc_irq];
+	reg = RD4(sc, PORT_CNF(entry->port));
+	entry->func(entry->arg, reg);
+	WR4(sc, PORT_CNF(entry->port), 0);
+}
 
 void
 pic32_port_ansel(struct pic32_port_softc *sc,
@@ -134,6 +165,43 @@ pic32_port_port(struct pic32_port_softc *sc,
 		return (1);
 
 	return (0);
+}
+
+void
+pic32_port_cncon(struct pic32_port_softc *sc,
+    uint8_t port, int edge_style, int enable)
+{
+	int reg;
+
+	reg = 0;
+
+	if (enable)
+		reg |= CNCON_ON;
+	if (edge_style)
+		reg |= CNCON_CNSTYLE;
+
+	WR4(sc, PORT_CNCON(port), reg);
+}
+
+void
+pic32_port_cnen(struct pic32_port_softc *sc,
+    uint8_t port, uint8_t pin, int pos, int neg)
+{
+	int reg;
+
+	reg = RD4(sc, PORT_CNEN0(port));
+	if (pos)
+		reg |= (1 << pin);
+	else
+		reg &= ~(1 << pin);
+	WR4(sc, PORT_CNEN0(port), reg);
+
+	reg = RD4(sc, PORT_CNEN1(port));
+	if (neg)
+		reg |= (1 << pin);
+	else
+		reg &= ~(1 << pin);
+	WR4(sc, PORT_CNEN1(port), reg);
 }
 
 void

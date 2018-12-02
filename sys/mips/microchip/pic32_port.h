@@ -54,6 +54,8 @@ enum port_state {
 #define	PORT_CNPU(n)		(0x50 + 0x100 * (n))
 #define	PORT_CNPD(n)		(0x60 + 0x100 * (n))
 #define	PORT_CNCON(n)		(0x70 + 0x100 * (n))
+#define	 CNCON_ON		(1 << 15) /* Change Notification (CN) Control On bit */
+#define	 CNCON_CNSTYLE		(1 << 11) /* Change Notification Style Selection bit */
 #define	PORT_CNEN0(n)		(0x80 + 0x100 * (n))
 #define	PORT_CNSTAT(n)		(0x90 + 0x100 * (n))
 #define	PORT_CNEN1(n)		(0xA0 + 0x100 * (n))
@@ -71,8 +73,15 @@ enum port_state {
 #define	RPOR_CLC1OUT	8	/* CLC1 Output */
 #define	RPOR_CLC2OUT	9	/* CLC2 Output */
 
+struct port_intr_entry {
+	uint8_t port;
+	void (*func)(void *arg, uint32_t cnf);
+	void *arg;
+};
+
 struct pic32_port_softc {
 	uint32_t base;
+	const struct port_intr_entry *map;
 };
 
 void pic32_port_init(struct pic32_port_softc *sc, uint32_t base);
@@ -84,5 +93,10 @@ void pic32_port_cnpu(struct pic32_port_softc *sc, uint32_t port, uint32_t pin, u
 void pic32_port_cnpd(struct pic32_port_softc *sc, uint32_t port, uint32_t pin, uint8_t enable);
 int pic32_port_port(struct pic32_port_softc *sc, uint32_t port, uint32_t pin);
 void pic32_port_cnpu(struct pic32_port_softc *sc, uint32_t port, uint32_t pin, uint8_t enable);
+
+void pic32_port_intr(void *arg, struct trapframe *frame, int mips_irq, int intc_irq);
+void pic32_port_cnen(struct pic32_port_softc *sc, uint8_t port, uint8_t pin, int pos, int neg);
+void pic32_port_cncon(struct pic32_port_softc *sc, uint8_t port, int edge_style, int enable);
+void pic32_port_install_intr_map(struct pic32_port_softc *sc, const struct port_intr_entry *m);
 
 #endif /* !_MIPS_MICROCHIP_PIC32_PORT_H_ */

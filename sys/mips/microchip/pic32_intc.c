@@ -57,16 +57,17 @@ pic32_intc_intr(void *arg, struct trapframe *frame, int irq)
 
 	for (i = 0; i < 6; i++) {
 		ifs = RD4(sc, INTC_IFS(i));
-		for (b = 0; b < 31; b++)
+		for (b = 0; b < 31; b++) {
 			if (ifs & (1 << b)) {
 				ipend = (i * 32 + b);
 				if (sc->map[ipend].handler != NULL) {
 					sc->map[ipend].handler(sc->map[ipend].arg,
-					    frame, irq);
+					    frame, irq, ipend);
 					dprintf("intr %d\n", ipend);
 					pic32_intc_clear_pending(sc, ipend);
 				}
 			}
+		}
 	}
 }
 
