@@ -84,7 +84,6 @@ void
 pic32_adc_init(struct pic32_adc_softc *sc,
     uint32_t base)
 {
-	uint32_t reg;
 
 	sc->base = base;
 }

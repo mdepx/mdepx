@@ -49,7 +49,6 @@ pic32_port_intr(void *arg, struct trapframe *frame,
 {
 	struct pic32_port_softc *sc;
 	const struct port_intr_entry *entry;
-	int i, j;
 	int reg;
 
 	sc = arg;

@@ -36,7 +36,6 @@ pic32_ccp_init(struct pic32_ccp_softc *sc,
     uint32_t base)
 {
 	uint32_t reg;
-	uint32_t freq;
 
 	sc->base = base;
 
