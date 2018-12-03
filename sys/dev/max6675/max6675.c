@@ -25,8 +25,10 @@
  */
 
 #include <sys/cdefs.h>
-#include <dev/spi/spi.h>
 #include <sys/endian.h>
+
+#include <dev/spi/spi.h>
+#include <dev/max6675/max6675.h>
 
 #define	MAX6675_DEBUG
 #undef	MAX6675_DEBUG

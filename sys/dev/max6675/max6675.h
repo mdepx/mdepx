@@ -27,6 +27,6 @@
 #ifndef	_DEV_MAX6675_MAX6675_H_
 #define	_DEV_MAX6675_MAX6675_H_
 
-int max6675_read_celsius(spi_device_t *dev);
+uint32_t max6675_read_celsius(spi_device_t *dev);
 
 #endif /* !_DEV_MAX6675_MAX6675_H_ */
