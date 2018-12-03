@@ -33,7 +33,7 @@
 #define	 ADCON1_SIDL		(1 << 13)	/* ADC Stop in Idle Mode bit */
 #define	 ADCON1_FORM_S		8	/* Data Output Format bits */
 #define	 ADCON1_FORM_M		(0x7 << ADCON1_FORM_S)
-#define	 ADCON1_FORM_SF32	(0x7 << ADCON1_FORM_S)	/* Signed Fractional 32-bit *
+#define	 ADCON1_FORM_SF32	(0x7 << ADCON1_FORM_S)	/* Signed Fractional 32-bit */
 #define	 ADCON1_FORM_F32	(0x6 << ADCON1_FORM_S)	/* Fractional 32-bit */
 #define	 ADCON1_FORM_SI32	(0x5 << ADCON1_FORM_S)	/* Signed Integer 32-bit */
 #define	 ADCON1_FORM_I32	(0x4 << ADCON1_FORM_S)	/* Integer 32-bit */
