@@ -92,7 +92,6 @@ void pic32_port_odc(struct pic32_port_softc *sc, uint32_t port, uint32_t pin, ui
 void pic32_port_cnpu(struct pic32_port_softc *sc, uint32_t port, uint32_t pin, uint8_t enable);
 void pic32_port_cnpd(struct pic32_port_softc *sc, uint32_t port, uint32_t pin, uint8_t enable);
 int pic32_port_port(struct pic32_port_softc *sc, uint32_t port, uint32_t pin);
-void pic32_port_cnpu(struct pic32_port_softc *sc, uint32_t port, uint32_t pin, uint8_t enable);
 
 void pic32_port_intr(void *arg, struct trapframe *frame, int mips_irq, int intc_irq);
 void pic32_port_cnen(struct pic32_port_softc *sc, uint8_t port, uint8_t pin, int pos, int neg);
