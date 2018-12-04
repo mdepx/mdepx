@@ -27,6 +27,8 @@
 #ifndef _MIPS_MICROCHIP_PIC32_CCP_H_
 #define _MIPS_MICROCHIP_PIC32_CCP_H_
 
+/* Capture/Compare/PWM timer module. */
+
 #define	CCPCON1	0x00
 #define	 CCPCON1_ON	(1 << 15)
 #define	 CCPCON1_T32	(1 << 5)	/* 32-Bit Time Base Select bit */
@@ -45,5 +47,6 @@ struct pic32_ccp_softc {
 
 void pic32_ccp_init(struct pic32_ccp_softc *sc, uint32_t base);
 void pic32_ccp_delay(struct pic32_ccp_softc *sc, uint32_t usec);
+uint32_t pic32_ccp_counts(struct pic32_ccp_softc *sc);
 
 #endif /* !_MIPS_MICROCHIP_PIC32_CCP_H_ */

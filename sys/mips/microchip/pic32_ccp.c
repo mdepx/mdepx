@@ -31,6 +31,16 @@
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
+uint32_t
+pic32_ccp_counts(struct pic32_ccp_softc *sc)
+{
+	uint32_t counts;
+
+	counts = RD4(sc, CCPTMR);
+
+	return (counts);
+}
+
 void
 pic32_ccp_init(struct pic32_ccp_softc *sc,
     uint32_t base)
