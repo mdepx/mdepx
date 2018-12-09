@@ -28,6 +28,7 @@
 #define	_MIPS_MICROCHIP_PIC32_PORT_H_
 
 #include <sys/types.h>
+#include <machine/frame.h>
 
 enum port_state {
 	PORT_INPUT,
@@ -92,7 +93,6 @@ void pic32_port_odc(struct pic32_port_softc *sc, uint32_t port, uint32_t pin, ui
 void pic32_port_cnpu(struct pic32_port_softc *sc, uint32_t port, uint32_t pin, uint8_t enable);
 void pic32_port_cnpd(struct pic32_port_softc *sc, uint32_t port, uint32_t pin, uint8_t enable);
 int pic32_port_port(struct pic32_port_softc *sc, uint32_t port, uint32_t pin);
-
 void pic32_port_intr(void *arg, struct trapframe *frame, int mips_irq, int intc_irq);
 void pic32_port_cnen(struct pic32_port_softc *sc, uint8_t port, uint8_t pin, int pos, int neg);
 void pic32_port_cncon(struct pic32_port_softc *sc, uint8_t port, int edge_style, int enable);
