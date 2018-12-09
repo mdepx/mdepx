@@ -24,12 +24,28 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/types.h>
+#include <sys/cdefs.h>
+
+#include <machine/frame.h>
 
 #include <mips/microchip/pic32_ccp.h>
 
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+
+void
+pic32_ccp_intr(void *arg, struct trapframe *frame,
+    int mips_irq, int intc_irq)
+{
+	struct pic32_ccp_softc *sc;
+
+	sc = arg;
+
+	WR4(sc, CCPPR, 0);
+
+	if (sc->cb != NULL)
+		sc->cb(sc->arg);
+}
 
 uint32_t
 pic32_ccp_counts(struct pic32_ccp_softc *sc)
@@ -42,6 +58,20 @@ pic32_ccp_counts(struct pic32_ccp_softc *sc)
 }
 
 void
+pic32_ccp_sched(struct pic32_ccp_softc *sc, uint32_t val,
+    void (*cb)(void *), void *arg)
+{
+	int counts;
+
+	counts = pic32_ccp_counts(sc);
+
+	sc->cb = cb;
+	sc->arg = arg;
+
+	WR4(sc, CCPPR, (val + counts));
+}
+
+void
 pic32_ccp_init(struct pic32_ccp_softc *sc,
     uint32_t base)
 {
@@ -50,11 +80,12 @@ pic32_ccp_init(struct pic32_ccp_softc *sc,
 	sc->base = base;
 
 	WR4(sc, CCPCON1, 0);
-
 	WR4(sc, CCPTMR, 0);
 
-	reg = CCPCON1_T32;
-	reg |= (3 << 6);
+	WR4(sc, CCPRA, 0);
+	WR4(sc, CCPRB, 0);
+
+	reg = CCPCON1_T32 | CCPCON1_TMRPS_64;
 	reg |= CCPCON1_ON;
 	WR4(sc, CCPCON1, reg);
 }

@@ -30,6 +30,7 @@
 /* Capture/Compare/PWM timer module. */
 
 #define	CCPCON1	0x00
+#define	 CCPCON1_TRIGEN		(1 << 23) /* TRIGEN: CCPx Triggered Enable bit */
 #define	 CCPCON1_ON		(1 << 15)
 #define	 CCPCON1_TMRPS_S	6	/* CCPx Time Base Prescale Select bits */
 #define	 CCPCON1_TMRPS_M	(0x3 << CCPCON1_TMRPS_S)
@@ -46,6 +47,8 @@
 
 struct pic32_ccp_softc {
 	uint32_t base;
+	void (*cb)(void *);
+	void *arg;
 };
 
 void pic32_ccp_init(struct pic32_ccp_softc *sc, uint32_t base);
@@ -53,5 +56,7 @@ void pic32_ccp_delay(struct pic32_ccp_softc *sc, uint32_t usec);
 uint32_t pic32_ccp_counts(struct pic32_ccp_softc *sc);
 void pic32_ccp_intr(void *arg, struct trapframe *frame,
     int mips_irq, int intc_irq);
+void pic32_ccp_sched(struct pic32_ccp_softc *sc,
+    uint32_t val, void (*cb)(void *), void *arg);
 
 #endif /* !_MIPS_MICROCHIP_PIC32_CCP_H_ */
