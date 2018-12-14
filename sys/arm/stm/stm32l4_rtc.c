@@ -33,15 +33,8 @@
 #define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-void
-stm32l4_rtc_init(struct stm32l4_rtc_softc *sc, uint32_t base)
-{
-
-	sc->base = base;
-}
-
-int
-stm32l4_rtc_enable(struct stm32l4_rtc_softc *sc)
+static int
+stm32l4_rtc_init_enable(struct stm32l4_rtc_softc *sc)
 {
 	int timeout;
 	int reg;
@@ -64,8 +57,79 @@ stm32l4_rtc_enable(struct stm32l4_rtc_softc *sc)
 		return (-1);
 	}
 
-	printf("%s: ISR %x\n", __func__, RD4(sc, RTC_ISR));
-	printf("%s: TR %x\n", __func__, RD4(sc, RTC_TR));
+	return (0);
+}
+
+static void
+stm32l4_rtc_init_disable(struct stm32l4_rtc_softc *sc)
+{
+	uint32_t reg;
+
+	reg = RD4(sc, RTC_ISR);
+	reg &= ~ISR_INIT;
+	WR4(sc, RTC_ISR, reg);
+}
+
+int
+stm32l4_rtc_set_timedate(struct stm32l4_rtc_softc *sc,
+    struct stm32l4_rtc_timedate *td)
+{
+	uint32_t reg;
+	int err;
+
+	err = stm32l4_rtc_init_enable(sc);
+	if (err != 0)
+		return (err);
+
+	reg = (td->second / 10) << TR_ST_S;
+	reg |= (td->second % 10) << TR_SU_S;
+	reg |= (td->minute / 10) << TR_MNT_S;
+	reg |= (td->minute % 10) << TR_MNU_S;
+	reg |= (td->hour / 10) << TR_HT_S;
+	reg |= (td->hour % 10) << TR_HU_S;
+	WR4(sc, RTC_TR, reg);
+
+	reg = (td->date / 10) << DR_DT_S;
+	reg |= (td->date % 10) << DR_DU_S;
+	reg |= (td->month / 10) ? DR_MT : 0;
+	reg |= (td->month % 10) << DR_MU_S;
+	reg |= td->weekday << DR_WDU_S;
+	reg |= (td->year / 10) << DR_YT_S;
+	reg |= (td->year % 10) << DR_YU_S;
+	WR4(sc, RTC_DR, reg);
+
+	stm32l4_rtc_init_disable(sc);
 
 	return (0);
+}
+
+void
+stm32l4_rtc_get_timedate(struct stm32l4_rtc_softc *sc,
+    struct stm32l4_rtc_timedate *td)
+{
+	uint32_t reg;
+
+	reg = RD4(sc, RTC_TR);
+	td->second = ((reg & TR_ST_M) >> TR_ST_S) * 10;
+	td->second += (reg & TR_SU_M) >> TR_SU_S;
+	td->minute = ((reg & TR_MNT_M) >> TR_MNT_S) * 10;
+	td->minute += (reg & TR_MNU_M) >> TR_MNU_S;
+	td->hour = ((reg & TR_HT_M) >> TR_HT_S) * 10;
+	td->hour += (reg & TR_HU_M) >> TR_HU_S;
+
+	reg = RD4(sc, RTC_DR);
+	td->date = ((reg & DR_DT_M) >> DR_DT_S) * 10;
+	td->date += (reg & DR_DU_M) >> DR_DU_S;
+	td->month = (reg & DR_MT) ? 10 : 0;
+	td->month += (reg & DR_MU_M) >> DR_MU_S;
+	td->weekday = (reg & DR_WDU_M) >> DR_WDU_S;
+	td->year = ((reg & DR_YT_M) >> DR_YT_S) * 10;
+	td->year += (reg & DR_YU_M) >> DR_YU_S;
+}
+
+void
+stm32l4_rtc_init(struct stm32l4_rtc_softc *sc, uint32_t base)
+{
+
+	sc->base = base;
 }

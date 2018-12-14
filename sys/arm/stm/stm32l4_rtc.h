@@ -224,11 +224,25 @@
 #define	 BKPR_BKP_S		0	/* application data */
 #define	 BKPR_BKP_M		(0xffffffff << BKPR_BKP_S)
 
+struct stm32l4_rtc_timedate {
+	uint8_t second;
+	uint8_t minute;
+	uint8_t hour;
+	uint8_t pm;
+	uint8_t date;
+	uint8_t month;
+	uint8_t weekday;
+	uint8_t year;
+};
+
 struct stm32l4_rtc_softc {
 	uint32_t base;
 };
 
 void stm32l4_rtc_init(struct stm32l4_rtc_softc *sc, uint32_t base);
-int stm32l4_rtc_enable(struct stm32l4_rtc_softc *sc);
+int stm32l4_rtc_set_timedate(struct stm32l4_rtc_softc *sc,
+    struct stm32l4_rtc_timedate *td);
+void stm32l4_rtc_get_timedate(struct stm32l4_rtc_softc *sc,
+    struct stm32l4_rtc_timedate *td);
 
 #endif /* !_ARM_STM_STM32L4_RTC_H_ */
