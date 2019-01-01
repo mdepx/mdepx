@@ -12,13 +12,14 @@ Osfive is an RTOS/SDK for microcontrollers.
 - libFLAC
 
 ## Supported platforms
-1. ARM
-..* Maxim MAX32625
-..* Maxim MAX32660
-2. MIPS
-..* Microchip PIC32
-..* Nordic Semiconductor nRF52
-..* STM32
-3. RISC-V
-..* SiFive E300G
-..* Microsemi
+- ARM
+⋅⋅* Maxim MAX32625
+⋅⋅* Maxim MAX32660
+⋅⋅* Nordic Semiconductor nRF52
+⋅⋅* STM32
+- MIPS
+⋅⋅* Microchip PIC32
+⋅⋅* BERI
+- RISC-V
+⋅⋅* Microsemi
+⋅⋅* SiFive E300G
