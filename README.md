@@ -13,13 +13,13 @@ Osfive is an RTOS/SDK for microcontrollers.
 
 ## Supported platforms
 - ARM
-⋅⋅* Maxim MAX32625
-⋅⋅* Maxim MAX32660
-⋅⋅* Nordic Semiconductor nRF52
-⋅⋅* STM32
+  * Maxim MAX32625
+  * Maxim MAX32660
+  * Nordic Semiconductor nRF52
+  * STM32
 - MIPS
-⋅⋅* Microchip PIC32
-⋅⋅* BERI
+  * Microchip PIC32
+  * BERI
 - RISC-V
-⋅⋅* Microsemi
-⋅⋅* SiFive E300G
+  * Microsemi
+  * SiFive E300G
