@@ -9,7 +9,11 @@ Osfive is an RTOS/SDK for microcontrollers.
 
 ## Supported libraries
 - BSD libc library
+- libaeabi
 - libFLAC
+- md5
+- tinycrypt
+- xz
 
 ## Supported platforms
 - ARM
