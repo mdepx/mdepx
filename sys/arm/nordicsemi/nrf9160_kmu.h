@@ -27,16 +27,35 @@
 #ifndef _ARM_NORDICSEMI_NRF9160_KMU_H_
 #define _ARM_NORDICSEMI_NRF9160_KMU_H_
 
-#define	KMU_TASKS_PUSH_KEYSLOT		0x000	/* Push a key slot over secure APB */
-#define	KMU_EVENTS_KEYSLOT_PUSHED	0x100	/* Key successfully pushed over secure APB */
-#define	KMU_EVENTS_KEYSLOT_REVOKED	0x104	/* Key has been revoked and cannot be tasked for selection */
-#define	KMU_EVENTS_KEYSLOT_ERROR	0x108	/* No key slot selected, no destination address defined, or error during push operation */
-#define	KMU_INTEN			0x300	/* Enable or disable interrupt */
+/* Push a key slot over secure APB */
+#define	KMU_TASKS_PUSH_KEYSLOT		0x000
+
+/* Key successfully pushed over secure APB */
+#define	KMU_EVENTS_KEYSLOT_PUSHED	0x100
+
+/* Key has been revoked and cannot be tasked for selection */
+#define	KMU_EVENTS_KEYSLOT_REVOKED	0x104
+
+/*
+ * No key slot selected, no destination address defined,
+ * or error during push operation
+ */
+#define	KMU_EVENTS_KEYSLOT_ERROR	0x108
+
+/* Enable or disable interrupt */
+#define	KMU_INTEN			0x300
 #define	KMU_INTENSET			0x304	/* Enable interrupt */
 #define	KMU_INTENCLR			0x308	/* Disable interrupt */
 #define	KMU_INTPEND			0x30C	/* Pending interrupts */
-#define	KMU_STATUS			0x40C	/* Status bits for KMU operation */
-#define	KMU_SELECTKEYSLOT		0x500	/* Select key slot ID to be read over AHB or pushed over secure APB when TASKS_PUSH_KEYSLOT is started */
+
+/* Status bits for KMU operation */
+#define	KMU_STATUS			0x40C
+
+/*
+ * Select key slot ID to be read over AHB or
+ * pushed over secure APB when TASKS_PUSH_KEYSLOT is started
+ */
+#define	KMU_SELECTKEYSLOT		0x500
 
 struct kmu_softc {
 	size_t base;

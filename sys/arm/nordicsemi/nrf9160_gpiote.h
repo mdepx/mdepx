@@ -27,19 +27,48 @@
 #ifndef _ARM_NORDICSEMI_NRF9160_GPIOTE_H_
 #define _ARM_NORDICSEMI_NRF9160_GPIOTE_H_
 
-#define	GPIOTE_TASKS_OUT(n)	(0x000 + (n) * 0x4)	/* Task for writing to pin specified in CONFIG[0].PSEL. Action on pin is configured in CONFIG[0].POLARITY. */
-#define	GPIOTE_TASKS_SET(n)	(0x030 + (n) * 0x4)	/* Task for writing to pin specified in CONFIG[0].PSEL. Action on pin is to set it high. */
-#define	GPIOTE_TASKS_CLR(n)	(0x060 + (n) * 0x4)	/* Task for writing to pin specified in CONFIG[0].PSEL. Action on pin is to set it low. */
-#define	GPIOTE_SUBSCRIBE_OUT(n)	(0x080 + (n) * 0x4)	/* Subscribe configuration for task OUT[0] */
-#define	GPIOTE_SUBSCRIBE_SET(n)	(0x0B0 + (n) * 0x4)	/* Subscribe configuration for task SET[0] */
-#define	GPIOTE_SUBSCRIBE_CLR(n)	(0x0E0 + (n) * 0x4)	/* Subscribe configuration for task CLR[0] */
-#define	GPIOTE_EVENTS_IN(n)	(0x100 + (n) * 0x4)	/* Event generated from pin specified in CONFIG[0].PSEL */
-#define	GPIOTE_EVENTS_PORT	0x17C			/* Event generated from multiple input GPIO pins with SENSE mechanism enabled */
-#define	GPIOTE_PUBLISH_IN(n)	(0x180 + (n) * 0x4)	/* Publish configuration for event IN[0] */
-#define	GPIOTE_PUBLISH_PORT	0x1FC			/* Publish configuration for event PORT */
-#define	GPIOTE_INTENSET		0x304			/* Enable interrupt */
-#define	GPIOTE_INTENCLR		0x308			/* Disable interrupt */
-#define	GPIOTE_CONFIG(n)	(0x510 + (n) * 0x4)	/* Configuration for OUT[n], SET[n] and CLR[n] tasks and IN[n] event */
+/*
+ * Task for writing to pin specified in CONFIG[n].PSEL.
+ * Action on pin is configured in CONFIG[n].POLARITY.
+ */
+#define	GPIOTE_TASKS_OUT(n)	(0x000 + (n) * 0x4)
+/*
+ * Task for writing to pin specified in CONFIG[n].PSEL.
+ * Action on pin is to set it high.
+ */
+#define	GPIOTE_TASKS_SET(n)	(0x030 + (n) * 0x4)
+/*
+ * Task for writing to pin specified in CONFIG[n].PSEL.
+ * Action on pin is to set it low.
+ */
+#define	GPIOTE_TASKS_CLR(n)	(0x060 + (n) * 0x4)
+
+/* Subscribe configuration for task OUT[n] */
+#define	GPIOTE_SUBSCRIBE_OUT(n)	(0x080 + (n) * 0x4)
+
+/* Subscribe configuration for task SET[n] */
+#define	GPIOTE_SUBSCRIBE_SET(n)	(0x0B0 + (n) * 0x4)
+
+/* Subscribe configuration for task CLR[n] */
+#define	GPIOTE_SUBSCRIBE_CLR(n)	(0x0E0 + (n) * 0x4)
+
+/* Event generated from pin specified in CONFIG[0].PSEL */
+#define	GPIOTE_EVENTS_IN(n)	(0x100 + (n) * 0x4)
+
+/* Event generated from multiple input GPIO pins with SENSE mechanism enabled */
+#define	GPIOTE_EVENTS_PORT	0x17C
+
+/* Publish configuration for event IN[n] */
+#define	GPIOTE_PUBLISH_IN(n)	(0x180 + (n) * 0x4)
+
+/* Publish configuration for event PORT */
+#define	GPIOTE_PUBLISH_PORT	0x1FC
+
+#define	GPIOTE_INTENSET		0x304	/* Enable interrupt */
+#define	GPIOTE_INTENCLR		0x308	/* Disable interrupt */
+
+/* Configuration for OUT[n], SET[n] and CLR[n] tasks and IN[n] event */
+#define	GPIOTE_CONFIG(n)	(0x510 + (n) * 0x4)
 
 struct GPIOTE_softc {
 	size_t base;
