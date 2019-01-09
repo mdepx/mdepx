@@ -33,14 +33,19 @@
 #define	RTC_TASKS_TRIGOVRFLW	0x00C	/* Set COUNTER to 0xFFFFF0 */
 #define	RTC_EVENTS_TICK		0x100	/* Event on COUNTER increment */
 #define	RTC_EVENTS_OVRFLW	0x104	/* Event on COUNTER overflow */
-#define	RTC_EVENTS_COMPARE(n)	(0x140 + (n) * 0x4) /* Compare event on CCn match */
+
+/* Compare event on CCn match */
+#define	RTC_EVENTS_COMPARE(n)	(0x140 + (n) * 0x4)
+
 #define	RTC_INTENSET		0x304	/* Enable interrupt */
 #define	RTC_INTENCLR		0x308	/* Disable interrupt */
 #define	RTC_EVTEN		0x340	/* Enable or disable event routing */
 #define	RTC_EVTENSET		0x344	/* Enable event routing */
 #define	RTC_EVTENCLR		0x348	/* Disable event routing */
 #define	RTC_COUNTER		0x504	/* Current COUNTER value */
-#define	RTC_PRESCALER		0x508	/* 12 bit prescaler for COUNTER frequency (32768/(PRESCALER+1)) */
+
+/* 12 bit prescaler for COUNTER frequency (32768/(PRESCALER+1)) */
+#define	RTC_PRESCALER		0x508
 #define	RTC_CC(n)		(0x540 + (n) * 0x4) /* Compare register n */
 
 struct rtc_softc {
