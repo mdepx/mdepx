@@ -29,56 +29,27 @@
 
 #define	PDM_TASKS_START		0x000	/* Starts continuous PDM transfer */
 #define	PDM_TASKS_STOP		0x004	/* Stops PDM transfer */
-
-/* Subscribe configuration for task START */
-#define	PDM_SUBSCRIBE_START	0x080
-
-/* Subscribe configuration for task STOP */
-#define	PDM_SUBSCRIBE_STOP	0x084
+#define	PDM_SUBSCRIBE_START	0x080	/* Subscribe configuration for task START */
+#define	PDM_SUBSCRIBE_STOP	0x084	/* Subscribe configuration for task STOP */
 #define	PDM_EVENTS_STARTED	0x100	/* PDM transfer has started */
 #define	PDM_EVENTS_STOPPED	0x104	/* PDM transfer has finished */
-/*
- * The PDM has written the last sample specified by SAMPLE.MAXCNT
- * or the last sample after a STOP task has been received) to Data RAM
- */
-#define	PDM_EVENTS_END		0x108
-
-/* Publish configuration for event STARTED */
-#define	PDM_PUBLISH_STARTED	0x180
-
-/* Publish configuration for event STOPPED */
-#define	PDM_PUBLISH_STOPPED	0x184
-
-/* Publish configuration for event END */
-#define	PDM_PUBLISH_END		0x188
+#define	PDM_EVENTS_END		0x108	/* The PDM has written the last sample specified by SAMPLE.MAXCNT (or the last sample after a STOP task has been received) to Data RAM */
+#define	PDM_PUBLISH_STARTED	0x180	/* Publish configuration for event STARTED */
+#define	PDM_PUBLISH_STOPPED	0x184	/* Publish configuration for event STOPPED */
+#define	PDM_PUBLISH_END		0x188	/* Publish configuration for event END */
 #define	PDM_INTEN		0x300	/* Enable or disable interrupt */
 #define	PDM_INTENSET		0x304	/* Enable interrupt */
 #define	PDM_INTENCLR		0x308	/* Disable interrupt */
 #define	PDM_ENABLE		0x500	/* PDM module enable register */
 #define	PDM_PDMCLKCTRL		0x504	/* PDM clock generator control */
-
-/* Defines the routing of the connected PDM microphones' signals */
-#define	PDM_MODE		0x508
+#define	PDM_MODE		0x508	/* Defines the routing of the connected PDM microphones' signals */
 #define	PDM_GAINL		0x518	/* Left output gain adjustment */
 #define	PDM_GAINR		0x51C	/* Right output gain adjustment */
-
-/*
- * Selects the ratio between PDM_CLK and output sample rate.
- * Change PDMCLKCTRL accordingly.
- */
-#define	PDM_RATIO		0x520
-
-/* Pin number configuration for PDM CLK signal */
-#define	PDM_PSEL_CLK		0x540
-
-/* Pin number configuration for PDM DIN signal */
-#define	PDM_PSEL_DIN		0x544
-
-/* RAM address pointer to write samples to with EasyDMA */
-#define	PDM_SAMPLE_PTR		0x560
-
-/* Number of samples to allocate memory for in EasyDMA mode */
-#define	PDM_SAMPLE_MAXCNT	0x564
+#define	PDM_RATIO		0x520	/* Selects the ratio between PDM_CLK and output sample rate. Change PDMCLKCTRL accordingly. */
+#define	PDM_PSEL_CLK		0x540	/* Pin number configuration for PDM CLK signal */
+#define	PDM_PSEL_DIN		0x544	/* Pin number configuration for PDM DIN signal */
+#define	PDM_SAMPLE_PTR		0x560	/* RAM address pointer to write samples to with EasyDMA */
+#define	PDM_SAMPLE_MAXCNT	0x564	/* Number of samples to allocate memory for in EasyDMA mode */
 
 struct pdm_softc {
 	size_t base;

@@ -27,29 +27,14 @@
 #ifndef _ARM_NORDICSEMI_NRF9160_DPPI_H_
 #define _ARM_NORDICSEMI_NRF9160_DPPI_H_
 
-/* Enable channel group n */
-#define	DPPI_TASKS_CHG_EN(n)		(0x000 + 0x8 * n)
-
-/* Disable channel group n */
-#define	DPPI_TASKS_CHG_DIS(n)		(0x004 + 0x8 * n)
-
-/* Subscribe configuration for task CHG[n].EN */
-#define	DPPI_SUBSCRIBE_CHG_EN(n)	(0x080 + 0x8 * n)
-
-/* Subscribe configuration for task CHG[n].DIS */
-#define	DPPI_SUBSCRIBE_CHG_DIS(n)	(0x084 + 0x8 * n)
-
-/* Channel enable register */
-#define	DPPI_CHEN			0x500
-
-/* Channel enable set register */
-#define	DPPI_CHENSET			0x504
-
-/* Channel enable clear register */
-#define	DPPI_CHENCLR			0x508
-
-/* Channel group n */
-#define	DPPI_CHG(n)			(0x800 + 0x4 * n)
+#define	DPPI_TASKS_CHG_EN(n)		(0x000 + 0x8 * n) /* Enable channel group n */
+#define	DPPI_TASKS_CHG_DIS(n)		(0x004 + 0x8 * n) /* Disable channel group n */
+#define	DPPI_SUBSCRIBE_CHG_EN(n)	(0x080 + 0x8 * n) /* Subscribe configuration for task CHG[n].EN */
+#define	DPPI_SUBSCRIBE_CHG_DIS(n)	(0x084 + 0x8 * n) /* Subscribe configuration for task CHG[n].DIS */
+#define	DPPI_CHEN			0x500 /* Channel enable register */
+#define	DPPI_CHENSET			0x504 /* Channel enable set register */
+#define	DPPI_CHENCLR			0x508 /* Channel enable clear register */
+#define	DPPI_CHG(n)			(0x800 + 0x4 * n) /* Channel group n */
 
 struct dppi_softc {
 	size_t base;

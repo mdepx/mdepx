@@ -27,43 +27,16 @@
 #ifndef _ARM_NORDICSEMI_NRF9160_I2S_H_
 #define _ARM_NORDICSEMI_NRF9160_I2S_H_
 
-/*
- * Starts continuous I2S transfer.
- * Also starts MCK generator when this is enabled.
- */
-#define	I2S_TASKS_START		0x000
-
-/*
- * Stops I2S transfer. Also stops MCK generator.
- * Triggering this task will cause the STOPPED event to be generated.
- */
-#define	I2S_TASKS_STOP		0x004
-
-/* Subscribe configuration for task START */
-#define	I2S_SUBSCRIBE_START	0x080
-
-/* Subscribe configuration for task STOP */
-#define	I2S_SUBSCRIBE_STOP	0x084
-
-/*
- * The RXD.PTR register has been copied to internal double-buffers.
- * When the I2S module is started and RX is enabled, this event will be
- * generated for every RXTXD.MAXCNT words that are received on the SDIN pin.
- */
-#define	I2S_EVENTS_RXPTRUPD	0x104
+#define	I2S_TASKS_START		0x000	/* Starts continuous I2S transfer. Also starts MCK generator when this is enabled. */
+#define	I2S_TASKS_STOP		0x004	/* Stops I2S transfer. Also stops MCK generator. Triggering this task will cause the STOPPED event to be generated. */
+#define	I2S_SUBSCRIBE_START	0x080	/* Subscribe configuration for task START */
+#define	I2S_SUBSCRIBE_STOP	0x084	/* Subscribe configuration for task STOP */
+#define	I2S_EVENTS_RXPTRUPD	0x104	/* The RXD.PTR register has been copied to internal double-buffers. When the I2S module is started and RX is enabled, this event will be generated for every RXTXD.MAXCNT words that are received on the SDIN pin. */
 #define	I2S_EVENTS_STOPPED	0x108	/* I2S transfer stopped. */
-/*
- * The TDX.PTR register has been copied to internal double-buffers.
- * When the I2S module is started and TX is enabled, this event will be
- * generated for every RXTXD.MAXCNT words that are sent on the SDOUT pin.
- */
-#define	I2S_EVENTS_TXPTRUPD	0x114
-/* Publish configuration for event RXPTRUPD */
-#define	I2S_PUBLISH_RXPTRUPD	0x184
-/* Publish configuration for event STOPPED */
-#define	I2S_PUBLISH_STOPPED	0x188
-/* Publish configuration for event TXPTRUPD */
-#define	I2S_PUBLISH_TXPTRUPD	0x194
+#define	I2S_EVENTS_TXPTRUPD	0x114	/* The TDX.PTR register has been copied to internal double-buffers. When the I2S module is started and TX is enabled, this event will be generated for every RXTXD.MAXCNT words that are sent on the SDOUT pin. */
+#define	I2S_PUBLISH_RXPTRUPD	0x184	/* Publish configuration for event RXPTRUPD */
+#define	I2S_PUBLISH_STOPPED	0x188	/* Publish configuration for event STOPPED */
+#define	I2S_PUBLISH_TXPTRUPD	0x194	/* Publish configuration for event TXPTRUPD */
 #define	I2S_INTEN		0x300	/* Enable or disable interrupt */
 #define	I2S_INTENSET		0x304	/* Enable interrupt */
 #define	I2S_INTENCLR		0x308	/* Disable interrupt */
@@ -75,8 +48,7 @@
 #define	I2S_CONFIG_MCKFREQ	0x514	/* Master clock generator frequency. */
 #define	I2S_CONFIG_RATIO	0x518	/* MCK / LRCK ratio. */
 #define	I2S_CONFIG_SWIDTH	0x51C	/* Sample width. */
-/* Alignment of sample within a frame. */
-#define	I2S_CONFIG_ALIGN	0x520
+#define	I2S_CONFIG_ALIGN	0x520	/* Alignment of sample within a frame. */
 #define	I2S_CONFIG_FORMAT	0x524	/* Frame format. */
 #define	I2S_CONFIG_CHANNELS	0x528	/* Enable channels. */
 #define	I2S_RXD_PTR		0x538	/* Receive buffer RAM start address. */

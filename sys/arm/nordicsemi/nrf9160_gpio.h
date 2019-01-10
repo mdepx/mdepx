@@ -34,24 +34,10 @@
 #define	GPIO_DIR		0x014	/* Direction of GPIO pins */
 #define	GPIO_DIRSET		0x018	/* DIR set register */
 #define	GPIO_DIRCLR		0x01C	/* DIR clear register */
-/*
- * Latch register indicating what GPIO pins that have met
- * the criteria set in the PIN_CNF[n].SENSE registers
- */
-#define	GPIO_LATCH		0x020
-/*
- * Select between default DETECT signal behaviour
- * and LDETECT mode (For non-secure pin only)
- */
-#define	GPIO_DETECTMODE		0x024
-/*
- * Select between default DETECT signal behaviour
- * and LDETECT mode (For secure pin only)
- */
-#define	GPIO_DETECTMODE_SEC	0x028
-
-/* Configuration of GPIO pins */
-#define	GPIO_PIN_CNF(n)		(0x200 + (n) * 0x4)
+#define	GPIO_LATCH		0x020	/* Latch register indicating what GPIO pins that have met the criteria set in the PIN_CNF[n].SENSE registers */
+#define	GPIO_DETECTMODE		0x024	/* Select between default DETECT signal behaviour and LDETECT mode (For non-secure pin only) */
+#define	GPIO_DETECTMODE_SEC	0x028	/* Select between default DETECT signal behaviour and LDETECT mode (For secure pin only) */
+#define	GPIO_PIN_CNF(n)		(0x200 + (n) * 0x4)	/* Configuration of GPIO pins */
 
 struct gpio_softc {
 	size_t base;
