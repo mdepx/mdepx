@@ -28,9 +28,12 @@
 
 #include "max32625_uart.h"
 
-#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
-#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
-#define	WR4_FIFO(_sc, _val)	*(volatile uint32_t *)((_sc)->tx) = _val
+#define	RD4(_sc, _reg)		\
+	*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	\
+	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+#define	WR4_FIFO(_sc, _val)	\
+	*(volatile uint32_t *)((_sc)->tx) = _val
 
 void
 max32625_uart_intr(void *arg, uint32_t irqno)

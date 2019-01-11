@@ -27,8 +27,10 @@
 #include <sys/cdefs.h>
 #include <arm/stm/stm32f4_fmc.h>
 
-#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
-#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+#define	RD4(_sc, _reg)		\
+	*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	\
+	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 static void
 fmc_sdram_cmd(struct stm32f4_fmc_softc *sc, uint32_t bank, uint32_t cmd)

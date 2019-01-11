@@ -38,10 +38,14 @@
 #define	dprintf(fmt, ...)
 #endif
 
-#define	RD2(_sc, _reg)		*(volatile uint16_t *)((_sc)->base + _reg)
-#define	WR2(_sc, _reg, _val)	*(volatile uint16_t *)((_sc)->base + _reg) = _val
-#define	RD1(_sc, _reg)		*(volatile uint8_t *)((_sc)->base + _reg)
-#define	WR1(_sc, _reg, _val)	*(volatile uint8_t *)((_sc)->base + _reg) = _val
+#define	RD2(_sc, _reg)		\
+	*(volatile uint16_t *)((_sc)->base + _reg)
+#define	WR2(_sc, _reg, _val)	\
+	*(volatile uint16_t *)((_sc)->base + _reg) = _val
+#define	RD1(_sc, _reg)		\
+	*(volatile uint8_t *)((_sc)->base + _reg)
+#define	WR1(_sc, _reg, _val)	\
+	*(volatile uint8_t *)((_sc)->base + _reg) = _val
 
 void
 stm32f4_spi_intr(void *arg)
