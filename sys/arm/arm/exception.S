@@ -38,9 +38,9 @@ exception:
 	mrs	r3, primask
 	stmdb	sp!, {r2-r11, r14}	/* save r4-r11, r14, sp and primask */
 	cpsid	i			/* disable interrupts */
-	mov	r1, sp
+	mov	r1, sp			/* r1 = registers saved on stack */
 	mov	r4, sp
-	bl	arm_exception		/* r0 = irq number, r1 = registers saved on stack */
+	bl	arm_exception
 	mov	r1, r4
 	ldmia	r1!, {r2-r11, r14}
 	msr 	msp, r1
