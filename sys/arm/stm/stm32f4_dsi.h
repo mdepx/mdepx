@@ -202,7 +202,9 @@ struct stm32f4_dsi_softc {
 	uint32_t base;
 };
 
-int stm32f4_dsi_init(struct stm32f4_dsi_softc *sc, dsi_device_t *dsi_dev, uint32_t base);
-void stm32f4_dsi_setup(struct stm32f4_dsi_softc *sc, const struct layer_info *);
+int stm32f4_dsi_init(struct stm32f4_dsi_softc *sc,
+    dsi_device_t *dsi_dev, uint32_t base);
+void stm32f4_dsi_setup(struct stm32f4_dsi_softc *sc,
+    const struct layer_info *);
 
 #endif /* !_ARM_STM_STM32F4_DSI_H_ */
