@@ -32,8 +32,10 @@
 
 #include <mips/microchip/pic32_port.h>
 
-#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
-#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+#define	RD4(_sc, _reg)		\
+	*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	\
+	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
 pic32_port_install_intr_map(struct pic32_port_softc *sc,

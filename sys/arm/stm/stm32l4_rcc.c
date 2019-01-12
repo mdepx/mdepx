@@ -28,8 +28,10 @@
 #include <sys/systm.h>
 #include <arm/stm/stm32l4_rcc.h>
 
-#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
-#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+#define	RD4(_sc, _reg)		\
+	*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	\
+	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 /* MSI (multispeed internal) RC oscillator clock configuration */
 void

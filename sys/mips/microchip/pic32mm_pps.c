@@ -27,8 +27,10 @@
 #include <sys/types.h>
 #include <mips/microchip/pic32mm_pps.h>
 
-#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
-#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+#define	RD4(_sc, _reg)		\
+	*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	\
+	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 static void
 pic32_pps_unlock(struct pic32_pps_softc *sc)

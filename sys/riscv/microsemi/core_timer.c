@@ -28,8 +28,10 @@
 
 #include <riscv/microsemi/core_timer.h>
 
-#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
-#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+#define	RD4(_sc, _reg)		\
+	*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	\
+	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
 core_timer_udelay(struct core_timer_softc *sc,

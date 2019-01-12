@@ -31,8 +31,10 @@
 #include <riscv/include/machdep.h>
 #include <riscv/sifive/e300g_clint.h>
 
-#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
-#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+#define	RD4(_sc, _reg)		\
+	*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	\
+	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 static int
 clint_mtime(struct clint_softc *sc)

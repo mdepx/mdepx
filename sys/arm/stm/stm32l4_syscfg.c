@@ -29,8 +29,10 @@
 #include "stm32l4_syscfg.h"
 #include "stm32f4_gpio.h"
 
-#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
-#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+#define	RD4(_sc, _reg)		\
+	*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	\
+	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
 stm32l4_syscfg_init(struct stm32l4_syscfg_softc *sc, uint32_t base)

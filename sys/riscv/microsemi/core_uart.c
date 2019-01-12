@@ -28,8 +28,10 @@
 
 #include <riscv/microsemi/core_uart.h>
 
-#define	RD1(_sc, _reg)		*(volatile uint8_t *)((_sc)->base + _reg)
-#define	WR1(_sc, _reg, _val)	*(volatile uint8_t *)((_sc)->base + _reg) = _val
+#define	RD1(_sc, _reg)		\
+	*(volatile uint8_t *)((_sc)->base + _reg)
+#define	WR1(_sc, _reg, _val)	\
+	*(volatile uint8_t *)((_sc)->base + _reg) = _val
 
 void
 core_uart_putc(struct core_uart_softc *sc, char c)
