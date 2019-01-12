@@ -51,6 +51,7 @@ void pic32_intc_init(struct pic32_intc_softc *sc, uint32_t base);
 void pic32_intc_enable(struct pic32_intc_softc *sc, int irq, uint8_t prio);
 void pic32_intc_clear_pending(struct pic32_intc_softc *sc, int irq);
 void pic32_intc_intr(void *arg, struct trapframe *frame, int irq);
-void pic32_intc_install_intr_map(struct pic32_intc_softc *sc, const struct intc_intr_entry *map);
+void pic32_intc_install_intr_map(struct pic32_intc_softc *sc,
+    const struct intc_intr_entry *map);
 
 #endif /* !_MIPS_MICROCHIP_PIC32_INTC_H_ */

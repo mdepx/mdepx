@@ -46,7 +46,8 @@ struct pic32_uart_softc {
 	uint32_t base;
 };
 
-void pic32_uart_init(struct pic32_uart_softc *sc, uint32_t base, uint32_t speed, uint32_t cpu_freq, uint32_t div);
+void pic32_uart_init(struct pic32_uart_softc *sc, uint32_t base,
+    uint32_t speed, uint32_t cpu_freq, uint32_t div);
 void pic32_putc(struct pic32_uart_softc *sc, char c);
 uint8_t pic32_getc(struct pic32_uart_softc *sc);
 
