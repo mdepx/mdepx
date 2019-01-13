@@ -27,6 +27,27 @@
 #ifndef _ARM_NORDICSEMI_NRF9160_H_
 #define _ARM_NORDICSEMI_NRF9160_H_
 
+#include <arm/nordicsemi/nrf9160_cryptocell.h>
+#include <arm/nordicsemi/nrf9160_dppi.h>
+#include <arm/nordicsemi/nrf9160_egu.h>
+#include <arm/nordicsemi/nrf9160_gpio.h>
+#include <arm/nordicsemi/nrf9160_gpiote.h>
+#include <arm/nordicsemi/nrf9160_i2s.h>
+#include <arm/nordicsemi/nrf9160_ipc.h>
+#include <arm/nordicsemi/nrf9160_kmu.h>
+#include <arm/nordicsemi/nrf9160_pdm.h>
+#include <arm/nordicsemi/nrf9160_pwm.h>
+#include <arm/nordicsemi/nrf9160_rtc.h>
+#include <arm/nordicsemi/nrf9160_saadc.h>
+#include <arm/nordicsemi/nrf9160_spim.h>
+#include <arm/nordicsemi/nrf9160_spis.h>
+#include <arm/nordicsemi/nrf9160_spu.h>
+#include <arm/nordicsemi/nrf9160_timer.h>
+#include <arm/nordicsemi/nrf9160_twim.h>
+#include <arm/nordicsemi/nrf9160_twis.h>
+#include <arm/nordicsemi/nrf9160_uarte.h>
+#include <arm/nordicsemi/nrf9160_wdt.h>
+
 #define	SPU_BASE		0x50003000	/* System Protection Unit */
 #define	REGULATORS_BASE		0x40004000	/* Regulator configuration */
 #define	CLOCK_BASE		0x40005000	/* Clock control */
