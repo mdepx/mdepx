@@ -40,8 +40,10 @@
 #define	dprintf(fmt, ...)
 #endif
 
-#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
-#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+#define	RD4(_sc, _reg)		\
+	*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	\
+	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
 pic32_intc_intr(void *arg, struct trapframe *frame, int irq)
@@ -50,6 +52,7 @@ pic32_intc_intr(void *arg, struct trapframe *frame, int irq)
 	uint32_t ifs;
 	uint32_t ipend;
 	int i, b;
+	void *arg;
 
 	sc = (struct pic32_intc_softc *)arg;
 
@@ -61,7 +64,8 @@ pic32_intc_intr(void *arg, struct trapframe *frame, int irq)
 			if (ifs & (1 << b)) {
 				ipend = (i * 32 + b);
 				if (sc->map[ipend].handler != NULL) {
-					sc->map[ipend].handler(sc->map[ipend].arg,
+					arg = sc->map[ipend].arg;
+					sc->map[ipend].handler(arg,
 					    frame, irq, ipend);
 					dprintf("intr %d\n", ipend);
 					pic32_intc_clear_pending(sc, ipend);

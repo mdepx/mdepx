@@ -50,10 +50,14 @@
 #define	RD2(_sc, _reg)		*(volatile uint16_t *)((_sc)->base + _reg)
 #define	RD1(_sc, _reg)		*(volatile uint8_t *)((_sc)->base + _reg)
 
-#define	WR8(_sc, _reg, _val)	*(volatile uint64_t *)((_sc)->base + _reg) = _val
-#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
-#define	WR2(_sc, _reg, _val)	*(volatile uint16_t *)((_sc)->base + _reg) = _val
-#define	WR1(_sc, _reg, _val)	*(volatile uint8_t *)((_sc)->base + _reg) = _val
+#define	WR8(_sc, _reg, _val)	\
+	*(volatile uint64_t *)((_sc)->base + _reg) = _val
+#define	WR4(_sc, _reg, _val)	\
+	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+#define	WR2(_sc, _reg, _val)	\
+	*(volatile uint16_t *)((_sc)->base + _reg) = _val
+#define	WR1(_sc, _reg, _val)	\
+	*(volatile uint8_t *)((_sc)->base + _reg) = _val
 
 int
 epw_request(struct epw_softc *sc, struct epw_request *req)
@@ -90,21 +94,26 @@ epw_request(struct epw_softc *sc, struct epw_request *req)
 		req->data_len = 0;
 		for (i = 0; i < sizeof(uint64_t); i++) {
 			if (req->byte_enable & (1 << (7 - i)))
-				req->data[req->data_len++] = RD1(sc, EPW_WRITE_DATA + (7 - i));
+				req->data[req->data_len++] =
+				    RD1(sc, EPW_WRITE_DATA + (7 - i));
 		}
 
 		switch (req->data_len) {
 		case 8:
-			dprintf("%s: val %lx\n", __func__, *(uint64_t *)req->data);
+			dprintf("%s: val %lx\n", __func__,
+			    *(uint64_t *)req->data);
 			break;
 		case 4:
-			dprintf("%s: val %x\n", __func__, *(uint32_t *)req->data);
+			dprintf("%s: val %x\n", __func__,
+			    *(uint32_t *)req->data);
 			break;
 		case 2:
-			dprintf("%s: val %x\n", __func__, *(uint16_t *)req->data);
+			dprintf("%s: val %x\n", __func__,
+			    *(uint16_t *)req->data);
 			break;
 		case 1:
-			dprintf("%s: val %x\n", __func__, *(uint8_t *)req->data);
+			dprintf("%s: val %x\n", __func__,
+			    *(uint8_t *)req->data);
 			break;
 		default:
 			break;

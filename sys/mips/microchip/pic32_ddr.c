@@ -37,8 +37,10 @@
 #define	dprintf(fmt, ...)
 #endif
 
-#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
-#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+#define	RD4(_sc, _reg)		\
+	*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	\
+	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 #define	DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
 #define	MAX(a, b)		((a) > (b) ? (a) : (b))

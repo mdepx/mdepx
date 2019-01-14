@@ -41,7 +41,7 @@
 #define	GPIOTE_INTENCLR		0x308			/* Disable interrupt */
 #define	GPIOTE_CONFIG(n)	(0x510 + (n) * 0x4)	/* Configuration for OUT[n], SET[n] and CLR[n] tasks and IN[n] event */
 
-struct GPIOTE_softc {
+struct gpiote_softc {
 	size_t base;
 };
 

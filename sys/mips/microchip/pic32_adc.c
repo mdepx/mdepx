@@ -29,12 +29,18 @@
 
 #include <mips/microchip/pic32_adc.h>
 
-#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
-#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
-#define	RD2(_sc, _reg)		*(volatile uint16_t *)((_sc)->base + _reg)
-#define	WR2(_sc, _reg, _val)	*(volatile uint16_t *)((_sc)->base + _reg) = _val
-#define	RD1(_sc, _reg)		*(volatile uint8_t *)((_sc)->base + _reg)
-#define	WR1(_sc, _reg, _val)	*(volatile uint8_t *)((_sc)->base + _reg) = _val
+#define	RD4(_sc, _reg)		\
+	*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	\
+	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+#define	RD2(_sc, _reg)		\
+	*(volatile uint16_t *)((_sc)->base + _reg)
+#define	WR2(_sc, _reg, _val)	\
+	*(volatile uint16_t *)((_sc)->base + _reg) = _val
+#define	RD1(_sc, _reg)		\
+	*(volatile uint8_t *)((_sc)->base + _reg)
+#define	WR1(_sc, _reg, _val)	\
+	*(volatile uint8_t *)((_sc)->base + _reg) = _val
 
 uint32_t
 pic32_adc_convert(struct pic32_adc_softc *sc, int channel)

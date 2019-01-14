@@ -28,8 +28,10 @@
 #include <dev/display/panel.h>
 #include <arm/stm/stm32f4_ltdc.h>
 
-#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
-#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+#define	RD4(_sc, _reg)		\
+	*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	\
+	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 static void
 stm32f4_ltdc_layer(struct stm32f4_ltdc_softc *sc,
@@ -72,6 +74,7 @@ stm32f4_ltdc_conf(struct stm32f4_ltdc_softc *sc,
     const struct layer_info *info, int i)
 {
 	uint32_t reg;
+	uint32_t val;
 
 	reg = ((info->hsync - 1) << SSCR_HSW_S);
 	reg |= ((info->vsync - 1) << SSCR_VSW_S);
@@ -85,8 +88,10 @@ stm32f4_ltdc_conf(struct stm32f4_ltdc_softc *sc,
 	reg |= ((info->hsync + info->hbp + info->width - 1) << AWCR_AAW_S);
 	WR4(sc, LTDC_AWCR, reg);
 
-	reg = ((info->vsync + info->vbp + info->height + info->vfp - 1) << TWCR_TOTALH_S);
-	reg |= ((info->hsync + info->hbp + info->width + info->hfp - 1) << TWCR_TOTALW_S);
+	val = info->vsync + info->vbp + info->height + info->vfp - 1;
+	reg = val << TWCR_TOTALH_S;
+	val = info->hsync + info->hbp + info->width + info->hfp - 1;
+	reg |= val << TWCR_TOTALW_S;
 	WR4(sc, LTDC_TWCR, reg);
 
 	/* Background color */

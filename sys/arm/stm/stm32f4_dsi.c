@@ -30,8 +30,10 @@
 
 #include <arm/stm/stm32f4_dsi.h>
 
-#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
-#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+#define	RD4(_sc, _reg)		\
+	*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	\
+	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 static void
 stm32f4_dsi_short(dsi_device_t *dev, uint8_t vchid,
@@ -274,7 +276,8 @@ stm32f4_dsi_setup(struct stm32f4_dsi_softc *sc,
 }
 
 int
-stm32f4_dsi_init(struct stm32f4_dsi_softc *sc, dsi_device_t *dsi_dev, uint32_t base)
+stm32f4_dsi_init(struct stm32f4_dsi_softc *sc,
+    dsi_device_t *dsi_dev, uint32_t base)
 {
 
 	sc->base = base;

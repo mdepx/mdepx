@@ -37,8 +37,10 @@
 
 #include "stm32f7_eth.h"
 
-#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
-#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+#define	RD4(_sc, _reg)		\
+	*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	\
+	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 #define	RX_DESC_SIZE	(sizeof(struct dwc_hwdesc) * RX_DESC_COUNT)
 #define	TX_DESC_SIZE	(sizeof(struct dwc_hwdesc) * TX_DESC_COUNT)
@@ -413,7 +415,8 @@ stm32f7_eth_transmit(struct ifnet *ifp, struct mbuf *m0)
 		idx = sc->tx_idx_head;
 		sc->txbuf[idx] = m;
 		flags = DDESC_TDES0_TXCHAIN | DDESC_TDES0_TXFIRST
-		    | DDESC_TDES0_TXLAST | DDESC_TDES0_TXINT | DDESC_TDES0_TXCRCDIS;
+		    | DDESC_TDES0_TXLAST | DDESC_TDES0_TXINT
+		    | DDESC_TDES0_TXCRCDIS;
 		flags = DDESC_TDES0_TXCHAIN;
 		if (enqueued == 0)
 			flags |= DDESC_TDES0_TXFIRST;

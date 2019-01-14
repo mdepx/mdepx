@@ -62,7 +62,7 @@ max31855_read(spi_device_t *dev)
 	if (val & (1 << 16))
 		printf("Fault\n");
 
-	dprintf("val1 %x, val %x. Temperature Data %d, Internal Temperature Data %d\n",
+	dprintf("val1 %x, val %x. Temperature Data: %d, internal %d\n",
 	    val1, val, (val >> 18) >> 2, ((val >> 4) & 0xfff) >> 4);
 
 	return (val);

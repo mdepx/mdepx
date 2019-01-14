@@ -72,7 +72,8 @@ struct spi_softc {
 	uint8_t cs;
 };
 
-int e300g_spi_init(struct spi_softc *sc, spi_device_t *dev, uint32_t base, uint8_t cs);
+int e300g_spi_init(struct spi_softc *sc, spi_device_t *dev,
+    uint32_t base, uint8_t cs);
 void e300g_spi_poll_txwm(struct spi_device *dev);
 
 #endif /* !_SYS_RISCV_SIFIVE_E300G_SPI_H_ */
