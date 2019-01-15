@@ -31,9 +31,13 @@
 #define	 ICSR_PENDSWSET	(1 << 28) /* Set pending pendSV bit */
 #define	NVIC_VTOR	0xD08	/* Vector Table Offset Register */
 #define	NVIC_CCR	0xD14	/* Configuration Control Register */
-#define	NVIC_ISER(n)	(0x100 + 0x4 * n)
-#define	NVIC_ICER(n)	(0x180 + 0x4 * n)
-#define	NVIC_ICPR(n)	(0x280 + 0x4 * n)
+#define	NVIC_ISER(n)	(0x100 + 0x4 * n) /* Interrupt Set-enable Regs */
+#define	NVIC_ICER(n)	(0x180 + 0x4 * n) /* Interrupt Clear-enable Regs */
+#define	NVIC_ISPR(n)	(0x200 + 0x4 * n) /* Interrupt Set-pending Regs */
+#define	NVIC_ICPR(n)	(0x280 + 0x4 * n) /* Interrupt Clear-pending Regs */
+#define	NVIC_IABR(n)	(0x300 + 0x4 * n) /* Interrupt Active Bit Regs */
+#define	NVIC_IPR(n)	(0x400 + 0x4 * n) /* Interrupt Priority Regs */
+#define	NVIC_STIR	0xF00	/* Software Trigger Interrupt Register */
 
 struct nvic_intr_entry {
 	void (*handler) (void *arg, struct trapframe *frame, int irq);
