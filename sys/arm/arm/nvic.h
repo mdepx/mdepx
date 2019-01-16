@@ -27,10 +27,29 @@
 #ifndef _ARM_ARM_NVIC_H_
 #define _ARM_ARM_NVIC_H_
 
-#define	NVIC_ICSR	0xD04	/* Interrupt Control State Register */
+/* System Control Block */
+#define	SCB_ACTLR	0x008	/* Auxiliary Control Register */
+#define	SCB_CPUID	0xD00	/* CPUID Base Register */
+#define	SCB_ICSR	0xD04	/* Interrupt Control State Register */
 #define	 ICSR_PENDSWSET	(1 << 28) /* Set pending pendSV bit */
-#define	NVIC_VTOR	0xD08	/* Vector Table Offset Register */
-#define	NVIC_CCR	0xD14	/* Configuration Control Register */
+#define	SCB_VTOR	0xD08	/* Vector Table Offset Register */
+#define	SCB_AIRCR	0xD0C	/* Application Interrupt and Reset Control */
+#define	SCB_SCR		0xD10	/* System Control Register */
+#define	SCB_CCR		0xD14	/* Configuration Control Register */
+#define	SCB_SHPR1	0xD18	/* System Handler Priority Register 1 */
+#define	SCB_SHPR2	0xD1C	/* System Handler Priority Register 2 */
+#define	SCB_SHPR3	0xD20	/* System Handler Priority Register 3 */
+#define	SCB_SHCRS	0xD24	/* System Handler Control and State Register */
+#define	SCB_CFSR	0xD28	/* Configurable Fault Status Register */
+#define	SCB_MMSR	0xD28	/* MemManage Fault Status Register */
+#define	SCB_BFSR	0xD29	/* BusFault Status Register */
+#define	SCB_UFSR	0xD2A	/* UsageFault Status Register */
+#define	SCB_HFSR	0xD2C	/* HardFault Status Register */
+#define	SCB_MMAR	0xD34	/* MemManage Fault Address Register */
+#define	SCB_BFAR	0xD38	/* BusFault Address Register */
+#define	SCB_AFSR	0xD3C	/* Auxiliary Fault Status Register */
+
+/* Nested Vectored Interrupt Controller */
 #define	NVIC_ISER(n)	(0x100 + 0x4 * n) /* Interrupt Set-enable Regs */
 #define	NVIC_ICER(n)	(0x180 + 0x4 * n) /* Interrupt Clear-enable Regs */
 #define	NVIC_ISPR(n)	(0x200 + 0x4 * n) /* Interrupt Set-pending Regs */
