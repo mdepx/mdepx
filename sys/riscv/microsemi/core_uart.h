@@ -42,8 +42,8 @@ struct core_uart_softc {
 	uint32_t base;
 };
 
-int core_uart_init(struct core_uart_softc *sc, uint32_t base, uint32_t cpu_freq,
-    uint32_t baud_rate, uint32_t ctrl2);
+int core_uart_init(struct core_uart_softc *sc, uint32_t base,
+    uint32_t cpu_freq, uint32_t baud_rate, uint32_t ctrl2);
 void core_uart_putc(struct core_uart_softc *sc, char c);
 
 #endif /* !_SYS_RISCV_MICROSEMI_CORE_UART_H_ */

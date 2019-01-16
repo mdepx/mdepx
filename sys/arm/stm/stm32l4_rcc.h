@@ -148,7 +148,8 @@ struct stm32l4_rcc_softc {
 
 int stm32l4_rcc_init(struct stm32l4_rcc_softc *sc, uint32_t base);
 void stm32l4_rcc_pll_configure(struct stm32l4_rcc_softc *sc,
-    int pllm, int plln, int pllq, int pllp, uint8_t external, uint32_t rcc_cfgr);
+    int pllm, int plln, int pllq, int pllp, uint8_t external,
+    uint32_t rcc_cfgr);
 void stm32l4_rcc_setup(struct stm32l4_rcc_softc *sc, struct rcc_config *cfg);
 void stm32l4_rcc_msi_configure(struct stm32l4_rcc_softc *sc, uint32_t freq);
 int stm32l4_rcc_lsi_enable(struct stm32l4_rcc_softc *sc);

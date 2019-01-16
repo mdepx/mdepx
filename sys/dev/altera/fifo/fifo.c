@@ -343,7 +343,7 @@ fifo_process_rx(struct altera_fifo_softc *sc,
 	if (error != 0)
 		return (error);
 
-	dprintf("%s: packet received, %d bytes (sop_rcvd %d eop_rcvd %d fill_level %d)\n",
+	dprintf("%s: pkt rcvd, %d bytes (sop %d eop %d fill_level %d)\n",
 	    __func__, transferred, sop_rcvd, eop_rcvd, fill_level);
 
 	return (transferred);

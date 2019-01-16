@@ -55,7 +55,8 @@ struct core_timer_softc {
 	uint32_t load_val;
 };
 
-void core_timer_udelay(struct core_timer_softc *sc, uint32_t usec, uint32_t osc_freq);
+void core_timer_udelay(struct core_timer_softc *sc, uint32_t usec,
+    uint32_t osc_freq);
 uint32_t core_timer_value(struct core_timer_softc *sc);
 int core_timer_init(struct core_timer_softc *sc, uint32_t base,
     uint32_t load_val, uint8_t prescaler);
