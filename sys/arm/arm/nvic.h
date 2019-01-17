@@ -52,6 +52,32 @@
 #define	MPU_RBAR_A3	0xDB4	/* Alias of RBAR */
 #define	MPU_RASR_A3	0xDB8	/* Alias of RASR */
 
+/* Floating Point Unit */
+#define FPU_CPACR	0xD88	/* Coprocessor Access Control Register */
+#define FPU_FPCCR	0xF34	/* Floating-point Context Control Register */
+#define FPU_FPCAR	0xF38	/* Floating-point Context Address Register */
+#define FPU_FPDSCR	0xF3C	/* Floating-point Default Status Control Register */
+
+/* Cache maintenance operations */
+#define	CM_ICIALLU	0xF50	/* Instruction cache invalidate all to the Point of Unification (PoU) */
+#define	CM_ICIMVAU	0xF58	/* Instruction cache invalidate by address to the PoU */
+#define	CM_DCIMVAC	0xF5C	/* Data cache invalidate by address to the Point of Coherency (PoC) */
+#define	CM_DCISW	0xF60	/* Data cache invalidate by set/way */
+#define	CM_DCCMVAU	0xF64	/* Data cache clean by address to the PoU */
+#define	CM_DCCMVAC	0xF68	/* Data cache clean by address to the PoC */
+#define	CM_DCCSW	0xF6C	/* Data cache clean by set/way */
+#define	CM_DCCIMVAC	0xF70	/* Data cache clean and invalidate by address to the PoC */
+#define	CM_DCCISW	0xF74	/* Data cache clean and invalidate by set/way */
+#define	CM_BPIALL	0xF78	/* The BPIALL register is not implemented */
+
+/* Access control */
+#define	AC_ITCMCR	0xF90	/* Instruction and Data Tightly-Coupled Memory Control Registers */
+#define	AC_DTCMCR	0xF94	/* Instruction and Data Tightly-Coupled Memory Control Registers */
+#define	AC_AHBPCR	0xF98	/* AHBP Control Register */
+#define	AC_CACR		0xF9C	/* L1 Cache Control Register */
+#define	AC_AHBSCR	0xFA0	/* AHB Slave Control Register */
+#define	AC_ABFSR	0xFA8	/* Auxiliary Bus Fault Status register */
+
 /* System Control Block */
 #define	SCB_ACTLR	0x008	/* Auxiliary Control Register */
 #define	SCB_CPUID	0xD00	/* CPUID Base Register */
