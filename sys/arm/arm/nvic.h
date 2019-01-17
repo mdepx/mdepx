@@ -27,6 +27,31 @@
 #ifndef _ARM_ARM_NVIC_H_
 #define _ARM_ARM_NVIC_H_
 
+/* System Timer */
+#define	SYST_CSR	0x010	/* SysTick Control and Status Register */
+#define	SYST_RVR	0x014	/* SysTick Reload Value Register */
+#define	SYST_CVR	0x018	/* SysTick Current Value Register */
+#define	SYST_CALIB	0x01C	/* SysTick Calibration Value Register */
+
+/* Processor features */
+#define	PF_CLIDR	0xD78	/* Cache Level ID Register */
+#define	PF_CTR		0xD7C	/* Cache Type Register */
+#define	PF_CCSIDR	0xD80	/* Cache Size ID Register */
+#define	PF_CSSELR	0xD84	/* Cache Size Selection Register */
+
+/* Memory Protection Unit */
+#define	MPU_TYPE	0xD90	/* MPU Type Register */
+#define	MPU_CTRL	0xD94	/* MPU Control Register */
+#define	MPU_RNR		0xD98	/* MPU Region Number Register */
+#define	MPU_RBAR	0xD9C	/* MPU Region Base Address Register */
+#define	MPU_RASR	0xDA0	/* MPU Region Attribute and Size Register */
+#define	MPU_RBAR_A1	0xDA4	/* Alias of RBAR */
+#define	MPU_RASR_A1	0xDA8	/* Alias of RASR */
+#define	MPU_RBAR_A2	0xDAC	/* Alias of RBAR */
+#define	MPU_RASR_A2	0xDB0	/* Alias of RASR */
+#define	MPU_RBAR_A3	0xDB4	/* Alias of RBAR */
+#define	MPU_RASR_A3	0xDB8	/* Alias of RASR */
+
 /* System Control Block */
 #define	SCB_ACTLR	0x008	/* Auxiliary Control Register */
 #define	SCB_CPUID	0xD00	/* CPUID Base Register */
