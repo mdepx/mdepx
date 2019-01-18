@@ -32,9 +32,12 @@
 int printf(const char * restrict format, ...);
 int vsprintf(char * restrict str, const char * restrict format, va_list ap);
 int vprintf(const char * restrict format, va_list ap);
-int snprintf(char * restrict str, size_t size, const char * restrict format, ...);
-int vsnprintf(char * restrict str, size_t size, const char * restrict format, va_list ap);
-int kvprintf(char const *fmt, void (*func)(int, void*), void *arg, int radix, va_list ap);
+int snprintf(char * restrict str, size_t size, const char * restrict format,
+    ...);
+int vsnprintf(char * restrict str, size_t size, const char * restrict format,
+    va_list ap);
+int kvprintf(char const *fmt, void (*func)(int, void*), void *arg, int radix,
+    va_list ap);
 int sprintf(char *buf, const char *cfmt, ...);
 int puts(const char *str);
 

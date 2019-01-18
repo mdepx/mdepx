@@ -29,7 +29,8 @@
 #ifndef	_ASSERT_H_
 #define	_ASSERT_H_
 
-#define	assert(n)	((n) ? (void)0 : __assert(__func__, __FILE__, __LINE__, #n))
+#define	assert(n)	\
+    ((n) ? (void)0 : __assert(__func__, __FILE__, __LINE__, #n))
 #define	static_assert	_Static_assert
 
 void __assert(const char *, const char *, int, const char *);
