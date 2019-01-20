@@ -4,4 +4,4 @@
 
 compile: objdir ${OBJECTS}
 
-.include "osfive/mk/objdir.mk"
+.include "osfive/mk/bsd.objdir.mk"
