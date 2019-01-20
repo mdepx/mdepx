@@ -45,7 +45,7 @@ LIBC_OBJECTS =			\
 LIBC_QUAD =			\
 		osfive/lib/libc/quad/qdivrem.o			\
 		osfive/lib/libc/quad/udivdi3.o			\
-		osfive/lib/libc/quad/umoddi3.o			\
+		osfive/lib/libc/quad/umoddi3.o
 
 .for obj in ${LIBC_OBJECTS}
 CFLAGS_$(obj) =
