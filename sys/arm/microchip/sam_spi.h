@@ -24,8 +24,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ARM_MICROCHIP_SAMD51_SPI_H_
-#define _ARM_MICROCHIP_SAMD51_SPI_H_
+#ifndef _ARM_MICROCHIP_SAM_SPI_H_
+#define _ARM_MICROCHIP_SAM_SPI_H_
 
 #define	SPI_CTRLA	0x00 /* Control A */
 #define	SPI_CTRLB	0x04 /* Control B */
@@ -41,8 +41,8 @@
 #define	SPI_DATA	0x28 /* Data */
 #define	SPI_DBGCTRL	0x30 /* Debug Control */
 
-struct samd51_spi_softc {
+struct sam_spi_softc {
 	uint32_t base;
 };
 
-#endif /* !_ARM_MICROCHIP_SAMD51_SPI_H_ */
+#endif /* !_ARM_MICROCHIP_SAM_SPI_H_ */

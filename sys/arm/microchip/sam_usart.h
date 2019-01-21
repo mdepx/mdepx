@@ -24,8 +24,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ARM_MICROCHIP_SAMD51_USART_H_
-#define _ARM_MICROCHIP_SAMD51_USART_H_
+#ifndef _ARM_MICROCHIP_SAM_USART_H_
+#define _ARM_MICROCHIP_SAM_USART_H_
 
 #define	USART_CTRLA	0x00 /* Control A */
 #define	USART_CTRLB	0x04 /* Control B */
@@ -42,8 +42,8 @@
 #define	USART_DATA	0x28 /* Data */
 #define	USART_DBGCTRL	0x30 /* Debug Control */
 
-struct samd51_usart_softc {
+struct sam_usart_softc {
 	uint32_t base;
 };
 
-#endif /* !_ARM_MICROCHIP_SAMD51_USART_H_ */
+#endif /* !_ARM_MICROCHIP_SAM_USART_H_ */
