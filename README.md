@@ -1,4 +1,4 @@
-# osfive
+# Introduction
 
 Osfive is an RTOS/SDK for microcontrollers.
 
@@ -28,4 +28,10 @@ Osfive is an RTOS/SDK for microcontrollers.
   * Microsemi
   * SiFive E300G
 
+# Getting started
+
 Osfive has no build system. You have to construct your own GNU or BSD makefile listing all the files you want to include to the build. See [example applications](https://github.com/osfive/).
+
+# License
+
+This project is licensed under two-clause [BSD license](https://en.wikipedia.org/wiki/BSD_licenses#2-clause_license_(%22Simplified_BSD_License%22_or_%22FreeBSD_License%22)
