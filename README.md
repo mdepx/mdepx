@@ -22,8 +22,8 @@ Osfive is an RTOS/SDK for microcontrollers.
   * Nordic Semiconductor nRF52
   * STM32
 - MIPS
+  * Bluespec Extensible RISC Implementation (BERI)
   * Microchip PIC32
-  * BERI
 - RISC-V
   * Microsemi
   * SiFive E300G
