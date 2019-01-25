@@ -2,7 +2,7 @@ OBJECTS := $(addprefix $(OBJDIR)/,${OBJECTS})
 
 ${OBJDIR}/%.o: %.c Makefile
 	@mkdir -p $(dir $@)
-	${CC} ${CFLAGS} ${CFLAGS_$@} -c -o $@ $<
+	${CC} ${CFLAGS} -c -o $@ $<
 
 ${OBJDIR}/%.o: %.S Makefile
 	@mkdir -p $(dir $@)

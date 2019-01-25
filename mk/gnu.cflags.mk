@@ -1,4 +1,4 @@
-CFLAGS += ${INCS} ${CFLAGS_$(.TARGET)} -D__OSFIVE__
+CFLAGS += ${INCS} ${CFLAGS_$@} -D__OSFIVE__
 
 INCS += -I${CURDIR}
 INCS += -I${CURDIR}/osfive/include
