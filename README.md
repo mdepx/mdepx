@@ -27,3 +27,5 @@ Osfive is an RTOS/SDK for microcontrollers.
 - RISC-V
   * Microsemi
   * SiFive E300G
+
+Osfive has no build system. You have to construct your own GNU or BSD makefile listing all the files you want to include to the build. See [example applications](https://github.com/osfive/).
