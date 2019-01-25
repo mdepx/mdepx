@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,25 +24,48 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ARM_MICROCHIP_SAMD51_SPI_H_
-#define _ARM_MICROCHIP_SAMD51_SPI_H_
+#ifndef _ARM_MICROCHIP_SAM_L1X_H_
+#define _ARM_MICROCHIP_SAM_L1X_H_
 
-#define	SPI_CTRLA	0x00 /* Control A */
-#define	SPI_CTRLB	0x04 /* Control B */
-#define	SPI_CTRLC	0x08 /* Control C */
-#define	SPI_BAUD	0x0C /* Baud */
-#define	SPI_INTENCLR	0x14 /* Interrupt Enable Clear */
-#define	SPI_INTENSET	0x16 /* Interrupt Enable Set */
-#define	SPI_INTFLAG	0x18 /* Interrupt Flag Status and Clear */
-#define	SPI_STATUS	0x1A /* Status */
-#define	SPI_SYNCBUSY	0x1C /* Synchronization Busy */
-#define	SPI_LENGTH	0x22 /* Length */
-#define	SPI_ADDR	0x24 /* Address */
-#define	SPI_DATA	0x28 /* Data */
-#define	SPI_DBGCTRL	0x30 /* Debug Control */
+#include <arm/microchip/sam_usart.h>
+#include <arm/microchip/sam_spi.h>
 
-struct samd51_spi_softc {
-	uint32_t base;
-};
+/* AHB-APB Bridge A */
+#define	BASE_PAC	0x40000000
+#define	BASE_PM		0x40000400
+#define	BASE_MCLK	0x40000800
+#define	BASE_RSTC	0x40000C00
+#define	BASE_OSCCTRL	0x40001000
+#define	BASE_OSC32KCTRL	0x40001400
+#define	BASE_SUPC	0x40001800
+#define	BASE_GCLK	0x40001C00
+#define	BASE_WDT	0x40002000
+#define	BASE_RTC	0x40002400
+#define	BASE_EIC	0x40002800
+#define	BASE_FREQM	0x40002C00
+#define	BASE_PORT	0x40003000
+#define	BASE_AC		0x40003400
 
-#endif /* !_ARM_MICROCHIP_SAMD51_SPI_H_ */
+/* AHB-APB Bridge B */
+#define	BASE_DSU	0x41002000
+#define	BASE_NVMCTRL	0x41004000
+#define	BASE_DMAC	0x41006000
+#define	BASE_HMATRIXHS	0x41008000
+
+/* AHB-APB Bridge C */
+#define	BASE_EVSYS	0x42000000
+#define	BASE_SERCOM0	0x42000400
+#define	BASE_SERCOM1	0x42000800
+#define	BASE_SERCOM2	0x42000C00
+#define	BASE_TC0	0x42001000
+#define	BASE_TC1	0x42001400
+#define	BASE_TC2	0x42001800
+#define	BASE_ADC	0x42001C00
+#define	BASE_DAC	0x42002000
+#define	BASE_PTC	0x42002400
+#define	BASE_TRNG	0x42002800
+#define	BASE_CCL	0x42002C00
+#define	BASE_OPAMP	0x42003000
+#define	BASE_TRAM	0x42003400
+
+#endif /* !_ARM_MICROCHIP_SAM_L1X_H_ */
