@@ -31,7 +31,7 @@
 #define	USART_THR		0x000	/* Transmit Holding Register. */
 #define	USART_DLL		0x000	/* Divisor Latch LSB. */
 #define	USART_DLM		0x004	/* Divisor Latch MSB. */
-#define	USART_IER		0x004	/* Interrupt Enable Register. /*
+#define	USART_IER		0x004	/* Interrupt Enable Register. */
 #define	USART_IIR		0x008	/* Interrupt ID Register. */
 #define	USART_FCR		0x008	/* FIFO Control Register. */
 #define	USART_LCR		0x00C	/* Line Control Register. */
