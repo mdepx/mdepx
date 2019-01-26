@@ -27,27 +27,27 @@
 #ifndef _ARM_NXP_LPC43XX_USART_H_
 #define _ARM_NXP_LPC43XX_USART_H_
 
-#define	USART_RBR		0x000	/* Receiver Buffer Register. Contains the next received character to be read (DLAB = 0). */
-#define	USART_THR		0x000	/* Transmit Holding Register. The next character to be transmitted is written here (DLAB = 0). */
-#define	USART_DLL		0x000	/* Divisor Latch LSB. Least significant byte of the baud rate divisor value. The full divisor is used to generate a baud rate from the fractional rate divider (DLAB = 1). */
-#define	USART_DLM		0x004	/* Divisor Latch MSB. Most significant byte of the baud rate divisor value. The full divisor is used to generate a baud rate from the fractional rate divider (DLAB = 1). */
-#define	USART_IER		0x004	/* Interrupt Enable Register. Contains individual interrupt enable bits for the 7 potential USART interrupts (DLAB = 0). */
-#define	USART_IIR		0x008	/* Interrupt ID Register. Identifies which interrupt(s) are pending. */
-#define	USART_FCR		0x008	/* FIFO Control Register. Controls USART FIFO usage and modes. */
-#define	USART_LCR		0x00C	/* Line Control Register. Contains controls for frame formatting and break generation. */
-#define	USART_LSR		0x014	/* Line Status Register. Contains flags for transmit and receive status, including line errors. */
-#define	USART_SCR		0x01C	/* Scratch Pad Register. Eight-bit temporary storage for software. */
-#define	USART_ACR		0x020	/* Auto-baud Control Register. Contains controls for the auto-baud feature. */
-#define	USART_ICR		0x024	/* IrDA control register (USART3 only) */
-#define	USART_FDR		0x028	/* Fractional Divider Register. Generates a clock input for the baud rate divider. */
-#define	USART_OSR		0x02C	/* Oversampling Register. Controls the degree of oversampling during each bit time. */
+#define	USART_RBR		0x000	/* Receiver Buffer Register. */
+#define	USART_THR		0x000	/* Transmit Holding Register. */
+#define	USART_DLL		0x000	/* Divisor Latch LSB. */
+#define	USART_DLM		0x004	/* Divisor Latch MSB. */
+#define	USART_IER		0x004	/* Interrupt Enable Register. /*
+#define	USART_IIR		0x008	/* Interrupt ID Register. */
+#define	USART_FCR		0x008	/* FIFO Control Register. */
+#define	USART_LCR		0x00C	/* Line Control Register. */
+#define	USART_LSR		0x014	/* Line Status Register. */
+#define	USART_SCR		0x01C	/* Scratch Pad Register. */
+#define	USART_ACR		0x020	/* Auto-baud Control Register. */
+#define	USART_ICR		0x024	/* IrDA control reg (USART3 only) */
+#define	USART_FDR		0x028	/* Fractional Divider Register. */
+#define	USART_OSR		0x02C	/* Oversampling Register. */
 #define	USART_HDEN		0x040	/* Half-duplex enable Register */
-#define	USART_SCICTRL		0x048	/* Smart card interface control register */
-#define	USART_RS485CTRL		0x04C	/* RS-485/EIA-485 Control. Contains controls to configure various aspects of RS-485/EIA-485 modes. */
-#define	USART_RS485ADRMATCH	0x050	/* RS-485/EIA-485 address match. Contains the address match value for RS-485/EIA-485 mode. */
-#define	USART_RS485DLY		0x054	/* RS-485/EIA-485 direction control delay. */
-#define	USART_SYNCCTRL		0x058	/* Synchronous mode control register. */
-#define	USART_TER		0x05C	/* Transmit Enable Register. Turns off USART transmitter for use with software flow control. */
+#define	USART_SCICTRL		0x048	/* Smart card interface control */
+#define	USART_RS485CTRL		0x04C	/* RS-485/EIA-485 Control. */
+#define	USART_RS485ADRMATCH	0x050	/* RS-485/EIA-485 address match. */
+#define	USART_RS485DLY		0x054	/* RS-485/EIA-485 direction control */
+#define	USART_SYNCCTRL		0x058	/* Synchronous mode control register */
+#define	USART_TER		0x05C	/* Transmit Enable Register. */
 
 struct usart_softc {
 	size_t base;
