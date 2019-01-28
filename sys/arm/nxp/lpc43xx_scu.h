@@ -24,46 +24,26 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ARM_NXP_LPC43XX_H_
-#define _ARM_NXP_LPC43XX_H_
+#ifndef _ARM_NXP_LPC43XX_SCU_H_
+#define _ARM_NXP_LPC43XX_SCU_H_
 
-#include <arm/nxp/lpc43xx_scu.h>
-#include <arm/nxp/lpc43xx_usart.h>
+#define	SCU_SFSP(p, n)	(0x80 * (p) + 0x4 * (n))	/* Pin configuration */
+#define	SCU_SFSCLK0	0xC00	/* Pin configuration register for pin CLK0 */
+#define	SCU_SFSCLK1	0xC04	/* Pin configuration register for pin CLK1 */
+#define	SCU_SFSCLK2	0xC08	/* Pin configuration register for pin CLK2 */
+#define	SCU_SFSCLK3	0xC0C	/* Pin configuration register for pin CLK3 */
+#define	SCU_SFSUSB	0xC80	/* Pin configuration for USB1_DM and USB1_DP */
+#define	SCU_SFSI2C0	0xC84	/* Pin configuration register for I2C0-bus */
+#define	SCU_ENAIO0	0xC88	/* ADC0 function select register */
+#define	SCU_ENAIO1	0xC8C	/* ADC1 function select register */
+#define	SCU_ENAIO2	0xC90	/* Analog function select register */
+#define	SCU_EMCDELAYCLK	0xD00	/* EMC clock delay register */
+#define	SCU_SDDELAY	0xD80	/* SD/MMC sample and drive delay register */
+#define	SCU_PINTSEL0	0xE00	/* Pin int. select for pin interrupts 0 to 3.*/
+#define	SCU_PINTSEL1	0xE04	/* Pin int. select for pin interrupts 4 to 7.*/
 
-/* APB3 peripherals */
-#define	BASE_ADC1		0x400E4000
-#define	BASE_ADC0		0x400E3000
-#define	BASE_C_CAN0		0x400E2000
-#define	BASE_DAC		0x400E1000
-#define	BASE_I2C1		0x400E0000
+struct scu_softc {
+	size_t base;
+};
 
-/* APB2 peripherals */
-#define	BASE_GIMA		0x400C7000
-#define	BASE_QEI		0x400C6000
-#define	BASE_SSP1		0x400C5000
-#define	BASE_timer3		0x400C4000
-#define	BASE_timer2		0x400C3000
-#define	BASE_USART3		0x400C2000
-#define	BASE_USART2		0x400C1000
-#define	BASE_RIT		0x400C0000
-
-/* APB1 peripherals */
-#define	BASE_C_CAN1		0x400A4000
-#define	BASE_I2S1		0x400A3000
-#define	BASE_I2S0		0x400A2000
-#define	BASE_I2C0		0x400A1000
-#define	BASE_MOTOCONPWM		0x400A0000
-
-/* APB0 peripherals */
-#define	BASE_GPIO_GROUP1	0x40089000
-#define	BASE_GPIO_GROUP0	0x40088000
-#define	BASE_GPIO		0x40087000
-#define	BASE_SCU		0x40086000
-#define	BASE_timer1		0x40085000
-#define	BASE_timer0		0x40084000
-#define	BASE_SSP0		0x40083000
-#define	BASE_UART1		0x40082000
-#define	BASE_USART0		0x40081000
-#define	BASE_WWDT		0x40080000
-
-#endif /* !_ARM_NXP_LPC43XX_H_ */
+#endif /* !_ARM_NXP_LPC43XX_SCU_H_ */
