@@ -34,12 +34,25 @@
 #define	USART_IER		0x004	/* Interrupt Enable Register. */
 #define	USART_IIR		0x008	/* Interrupt ID Register. */
 #define	USART_FCR		0x008	/* FIFO Control Register. */
+#define	 FCR_FIFOEN		(1 << 0) /* FIFO Enable. */
 #define	USART_LCR		0x00C	/* Line Control Register. */
+#define	 LCR_WLS_S		0	/* Word Length Select. */
+#define	 LCR_WLS_M		(0x3 << LCR_WLS_S)
+#define	 LCR_WLS_5		(0x0 << LCR_WLS_S)
+#define	 LCR_WLS_6		(0x1 << LCR_WLS_S)
+#define	 LCR_WLS_7		(0x2 << LCR_WLS_S)
+#define	 LCR_WLS_8		(0x3 << LCR_WLS_S)
+#define	 LCR_DLAB		(1 << 7) /* Divisor Latch Access Bit. */
 #define	USART_LSR		0x014	/* Line Status Register. */
+#define	 LSR_TEMT		(1 << 6) /* Transmitter Empty. */
 #define	USART_SCR		0x01C	/* Scratch Pad Register. */
 #define	USART_ACR		0x020	/* Auto-baud Control Register. */
 #define	USART_ICR		0x024	/* IrDA control reg (USART3 only) */
 #define	USART_FDR		0x028	/* Fractional Divider Register. */
+#define	 FDR_DIVADDVAL_S	0 /* Baud rate generation pre-scaler divisor.*/
+#define	 FDR_DIVADDVAL_M	(0xf << FDR_DIVADDVAL_S)
+#define	 FDR_MULVAL_S		4 /* Baud rate pre-scaler multiplier value. */
+#define	 FDR_MULVAL_M		(0xf << FDR_MULVAL_S)
 #define	USART_OSR		0x02C	/* Oversampling Register. */
 #define	USART_HDEN		0x040	/* Half-duplex enable Register */
 #define	USART_SCICTRL		0x048	/* Smart card interface control */
