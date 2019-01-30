@@ -62,8 +62,19 @@
 #define	USART_SYNCCTRL		0x058	/* Synchronous mode control register */
 #define	USART_TER		0x05C	/* Transmit Enable Register. */
 
+struct usart_baud_entry {
+	uint8_t dlm;
+	uint8_t dll;
+	uint8_t divaddval;
+	uint8_t mulval;
+};
+
 struct usart_softc {
 	size_t base;
 };
+
+void lpc43xx_usart_putc(struct usart_softc *sc, char ch);
+void lpc43xx_usart_init(struct usart_softc *sc, uint32_t base,
+    struct usart_baud_entry *baud);
 
 #endif /* !_ARM_NXP_LPC43XX_USART_H_ */
