@@ -28,6 +28,14 @@
 #define _ARM_NXP_LPC43XX_SCU_H_
 
 #define	SCU_SFSP(p, n)	(0x80 * (p) + 0x4 * (n))	/* Pin configuration */
+#define	 SFSP_ZIF	(1 << 7) /* Input glitch filter. */
+#define	 SFSP_EZI	(1 << 6) /* Input buffer enable. */
+#define	 SFSP_EHS	(1 << 5) /* Select Slew rate. */
+#define	 SFSP_EPUN	(1 << 4) /* Disable pull-up resistor at pad. */
+#define	 SFSP_EPD	(1 << 3) /* Enable pull-down resistor at pad. */
+#define	 SFSP_MODE_S	0	/* Select pin function. */
+#define	 SFSP_MODE_M	(0x7 << SFSP_MODE_S)
+#define	 SFSP_MODE(n)	((n) << SFSP_MODE_S)
 #define	SCU_SFSCLK0	0xC00	/* Pin configuration register for pin CLK0 */
 #define	SCU_SFSCLK1	0xC04	/* Pin configuration register for pin CLK1 */
 #define	SCU_SFSCLK2	0xC08	/* Pin configuration register for pin CLK2 */
