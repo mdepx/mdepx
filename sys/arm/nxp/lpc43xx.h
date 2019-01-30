@@ -27,6 +27,7 @@
 #ifndef _ARM_NXP_LPC43XX_H_
 #define _ARM_NXP_LPC43XX_H_
 
+#include <arm/nxp/lpc43xx_cgu.h>
 #include <arm/nxp/lpc43xx_scu.h>
 #include <arm/nxp/lpc43xx_usart.h>
 
