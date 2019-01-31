@@ -50,8 +50,17 @@
 #define	SCU_PINTSEL0	0xE00	/* Pin int. select for pin interrupts 0 to 3.*/
 #define	SCU_PINTSEL1	0xE04	/* Pin int. select for pin interrupts 4 to 7.*/
 
+struct scu_pin {
+	uint8_t port;
+	uint8_t pin;
+	uint8_t config;
+};
+
 struct scu_softc {
 	size_t base;
 };
+
+void lpc43xx_scu_init(struct scu_softc *sc, uint32_t base,
+    const struct scu_pin *pins, uint8_t npins);
 
 #endif /* !_ARM_NXP_LPC43XX_SCU_H_ */
