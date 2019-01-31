@@ -51,7 +51,7 @@ lpc43xx_usart_putc(struct usart_softc *sc, char ch)
 
 void
 lpc43xx_usart_set_baudrate(struct usart_softc *sc,
-    struct usart_baud_entry *baud)
+    const struct usart_baud_entry *baud)
 {
 	uint32_t reg;
 
@@ -77,7 +77,7 @@ lpc43xx_usart_set_baudrate(struct usart_softc *sc,
 
 void
 lpc43xx_usart_init(struct usart_softc *sc, uint32_t base,
-    struct usart_baud_entry *baud)
+    const struct usart_baud_entry *baud)
 {
 
 	sc->base = base;

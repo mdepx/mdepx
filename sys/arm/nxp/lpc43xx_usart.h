@@ -75,6 +75,6 @@ struct usart_softc {
 
 void lpc43xx_usart_putc(struct usart_softc *sc, char ch);
 void lpc43xx_usart_init(struct usart_softc *sc, uint32_t base,
-    struct usart_baud_entry *baud);
+    const struct usart_baud_entry *baud);
 
 #endif /* !_ARM_NXP_LPC43XX_USART_H_ */
