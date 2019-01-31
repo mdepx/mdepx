@@ -20,6 +20,7 @@ Osfive is an RTOS/SDK for microcontrollers.
   * Maxim MAX32625
   * Maxim MAX32660
   * Nordic Semiconductor nRF52
+  * NXP LPC43xx
   * STM32
 - MIPS
   * Bluespec Extensible RISC Implementation (BERI)
