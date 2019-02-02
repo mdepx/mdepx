@@ -40,6 +40,20 @@
 #define	GPIOTE_INTENSET		0x304			/* Enable interrupt */
 #define	GPIOTE_INTENCLR		0x308			/* Disable interrupt */
 #define	GPIOTE_CONFIG(n)	(0x510 + (n) * 0x4)	/* Configuration for OUT[n], SET[n] and CLR[n] tasks and IN[n] event */
+#define	 CONFIG_RW_MODE_S	0 /* Mode */
+#define	 CONFIG_RW_MODE_M	(0x3 << CONFIG_RW_MODE_S)
+#define	 CONFIG_RW_MODE_DIS	(0 << CONFIG_RW_MODE_S) /* Disabled */
+#define	 CONFIG_RW_MODE_EVENT	(1 << CONFIG_RW_MODE_S) /* Event mode */
+#define	 CONFIG_RW_MODE_TASK	(3 << CONFIG_RW_MODE_S) /* Task mode */
+#define	 CONFIG_RW_PSEL_S	8 /* GPIO number associated with SET[n], CLR[n] and OUT[n] tasks and IN[n] event */
+#define	 CONFIG_RW_PSEL_M	(0x1f << CONFIG_RW_PSEL_S)
+#define	 CONFIG_RW_POLARITY_S	16
+#define	 CONFIG_RW_POLARITY_M	(0x3 << CONFIG_RW_POLARITY_S)
+#define	 CONFIG_RW_POLARITY_NONE	(0x0 << CONFIG_RW_POLARITY_S)
+#define	 CONFIG_RW_POLARITY_LOTOHI	(0x1 << CONFIG_RW_POLARITY_S)
+#define	 CONFIG_RW_POLARITY_HITOLO	(0x2 << CONFIG_RW_POLARITY_S)
+#define	 CONFIG_RW_POLARITY_TOGGLE	(0x3 << CONFIG_RW_POLARITY_S)
+#define	 CONFIG_RW_OUTINIT		(1 << 20) /* Initial value of the output */
 
 struct gpiote_softc {
 	size_t base;
