@@ -1,5 +1,3 @@
-OBJECTS := $(addprefix $(OBJDIR)/,${OBJECTS})
-
 $(foreach lib,${LIBRARIES},						\
 $(foreach obj,${${lib}_OBJECTS},					\
 	${eval CFLAGS_osfive/${obj} += ${${lib}_CFLAGS}};		\
@@ -10,6 +8,8 @@ $(foreach obj,${${lib}_OBJECTS},					\
 		    -I${CURDIR}/osfive/${inc}};				\
 	)								\
 ))
+
+OBJECTS := $(addprefix $(OBJDIR)/,${OBJECTS})
 
 ${OBJDIR}/%.o: %.c Makefile
 	@mkdir -p $(dir $@)
