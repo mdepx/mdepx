@@ -1,26 +1,26 @@
-LIBAEABI =	\
-	osfive/lib/libaeabi/crt.o	\
-	osfive/lib/libaeabi/divdi3.o	\
-	osfive/lib/libaeabi/idiv.o	\
-	osfive/lib/libaeabi/idivmod.o	\
-	osfive/lib/libaeabi/lasr.o	\
-	osfive/lib/libaeabi/lcmp.o	\
-	osfive/lib/libaeabi/ldivmod.o	\
-	osfive/lib/libaeabi/lmul.o	\
-	osfive/lib/libaeabi/memmove.o	\
-	osfive/lib/libaeabi/memset.o	\
-	osfive/lib/libaeabi/moddi3.o	\
-	osfive/lib/libaeabi/modsi3.o	\
-	osfive/lib/libaeabi/ulcmp.o	\
-	osfive/lib/libaeabi/umoddi3.o	\
-	osfive/lib/libaeabi/umodsi3.o	\
-	osfive/lib/libaeabi/uread4.o	\
-	osfive/lib/libaeabi/uread8.o	\
-	osfive/lib/libaeabi/uwrite4.o	\
-	osfive/lib/libaeabi/uwrite8.o
+LIBAEABI =			\
+	lib/libaeabi/crt.o	\
+	lib/libaeabi/divdi3.o	\
+	lib/libaeabi/idiv.o	\
+	lib/libaeabi/idivmod.o	\
+	lib/libaeabi/lasr.o	\
+	lib/libaeabi/lcmp.o	\
+	lib/libaeabi/ldivmod.o	\
+	lib/libaeabi/lmul.o	\
+	lib/libaeabi/memmove.o	\
+	lib/libaeabi/memset.o	\
+	lib/libaeabi/moddi3.o	\
+	lib/libaeabi/modsi3.o	\
+	lib/libaeabi/ulcmp.o	\
+	lib/libaeabi/umoddi3.o	\
+	lib/libaeabi/umodsi3.o	\
+	lib/libaeabi/uread4.o	\
+	lib/libaeabi/uread8.o	\
+	lib/libaeabi/uwrite4.o	\
+	lib/libaeabi/uwrite8.o
 
-UNUSED = 	\
-	osfive/lib/libaeabi/llsl.o	\
-	osfive/lib/libaeabi/llsr.o
+UNUSED = 			\
+	lib/libaeabi/llsl.o	\
+	lib/libaeabi/llsr.o
 
 OBJECTS += ${LIBAEABI}
