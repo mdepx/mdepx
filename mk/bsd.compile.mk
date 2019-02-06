@@ -1,4 +1,7 @@
 .for lib in ${LIBRARIES}
+.if empty(${lib}_OBJECTS)
+.error Error: library "${lib}" not found
+.endif
 .for obj in ${${lib}_OBJECTS}
 CFLAGS_osfive/${obj}+=${${lib}_CFLAGS}
 CFLAGS_osfive/${obj}+=-I${.CURDIR}/machine/

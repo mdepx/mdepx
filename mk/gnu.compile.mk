@@ -1,12 +1,15 @@
 $(foreach lib,${LIBRARIES},						\
-$(foreach obj,${${lib}_OBJECTS},					\
-	${eval CFLAGS_osfive/${obj} += ${${lib}_CFLAGS}};		\
-	${eval CFLAGS_osfive/${obj} += -I${CURDIR}/machine/};		\
-	${eval OBJECTS+=osfive/${obj}};					\
-	$(foreach inc,${${lib}_INCS},					\
-		${eval CFLAGS_osfive/${obj} +=				\
-		    -I${CURDIR}/osfive/${inc}};				\
-	)								\
+	$(if $(filter %, ${${lib}_OBJECTS}),,				\
+		$(error Error: library "${lib}" not found)		\
+	endif)								\
+	$(foreach obj,${${lib}_OBJECTS},				\
+		${eval CFLAGS_osfive/${obj} += ${${lib}_CFLAGS}}	\
+		${eval CFLAGS_osfive/${obj} += -I${CURDIR}/machine/}	\
+		${eval OBJECTS+=osfive/${obj}}				\
+		$(foreach inc,${${lib}_INCS},				\
+			${eval CFLAGS_osfive/${obj} +=			\
+			    -I${CURDIR}/osfive/${inc}}			\
+		)							\
 ))
 
 OBJECTS := $(addprefix $(OBJDIR)/,${OBJECTS})
