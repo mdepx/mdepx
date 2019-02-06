@@ -40,7 +40,7 @@ LIBC_OBJECTS =						\
 		lib/libc/string/memcmp.o		\
 		lib/libc/string/bcopy.o			\
 		lib/libc/string/bzero.o			\
-		lib/libc/sys/fstat.o			\
+		lib/libc/sys/fstat.o
 
 LIBC_QUAD =						\
 		lib/libc/quad/qdivrem.o			\
