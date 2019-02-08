@@ -40,7 +40,8 @@ struct spi_command {
 
 struct spi_device {
 	void *sc;
-	int (*transfer)(struct spi_device *, uint8_t *out, uint8_t *in, uint32_t len);
+	int (*transfer)(struct spi_device *, uint8_t *out,
+	    uint8_t *in, uint32_t len);
 };
 
 typedef struct spi_device spi_device_t;
