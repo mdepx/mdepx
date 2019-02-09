@@ -34,4 +34,4 @@ struct kernel_console {
 
 void console_register(void (*func)(int, void*), void *arg);
 
-#endif /* !_SYS_KERN_CONSOLE */
+#endif /* !_SYS_KERN_CONSOLE_H_ */
