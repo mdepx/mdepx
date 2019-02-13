@@ -42,7 +42,7 @@ LIBC_OBJECTS =						\
 		lib/libc/string/bzero.o			\
 		lib/libc/sys/fstat.o
 
-LIBC_QUAD =						\
+LIBC_QUAD_OBJECTS =					\
 		lib/libc/quad/qdivrem.o			\
 		lib/libc/quad/udivdi3.o			\
 		lib/libc/quad/umoddi3.o

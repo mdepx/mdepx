@@ -1,4 +1,4 @@
-LIBAEABI =			\
+LIBAEABI_OBJECTS =		\
 	lib/libaeabi/crt.o	\
 	lib/libaeabi/divdi3.o	\
 	lib/libaeabi/idiv.o	\
@@ -22,5 +22,3 @@ LIBAEABI =			\
 UNUSED = 			\
 	lib/libaeabi/llsl.o	\
 	lib/libaeabi/llsr.o
-
-OBJECTS += ${LIBAEABI}
