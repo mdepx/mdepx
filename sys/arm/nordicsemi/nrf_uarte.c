@@ -27,7 +27,7 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 
-#include "nrf52_uarte.h"
+#include "nrf_uarte.h"
 
 #define	RD4(_sc, _reg)		\
 	*(volatile uint32_t *)((_sc)->base + _reg)
@@ -41,9 +41,9 @@ uarte_intr(void *arg, uint32_t irqno)
 
 	sc = arg;
 
-	WR4(sc, EVENTS_RXDRDY, 0);
-	WR4(sc, RXD_MAXCNT, 8);
-	WR4(sc, TASKS_STARTRX, 1);
+	WR4(sc, UARTE_EVENTS_RXDRDY, 0);
+	WR4(sc, UARTE_RXD_MAXCNT, 8);
+	WR4(sc, UARTE_TASKS_STARTRX, 1);
 }
 
 void
@@ -51,15 +51,15 @@ uarte_putc(struct uarte_softc *sc, char ch)
 {
 	int timeout;
 
-	WR4(sc, EVENTS_ENDTX, 0);
-	WR4(sc, TXD_PTR, (uint32_t)&ch);
-	WR4(sc, TXD_MAXCNT, 1);
-	WR4(sc, TASKS_STARTTX, 1);
+	WR4(sc, UARTE_EVENTS_ENDTX, 0);
+	WR4(sc, UARTE_TXD_PTR, (uint32_t)&ch);
+	WR4(sc, UARTE_TXD_MAXCNT, 1);
+	WR4(sc, UARTE_TASKS_STARTTX, 1);
 
 	timeout = 1000;
 	do {
-		if (RD4(sc, EVENTS_ENDTX) != 0) {
-			WR4(sc, EVENTS_ENDTX, 0);
+		if (RD4(sc, UARTE_EVENTS_ENDTX) != 0) {
+			WR4(sc, UARTE_EVENTS_ENDTX, 0);
 			break;
 		}
 	} while (--timeout);
@@ -69,25 +69,25 @@ static void
 uarte_start(struct uarte_softc *sc)
 {
 
-	WR4(sc, INTENSET, RXDRDY);
+	WR4(sc, UARTE_INTENSET, INTENSET_RXDRDY);
 
-	WR4(sc, ENABLE, 0);
+	WR4(sc, UARTE_ENABLE, 0);
 	switch (sc->baudrate) {
 	case 115200:
-		WR4(sc, BAUDRATE, BAUD_115200);
+		WR4(sc, UARTE_BAUDRATE, BAUD_115200);
 		break;
 	default:
 		panic("Unsupported baud rate");
 	}
-	WR4(sc, PSELTXD, sc->pin_tx);
-	WR4(sc, PSELRXD, sc->pin_rx);
-	WR4(sc, CONFIG, 0);
-	WR4(sc, ENABLE, ENABLE_EN);
+	WR4(sc, UARTE_PSEL_TXD, sc->pin_tx);
+	WR4(sc, UARTE_PSEL_RXD, sc->pin_rx);
+	WR4(sc, UARTE_CONFIG, 0);
+	WR4(sc, UARTE_ENABLE, ENABLE_EN);
 
-	WR4(sc, RXD_PTR, (uint32_t)&sc->rx_data[0]);
-	WR4(sc, RXD_MAXCNT, 8);
+	WR4(sc, UARTE_RXD_PTR, (uint32_t)&sc->rx_data[0]);
+	WR4(sc, UARTE_RXD_MAXCNT, 8);
 
-	WR4(sc, TASKS_STARTRX, 1);
+	WR4(sc, UARTE_TASKS_STARTRX, 1);
 }
 
 void

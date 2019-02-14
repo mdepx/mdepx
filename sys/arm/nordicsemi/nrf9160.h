@@ -45,8 +45,8 @@
 #include <arm/nordicsemi/nrf9160_timer.h>
 #include <arm/nordicsemi/nrf9160_twim.h>
 #include <arm/nordicsemi/nrf9160_twis.h>
-#include <arm/nordicsemi/nrf9160_uarte.h>
 #include <arm/nordicsemi/nrf9160_wdt.h>
+#include <arm/nordicsemi/nrf_uarte.h>
 
 #define	SPU_BASE		0x50003000	/* System Protection Unit */
 #define	REGULATORS_BASE		0x40004000	/* Regulator configuration */

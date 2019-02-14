@@ -62,14 +62,20 @@
 #define	UARTE_SHORTS	0x200	/* Shortcuts between local events and tasks */
 #define	UARTE_INTEN	0x300	/* Enable or disable interrupt */
 #define	UARTE_INTENSET	0x304	/* Enable interrupt */
+#define	 INTENSET_RXDRDY	(1 << 2)
+#define	 INTENSET_TXDRDY	(1 << 7)
+#define	 INTENSET_ENDTX		(1 << 8)
+#define	 INTENSET_ENDRX		(1 << 4)
 #define	UARTE_INTENCLR	0x308	/* Disable interrupt */
 #define	UARTE_ERRORSRC	0x480	/* Error source (read/write one to clear). */
 #define	UARTE_ENABLE	0x500	/* Enable UART */
+#define	 ENABLE_EN		8
 #define	UARTE_PSEL_RTS	0x508	/* Pin select for RTS signal */
 #define	UARTE_PSEL_TXD	0x50C	/* Pin select for TXD signal */
 #define	UARTE_PSEL_CTS	0x510	/* Pin select for CTS signal */
 #define	UARTE_PSEL_RXD	0x514	/* Pin select for RXD signal */
 #define	UARTE_BAUDRATE	0x524	/* Baud rate. Accuracy depends on the HFCLK source selected. */
+#define	 BAUD_115200	0x01D7E000
 #define	UARTE_RXD_PTR	0x534	/* Data pointer */
 #define	UARTE_RXD_MAXCNT 0x538	/* Maximum number of bytes in receive buffer */
 #define	UARTE_RXD_AMOUNT 0x53C	/* Number of bytes transferred in the last transaction */
@@ -79,7 +85,16 @@
 #define	UARTE_CONFIG	0x56C	/* Configuration of parity and hardware flow control */
 
 struct uarte_softc {
-	size_t base;
+	uint32_t base;
+	uint8_t rx_data[16];
+	uint8_t pin_tx;
+	uint8_t pin_rx;
+	uint32_t baudrate;
 };
+
+void uarte_init(struct uarte_softc *sc, uint32_t base, uint8_t pin_tx,
+    uint8_t pin_rx, uint32_t baudrate);
+void uarte_putc(struct uarte_softc *sc, char ch);
+void uarte_intr(void *arg, uint32_t irqno);
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_UARTE_H_ */

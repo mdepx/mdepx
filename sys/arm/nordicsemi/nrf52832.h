@@ -27,7 +27,7 @@
 #ifndef _ARM_NORDICSEMI_NRF52832_H_
 #define _ARM_NORDICSEMI_NRF52832_H_
 
-#include <arm/nordicsemi/nrf52_uarte.h>
+#include <arm/nordicsemi/nrf_uarte.h>
 
 #define	UART_BASE	0x40002000
 
