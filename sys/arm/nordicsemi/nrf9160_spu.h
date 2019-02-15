@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2018-2019 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,12 +46,31 @@
 #define	SPU_FLASHNSC_SIZE(n)	(0x504 + (n) * 0x8)	/* Define the size of the non-secure callable (NSC) region n */
 #define	SPU_RAMNSC_REGION(n)	(0x540 + (n) * 0x8)	/* Define which RAM region can contain the non-secure callable (NSC) region n */
 #define	SPU_RAMNSC_SIZE(n)	(0x544 + (n) * 0x8)	/* Define the size of the non-secure callable (NSC) region n */
-#define	SPU_FLASHREGION_PERM(n)	(0x600 + (n) * 0x8)	/* Access permissions for flash region n */
-#define	SPU_RAMREGION_PERM(n)	(0x700 + (n) * 0x8)	/* Access permissions for RAM region n */
-#define	SPU_PERIPHID_PERM(n)	(0x800 + (n) * 0x8)	/* List capabilities and access permissions for the peripheral with ID n */
+#define	SPU_FLASHREGION_PERM(n)	(0x600 + (n) * 0x4)	/* Access permissions for flash region n */
+#define	SPU_RAMREGION_PERM(n)	(0x700 + (n) * 0x4)	/* Access permissions for RAM region n */
+#define	 PERM_EXECUTE		(1 << 0) /* Allow instruction fetches from RAM region n */
+#define	 PERM_WRITE		(1 << 1) /* Allow write operation to RAM region n */
+#define	 PERM_READ		(1 << 2) /* Allow read operation from RAM region n */
+#define	 PERM_SECATTR		(1 << 4) /* RAM region n security attribute is secure */
+#define	 PERM_LOCK		(1 << 8) /* The content of this register can't be changed until the next reset */
+#define	SPU_PERIPHID_PERM(n)	(0x800 + (n) * 0x4)	/* List capabilities and access permissions for the peripheral with ID n */
+#define	 PERIPHID_SECMAP_S		0 /* TrustZone secure attribute */
+#define	 PERIPHID_SECMAP_M		(0x3 << PERIPHID_SECMAP_S)
+#define	 PERIPHID_SECMAP_NON_SECURE	(0x0 << PERIPHID_SECMAP_S)
+#define	 PERIPHID_SECMAP_SECURE		(0x1 << PERIPHID_SECMAP_S)
+#define	 PERIPHID_SECMAP_USER_SELECT	(0x2 << PERIPHID_SECMAP_S)
+#define	 PERIPHID_SECMAP_SPLIT		(0x3 << PERIPHID_SECMAP_S)
+#define	 PERIPHID_DMA_S			2 /* Indicate if the peripheral has DMA capabilities */
+#define	 PERIPHID_DMA_M			(0x3 << PERIPHID_DMA_S)
+#define	 PERIPHID_SECATTR		(1 << 4) /* Peripheral is mapped in secure peripheral address space */
+#define	 PERIPHID_DMASEC		(1 << 5) /* DMA transfers initiated by this peripheral have the secure attribute set*/
+#define	 PERIPHID_LOCK			(1 << 8) /* The content of this register can't be changed until the next reset */
+#define	 PERIPHID_PRESENT		(1 << 31) /* Indicate if a peripheral is present with ID n */
 
 struct spu_softc {
 	size_t base;
 };
+
+void spu_init(struct spu_softc *sc, uint32_t base);
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_SPU_H_ */
