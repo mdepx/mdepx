@@ -56,31 +56,43 @@ arm_nvic_intr(uint32_t irq, struct trapframe *frame)
 }
 
 void
+arm_nvic_set_prio(struct arm_nvic_softc *sc, uint32_t n,
+    int prio)
+{
+	int reg;
+
+	reg = RD4(sc, NVIC_IPR(n / 4));
+	reg &= ~(0xff << ((n % 4) * 8));
+	reg |= (prio << ((n % 4) * 8));
+	WR4(sc, NVIC_IPR(n / 4), reg);
+}
+
+void
 arm_nvic_enable_intr(struct arm_nvic_softc *sc, uint32_t n)
 {
 
-	WR4(sc, NVIC_ISER((n / 32)), (1 << (n % 32)));
+	WR4(sc, NVIC_ISER(n / 32), (1 << (n % 32)));
 }
 
 void
 arm_nvic_disable_intr(struct arm_nvic_softc *sc, uint32_t n)
 {
 
-	WR4(sc, NVIC_ICER((n / 32)), (1 << (n % 32)));
+	WR4(sc, NVIC_ICER(n / 32), (1 << (n % 32)));
 }
 
 void
 arm_nvic_set_pending(struct arm_nvic_softc *sc, uint32_t n)
 {
 
-	WR4(sc, NVIC_ISPR((n / 32)), (1 << (n % 32)));
+	WR4(sc, NVIC_ISPR(n / 32), (1 << (n % 32)));
 }
 
 void
 arm_nvic_clear_pending(struct arm_nvic_softc *sc, uint32_t n)
 {
 
-	WR4(sc, NVIC_ICPR((n / 32)), (1 << (n % 32)));
+	WR4(sc, NVIC_ICPR(n / 32), (1 << (n % 32)));
 }
 
 void
@@ -89,14 +101,14 @@ arm_nvic_target_ns(struct arm_nvic_softc *sc, uint32_t n,
 {
 	int reg;
 
-	reg = RD4(sc, NVIC_ITNS((n / 32)));
+	reg = RD4(sc, NVIC_ITNS(n / 32));
 
 	if (secure)
 		reg &= ~(1 << (n % 32));
 	else
 		reg |= (1 << (n % 32));
 
-	WR4(sc, NVIC_ITNS((n / 32)), reg);
+	WR4(sc, NVIC_ITNS(n / 32), reg);
 }
 
 int

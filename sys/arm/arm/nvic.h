@@ -126,13 +126,14 @@ struct arm_nvic_softc {
 };
 
 int arm_nvic_init(struct arm_nvic_softc *sc, uint32_t base);
-void arm_nvic_enable_intr(struct arm_nvic_softc *sc, uint32_t intr);
+void arm_nvic_enable_intr(struct arm_nvic_softc *sc, uint32_t n);
 void arm_nvic_disable_intr(struct arm_nvic_softc *sc, uint32_t n);
 void arm_nvic_intr(uint32_t irq, struct trapframe *frame);
 void arm_nvic_install_intr_map(struct arm_nvic_softc *sc,
     const struct nvic_intr_entry *m);
-void arm_nvic_set_pending(struct arm_nvic_softc *sc, uint32_t intr);
-void arm_nvic_clear_pending(struct arm_nvic_softc *sc, uint32_t intr);
+void arm_nvic_set_pending(struct arm_nvic_softc *sc, uint32_t n);
+void arm_nvic_clear_pending(struct arm_nvic_softc *sc, uint32_t n);
 void arm_nvic_target_ns(struct arm_nvic_softc *sc, uint32_t n, int secure);
+void arm_nvic_set_prio(struct arm_nvic_softc *sc, uint32_t n, int prio);
 
 #endif /* !_ARM_ARM_NVIC_H_ */
