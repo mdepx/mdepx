@@ -83,6 +83,22 @@ arm_nvic_clear_pending(struct arm_nvic_softc *sc, uint32_t n)
 	WR4(sc, NVIC_ICPR((n / 32)), (1 << (n % 32)));
 }
 
+void
+arm_nvic_target_ns(struct arm_nvic_softc *sc, uint32_t n,
+    int secure)
+{
+	int reg;
+
+	reg = RD4(sc, NVIC_ITNS((n / 32)));
+
+	if (secure)
+		reg &= ~(1 << (n % 32));
+	else
+		reg |= (1 << (n % 32));
+
+	WR4(sc, NVIC_ITNS((n / 32)), reg);
+}
+
 int
 arm_nvic_init(struct arm_nvic_softc *sc, uint32_t base)
 {

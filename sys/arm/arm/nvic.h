@@ -99,14 +99,21 @@
 #define	SCB_MMAR	0xD34	/* MemManage Fault Address Register */
 #define	SCB_BFAR	0xD38	/* BusFault Address Register */
 #define	SCB_AFSR	0xD3C	/* Auxiliary Fault Status Register */
+/* ARMv8-M */
+#define	SCB_CPACR	0xD88	/* Coprocessor Access Control Register */
+#define	SCB_NSACR	0xD8C	/* Non-secure Access Control Register */
+#define	 NSACR_CP11	(1 << 11) /* Enables Non-secure access to the FPU */
+#define	 NSACR_CP10	(1 << 10) /* Enables Non-secure access to the FPU */
+#define	 NSACR_CP(n)	(1 << (n)) /* n == 0..7 */
 
 /* Nested Vectored Interrupt Controller */
-#define	NVIC_ISER(n)	(0x100 + 0x4 * n) /* Interrupt Set-enable Regs */
-#define	NVIC_ICER(n)	(0x180 + 0x4 * n) /* Interrupt Clear-enable Regs */
-#define	NVIC_ISPR(n)	(0x200 + 0x4 * n) /* Interrupt Set-pending Regs */
-#define	NVIC_ICPR(n)	(0x280 + 0x4 * n) /* Interrupt Clear-pending Regs */
-#define	NVIC_IABR(n)	(0x300 + 0x4 * n) /* Interrupt Active Bit Regs */
-#define	NVIC_IPR(n)	(0x400 + 0x4 * n) /* Interrupt Priority Regs */
+#define	NVIC_ISER(n)	(0x100 + 0x4 * (n)) /* Interrupt Set-enable Regs */
+#define	NVIC_ICER(n)	(0x180 + 0x4 * (n)) /* Interrupt Clear-enable Regs */
+#define	NVIC_ISPR(n)	(0x200 + 0x4 * (n)) /* Interrupt Set-pending Regs */
+#define	NVIC_ICPR(n)	(0x280 + 0x4 * (n)) /* Interrupt Clear-pending Regs */
+#define	NVIC_IABR(n)	(0x300 + 0x4 * (n)) /* Interrupt Active Bit Regs */
+#define	NVIC_ITNS(n)	(0x380 + 0x4 * (n)) /* Interrupt Target Non-secure */
+#define	NVIC_IPR(n)	(0x400 + 0x4 * (n)) /* Interrupt Priority Regs */
 #define	NVIC_STIR	0xF00	/* Software Trigger Interrupt Register */
 
 struct nvic_intr_entry {
@@ -126,5 +133,6 @@ void arm_nvic_install_intr_map(struct arm_nvic_softc *sc,
     const struct nvic_intr_entry *m);
 void arm_nvic_set_pending(struct arm_nvic_softc *sc, uint32_t intr);
 void arm_nvic_clear_pending(struct arm_nvic_softc *sc, uint32_t intr);
+void arm_nvic_target_ns(struct arm_nvic_softc *sc, uint32_t n, int secure);
 
 #endif /* !_ARM_ARM_NVIC_H_ */
