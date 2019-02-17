@@ -45,6 +45,7 @@
 #include <arm/nordicsemi/nrf9160_timer.h>
 #include <arm/nordicsemi/nrf9160_twim.h>
 #include <arm/nordicsemi/nrf9160_twis.h>
+#include <arm/nordicsemi/nrf9160_uicr.h>
 #include <arm/nordicsemi/nrf9160_wdt.h>
 #include <arm/nordicsemi/nrf_uarte.h>
 
@@ -105,7 +106,9 @@
 #define	BASE_FICR	0x00FF0000 /* Factory information configuration */
 #define	BASE_UICR	0x00FF8000 /* User information configuration */
 #define	BASE_TAD	0xE0080000 /* Trace and debug control */
-#define	BASE_NVIC	0xE000E000
+#define	BASE_NVIC	0xE000E000 /* Nested Vectored Interrupt Controller */
+#define	BASE_UICR	0x00FF8000 /* User information configuration */
+#define	BASE_FICR	0x00FF0000 /* Factory information configuration */
 
 #define	PERIPH_SECURE_ACCESS	(1 << 28)
 
