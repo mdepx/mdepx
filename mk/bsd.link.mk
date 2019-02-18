@@ -3,7 +3,7 @@
 .endif
 
 ${APP}.elf: ${LDSCRIPT} ${OBJECTS}
-	${LD} -T ${LDSCRIPT} ${OBJECTS:M*} -o ${APP}.elf
+	${LD} -T ${LDSCRIPT} ${OBJECTS:M*} ${OBJECTS_LINK} -o ${APP}.elf
 
 ${APP}.bin: ${APP}.elf
 	${OBJCOPY} -O binary ${APP}.elf ${APP}.bin
