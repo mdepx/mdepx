@@ -10,4 +10,4 @@ MBEDTLS_MDSHA_OBJECTS = 		\
 	lib/mbedtls/library/asn1parse.o	\
 	lib/mbedtls/library/ripemd160.o
 
-MBEDTLS_MDSHA_CFLAGS = -I${.CURDIR}/osfive/lib/mbedtls/include/
+MBEDTLS_MDSHA_INCS = lib/mbedtls/include/
