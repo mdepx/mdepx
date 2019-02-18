@@ -27,6 +27,8 @@
 #ifndef _ARM_NORDICSEMI_NRF9160_TIMER_H_
 #define _ARM_NORDICSEMI_NRF9160_TIMER_H_
 
+#include <machine/frame.h>
+
 #define	TIMER_TASKS_START	0x000	/* Start Timer */
 #define	TIMER_TASKS_STOP	0x004	/* Stop Timer */
 #define	TIMER_TASKS_COUNT	0x008	/* Increment Timer (Counter mode only) */
