@@ -1,13 +1,17 @@
+OSDIR := osfive
+OBJDIR := obj
+OSOBJDIR = ${OBJDIR}/${OSDIR}
+
 $(foreach lib,${LIBRARIES},						\
 	$(if $(filter %, ${${lib}_OBJECTS}),,				\
 		$(error Error: library "${lib}" not found)		\
 	endif)								\
 	$(foreach obj,${${lib}_OBJECTS},				\
-		${eval CFLAGS_osfive/${obj} += ${${lib}_CFLAGS}}	\
-		${eval CFLAGS_osfive/${obj} += -I${CURDIR}/machine/}	\
-		${eval OBJECTS+=osfive/${obj}}				\
+		${eval CFLAGS_${OSOBJDIR}/${obj} += ${${lib}_CFLAGS}}	\
+		${eval CFLAGS_${OSOBJDIR}/${obj} += -I${CURDIR}/machine/}\
+		${eval OBJECTS+=${OSDIR}/${obj}}			\
 		$(foreach inc,${${lib}_INCS},				\
-			${eval CFLAGS_osfive/${obj} +=			\
+			${eval CFLAGS_${OSOBJDIR}/${obj} +=		\
 			    -I${CURDIR}/osfive/${inc}}			\
 		)							\
 ))
