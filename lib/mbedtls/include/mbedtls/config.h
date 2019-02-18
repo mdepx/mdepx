@@ -20,6 +20,9 @@
 #ifndef MBEDTLS_CONFIG_H
 #define MBEDTLS_CONFIG_H
 
+#define	MBEDTLS_MD_C		1
+#define	MBEDTLS_ASN1_PARSE_C	1
+
 #include "check_config.h"
 
 #endif /* MBEDTLS_CONFIG_H */
