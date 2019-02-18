@@ -36,15 +36,26 @@
 #define	TIMER_EVENTS_COMPARE(n)	(0x140 + (n) * 0x4)	/* Compare event on CCn match */
 #define	TIMER_SHORTS		0x200	/* Shortcut register */
 #define	TIMER_INTENSET		0x304	/* Enable interrupt */
+#define	 INTENSET_COMPARE(n)	(1 << ((n) + 16)) /* Enable interrupt for event COMPARE[n] */
 #define	TIMER_INTENCLR		0x308	/* Disable interrupt */
 #define	TIMER_STATUS		0x400	/* Timer status */
 #define	TIMER_MODE		0x504	/* Timer mode selection */
 #define	TIMER_BITMODE		0x508	/* Configure the number of bits used by the TIMER */
+#define	 BITMODE_16		0	/* 16 bit timer bit width */
+#define	 BITMODE_8		1	/* 8 bit timer bit width */
+#define	 BITMODE_24		2	/* 24 bit timer bit width */
+#define	 BITMODE_32		3	/* 32 bit timer bit width */
 #define	TIMER_PRESCALER		0x510	/* Timer prescaler register */
 #define	TIMER_CC(n)		(0x540 + (n) * 0x4)	/* Capture/Compare register n */
 
 struct timer_softc {
 	size_t base;
+	uint8_t cc_idx;
 };
+
+void timer_init(struct timer_softc *sc, uint32_t base);
+void timer_intr(void *arg, struct trapframe *tf, int irq);
+void timer_timeout(struct timer_softc *sc, uint8_t cc_idx,
+    uint32_t timeout);
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_TIMER_H_ */
