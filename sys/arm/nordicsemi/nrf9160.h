@@ -36,6 +36,7 @@
 #include <arm/nordicsemi/nrf9160_ipc.h>
 #include <arm/nordicsemi/nrf9160_kmu.h>
 #include <arm/nordicsemi/nrf9160_pdm.h>
+#include <arm/nordicsemi/nrf9160_power.h>
 #include <arm/nordicsemi/nrf9160_pwm.h>
 #include <arm/nordicsemi/nrf9160_rtc.h>
 #include <arm/nordicsemi/nrf9160_saadc.h>
