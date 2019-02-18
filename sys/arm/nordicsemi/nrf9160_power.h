@@ -49,7 +49,6 @@ struct power_softc {
 };
 
 void power_init(struct power_softc *sc, uint32_t base);
-void power_write4(struct power_softc *sc, uint32_t reg,
-    uint32_t val);
+void power_reset_events(struct power_softc *sc);
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_POWER_H_ */
