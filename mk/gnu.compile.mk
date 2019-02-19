@@ -1,5 +1,5 @@
-OSDIR := osfive
-OBJDIR := obj
+OSDIR ?= osfive
+OBJDIR ?= obj
 OSOBJDIR = ${OBJDIR}/${OSDIR}
 
 $(foreach lib,${LIBRARIES},						\
