@@ -3,4 +3,4 @@ error "APP must be defined"
 endif
 
 clean:
-	rm -f ${OBJECTS} ${APP}.elf ${APP}.bin ${APP}.srec
+	rm -f ${OBJECTS} ${OBJDIR}/${APP}.elf ${OBJDIR}/${APP}.bin ${OBJDIR}/${APP}.srec
