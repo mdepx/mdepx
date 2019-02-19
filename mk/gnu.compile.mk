@@ -12,7 +12,7 @@ $(foreach lib,${LIBRARIES},						\
 		${eval OBJECTS+=${OSDIR}/${obj}}			\
 		$(foreach inc,${${lib}_INCS},				\
 			${eval CFLAGS_${OSOBJDIR}/${obj} +=		\
-			    -I${CURDIR}/osfive/${inc}}			\
+			    -I${CURDIR}/${OSDIR}/${inc}}		\
 		)							\
 ))
 
@@ -29,6 +29,6 @@ ${OBJDIR}/%.o: %.S Makefile
 compile: objdir machine ${OBJECTS}
 	@rm -f ${CURDIR}/machine
 
-include ${CURDIR}/osfive/mk/gnu.cflags.mk
-include ${CURDIR}/osfive/mk/gnu.objdir.mk
-include ${CURDIR}/osfive/mk/gnu.machine.mk
+include ${CURDIR}/${OSDIR}/mk/gnu.cflags.mk
+include ${CURDIR}/${OSDIR}/mk/gnu.objdir.mk
+include ${CURDIR}/${OSDIR}/mk/gnu.machine.mk
