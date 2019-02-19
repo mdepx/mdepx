@@ -18,6 +18,13 @@ $(foreach lib,${LIBRARIES},						\
 
 OBJECTS := $(addprefix $(OBJDIR)/,${OBJECTS})
 
+INCS += -I${CURDIR}
+INCS += -I${CURDIR}/${OSDIR}/include
+INCS += -I${CURDIR}/${OSDIR}/sys
+INCS += -I${CURDIR}/${OSDIR}/lib
+
+CFLAGS += ${INCS} ${CFLAGS_$@} -D__OSFIVE__
+
 ${OBJDIR}/%.o: %.c Makefile
 	@mkdir -p $(dir $@)
 	${CC} ${CFLAGS} -c -o $@ $<
@@ -29,6 +36,5 @@ ${OBJDIR}/%.o: %.S Makefile
 compile: objdir machine ${OBJECTS}
 	@rm -f ${CURDIR}/machine
 
-include ${CURDIR}/${OSDIR}/mk/gnu.cflags.mk
-include ${CURDIR}/${OSDIR}/mk/gnu.objdir.mk
-include ${CURDIR}/${OSDIR}/mk/gnu.machine.mk
+include ${OSDIR}/mk/gnu.objdir.mk
+include ${OSDIR}/mk/gnu.machine.mk
