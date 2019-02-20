@@ -1,7 +1,3 @@
-OSDIR ?= osfive
-OBJDIR ?= obj
-OSOBJDIR = ${OBJDIR}/${OSDIR}
-
 $(foreach lib,${LIBRARIES},						\
 	$(if $(filter %, ${${lib}_OBJECTS}),,				\
 		$(error Error: library "${lib}" not found)		\

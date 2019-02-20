@@ -1,0 +1,2 @@
+OSDIR ?= osfive
+OSOBJDIR = ${.OBJDIR}/${OSDIR}

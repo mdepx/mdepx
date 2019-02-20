@@ -1,6 +1,3 @@
-OSDIR ?= osfive
-OSOBJDIR = ${.OBJDIR}/${OSDIR}
-
 .for lib in ${LIBRARIES}
 .if empty(${lib}_OBJECTS)
 .error Error: library "${lib}" not found

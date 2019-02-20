@@ -1,0 +1,6 @@
+.include "${.CURDIR}/osfive/mk/bsd.user.mk"
+.include "${.CURDIR}/osfive/mk/bsd.compile.mk"
+.include "${.CURDIR}/osfive/mk/bsd.link.mk"
+.include "${.CURDIR}/osfive/mk/bsd.binutils.mk"
+.include "${.CURDIR}/osfive/mk/bsd.clean.mk"
+.include "${.CURDIR}/osfive/mk/bsd.info.mk"
