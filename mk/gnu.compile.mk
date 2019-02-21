@@ -29,7 +29,7 @@ ${OBJDIR}/%.o: %.S Makefile
 	@mkdir -p $(dir $@)
 	${CC} ${CFLAGS} -c -o $@ $<
 
-compile: objdir machine ${OBJECTS}
+__compile: __objdir __machine ${OBJECTS}
 	@rm -f ${CURDIR}/machine
 
 include ${OSDIR}/mk/gnu.objdir.mk

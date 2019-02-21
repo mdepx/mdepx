@@ -11,6 +11,6 @@ ${APP}.bin: ${APP}.elf
 ${APP}.srec: ${APP}.elf
 	${OBJCOPY} -O srec ${APP}.elf ${APP}.srec
 
-link:	${APP}.elf
-binary: ${APP}.bin
-srec:	${APP}.srec
+__link: ${APP}.elf
+__binary: ${APP}.bin
+__srec: ${APP}.srec

@@ -23,7 +23,7 @@ CFLAGS += ${INCS} ${CFLAGS_$(.TARGET)} -D__OSFIVE__
 	@mkdir -p ${.TARGET:H}
 	${CC} ${CFLAGS:M*} -c -o ${.TARGET} ${.IMPSRC}
 
-compile: objdir machine ${OBJECTS}
+__compile: __objdir __machine ${OBJECTS}
 	@rm -f ${.CURDIR}/machine
 
 .include "${OSDIR}/mk/bsd.objdir.mk"

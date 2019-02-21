@@ -14,6 +14,6 @@ ARCHES_TMP += ${arch}
 .error Error: unknown arch ${ARCH}. Available arches: ${ARCHES}.
 .endif
 
-machine:
+__machine:
 	@rm -f ${.CURDIR}/machine
 	@ln -s ${.CURDIR}/${OSDIR}/sys/${ARCH}/include ${.CURDIR}/machine

@@ -1,4 +1,4 @@
-objdir:
+__objdir:
 	@if test -n "${MAKEOBJDIRPREFIX}"; then				\
 	    if ! test -d "${MAKEOBJDIRPREFIX}/${.CURDIR}"; then		\
 		mkdir -p ${MAKEOBJDIRPREFIX}/${.CURDIR};		\

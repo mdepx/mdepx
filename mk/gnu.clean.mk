@@ -2,5 +2,5 @@ ifndef APP
 error "APP must be defined"
 endif
 
-clean:
+__clean:
 	rm -f ${OBJECTS} ${OBJDIR}/${APP}.elf ${OBJDIR}/${APP}.bin ${OBJDIR}/${APP}.srec
