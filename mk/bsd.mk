@@ -1,3 +1,6 @@
+OSDIR ?= osfive
+OSOBJDIR = ${.OBJDIR}/${OSDIR}
+
 .include "${.CURDIR}/${OSDIR}/mk/bsd.binutils.mk"
 .include "${.CURDIR}/${OSDIR}/mk/bsd.clean.mk"
 .include "${.CURDIR}/${OSDIR}/mk/bsd.compile.mk"
