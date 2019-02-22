@@ -60,7 +60,6 @@ void
 fifo_interrupts_enable(struct altera_fifo_softc *sc, int mask)
 {
 
-	WR4_FIFO_MEMC(sc, A_ONCHIP_FIFO_MEM_CORE_STATUS_REG_EVENT, 0);
 	WR4_FIFO_MEMC(sc, A_ONCHIP_FIFO_MEM_CORE_STATUS_REG_INT_ENABLE,
 	    htole32(mask));
 }
@@ -92,13 +91,14 @@ void
 altera_fifo_intr(void *arg)
 {
 	struct altera_fifo_softc *sc;
+	uint32_t reg0;
 	uint32_t reg;
 	uint32_t err;
 
 	sc = arg;
 
-	reg = RD4_FIFO_MEMC(sc, A_ONCHIP_FIFO_MEM_CORE_STATUS_REG_EVENT);
-	reg = le32toh(reg);
+	reg0 = RD4_FIFO_MEMC(sc, A_ONCHIP_FIFO_MEM_CORE_STATUS_REG_EVENT);
+	reg = le32toh(reg0);
 
 	dprintf("%s: reg %x\n", __func__, reg);
 
@@ -113,7 +113,9 @@ altera_fifo_intr(void *arg)
 	if (sc->cb != NULL)
 		sc->cb(sc->cb_arg);
 
-	WR4_FIFO_MEMC(sc, A_ONCHIP_FIFO_MEM_CORE_STATUS_REG_EVENT, htole32(reg));
+	if (reg0 != 0)
+		WR4_FIFO_MEMC(sc,
+		    A_ONCHIP_FIFO_MEM_CORE_STATUS_REG_EVENT, reg0);
 }
 
 int
