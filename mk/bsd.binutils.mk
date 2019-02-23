@@ -2,8 +2,8 @@
 .error "APP must be defined"
 .endif
 
-__objdump:
+__o:
 	${CROSS_COMPILE}objdump -d ${.OBJDIR}/${APP}.elf ${ARGS} | less
 
-__readelf:
+__r:
 	${CROSS_COMPILE}readelf -a ${.OBJDIR}/${APP}.elf ${ARGS} | less
