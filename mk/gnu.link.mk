@@ -1,5 +1,5 @@
 ifndef APP
-error "APP must be defined"
+$(error Error: APP must be defined)
 endif
 
 ${OBJDIR}/${APP}.elf: ${LDSCRIPT} ${OBJECTS}

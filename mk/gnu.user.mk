@@ -1,5 +1,5 @@
 ifndef APP
-error "APP must be defined"
+$(error Error: APP must be defined)
 endif
 
 ifneq ("$(wildcard ${HOME}/.osfive/${APP}.mk)","")

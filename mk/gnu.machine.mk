@@ -1,5 +1,5 @@
 ifndef ARCH
-error "ARCH must be defined"
+$(error Error: ARCH must be defined)
 endif
 
 ARCHES = arm mips riscv
