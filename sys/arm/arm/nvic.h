@@ -27,6 +27,8 @@
 #ifndef _ARM_ARM_NVIC_H_
 #define _ARM_ARM_NVIC_H_
 
+#include <machine/frame.h>
+
 /* System Timer */
 #define	SYST_CSR	0x010	/* SysTick Control and Status Register */
 #define	SYST_RVR	0x014	/* SysTick Reload Value Register */

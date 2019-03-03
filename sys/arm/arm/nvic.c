@@ -26,8 +26,6 @@
 
 #include <sys/cdefs.h>
 
-#include <machine/frame.h>
-
 #include <arm/arm/nvic.h>
 
 #define	RD4(_sc, _reg)		\
