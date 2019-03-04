@@ -300,7 +300,7 @@ fl_realloc(void *ptr, size_t size)
 		}
 	} else {
 		if (((next->flags & FLAG_ALLOCATED) == 0) &&
-		    (node->size + next->size) > (size + sizeof(struct node_s))) {
+		    (node->size + next->size) > (size + sizeof(struct node_s))){
 			subs = (struct node_s *)((uint8_t *)next + next->size);
 
 			/* Remove node */
