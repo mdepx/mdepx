@@ -27,6 +27,8 @@
 #ifndef	_MACHINE_CPUFUNC_H_
 #define	_MACHINE_CPUFUNC_H_
 
+#include <machine/cpuregs.h>
+
 #define mtc0(reg, sel, value)						\
 	__asm __volatile(						\
 		"mtc0   %z0, $%1, %2"					\
