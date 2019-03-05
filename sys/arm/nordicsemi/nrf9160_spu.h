@@ -74,5 +74,11 @@ struct spu_softc {
 void spu_init(struct spu_softc *sc, uint32_t base);
 void spu_periph_set_attr(struct spu_softc *sc, int periph_id,
     int secure_attr, int secure_dma);
+void spu_flash_set_perm(struct spu_softc *sc, int region_id,
+    int secure);
+void spu_sram_set_perm(struct spu_softc *sc, int region_id,
+    int secure);
+void spu_gpio_set_perm(struct spu_softc *sc, int region_id,
+    int perm);
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_SPU_H_ */

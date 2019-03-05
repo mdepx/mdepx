@@ -53,6 +53,46 @@ spu_periph_set_attr(struct spu_softc *sc, int periph_id,
 }
 
 void
+spu_flash_set_perm(struct spu_softc *sc, int region_id,
+    int secure)
+{
+	int reg;
+
+	reg = PERM_EXECUTE | PERM_WRITE | PERM_READ;
+
+	if (secure)
+		reg |= PERM_SECATTR;
+
+	reg |= PERM_LOCK;
+
+	WR4(sc, SPU_FLASHREGION_PERM(region_id), reg);
+}
+
+void
+spu_sram_set_perm(struct spu_softc *sc, int region_id,
+    int secure)
+{
+	int reg;
+
+	reg = PERM_EXECUTE | PERM_WRITE | PERM_READ;
+
+	if (secure)
+		reg |= PERM_SECATTR;
+
+	reg |= PERM_LOCK;
+
+	WR4(sc, SPU_RAMREGION_PERM(region_id), reg);
+}
+
+void
+spu_gpio_set_perm(struct spu_softc *sc, int region_id,
+    int perm)
+{
+
+	WR4(sc, SPU_GPIOPORT_PERM(region_id), perm);
+}
+
+void
 spu_init(struct spu_softc *sc, uint32_t base)
 {
 
