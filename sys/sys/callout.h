@@ -46,6 +46,9 @@ struct mi_timer {
 	void (*stop)(void *arg);
 	uint32_t (*count)(void *arg);
 	void *arg;
+	uint32_t ticks_per_usec;
+	uint32_t count_last;
+	int started;
 };
 
 void callout_init(struct callout *c);
