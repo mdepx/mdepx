@@ -104,14 +104,15 @@
 #define	BASE_VMC	0x4003A000 /* Volatile memory controller */
 #define	BASE_CRYPTOCELL	0x50840000 /* CryptoCell sub-system control interface*/
 #define	BASE_P0		0x40842500 /* General purpose input and output */
+#define	PERIPH_SECURE_ACCESS	(1 << 28)
+
 #define	BASE_FICR	0x00FF0000 /* Factory information configuration */
 #define	BASE_UICR	0x00FF8000 /* User information configuration */
 #define	BASE_TAD	0xE0080000 /* Trace and debug control */
-#define	BASE_NVIC	0xE000E000 /* Nested Vectored Interrupt Controller */
+#define	BASE_SCS	0xE000E000 /* System Control Space */
+#define	BASE_SCS_NS	0xE002E000 /* System Control Space Non-Secure */
 #define	BASE_UICR	0x00FF8000 /* User information configuration */
 #define	BASE_FICR	0x00FF0000 /* Factory information configuration */
-
-#define	PERIPH_SECURE_ACCESS	(1 << 28)
 
 #define	ID_SPU		3
 #define	ID_REGULATORS	4
