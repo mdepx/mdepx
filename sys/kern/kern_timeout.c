@@ -120,6 +120,10 @@ callout_add(struct callout *c0)
 		mi_tmr->count_last = mi_tmr->count(mi_tmr->arg);
 		mi_tmr->started = 1;
 		mi_tmr->start(mi_tmr->arg, c0->usec);
+
+#ifdef CALLOUT_DEBUG
+		callout_dump();
+#endif
 		return;
 	}
 
