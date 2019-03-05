@@ -85,6 +85,12 @@
 #define	 ICSR_PENDSWSET	(1 << 28) /* Set pending pendSV bit */
 #define	SCB_VTOR	0xD08	/* Vector Table Offset Register */
 #define	SCB_AIRCR	0xD0C	/* Application Interrupt and Reset Control */
+#define	 AIRCR_VECTKEY_S	16 /* Vector key. */
+#define	 AIRCR_VECTKEY_M	(0xffff << AIRCR_VECTKEY_S)
+#define	 AIRCR_VECTKEY	(0x05FA << AIRCR_VECTKEY_S)
+#define	 AIRCR_BFHFNMINS	(1 << 13) /* BusFault, HardFault, and NMI Non-secure enable. */
+#define	 AIRCR_PRIS		(1 << 4) /* Prioritize Secure exceptions. */
+#define	 AIRCR_SYSRESETREQS	(1 << 3) /* System reset request Secure only.*/
 #define	SCB_SCR		0xD10	/* System Control Register */
 #define	SCB_CCR		0xD14	/* Configuration Control Register */
 #define	SCB_SHPR1	0xD18	/* System Handler Priority Register 1 */
@@ -105,6 +111,17 @@
 #define	 NSACR_CP11	(1 << 11) /* Enables Non-secure access to the FPU */
 #define	 NSACR_CP10	(1 << 10) /* Enables Non-secure access to the FPU */
 #define	 NSACR_CP(n)	(1 << (n)) /* n == 0..7 */
+
+/* Security Attribution Unit */
+#define	SAU_CTRL	0xDD0	/* SAU Control Register */
+#define	 CTRL_ALLNS	(1 << 1) /* Memory is marked as Non-secure. */
+#define	 CTRL_ENABLE	(1 << 0) /* The SAU is enabled. */
+#define	SAU_TYPE	0xDD4	/* SAU Type Register */
+#define	SAU_RNR		0xDD8	/* SAU Region Number Register */
+#define	SAU_RBAR	0xDDC	/* SAU Region Base Address Register */
+#define	SAU_RLAR	0xDE0	/* SAU Region Limit Address Register */
+#define	SAU_SFSR	0xDE4	/* Secure Fault Status Register */
+#define	SAU_SFAR	0xDE8	/* Secure Fault Address Register */
 
 #if 0
 /* Nested Vectored Interrupt Controller */

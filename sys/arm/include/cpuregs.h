@@ -24,32 +24,12 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ARM_ARM_SCB_H_
-#define _ARM_ARM_SCB_H_
+#ifndef	_MACHINE_CPUREGS_H_
+#define	_MACHINE_CPUREGS_H_
 
-#include <machine/frame.h>
-#include <machine/scs.h>
+#define	CONTROL_SFPA	(1 << 3) /* Secure floating-point active. */
+#define	CONTROL_FPCA	(1 << 2) /* Floating-point context active. */
+#define	CONTROL_SPSEL	(1 << 1) /* Stack-pointer select. */
+#define	CONTROL_NPRIV	(1 << 0) /* Not privileged. Thread mode has unprivileged access only. */
 
-/* System Control Block. */
-
-struct scb_intr_entry {
-	void (*handler) (void *arg, struct trapframe *frame, int irq);
-	void *arg;
-};
-
-struct arm_scb_softc {
-	uint32_t base;
-};
-
-int arm_scb_init(struct arm_scb_softc *sc, uint32_t base);
-void arm_scb_set_vector(struct arm_scb_softc *sc, uint32_t vtor);
-void arm_scb_exceptions_prio_config(struct arm_scb_softc *sc,
-    int prio_secure);
-void arm_scb_exceptions_target_config(struct arm_scb_softc *sc,
-    int secure);
-void arm_scb_sysreset_secure(struct arm_scb_softc *sc,
-    int secure_only);
-void arm_sau_configure(struct arm_scb_softc *sc, int enable, int allns);
-void arm_fpu_non_secure(struct arm_scb_softc *sc, int enable);
-
-#endif /* !_ARM_ARM_SCB_H_ */
+#endif /* !_MACHINE_CPUREGS_H_ */

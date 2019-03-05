@@ -36,10 +36,117 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
+arm_scb_exceptions_prio_config(struct arm_scb_softc *sc,
+    int prio_secure)
+{
+	uint32_t reg;
+
+	reg = RD4(sc, SCB_AIRCR);
+	reg &= ~(AIRCR_VECTKEY_M);
+	reg |= AIRCR_VECTKEY;
+
+	if (prio_secure)
+		/* Non-secure exceptions are de-prioritized. */
+		reg |= AIRCR_PRIS;
+	else
+		/*
+		 * Priority ranges of Secure and Non-secure
+		 * exceptions are identical.
+		 */
+		reg &= ~AIRCR_PRIS;
+
+	WR4(sc, SCB_AIRCR, reg);
+}
+
+void
+arm_scb_exceptions_target_config(struct arm_scb_softc *sc,
+    int secure)
+{
+	uint32_t reg;
+
+	reg = RD4(sc, SCB_AIRCR);
+	reg &= ~(AIRCR_VECTKEY_M);
+	reg |= AIRCR_VECTKEY;
+
+	if (secure)
+		/* BusFault, HardFault, and NMI are Secure. */
+		reg &= ~AIRCR_BFHFNMINS;
+	else
+		/*
+		 * BusFault and NMI are Non-secure and exceptions
+		 * can target Non-secure HardFault.
+		 */
+		reg |= AIRCR_BFHFNMINS;
+
+	WR4(sc, SCB_AIRCR, reg);
+}
+
+void
+arm_scb_sysreset_secure(struct arm_scb_softc *sc,
+    int secure_only)
+{
+	uint32_t reg;
+
+	reg = RD4(sc, SCB_AIRCR);
+	reg &= ~(AIRCR_VECTKEY_M);
+	reg |= AIRCR_VECTKEY;
+
+	if (secure_only)
+		/*
+		 * SYSRESETREQ functionality is only available
+		 * to Secure state.
+		 */
+		reg |= AIRCR_SYSRESETREQS;
+	else
+		/*
+		 * SYSRESETREQ functionality is available to both
+		 * Security states.
+		 */
+		reg &= ~AIRCR_SYSRESETREQS;
+	WR4(sc, SCB_AIRCR, reg);
+}
+
+void
 arm_scb_set_vector(struct arm_scb_softc *sc, uint32_t vtor)
 {
 
 	WR4(sc, SCB_VTOR, vtor);
+}
+
+void
+arm_fpu_non_secure(struct arm_scb_softc *sc, int enable)
+{
+	uint32_t reg;
+
+	reg = RD4(sc, SCB_NSACR);
+
+	if (enable)
+		reg |= (NSACR_CP10 | NSACR_CP11);
+	else
+		reg &= ~(NSACR_CP10 | NSACR_CP11);
+
+	WR4(sc, SCB_NSACR, reg);
+}
+
+/* SAU Control Register routines */
+
+void
+arm_sau_configure(struct arm_scb_softc *sc, int enable, int allns)
+{
+	uint32_t reg;
+
+	reg = RD4(sc, SAU_CTRL);
+	if (enable)
+		reg |= CTRL_ENABLE;
+	else
+		reg &= ~CTRL_ENABLE;
+
+	if (allns)
+		reg |= CTRL_ALLNS;
+	else
+		reg &= ~CTRL_ALLNS;
+
+	WR4(sc, SAU_CTRL, reg);
 }
 
 int
