@@ -31,10 +31,13 @@
 #ifndef	_MIPS_MIPS_TIMER_H_
 #define	_MIPS_MIPS_TIMER_H_
 
+#include <sys/callout.h>
+
 struct mips_timer_softc {
 	uint32_t frequency;
 	uint32_t ticks_per_usec;
 	uint32_t usleep;
+	struct mi_timer mt;
 };
 
 void mips_timer_init(struct mips_timer_softc *sc, uint32_t freq);

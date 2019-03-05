@@ -56,6 +56,8 @@ mips_timer_intr(void *arg, struct trapframe *frame, int irq)
 		sc->usleep = 0;
 
 	mips_wr_compare(-1);
+
+	callout_callback(&sc->mt, 0);
 }
 
 void
@@ -112,6 +114,46 @@ mips_timer_udelay(struct mips_timer_softc *sc, uint32_t usec)
 	}
 }
 
+static uint32_t
+timer_count(void *arg)
+{
+	struct mips_timer_softc *sc;
+	uint32_t count;
+
+	sc = arg;
+
+	count = mips_rd_count();
+
+	dprintf("%s: count %u\n", __func__, count);
+
+	return (count);
+}
+
+static void
+timer_stop(void *arg)
+{
+
+	dprintf("%s\n", __func__);
+
+	mips_wr_compare(-1);
+}
+
+static void
+timer_start(void *arg, uint32_t usec)
+{
+	struct mips_timer_softc *sc;
+	uint32_t reg;
+
+	sc = arg;
+
+	dprintf("%s: usec %u, count %u\n",
+	    __func__, usec, (usec * sc->ticks_per_usec));
+
+	reg = mips_rd_count();
+	reg += (usec * sc->ticks_per_usec);
+	mips_wr_compare(reg);
+}
+
 void
 mips_timer_init(struct mips_timer_softc *sc, uint32_t freq)
 {
@@ -123,4 +165,14 @@ mips_timer_init(struct mips_timer_softc *sc, uint32_t freq)
 
 	sc->frequency = freq;
 	sc->ticks_per_usec = freq / 1000000;
+
+	sc->mt.ticks_per_usec = sc->ticks_per_usec;
+	sc->mt.start = timer_start;
+	sc->mt.stop = timer_stop;
+	sc->mt.count = timer_count;
+	sc->mt.arg = sc;
+
+	mips_wr_compare(-1);
+
+	callout_register(&sc->mt);
 }
