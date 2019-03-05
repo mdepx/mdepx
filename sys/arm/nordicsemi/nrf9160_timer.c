@@ -26,6 +26,7 @@
 
 #include <sys/cdefs.h>
 #include <sys/systm.h>
+#include <sys/callout.h>
 
 #include <machine/frame.h>
 
@@ -36,26 +37,84 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
+#define	NRF_TIMER_DEBUG
+#undef	NRF_TIMER_DEBUG
+
+#ifdef	NRF_TIMER_DEBUG
+#define	dprintf(fmt, ...)	printf(fmt, ##__VA_ARGS__)
+#else
+#define	dprintf(fmt, ...)
+#endif
+
 void
 timer_intr(void *arg, struct trapframe *tf, int irq)
 {
 	struct timer_softc *sc;
+	uint32_t elapsed;
 
 	sc = arg;
 
+	dprintf("%s\n", __func__);
+
+	WR4(sc, TIMER_TASKS_CAPTURE(2), 1);
+
+	elapsed = RD4(sc, TIMER_CC(2));
+
+	WR4(sc, TIMER_TASKS_STOP, 1);
 	WR4(sc, TIMER_EVENTS_COMPARE(sc->cc_idx), 0);
-	WR4(sc, TIMER_TASKS_CLEAR, 1);
+
+	callout_callback(&sc->mt, elapsed);
 }
 
-void
-timer_timeout(struct timer_softc *sc, uint8_t cc_idx,
-    uint32_t timeout)
+static uint32_t
+timer_count(void *arg)
 {
+	struct timer_softc *sc;
+	uint32_t count;
 
-	sc->cc_idx = cc_idx;
+	sc = arg;
+
+	WR4(sc, TIMER_TASKS_CAPTURE(1), 1);
+
+	count = RD4(sc, TIMER_CC(1));
+
+	dprintf("%s: count %d\n", __func__, count);
+
+	return (count);
+}
+
+static void
+timer_stop(void *arg)
+{
+	struct timer_softc *sc;
+
+	dprintf("%s\n", __func__);
+
+	sc = arg;
+
+	WR4(sc, TIMER_TASKS_STOP, 1);
+	WR4(sc, TIMER_EVENTS_COMPARE(sc->cc_idx), 0);
+}
+
+static void
+timer_start(void *arg, uint32_t usec)
+{
+	struct timer_softc *sc;
+	uint32_t reg;
+
+	dprintf("%s: usec %d\n", __func__, usec);
+
+	sc = arg;
+
+	sc->cc_idx = 0;
+
 	WR4(sc, TIMER_BITMODE, BITMODE_32);
-	WR4(sc, TIMER_INTENSET, INTENSET_COMPARE(cc_idx));
-	WR4(sc, TIMER_CC(cc_idx), timeout);
+
+	WR4(sc, TIMER_TASKS_CAPTURE(3), 1);
+	reg = RD4(sc, TIMER_CC(3));
+	WR4(sc, TIMER_CC(sc->cc_idx), reg + usec);
+
+	WR4(sc, TIMER_INTENSET, INTENSET_COMPARE(sc->cc_idx));
 	WR4(sc, TIMER_TASKS_START, 1);
 }
 
@@ -64,4 +123,11 @@ timer_init(struct timer_softc *sc, uint32_t base)
 {
 
 	sc->base = base;
+
+	sc->mt.start = timer_start;
+	sc->mt.stop = timer_stop;
+	sc->mt.count = timer_count;
+	sc->mt.arg = sc;
+	sc->mt.ticks_per_usec = 1;
+	callout_register(&sc->mt);
 }

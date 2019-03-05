@@ -27,6 +27,8 @@
 #ifndef _ARM_NORDICSEMI_NRF9160_TIMER_H_
 #define _ARM_NORDICSEMI_NRF9160_TIMER_H_
 
+#include <sys/callout.h>
+
 #include <machine/frame.h>
 
 #define	TIMER_TASKS_START	0x000	/* Start Timer */
@@ -53,11 +55,10 @@
 struct timer_softc {
 	size_t base;
 	uint8_t cc_idx;
+	struct mi_timer mt;
 };
 
 void timer_init(struct timer_softc *sc, uint32_t base);
 void timer_intr(void *arg, struct trapframe *tf, int irq);
-void timer_timeout(struct timer_softc *sc, uint8_t cc_idx,
-    uint32_t timeout);
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_TIMER_H_ */
