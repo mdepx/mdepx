@@ -78,16 +78,16 @@ callout_init(struct callout *c)
 static void
 decrease_timeouts(void)
 {
-	uint32_t count;
 	uint32_t ticks_elapsed;
 	uint32_t usec_elapsed;
+	uint32_t count;
 	struct callout *c;
 
 	count = mi_tmr->count(mi_tmr->arg);
-	if (count > mi_tmr->count_last)
-		ticks_elapsed = (count - mi_tmr->count_last);
+	if (count > mi_tmr->count_saved)
+		ticks_elapsed = (count - mi_tmr->count_saved);
 	else
-		ticks_elapsed = (0xffffffff - mi_tmr->count_last + count);
+		ticks_elapsed = (0xffffffff - mi_tmr->count_saved + count);
 	usec_elapsed = (ticks_elapsed / mi_tmr->ticks_per_usec);
 
 	dprintf("%s: usec_elapsed %u\n", __func__, usec_elapsed);
@@ -113,11 +113,11 @@ callout_add(struct callout *c0)
 
 	if (callouts == NULL) {
 		KASSERT(mi_tmr->started == 0,
-		    ("mi timer started with callouts == NULL"));
+		    ("mi timer started, but callouts == NULL"));
 		callouts = c0;
 		c0->next = NULL;
 		c0->prev = NULL;
-		mi_tmr->count_last = mi_tmr->count(mi_tmr->arg);
+		mi_tmr->count_saved = mi_tmr->count(mi_tmr->arg);
 		mi_tmr->started = 1;
 		mi_tmr->start(mi_tmr->arg, c0->usec);
 
@@ -161,7 +161,7 @@ callout_add(struct callout *c0)
 		c->next = c0;
 	}
 
-	mi_tmr->count_last = mi_tmr->count(mi_tmr->arg);
+	mi_tmr->count_saved = mi_tmr->count(mi_tmr->arg);
 	mi_tmr->started = 1;
 	mi_tmr->start(mi_tmr->arg, callouts->usec);
 
@@ -170,26 +170,37 @@ callout_add(struct callout *c0)
 #endif
 }
 
-void
+int
 callout_reset(struct callout *c, uint32_t usec,
     void (*func)(void *arg), void *arg)
 {
 	uint32_t intr;
 
+	intr = intr_disable();
+
+	if (c->flags & CALLOUT_FLAG_RUNNING) {
+		intr_restore(intr);
+		return (-1);
+	}
+
 	dprintf("%s: adding callout usec %d\n", __func__, usec);
 
 	if (usec == 0) {
 		c->state = 1;
-		return;
+		intr_restore(intr);
+		return (0);
 	}
 
+	c->usec_orig = usec;
 	c->usec = usec;
 	c->func = func;
 	c->arg = arg;
 
-	intr = intr_disable();
 	callout_add(c);
+	c->flags |= CALLOUT_FLAG_RUNNING;
 	intr_restore(intr);
+
+	return (0);
 }
 
 int
@@ -238,13 +249,14 @@ callout_callback(struct mi_timer *mt, uint32_t usec_elapsed0)
 	while (c != NULL) {
 		tmp = c->next;	
 		c->state = 1;
+		c->flags &= ~CALLOUT_FLAG_RUNNING;
 		if (c->func)
 			c->func(c->arg);
 		c = tmp;
 	}
 
 	if (callouts != NULL && mi_tmr->started == 0) {
-		mi_tmr->count_last = mi_tmr->count(mi_tmr->arg);
+		mi_tmr->count_saved = mi_tmr->count(mi_tmr->arg);
 		mi_tmr->started = 1;
 		mi_tmr->start(mi_tmr->arg, callouts->usec);
 	}
