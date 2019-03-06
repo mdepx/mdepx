@@ -252,8 +252,6 @@ fifo_process_rx(struct altera_fifo_softc *sc,
 		return (0);
 
 	dprintf("%s(%d): fill_level %d\n", __func__, sc->unit, fill_level);
-	dprintf("%s: copy %x -> %x, %d bytes\n",
-	    __func__, read_lo, write_lo, len);
 
 	write_lo = (uint64_t)iov->iov_base;
 	write_lo |= MIPS_XKPHYS_UNCACHED_BASE;
@@ -262,6 +260,8 @@ fifo_process_rx(struct altera_fifo_softc *sc,
 	eop_rcvd = 0;
 	empty = 0;
 	transferred = 0;
+
+	dprintf("%s: copy 0 -> %x\n", __func__, write_lo);
 
 	read_buf = 0;
 	got_bits = 0;
