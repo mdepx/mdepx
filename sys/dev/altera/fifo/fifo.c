@@ -144,7 +144,8 @@ fifo_process_tx(struct altera_fifo_softc *sc,
 		read_lo |= MIPS_XKPHYS_UNCACHED_BASE;
 		len = iov[i].iov_len;
 
-		dprintf("%s: copy %lx -> 0, %d bytes\n", __func__, read_lo, len);
+		dprintf("%s: copy %lx -> 0, %d bytes\n",
+		    __func__, read_lo, len);
 
 		if (read_lo & 1) {
 			read_buf = (read_buf << 8) | *(uint8_t *)read_lo;
@@ -165,19 +166,22 @@ fifo_process_tx(struct altera_fifo_softc *sc,
 			word = (uint32_t)((read_buf >> got_bits) & 0xffffffff);
 			fill_level = fifo_fill_level_wait(sc);
 			if (len == 0 && (i == (iovcnt - 1)) && (got_bits == 0))
-				WR4_FIFO_MEM(sc, A_ONCHIP_FIFO_MEM_CORE_METADATA,
+				WR4_FIFO_MEM(sc,
+				    A_ONCHIP_FIFO_MEM_CORE_METADATA,
 				    htole32(A_ONCHIP_FIFO_MEM_CORE_EOP));
 			WR4_FIFO_MEM(sc, A_ONCHIP_FIFO_MEM_CORE_DATA, word);
 		}
 
 		while (len >= 4) {
-			read_buf = (read_buf << 32) | (uint64_t)*(uint32_t *)read_lo;
+			read_buf = (read_buf << 32) |
+			    (uint64_t)*(uint32_t *)read_lo;
 			read_lo += 4;
 			len -= 4;
 			word = (uint32_t)((read_buf >> got_bits) & 0xffffffff);
 			fill_level = fifo_fill_level_wait(sc);
 			if (len == 0 && (i == (iovcnt - 1)) && (got_bits == 0))
-				WR4_FIFO_MEM(sc, A_ONCHIP_FIFO_MEM_CORE_METADATA,
+				WR4_FIFO_MEM(sc,
+				    A_ONCHIP_FIFO_MEM_CORE_METADATA,
 				    htole32(A_ONCHIP_FIFO_MEM_CORE_EOP));
 			WR4_FIFO_MEM(sc, A_ONCHIP_FIFO_MEM_CORE_DATA, word);
 		}
@@ -201,7 +205,8 @@ fifo_process_tx(struct altera_fifo_softc *sc,
 			word = (uint32_t)((read_buf >> got_bits) & 0xffffffff);
 			fill_level = fifo_fill_level_wait(sc);
 			if (len == 0 && (i == (iovcnt - 1)) && (got_bits == 0))
-				WR4_FIFO_MEM(sc, A_ONCHIP_FIFO_MEM_CORE_METADATA,
+				WR4_FIFO_MEM(sc,
+				    A_ONCHIP_FIFO_MEM_CORE_METADATA,
 				    htole32(A_ONCHIP_FIFO_MEM_CORE_EOP));
 			WR4_FIFO_MEM(sc, A_ONCHIP_FIFO_MEM_CORE_DATA, word);
 		}
@@ -247,7 +252,8 @@ fifo_process_rx(struct altera_fifo_softc *sc,
 		return (0);
 
 	dprintf("%s(%d): fill_level %d\n", __func__, sc->unit, fill_level);
-	dprintf("%s: copy %x -> %x, %d bytes\n", __func__, read_lo, write_lo, len);
+	dprintf("%s: copy %x -> %x, %d bytes\n",
+	    __func__, read_lo, write_lo, len);
 
 	write_lo = (uint64_t)iov->iov_base;
 	write_lo |= MIPS_XKPHYS_UNCACHED_BASE;
