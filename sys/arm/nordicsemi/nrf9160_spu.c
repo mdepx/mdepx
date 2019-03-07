@@ -41,6 +41,13 @@ spu_periph_set_attr(struct spu_softc *sc, int periph_id,
 	int reg;
 
 	reg = RD4(sc, SPU_PERIPHID_PERM(periph_id));
+	if ((reg & PERIPHID_PRESENT) == 0)
+		return;
+
+	if ((reg & PERIPHID_SECMAP_M) != PERIPHID_SECMAP_USER_SELECT &&
+	    (reg & PERIPHID_SECMAP_M) != PERIPHID_SECMAP_SPLIT)
+		return;
+
 	if (secure_attr)
 		reg |= PERIPHID_SECATTR;
 	else
