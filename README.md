@@ -3,9 +3,10 @@
 Osfive is an RTOS/SDK for microcontrollers.
 
 ## Key features
-- Single-threaded
 - Application-centric
+- Single-threaded
 - Tickless operation
+- Static memory allocation (malloc() is provided for applications)
 
 ## Supported libraries
 - BSD libc library
@@ -28,6 +29,7 @@ Osfive is an RTOS/SDK for microcontrollers.
 - RISC-V
   * Microsemi
   * SiFive E300G
+  * GFE P1 Processor (Bluespec Piccolo)
 
 # Getting started
 
