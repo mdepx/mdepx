@@ -57,7 +57,7 @@ mips_timer_intr(void *arg, struct trapframe *frame, int irq)
 
 	mips_wr_compare(-1);
 
-	callout_callback(&sc->mt, 0);
+	callout_callback(&sc->mt);
 }
 
 void

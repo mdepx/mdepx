@@ -57,7 +57,7 @@ struct mi_timer {
 void callout_init(struct callout *c);
 int callout_reset(struct callout *c, uint32_t usec,
     void (*func)(void *arg), void *arg);
-int callout_callback(struct mi_timer *, uint32_t usec_elapsed);
+int callout_callback(struct mi_timer *);
 int callout_register(struct mi_timer *);
 
 #endif /* _SYS_CALLOUT_H_ */

@@ -50,20 +50,15 @@ void
 timer_intr(void *arg, struct trapframe *tf, int irq)
 {
 	struct timer_softc *sc;
-	uint32_t elapsed;
 
 	sc = arg;
 
 	dprintf("%s\n", __func__);
 
-	WR4(sc, TIMER_TASKS_CAPTURE(2), 1);
-
-	elapsed = RD4(sc, TIMER_CC(2));
-
 	WR4(sc, TIMER_TASKS_STOP, 1);
 	WR4(sc, TIMER_EVENTS_COMPARE(sc->cc_idx), 0);
 
-	callout_callback(&sc->mt, elapsed);
+	callout_callback(&sc->mt);
 }
 
 static uint32_t

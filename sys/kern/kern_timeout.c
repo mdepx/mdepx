@@ -204,7 +204,7 @@ callout_reset(struct callout *c, uint32_t usec,
 }
 
 int
-callout_callback(struct mi_timer *mt, uint32_t usec_elapsed0)
+callout_callback(struct mi_timer *mt)
 {
 	struct callout *c, *old, *tmp;
 
