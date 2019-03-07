@@ -46,6 +46,7 @@
 #endif
 
 static struct callout *callouts;
+static struct callout *callouts_tail;
 static struct mi_timer *mi_tmr;
 
 #ifdef CALLOUT_DEBUG
@@ -107,7 +108,7 @@ decrease_timeouts(void)
 static void
 callout_add(struct callout *c0)
 {
-	struct callout *c, *c1;
+	struct callout *c;
 
 	dprintf("%s\n", __func__);
 
@@ -115,6 +116,7 @@ callout_add(struct callout *c0)
 		KASSERT(mi_tmr->started == 0,
 		    ("mi timer started, but callouts == NULL"));
 		callouts = c0;
+		callouts_tail = c0;
 		c0->next = NULL;
 		c0->prev = NULL;
 		mi_tmr->count_saved = mi_tmr->count(mi_tmr->arg);
@@ -133,32 +135,23 @@ callout_add(struct callout *c0)
 		decrease_timeouts();
 	}
 
-	c1 = NULL;
+	for (c = callouts;
+	    (c != NULL && c->usec < c0->usec);
+	    (c = c->next));
 
-	for (c = callouts; c != NULL; c = c->next) {
-		/*
-		 * Check if this is a suitable
-		 * place for the new callout.
-		 */
-		if (c1 == NULL && c0->usec <= c->usec)
-			c1 = c;
-
-		if (c->next == NULL)
-			break;
-	}
-
-	if (c1 != NULL) {
-		c0->next = c1;
-		c0->prev = c1->prev;
+	if (c != NULL) {
+		c0->next = c;
+		c0->prev = c->prev;
 		if (c0->prev == NULL)
 			callouts = c0;
 		else
 			c0->prev->next = c0;
-		c1->prev = c0;
+		c->prev = c0;
 	} else {
-		c0->next = NULL;
-		c0->prev = c;
-		c->next = c0;
+		callouts_tail->next = c0;
+		c0->prev = callouts_tail;
+		callouts_tail = c0;
+		callouts_tail->next = NULL;
 	}
 
 	mi_tmr->count_saved = mi_tmr->count(mi_tmr->arg);
@@ -242,6 +235,8 @@ callout_callback(struct mi_timer *mt)
 	}
 
 	callouts = c;
+	if (callouts == NULL)
+		callouts_tail = NULL;
 
 	KASSERT(callouts != old, ("wrong"));
 
