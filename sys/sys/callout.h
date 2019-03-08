@@ -51,7 +51,7 @@ struct mi_timer {
 	void *arg;
 	uint32_t ticks_per_usec;
 	uint32_t count_saved;
-	int started;
+	int running;
 };
 
 void callout_init(struct callout *c);

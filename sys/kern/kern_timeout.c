@@ -76,27 +76,34 @@ callout_init(struct callout *c)
 	c->state = 0;
 }
 
-static void
-decrease_timeouts(void)
+static uint32_t
+get_elapsed(void)
 {
 	uint32_t ticks_elapsed;
 	uint32_t usec_elapsed;
 	uint32_t count;
-	struct callout *c;
 
 	count = mi_tmr->count(mi_tmr->arg);
 	if (count > mi_tmr->count_saved)
 		ticks_elapsed = (count - mi_tmr->count_saved);
 	else
 		ticks_elapsed = (0xffffffff - mi_tmr->count_saved + count);
+	mi_tmr->count_saved = count;
 	usec_elapsed = (ticks_elapsed / mi_tmr->ticks_per_usec);
 
 	dprintf("%s: usec_elapsed %u\n", __func__, usec_elapsed);
 
-	/*
-	 * Decrease all the timeouts first,
-	 * then call user callback function.
-	 */
+	return (usec_elapsed);
+}
+
+static void
+fix_timeouts(void)
+{
+	struct callout *c;
+	uint32_t usec_elapsed;
+
+	usec_elapsed = get_elapsed();
+
 	for (c = callouts; c != NULL; c = c->next) {
 		if (usec_elapsed >= c->usec)
 			c->usec = 0;
@@ -109,18 +116,19 @@ static void
 callout_add(struct callout *c0)
 {
 	struct callout *c;
+	int changed;
 
 	dprintf("%s\n", __func__);
 
 	if (callouts == NULL) {
-		KASSERT(mi_tmr->started == 0,
-		    ("mi timer started, but callouts == NULL"));
+		KASSERT(mi_tmr->running == 0,
+		    ("mi timer is running, but callouts == NULL"));
 		callouts = c0;
 		callouts_tail = c0;
 		c0->next = NULL;
 		c0->prev = NULL;
 		mi_tmr->count_saved = mi_tmr->count(mi_tmr->arg);
-		mi_tmr->started = 1;
+		mi_tmr->running = 1;
 		mi_tmr->start(mi_tmr->arg, c0->usec);
 
 #ifdef CALLOUT_DEBUG
@@ -129,22 +137,22 @@ callout_add(struct callout *c0)
 		return;
 	}
 
-	if (mi_tmr->started) {
-		mi_tmr->stop(mi_tmr->arg);
-		mi_tmr->started = 0;
-		decrease_timeouts();
-	}
+	if (mi_tmr->running)
+		fix_timeouts();
 
 	for (c = callouts;
 	    (c != NULL && c->usec < c0->usec);
 	    (c = c->next));
 
+	changed = 0;
+
 	if (c != NULL) {
 		c0->next = c;
 		c0->prev = c->prev;
-		if (c0->prev == NULL)
+		if (c0->prev == NULL) {
 			callouts = c0;
-		else
+			changed = 1;
+		} else
 			c0->prev->next = c0;
 		c->prev = c0;
 	} else {
@@ -154,9 +162,8 @@ callout_add(struct callout *c0)
 		callouts_tail->next = NULL;
 	}
 
-	mi_tmr->count_saved = mi_tmr->count(mi_tmr->arg);
-	mi_tmr->started = 1;
-	mi_tmr->start(mi_tmr->arg, callouts->usec);
+	if (changed && mi_tmr->running)
+		mi_tmr->start(mi_tmr->arg, callouts->usec);
 
 #ifdef CALLOUT_DEBUG
 	callout_dump();
@@ -201,10 +208,7 @@ callout_callback(struct mi_timer *mt)
 {
 	struct callout *c, *old, *tmp;
 
-	/*
-	 * Mi timer is halted at this step.
-	 * Interrupts are disabled.
-	 */
+	/* TODO: check if interrupts are disabled. */
 
 	dprintf("%s\n", __func__);
 
@@ -216,12 +220,10 @@ callout_callback(struct mi_timer *mt)
 	if (callouts == NULL)
 		return (0);
 
-	mi_tmr->started = 0;
-
 	KASSERT(callouts != NULL,
 	    ("%s: callouts is NULL", __func__));
 
-	decrease_timeouts();
+	fix_timeouts();
 
 	old = callouts;
 
@@ -240,6 +242,8 @@ callout_callback(struct mi_timer *mt)
 
 	KASSERT(callouts != old, ("wrong"));
 
+	mi_tmr->running = 0;
+
 	c = old;
 	while (c != NULL) {
 		tmp = c->next;	
@@ -250,10 +254,14 @@ callout_callback(struct mi_timer *mt)
 		c = tmp;
 	}
 
-	if (callouts != NULL && mi_tmr->started == 0) {
-		mi_tmr->count_saved = mi_tmr->count(mi_tmr->arg);
-		mi_tmr->started = 1;
-		mi_tmr->start(mi_tmr->arg, callouts->usec);
+	if (callouts != NULL) {
+		if (mi_tmr->running == 0) {
+			mi_tmr->running = 1;
+			mi_tmr->start(mi_tmr->arg, callouts->usec);
+		}
+	} else {
+		mi_tmr->running = 0;
+		mi_tmr->stop(mi_tmr->arg);
 	}
 
 	return (0);
@@ -267,7 +275,7 @@ callout_register(struct mi_timer *mt)
 		return (EEXIST);
 
 	mi_tmr = mt;
-	mi_tmr->started = 0;
+	mi_tmr->running = 0;
 
 	return (0);
 }

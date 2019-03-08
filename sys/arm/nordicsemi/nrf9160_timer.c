@@ -55,7 +55,6 @@ timer_intr(void *arg, struct trapframe *tf, int irq)
 
 	dprintf("%s\n", __func__);
 
-	WR4(sc, TIMER_TASKS_STOP, 1);
 	WR4(sc, TIMER_EVENTS_COMPARE(sc->cc_idx), 0);
 
 	callout_callback(&sc->mt);
@@ -70,7 +69,6 @@ timer_count(void *arg)
 	sc = arg;
 
 	WR4(sc, TIMER_TASKS_CAPTURE(1), 1);
-
 	count = RD4(sc, TIMER_CC(1));
 
 	dprintf("%s: count %d\n", __func__, count);
@@ -101,15 +99,11 @@ timer_start(void *arg, uint32_t usec)
 
 	sc = arg;
 
-	sc->cc_idx = 0;
-
-	WR4(sc, TIMER_BITMODE, BITMODE_32);
-
+	if (usec == 1)
+		usec++;
 	WR4(sc, TIMER_TASKS_CAPTURE(3), 1);
 	reg = RD4(sc, TIMER_CC(3));
 	WR4(sc, TIMER_CC(sc->cc_idx), reg + usec);
-
-	WR4(sc, TIMER_INTENSET, INTENSET_COMPARE(sc->cc_idx));
 	WR4(sc, TIMER_TASKS_START, 1);
 }
 
@@ -118,6 +112,10 @@ timer_init(struct timer_softc *sc, uint32_t base)
 {
 
 	sc->base = base;
+	sc->cc_idx = 0;
+
+	WR4(sc, TIMER_BITMODE, BITMODE_32);
+	WR4(sc, TIMER_INTENSET, INTENSET_COMPARE(sc->cc_idx));
 
 	sc->mt.start = timer_start;
 	sc->mt.stop = timer_stop;
