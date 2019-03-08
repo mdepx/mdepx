@@ -104,19 +104,17 @@ fix_timeouts(void)
 
 	usec_elapsed = get_elapsed();
 
-	for (c = callouts; c != NULL; c = c->next) {
+	for (c = callouts; c != NULL; c = c->next)
 		if (usec_elapsed >= c->usec)
 			c->usec = 0;
 		else
 			c->usec -= usec_elapsed;
-	}
 }
 
 static void
 callout_add(struct callout *c0)
 {
 	struct callout *c;
-	int changed;
 
 	dprintf("%s\n", __func__);
 
@@ -129,7 +127,7 @@ callout_add(struct callout *c0)
 		c0->prev = NULL;
 		mi_tmr->count_saved = mi_tmr->count(mi_tmr->arg);
 		mi_tmr->running = 1;
-		mi_tmr->start(mi_tmr->arg, c0->usec);
+		mi_tmr->start(mi_tmr->arg, callouts->usec);
 
 #ifdef CALLOUT_DEBUG
 		callout_dump();
@@ -144,26 +142,23 @@ callout_add(struct callout *c0)
 	    (c != NULL && c->usec < c0->usec);
 	    (c = c->next));
 
-	changed = 0;
-
 	if (c != NULL) {
 		c0->next = c;
 		c0->prev = c->prev;
+		c->prev = c0;
 		if (c0->prev == NULL) {
 			callouts = c0;
-			changed = 1;
+			if (mi_tmr->running)
+				mi_tmr->start(mi_tmr->arg,
+				    callouts->usec);
 		} else
 			c0->prev->next = c0;
-		c->prev = c0;
 	} else {
 		callouts_tail->next = c0;
 		c0->prev = callouts_tail;
 		callouts_tail = c0;
 		callouts_tail->next = NULL;
 	}
-
-	if (changed && mi_tmr->running)
-		mi_tmr->start(mi_tmr->arg, callouts->usec);
 
 #ifdef CALLOUT_DEBUG
 	callout_dump();
