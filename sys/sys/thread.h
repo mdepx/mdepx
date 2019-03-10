@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018-2019 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,47 +24,16 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
-#include <sys/systm.h>
-#include <sys/lock.h>
-#include <sys/thread.h>
+#ifndef	_SYS_THREAD_H_
+#define	_SYS_THREAD_H_
 
-#include <machine/machdep.h>
-#include <machine/frame.h>
-#include <machine/cpufunc.h>
+#include <machine/thread.h>
 
-static struct thread thread0;
+struct thread {
+	const char *td_name;
+	struct mdthread td_md;
+};
 
-void
-spinlock_enter(void)
-{
-	struct thread *td;
+struct thread *curthread;
 
-	td = curthread;
-
-	if (td->td_md.md_spinlock_count == 0) {
-		td->td_md.md_spinlock_count = 1;
-		td->td_md.md_saved_primask = intr_disable();
-	} else
-		td->td_md.md_spinlock_count++;
-}
-
-void
-spinlock_exit(void)
-{
-	struct thread *td;
-
-	td = curthread;
-
-	td->td_md.md_spinlock_count--;
-	if (td->td_md.md_spinlock_count == 0)
-		intr_restore(td->td_md.md_saved_primask);
-}
-
-void
-md_init(void)
-{
-
-	thread0.td_name = "the only thread";
-	curthread = &thread0;
-}
+#endif /* !_SYS_THREAD_H_ */
