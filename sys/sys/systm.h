@@ -30,6 +30,9 @@
 void udelay(uint32_t usec);	/* polling delay */
 void usleep(uint32_t usec);	/* interrupt-driven sleep */
 
+void critical_enter(void);
+void critical_exit(void);
+
 void panic(const char *fmt, ...);
 
 #define	KASSERT(e, m) do {		\

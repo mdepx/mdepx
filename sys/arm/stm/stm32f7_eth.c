@@ -28,7 +28,6 @@
 #include <sys/errno.h>
 #include <sys/systm.h>
 #include <sys/mbuf.h>
-#include <sys/lock.h>
 #include <net/if.h>
 #include <net/ethernet.h>
 
@@ -150,7 +149,7 @@ dwc_txfinish_locked(struct stm32f7_eth_softc *sc)
 	struct dwc_hwdesc *desc;
 	struct mbuf *m;
 
-	spinlock_enter();
+	critical_enter();
 
 	while (sc->tx_idx_tail != sc->tx_idx_head) {
 		desc = &sc->txdesc_ring[sc->tx_idx_tail];
@@ -162,7 +161,7 @@ dwc_txfinish_locked(struct stm32f7_eth_softc *sc)
 		sc->tx_idx_tail = next_txidx(sc, sc->tx_idx_tail);
 	}
 
-	spinlock_exit();
+	critical_exit();
 }
 
 static void
@@ -400,7 +399,7 @@ stm32f7_eth_transmit(struct ifnet *ifp, struct mbuf *m0)
 
 	sc = ifp->if_softc;
 
-	spinlock_enter();
+	critical_enter();
 
 	enqueued = 0;
 
@@ -433,7 +432,7 @@ stm32f7_eth_transmit(struct ifnet *ifp, struct mbuf *m0)
 	if (enqueued)
 		WR4(sc, ETH_DMATPDR, 0x1);
 
-	spinlock_exit();
+	critical_exit();
 
 	return (0);
 }

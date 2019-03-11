@@ -28,7 +28,6 @@
 #define	_MACHINE_THREAD_H_
 
 struct mdthread {
-	int md_spinlock_count;
 	register_t md_saved_intr;
 };
 

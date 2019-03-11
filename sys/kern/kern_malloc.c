@@ -32,17 +32,17 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/systm.h>
 #include <sys/malloc.h>
-#include <sys/lock.h>
 
 void *
 malloc(size_t size)
 {
 	void *ret;
 
-	spinlock_enter();
+	critical_enter();
 	ret = fl_malloc(size);
-	spinlock_exit();
+	critical_exit();
 
 	return (ret);
 }
@@ -51,9 +51,9 @@ void
 free(void *ptr)
 {
 
-	spinlock_enter();
+	critical_enter();
 	fl_free(ptr);
-	spinlock_exit();
+	critical_exit();
 }
 
 void *
@@ -61,9 +61,9 @@ calloc(size_t number, size_t size)
 {
 	void *ret;
 
-	spinlock_enter();
+	critical_enter();
 	ret = fl_calloc(number, size);
-	spinlock_exit();
+	critical_exit();
 
 	return (ret);
 }
@@ -73,9 +73,9 @@ realloc(void *ptr, size_t size)
 {
 	void *ret;
 
-	spinlock_enter();
+	critical_enter();
 	ret = fl_realloc(ptr, size);
-	spinlock_exit();
+	critical_exit();
 
 	return (ret);
 }
@@ -84,16 +84,16 @@ void
 malloc_add_region(uintptr_t base, int size)
 {
 
-	spinlock_enter();
+	critical_enter();
 	fl_add_region(base, size);
-	spinlock_exit();
+	critical_exit();
 }
 
 void
 malloc_init(void)
 {
 
-	spinlock_enter();
+	critical_enter();
 	fl_init();
-	spinlock_exit();
+	critical_exit();
 }

@@ -26,7 +26,6 @@
 
 #include <sys/cdefs.h>
 #include <sys/systm.h>
-#include <sys/lock.h>
 #include <sys/thread.h>
 
 #include <machine/machdep.h>
@@ -36,28 +35,28 @@
 static struct thread thread0;
 
 void
-spinlock_enter(void)
+critical_enter(void)
 {
 	struct thread *td;
 
 	td = curthread;
 
-	if (td->td_md.md_spinlock_count == 0) {
-		td->td_md.md_spinlock_count = 1;
+	if (td->td_critnest == 0) {
+		td->td_critnest = 1;
 		td->td_md.md_saved_primask = intr_disable();
 	} else
-		td->td_md.md_spinlock_count++;
+		td->td_critnest++;
 }
 
 void
-spinlock_exit(void)
+critical_exit(void)
 {
 	struct thread *td;
 
 	td = curthread;
 
-	td->td_md.md_spinlock_count--;
-	if (td->td_md.md_spinlock_count == 0)
+	td->td_critnest--;
+	if (td->td_critnest == 0)
 		intr_restore(td->td_md.md_saved_primask);
 }
 

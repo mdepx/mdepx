@@ -32,6 +32,7 @@
 struct thread {
 	const char *td_name;
 	struct mdthread td_md;
+	volatile u_int td_critnest;
 };
 
 struct thread *curthread;
