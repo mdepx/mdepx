@@ -62,6 +62,13 @@ spinlock_exit(void)
 }
 
 void
+cpu_idle(void)
+{
+
+	__asm __volatile("wait");
+}
+
+void
 md_init(void)
 {
 

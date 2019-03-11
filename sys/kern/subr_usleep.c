@@ -24,18 +24,19 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_SYS_THREAD_H_
-#define	_SYS_THREAD_H_
+#include <sys/cdefs.h>
+#include <sys/callout.h>
+#include <sys/systm.h>
+#include <sys/thread.h>
 
-#include <machine/thread.h>
+void
+usleep(uint32_t usec)
+{
+	struct callout c;
 
-struct thread {
-	const char *td_name;
-	struct mdthread td_md;
-};
+	callout_init(&c);
+	callout_reset(&c, usec, NULL, NULL);
 
-struct thread *curthread;
-
-void cpu_idle(void);
-
-#endif /* !_SYS_THREAD_H_ */
+	while (c.state == 0)
+		cpu_idle();
+}
