@@ -64,7 +64,9 @@ void
 cpu_idle(void)
 {
 
+	critical_enter();
 	__asm __volatile("wait");
+	critical_exit();
 }
 
 void

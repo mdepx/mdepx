@@ -64,7 +64,11 @@ void
 cpu_idle(void)
 {
 
-	__asm __volatile("wfi");
+	critical_enter();
+	__asm __volatile(
+		"dsb \n"
+		"wfi \n");
+	critical_exit();
 }
 
 void
