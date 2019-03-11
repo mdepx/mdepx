@@ -30,9 +30,12 @@
 
 #include <sys/cdefs.h>
 #include <sys/systm.h>
+#include <sys/thread.h>
+
 #include <machine/frame.h>
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
+
 #include <mips/mips/trap.h>
 
 #define	TRAP_DEBUG
@@ -78,7 +81,7 @@ mips_exception(struct trapframe *frame)
 	uint32_t cause;
 	int i;
 
-	critical_enter();
+	curthread->td_critnest++;
 
 	cause = mips_rd_cause();
 	dprintf("%s: cause %x\n", __func__, cause);
@@ -103,7 +106,7 @@ mips_exception(struct trapframe *frame)
 		    __func__, exc_code, frame->tf_pc, frame->tf_badvaddr);
 	}
 
-	critical_exit();
+	curthread->td_critnest--;
 
 	dprintf("Exception cause: %x, code %d\n", cause, exc_code);
 }

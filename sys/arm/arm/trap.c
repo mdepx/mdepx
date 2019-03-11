@@ -26,7 +26,10 @@
 
 #include <sys/cdefs.h>
 #include <sys/systm.h>
+#include <sys/thread.h>
+
 #include <machine/frame.h>
+
 #include <arm/arm/nvic.h>
 
 void arm_exception(int irq, struct trapframe *tf);
@@ -58,7 +61,7 @@ arm_exception(int exc_code, struct trapframe *tf)
 {
 	uint32_t irq;
 
-	critical_enter();
+	curthread->td_critnest++;
 
 	if (exc_code >= 16) {
 		irq = exc_code - 16;
@@ -68,5 +71,5 @@ arm_exception(int exc_code, struct trapframe *tf)
 		panic("unhandled exception %d\n", exc_code);
 	}
 
-	critical_exit();
+	curthread->td_critnest--;
 }
