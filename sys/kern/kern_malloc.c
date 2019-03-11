@@ -1,6 +1,13 @@
 /*-
- * Copyright (c) 2018-2019 Ruslan Bukin <br@bsdpad.com>
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
+ *
+ * This software was developed by SRI International and the University of
+ * Cambridge Computer Laboratory (Department of Computer Science and
+ * Technology) under DARPA contract HR0011-18-C-0016 ("ECATS"), as part of the
+ * DARPA SSITH research programme.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,12 +31,69 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_SYS_MALLOC_H_
-#define	_SYS_MALLOC_H_
+#include <sys/cdefs.h>
+#include <sys/malloc.h>
+#include <sys/lock.h>
 
-#include <sys/malloc_fl.h>
+void *
+malloc(size_t size)
+{
+	void *ret;
 
-void malloc_init(void);
-void malloc_add_region(uintptr_t base, int size);
+	spinlock_enter();
+	ret = fl_malloc(size);
+	spinlock_exit();
 
-#endif /* !_SYS_MALLOC_H_ */
+	return (ret);
+}
+
+void
+free(void *ptr)
+{
+
+	spinlock_enter();
+	fl_free(ptr);
+	spinlock_exit();
+}
+
+void *
+calloc(size_t number, size_t size)
+{
+	void *ret;
+
+	spinlock_enter();
+	ret = fl_calloc(number, size);
+	spinlock_exit();
+
+	return (ret);
+}
+
+void *
+realloc(void *ptr, size_t size)
+{
+	void *ret;
+
+	spinlock_enter();
+	ret = fl_realloc(ptr, size);
+	spinlock_exit();
+
+	return (ret);
+}
+
+void            
+malloc_add_region(uintptr_t base, int size)
+{
+
+	spinlock_enter();
+	fl_add_region(base, size);
+	spinlock_exit();
+}
+
+void
+malloc_init(void)
+{
+
+	spinlock_enter();
+	fl_init();
+	spinlock_exit();
+}
