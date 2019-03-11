@@ -78,6 +78,8 @@ mips_exception(struct trapframe *frame)
 	uint32_t cause;
 	int i;
 
+	critical_enter();
+
 	cause = mips_rd_cause();
 	dprintf("%s: cause %x\n", __func__, cause);
 	exc_code = (cause & MIPS_CR_EXC_CODE_M) >> \
@@ -100,6 +102,8 @@ mips_exception(struct trapframe *frame)
 		panic("%s: no handler: exc_code %d, pc %zx, badvaddr %zx\n",
 		    __func__, exc_code, frame->tf_pc, frame->tf_badvaddr);
 	}
+
+	critical_exit();
 
 	dprintf("Exception cause: %x, code %d\n", cause, exc_code);
 }

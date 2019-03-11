@@ -58,6 +58,8 @@ arm_exception(int exc_code, struct trapframe *tf)
 {
 	uint32_t irq;
 
+	critical_enter();
+
 	if (exc_code >= 16) {
 		irq = exc_code - 16;
 		arm_nvic_intr(irq, tf);
@@ -65,4 +67,6 @@ arm_exception(int exc_code, struct trapframe *tf)
 		dump_frame(tf);
 		panic("unhandled exception %d\n", exc_code);
 	}
+
+	critical_exit();
 }

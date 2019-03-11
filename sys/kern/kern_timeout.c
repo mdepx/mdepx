@@ -33,6 +33,7 @@
 #include <sys/systm.h>
 #include <sys/errno.h>
 #include <sys/callout.h>
+#include <sys/thread.h>
 
 #include <machine/cpufunc.h>
 
@@ -116,6 +117,9 @@ callout_add(struct callout *c0)
 {
 	struct callout *c;
 
+	KASSERT(curthread != NULL, ("curthread is NULL"));
+	KASSERT(curthread->td_critnest > 0, ("Not in critical section."));
+
 	dprintf("%s\n", __func__);
 
 	if (callouts == NULL) {
@@ -169,12 +173,11 @@ int
 callout_reset(struct callout *c, uint32_t usec,
     void (*func)(void *arg), void *arg)
 {
-	uint32_t intr;
 
-	intr = intr_disable();
+	critical_enter();
 
 	if (c->flags & CALLOUT_FLAG_RUNNING) {
-		intr_restore(intr);
+		critical_exit();
 		return (-1);
 	}
 
@@ -182,7 +185,7 @@ callout_reset(struct callout *c, uint32_t usec,
 
 	if (usec == 0) {
 		c->state = 1;
-		intr_restore(intr);
+		critical_exit();
 		return (0);
 	}
 
@@ -193,7 +196,7 @@ callout_reset(struct callout *c, uint32_t usec,
 
 	callout_add(c);
 	c->flags |= CALLOUT_FLAG_RUNNING;
-	intr_restore(intr);
+	critical_exit();
 
 	return (0);
 }
@@ -203,7 +206,7 @@ callout_callback(struct mi_timer *mt)
 {
 	struct callout *c, *old, *tmp;
 
-	/* TODO: check if interrupts are disabled. */
+	KASSERT(curthread->td_critnest > 0, ("Not in critical section."));
 
 	dprintf("%s\n", __func__);
 
