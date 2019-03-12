@@ -51,7 +51,7 @@ static void
 default_handler(void *arg, struct trapframe *frame, int i)
 {
 
-	printf("Install interrupt handler!\n");
+	printf("Interrupt handler is missing for int %d\n", i);
 }
 
 static const struct mips_intr_entry mips_intr_map[MIPS_N_INTR] = {
