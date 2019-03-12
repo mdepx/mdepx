@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2018-2019 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,16 +33,13 @@
 	.thumb_func
 	.type exception, function
 exception:
-	mrs	r0, ipsr		/* r0 = exception number */
-	mov	r2, sp
-	mrs	r3, primask
-	stmdb	sp!, {r2-r11, r14}	/* save r4-r11, r14, sp and primask */
-	cpsid	i			/* disable interrupts */
-	mov	r1, sp			/* r1 = registers saved on stack */
-	mov	r4, sp
-	bl	arm_exception
-	mov	r1, r4
-	ldmia	r1!, {r2-r11, r14}
-	msr 	msp, r1
-	msr	primask, r3		/* restore interrupts */
+	mrs	r1, ipsr		/* r1 = exception number. */
+	mrs	r3, primask		/* r3 = primask. */
+	stmdb	sp!, {r3-r11, r14}	/* Save primask, r4-r11 and r14. */
+	cpsid	i			/* Disable interrupts. */
+	mov	r0, sp			/* r0 = trapframe. */
+	bl	arm_exception		/* Branch link to arm_exception() */
+	ldmia	r0!, {r3-r11, r14}	/* Load primask, r4-r11 and r14. */
+	msr 	msp, r0			/* Restore sp. */
+	msr	primask, r3		/* Restore interrupts. */
 	bx	r14

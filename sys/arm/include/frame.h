@@ -40,7 +40,6 @@ struct hwregs {
 };
 
 struct trapframe {
-	struct hwregs	*hwregs;
 	register_t	tf_primask;
 	register_t	tf_r4;
 	register_t	tf_r5;
@@ -51,6 +50,7 @@ struct trapframe {
 	register_t	tf_r10;
 	register_t	tf_r11;
 	register_t	tf_r14;
+	struct hwregs	hwregs;
 };
 #endif
 
