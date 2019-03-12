@@ -28,6 +28,7 @@
 #include <sys/systm.h>
 #include <sys/thread.h>
 
+#include <machine/cpuregs.h>
 #include <machine/frame.h>
 
 #include <arm/arm/nvic.h>
@@ -57,6 +58,22 @@ dump_frame(struct trapframe *tf)
 	printf("tf->tf_r14 == %x\n", tf->tf_r14);
 }
 
+static void
+handle_exception(struct trapframe *tf, int exc_code)
+{
+
+	switch (exc_code) {
+	case EXCP_SVCALL:
+		break;
+	case EXCP_HARD_FAULT:
+		dump_frame(tf);
+		panic("Hardfault");
+	default:
+		dump_frame(tf);
+		panic("unhandled exception %d", exc_code);
+	}
+}
+
 struct trapframe *
 arm_exception(struct trapframe *tf, int exc_code)
 {
@@ -67,10 +84,8 @@ arm_exception(struct trapframe *tf, int exc_code)
 	if (exc_code >= 16) {
 		irq = exc_code - 16;
 		arm_nvic_intr(irq, tf);
-	} else {
-		dump_frame(tf);
-		panic("unhandled exception %d\n", exc_code);
-	}
+	} else
+		handle_exception(tf, exc_code);
 
 	curthread->td_critnest--;
 
