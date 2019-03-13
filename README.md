@@ -39,7 +39,9 @@ Osfive has no build system. You have to construct your own GNU or BSD makefile l
 
 # Contributing
 
-Osfive uses FreeBSD [style(9)](https://www.freebsd.org/cgi/man.cgi?query=style&sektion=9) guide.
+Please submit patches on github.
+
+Note osfive uses FreeBSD [style(9)](https://www.freebsd.org/cgi/man.cgi?query=style&sektion=9) guide.
 
 # License
 
