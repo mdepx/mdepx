@@ -3,10 +3,11 @@
 Osfive is an RTOS/SDK for microcontrollers.
 
 ## Key features
-- Application-centric
-- Single-threaded
-- Tickless operation
-- Static memory allocation (malloc() is provided for applications)
+- Application-centric.
+- Multi-threading supported for ARM Cortex-M.
+- Fully preemptible.
+- Tickless operation.
+- Static/Dynamic memory allocation.
 
 ## Supported libraries
 - BSD libc library
