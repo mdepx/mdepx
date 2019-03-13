@@ -47,4 +47,8 @@
 /* Execution PSR (EPSR) register */
 #define	XPSR_T		(1 << 24) /* Thumb state bit (T-bit) */
 
+#define	EXCP_RET_HANDLER	0xFFFFFFF1
+#define	EXCP_RET_THREAD_MSP	0xFFFFFFF9
+#define	EXCP_RET_THREAD_PSP	0xFFFFFFFD
+
 #endif /* !_MACHINE_CPUREGS_H_ */

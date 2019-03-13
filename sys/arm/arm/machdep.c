@@ -76,7 +76,7 @@ md_setup_frame(struct trapframe *tf, void *entry,
 {
 	struct hwregs *hw;
 
-	tf->tf_r14 = 0xfffffff9;
+	tf->tf_r14 = EXCP_RET_THREAD_MSP;
 
 	hw = (struct hwregs *)&tf->hwregs;
 	hw->r0 = (uint32_t)arg;
