@@ -89,5 +89,5 @@ arm_exception(struct trapframe *tf, int exc_code)
 
 	curthread->td_critnest--;
 
-	return (tf);
+	return (sched_next(tf));
 }

@@ -27,16 +27,34 @@
 #ifndef	_SYS_THREAD_H_
 #define	_SYS_THREAD_H_
 
+#include <sys/callout.h>
+
 #include <machine/thread.h>
 
 struct thread {
-	const char *td_name;
-	struct mdthread td_md;
-	volatile u_int td_critnest;
+	const char *		td_name;
+	struct mdthread		td_md;
+	volatile u_int		td_critnest;
+	struct trapframe *	td_tf;
+	uint8_t *		td_mem;
+	uint32_t		td_mem_size;
+	uint8_t			td_index;
+	uint8_t			td_idle;
+	struct callout		td_c;
+	int			td_running;
+	struct thread *		td_next;
+	struct thread *		td_prev;
+	uint32_t		td_quantum;
 };
 
 struct thread *curthread;
 
+void thread0_init(void);
+struct trapframe *sched_next(struct trapframe *);
+struct thread *thread_create(const char *name, uint32_t quantum,
+    void *entry, void *arg);
 void cpu_idle(void);
+void md_setup_frame(struct trapframe *tf, void *entry,
+    void *arg, void *terminate);
 
 #endif /* !_SYS_THREAD_H_ */
