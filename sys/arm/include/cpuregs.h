@@ -32,6 +32,7 @@
 #define	CONTROL_SPSEL	(1 << 1) /* Stack-pointer select. */
 #define	CONTROL_NPRIV	(1 << 0) /* Not privileged. Thread mode has unprivileged access only. */
 
+/* Exception numbers */
 #define	EXCP_RESET		1
 #define	EXCP_NMI		2
 #define	EXCP_HARD_FAULT		3
@@ -42,5 +43,8 @@
 #define	EXCP_DEBUG_MONITOR	12
 #define	EXCP_PENDSV		14
 #define	EXCP_SYSTICK		15
+
+/* Execution PSR (EPSR) register */
+#define	XPSR_T		(1 << 24) /* Thumb state bit (T-bit) */
 
 #endif /* !_MACHINE_CPUREGS_H_ */

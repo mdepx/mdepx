@@ -30,6 +30,7 @@
 
 #include <machine/machdep.h>
 #include <machine/frame.h>
+#include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
 
 void
@@ -81,7 +82,7 @@ md_setup_frame(struct trapframe *tf, void *entry,
 	hw->r0 = (uint32_t)arg;
 	hw->r14 = (uint32_t)terminate;
 	hw->r15 = (uint32_t)entry;
-	hw->xpsr = (1 << 24);
+	hw->xpsr = XPSR_T;
 }
 
 void
