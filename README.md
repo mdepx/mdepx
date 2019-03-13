@@ -18,11 +18,11 @@ Osfive is an RTOS/SDK for microcontrollers.
 - xz
 
 ## Supported platforms
-- ARM
+- ARM Cortex-M
   * Maxim MAX32625
   * Maxim MAX32660
   * Nordic Semiconductor nRF52
-  * Nordic Semiconductor nRF9160
+  * [Nordic Semiconductor nRF9160](https://github.com/osfive/nrf9160)
   * NXP LPC43xx
   * STM32xx
 - MIPS
@@ -30,8 +30,8 @@ Osfive is an RTOS/SDK for microcontrollers.
   * Microchip PIC32
 - RISC-V
   * Microsemi
-  * SiFive E300G
-  * GFE P1 Processor (Bluespec Piccolo)
+  * [SiFive E300G](https://github.com/osfive/hifive1-oled)
+  * [GFE P1 Processor (Bluespec Piccolo)](https://github.com/CTSRD-CHERI/piccolo-demo)
 
 # Getting started
 
