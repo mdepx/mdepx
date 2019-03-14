@@ -36,6 +36,7 @@ VECTOR(MipsException)
 	PTR_LA	k0, mips_exception
 	jalr	k0
 	nop
+	move	sp, v0
 	restore_registers
 	sync
 	eret
