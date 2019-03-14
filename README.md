@@ -4,7 +4,7 @@ Osfive is an RTOS/SDK for microcontrollers.
 
 ## Key features
 - Application-centric
-- Multi-threading supported for ARM Cortex-M
+- Multi-threading supported for ARM Cortex-M and MIPS.
 - Fully preemptible
 - Tickless operation
 - Static/Dynamic memory allocation
