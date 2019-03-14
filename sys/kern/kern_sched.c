@@ -96,7 +96,11 @@ thread_terminate(void)
 
 	critical_exit();
 
-	__asm __volatile("svc 0");
+	md_thread_terminate();
+
+	/* NOT REACHED */
+
+	panic("md_thread_terminate() returned\n");
 }
 
 struct thread *

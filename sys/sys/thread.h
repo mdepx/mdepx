@@ -56,5 +56,6 @@ struct thread *thread_create(const char *name, uint32_t quantum,
 void cpu_idle(void);
 void md_setup_frame(struct trapframe *tf, void *entry,
     void *arg, void *terminate);
+void md_thread_terminate(void);
 
 #endif /* !_SYS_THREAD_H_ */

@@ -86,6 +86,13 @@ md_setup_frame(struct trapframe *tf, void *entry,
 }
 
 void
+md_thread_terminate(void)
+{
+
+	__asm __volatile("svc 0");
+}
+
+void
 md_init(void)
 {
 
