@@ -2,10 +2,6 @@
  * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
- * This software was developed by SRI International and the University of
- * Cambridge Computer Laboratory under DARPA/AFRL contract FA8750-10-C-0237
- * ("CTSRD"), as part of the DARPA CRASH research programme.
- *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -28,23 +24,30 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_MACHINE_FRAME_H_
-#define	_MACHINE_FRAME_H_
+#include <sys/cdefs.h>
+#include <sys/systm.h>
+#include <sys/thread.h>
 
-#ifndef __ASSEMBLER__
-struct trapframe {
-	register_t tf_ra;
-	register_t tf_sp;
-	register_t tf_gp;
-	register_t tf_tp;
-	register_t tf_t[7];
-	register_t tf_s[12];
-	register_t tf_a[8];
-	register_t tf_mepc;
-	register_t tf_mstatus;
-	register_t tf_mtval;
-	register_t tf_mcause;
-};
+#include <machine/frame.h>
+#include <machine/cpuregs.h>
+#include <machine/cpufunc.h>
+
+#include <riscv/riscv/trap.h>
+
+#define	TRAP_DEBUG
+#undef	TRAP_DEBUG
+
+#ifdef	TRAP_DEBUG
+#define	dprintf(fmt, ...)	printf(fmt, ##__VA_ARGS__)
+#else
+#define	dprintf(fmt, ...)
 #endif
 
-#endif /* !_MACHINE_FRAME_H_ */
+struct trapframe *
+riscv_exception(struct trapframe *frame)
+{
+
+	dprintf("%s\n", __func__);
+
+	return (frame);
+}
