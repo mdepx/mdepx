@@ -32,8 +32,6 @@
 #include <machine/frame.h>
 #include <machine/cpufunc.h>
 
-static struct thread thread0;
-
 void
 critical_enter(void)
 {
@@ -70,9 +68,25 @@ cpu_idle(void)
 }
 
 void
+md_setup_frame(struct trapframe *tf, void *entry,
+    void *arg, void *terminate)
+{
+
+	tf->tf_ra = (uint32_t)terminate;
+	tf->tf_pc = (uint32_t)entry;
+	tf->tf_a[0] = (uint32_t)arg;
+}
+
+void
+md_thread_terminate(void)
+{
+
+	__asm __volatile("syscall");
+}
+
+void
 md_init(void)
 {
 
-	thread0.td_name = "the only thread";
-	curthread = &thread0;
+	thread0_init();
 }

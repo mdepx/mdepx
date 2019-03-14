@@ -74,14 +74,18 @@ mips_install_intr_map(const struct mips_intr_entry *m)
 	map = m;
 }
 
-void
+struct trapframe *
 mips_exception(struct trapframe *frame)
 {
+	struct trapframe *ret;
+	struct thread *td;
 	uint32_t exc_code;
 	uint32_t cause;
 	int i;
 
-	curthread->td_critnest++;
+	td = curthread;
+
+	td->td_critnest++;
 
 	cause = mips_rd_cause();
 	dprintf("%s: cause %x\n", __func__, cause);
@@ -98,6 +102,9 @@ mips_exception(struct trapframe *frame)
 					    __func__, i);
 			}
 		break;
+	case MIPS_CR_EXC_CODE_SYS:
+		frame->tf_pc += 4;
+		break;
 	case MIPS_CR_EXC_CODE_RI:
 		panic("%s: reserved instruction at pc %zx, badvaddr %zx\n",
 		    __func__, frame->tf_pc, frame->tf_badvaddr);
@@ -106,7 +113,11 @@ mips_exception(struct trapframe *frame)
 		    __func__, exc_code, frame->tf_pc, frame->tf_badvaddr);
 	}
 
-	curthread->td_critnest--;
-
 	dprintf("Exception cause: %x, code %d\n", cause, exc_code);
+
+	ret = sched_next(frame);
+
+	td->td_critnest--;
+
+	return (ret);
 }

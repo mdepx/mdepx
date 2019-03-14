@@ -41,6 +41,6 @@ struct mips_intr_entry {
 void mips_install_intr_map(const struct mips_intr_entry *m);
 void mips_assign_intr(void *arg, uint8_t ip, void (*handler)(void *arg,
     struct trapframe *, int irq));
-void mips_exception(struct trapframe *frame);
+struct trapframe *mips_exception(struct trapframe *frame);
 
 #endif /* !_MIPS_MIPS_TRAP_H_ */
