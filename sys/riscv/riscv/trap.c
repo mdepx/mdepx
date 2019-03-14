@@ -47,7 +47,14 @@ struct trapframe *
 riscv_exception(struct trapframe *frame)
 {
 
-	dprintf("%s\n", __func__);
+	switch (frame->tf_mcause) {
+	case EXCP_MACHINE_ECALL:
+		frame->tf_mepc += 4;
+		break;
+	default:
+		panic("%s: unhandled exception 0x%x\n",
+		    __func__, frame->tf_mcause);
+	}
 
 	return (frame);
 }
