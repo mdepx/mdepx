@@ -52,7 +52,6 @@ pic32_intc_intr(void *arg, struct trapframe *frame, int irq)
 	uint32_t ifs;
 	uint32_t ipend;
 	int i, b;
-	void *arg;
 
 	sc = (struct pic32_intc_softc *)arg;
 

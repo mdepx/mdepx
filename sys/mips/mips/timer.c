@@ -117,10 +117,7 @@ mips_timer_udelay(struct mips_timer_softc *sc, uint32_t usec)
 static uint32_t
 timer_count(void *arg)
 {
-	struct mips_timer_softc *sc;
 	uint32_t count;
-
-	sc = arg;
 
 	count = mips_rd_count();
 
