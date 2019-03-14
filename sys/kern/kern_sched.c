@@ -175,7 +175,7 @@ sched_next(struct trapframe *tf)
 	}
 
 	td->td_running = 1;
-	bzero(&td->td_c, sizeof (struct callout));
+	callout_init(&td->td_c);
 	callout_reset(&td->td_c, td->td_quantum, sched_cb, td);
 
 	curthread = td;
