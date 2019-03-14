@@ -154,11 +154,8 @@
 	REG_L	s7, (REG_SIZE * 24)(sp)
 
 	REG_L	gp, (REG_SIZE * 25)(sp)
-	REG_L	sp, (REG_SIZE * 26)(sp)
 	REG_L	s8, (REG_SIZE * 27)(sp)
 	REG_L	ra, (REG_SIZE * 28)(sp)
 
 	addi	sp, sp, (TF_SIZE)
-
-	mtc0	k0, CP0_STATUS
 .endm
