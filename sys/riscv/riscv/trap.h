@@ -24,9 +24,9 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_MIPS_MIPS_TRAP_H_
-#define	_MIPS_MIPS_TRAP_H_
+#ifndef	_RISCV_RISCV_TRAP_H_
+#define	_RISCV_RISCV_TRAP_H_
 
 struct trapframe *riscv_exception(struct trapframe *frame);
 
-#endif /* !_MIPS_MIPS_TRAP_H_ */
+#endif /* !_RISCV_RISCV_TRAP_H_ */
