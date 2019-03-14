@@ -152,6 +152,9 @@ sched_next(struct trapframe *tf)
 {
 	struct thread *td;
 
+	KASSERT(curthread->td_critnest > 0,
+	    ("Not in critical section."));
+
 	/* Save old */   
 	curthread->td_tf = tf;
 

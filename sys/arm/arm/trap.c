@@ -77,9 +77,12 @@ handle_exception(struct trapframe *tf, int exc_code)
 struct trapframe *
 arm_exception(struct trapframe *tf, int exc_code)
 {
+	struct trapframe *ret;
+	struct thread *td;
 	uint32_t irq;
 
-	curthread->td_critnest++;
+	td = curthread;
+	td->td_critnest++;
 
 	if (exc_code >= 16) {
 		irq = exc_code - 16;
@@ -87,7 +90,9 @@ arm_exception(struct trapframe *tf, int exc_code)
 	} else
 		handle_exception(tf, exc_code);
 
-	curthread->td_critnest--;
+	ret = sched_next(tf);
 
-	return (sched_next(tf));
+	td->td_critnest--;
+
+	return (ret);
 }
