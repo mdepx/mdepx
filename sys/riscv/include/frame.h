@@ -1,6 +1,10 @@
 /*-
- * Copyright (c) 2017 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
+ *
+ * This software was developed by SRI International and the University of
+ * Cambridge Computer Laboratory under DARPA/AFRL contract FA8750-10-C-0237
+ * ("CTSRD"), as part of the DARPA CRASH research programme.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,9 +28,14 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_MACHINE_MACHDEP_H_
-#define	_MACHINE_MACHDEP_H_
+#ifndef	_MACHINE_FRAME_H_
+#define	_MACHINE_FRAME_H_
 
-void md_init(void);
+#ifndef __ASSEMBLER__
+struct trapframe {
+	register_t	tf_a0;
+	/* TODO */
+};
+#endif
 
-#endif /* !_MACHINE_MACHDEP_H_ */
+#endif /* !_MACHINE_FRAME_H_ */

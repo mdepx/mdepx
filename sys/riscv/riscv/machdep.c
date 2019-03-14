@@ -30,9 +30,8 @@
 
 #include <machine/machdep.h>
 #include <machine/frame.h>
+#include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
-
-static struct thread thread0;
 
 void
 critical_enter(void)
@@ -61,7 +60,7 @@ critical_exit(void)
 }
 
 void
-cpu_idle(int busy)
+cpu_idle(void)
 {
 
 	critical_enter();
@@ -72,9 +71,21 @@ cpu_idle(int busy)
 }
 
 void
+md_setup_frame(struct trapframe *tf, void *entry,
+    void *arg, void *terminate)
+{
+
+}
+
+void
+md_thread_terminate(void)
+{
+
+}
+
+void
 md_init(void)
 {
 
-	thread0.td_name = "the only thread";
-	curthread = &thread0;
+	thread0_init();
 }
