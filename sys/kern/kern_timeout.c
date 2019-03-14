@@ -176,6 +176,8 @@ callout_reset(struct callout *c, uint32_t usec,
 
 	critical_enter();
 
+	KASSERT(mi_tmr != NULL, ("mi timer is NULL"));
+
 	if (c->flags & CALLOUT_FLAG_RUNNING) {
 		critical_exit();
 		return (-1);
