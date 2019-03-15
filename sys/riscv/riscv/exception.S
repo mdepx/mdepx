@@ -75,9 +75,6 @@
 .endm
 
 .macro load_registers el
-	lw	t0, (32 * 4)(sp)
-	csrw	mstatus, t0
-
 	lw	t0, (31 * 4)(sp)
 	csrw	mepc, t0
 
@@ -122,6 +119,7 @@ ASM_ENTRY(cpu_exception_handler)
 	save_registers 1
 	mv a0, sp
 	jal riscv_exception
+	mv sp, a0
 	load_registers 1
 	mret
 END(cpu_exception_handler)
