@@ -60,6 +60,7 @@ handle_exception(struct trapframe *tf)
 struct trapframe *
 riscv_exception(struct trapframe *tf)
 {
+	struct trapframe *ret;
 	struct thread *td;
 	int irq;
 
@@ -73,7 +74,9 @@ riscv_exception(struct trapframe *tf)
 	} else
 		handle_exception(tf);
 
+	ret = sched_next(tf);
+
 	td->td_critnest--;
 
-	return (tf);
+	return (ret);
 }
