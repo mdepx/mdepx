@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2017 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2017-2019 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,9 +24,11 @@
  * SUCH DAMAGE.
  */
 
-/* Coreplex-Local Interrupts (CLINT) */
+/* Core Local Interruptor (CLINT) */
 
-#include <sys/types.h>
+#include <sys/cdefs.h>
+
+#include <machine/cpuregs.h>
 
 #include <riscv/include/machdep.h>
 #include <riscv/sifive/e300g_clint.h>
@@ -36,14 +38,62 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-static int
-clint_mtime(struct clint_softc *sc)
+static struct clint_softc *clint_sc;
+
+void
+clint_intr(void)
 {
-	uint32_t reg;
+	struct clint_softc *sc;
 
-	reg = RD4(sc, MTIME);
+	sc = clint_sc;
 
-	return (reg);
+	csr_clear(mie, MIE_MTIE);
+
+	callout_callback(&sc->mt);
+}
+
+static void
+clint_stop(void *arg)
+{
+
+	csr_clear(mie, MIE_MTIE);
+	csr_clear(mip, MIP_MTIP);
+}
+
+static void
+clint_start(void *arg, uint32_t usec)
+{
+	struct clint_softc *sc;
+	uint32_t low, high;
+	uint32_t new;
+
+	sc = arg;
+
+	low = RD4(sc, MTIME);
+	high = RD4(sc, MTIME + 0x4);
+
+	new = low + usec * sc->ticks_per_usec;
+	if (new < low)
+		high += 1;
+
+	WR4(sc, MTIMECMP(0) + 0x4, high);
+	WR4(sc, MTIMECMP(0), new);
+
+	csr_clear(mip, MIP_MTIP);
+	csr_set(mie, MIE_MTIE);
+}
+
+static uint32_t
+clint_mtime(void *arg)
+{
+	struct clint_softc *sc;
+	uint32_t low;
+
+	sc = arg;
+
+	low = RD4(sc, MTIME);
+
+	return (low);
 }
 
 void
@@ -116,7 +166,20 @@ int
 e300g_clint_init(struct clint_softc *sc, uint32_t base)
 {
 
+	clint_sc = sc;
 	sc->base = base;
+
+	sc->ticks_per_usec = 100; /* TODO */
+	sc->mt.ticks_per_usec = sc->ticks_per_usec;
+	sc->mt.start = clint_start;
+	sc->mt.stop = clint_stop;
+	sc->mt.count = clint_mtime;
+	sc->mt.arg = sc;
+
+	callout_register(&sc->mt);
+
+	csr_clear(mie, MIE_MTIE);
+	csr_clear(mip, MIP_MTIP);
 
 	return (0);
 }

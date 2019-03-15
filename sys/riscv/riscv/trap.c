@@ -60,13 +60,20 @@ handle_exception(struct trapframe *tf)
 struct trapframe *
 riscv_exception(struct trapframe *tf)
 {
+	struct thread *td;
 	int irq;
+
+	td = curthread;
+
+	td->td_critnest++;
 
 	if (tf->tf_mcause & EXCP_INTR) {
 		irq = (tf->tf_mcause & EXCP_MASK);
 		riscv_intr(tf, irq);
 	} else
 		handle_exception(tf);
+
+	td->td_critnest--;
 
 	return (tf);
 }

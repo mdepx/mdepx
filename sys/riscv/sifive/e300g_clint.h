@@ -32,6 +32,8 @@
 #ifndef _SYS_RISCV_SIFIVE_E300G_CLINT_H_
 #define _SYS_RISCV_SIFIVE_E300G_CLINT_H_
 
+#include <sys/callout.h>
+
 /* MSIP Registers (16 KiB) */
 #define	MSIP(hart)	(0x4 * (hart))
 
@@ -41,10 +43,13 @@
 
 struct clint_softc {
 	uint32_t base;
+	struct mi_timer mt;
+	int ticks_per_usec;
 };
 
 int e300g_clint_init(struct clint_softc *sc, uint32_t base);
 int clint_get_cpu_freq(struct clint_softc *sc, uint32_t osc_freq);
 void clint_udelay(struct clint_softc *sc, uint32_t usec, uint32_t osc_freq);
+void clint_intr(void);
 
 #endif /* !_SYS_RISCV_SIFIVE_E300G_CLINT_H_ */
