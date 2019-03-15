@@ -43,18 +43,30 @@
 #define	dprintf(fmt, ...)
 #endif
 
-struct trapframe *
-riscv_exception(struct trapframe *frame)
+static void
+handle_exception(struct trapframe *tf)
 {
 
-	switch (frame->tf_mcause) {
+	switch (tf->tf_mcause) {
 	case EXCP_MACHINE_ECALL:
-		frame->tf_mepc += 4;
+		tf->tf_mepc += 4;
 		break;
 	default:
 		panic("%s: unhandled exception 0x%x\n",
-		    __func__, frame->tf_mcause);
+		    __func__, tf->tf_mcause);
 	}
+}
 
-	return (frame);
+struct trapframe *
+riscv_exception(struct trapframe *tf)
+{
+	int irq;
+
+	if (tf->tf_mcause & EXCP_INTR) {
+		irq = (tf->tf_mcause & EXCP_MASK);
+		riscv_intr(tf, irq);
+	} else
+		handle_exception(tf);
+
+	return (tf);
 }

@@ -24,10 +24,28 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_RISCV_RISCV_TRAP_H_
-#define	_RISCV_RISCV_TRAP_H_
+#include <sys/cdefs.h>
+#include <sys/systm.h>
+#include <sys/thread.h>
 
-struct trapframe *riscv_exception(struct trapframe *frame);
-void riscv_intr(struct trapframe *tf, int irq);
+#include <machine/frame.h>
+#include <machine/cpuregs.h>
+#include <machine/cpufunc.h>
 
-#endif /* !_RISCV_RISCV_TRAP_H_ */
+#include <riscv/riscv/trap.h>
+
+#define	INTR_DEBUG
+#undef	INTR_DEBUG
+
+#ifdef	INTR_DEBUG
+#define	dprintf(fmt, ...)	printf(fmt, ##__VA_ARGS__)
+#else
+#define	dprintf(fmt, ...)
+#endif
+
+void
+riscv_intr(struct trapframe *tf, int irq)
+{
+
+	/* TODO */
+}

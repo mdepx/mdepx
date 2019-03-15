@@ -54,7 +54,11 @@
 #define	EXCP_INST_PAGE_FAULT		12
 #define	EXCP_LOAD_PAGE_FAULT		13
 #define	EXCP_STORE_PAGE_FAULT		15
+#if __riscv_xlen == 32
+#define	EXCP_INTR			(1 << 31)
+#else
 #define	EXCP_INTR			(1ul << 63)
+#endif
 
 #define	SSTATUS_UIE			(1 << 0)
 #define	SSTATUS_SIE			(1 << 1)
