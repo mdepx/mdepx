@@ -112,12 +112,21 @@ thread_create(const char *name, uint32_t quantum,
 	critical_enter();
 
 	td = malloc(sizeof(struct thread));
+	if (td == NULL) {
+		critical_exit();
+		return (NULL);
+	}
 	memset(td, 0, sizeof(struct thread));
 	td->td_name = name;
 	td->td_quantum = quantum;
 	td->td_idle = 0;
 	td->td_mem_size = 1024;
 	td->td_mem = malloc(td->td_mem_size);
+	if (td->td_mem == NULL) {
+		free(td);
+		critical_exit();
+		return (NULL);
+	}
 	memset(td->td_mem, 0, td->td_mem_size);
 
 	td->td_tf = (struct trapframe *)((uint8_t *)td->td_mem
