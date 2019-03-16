@@ -38,12 +38,23 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
+#define	CLINT_DEBUG
+#undef	CLINT_DEBUG
+
+#ifdef	CLINT_DEBUG
+#define	dprintf(fmt, ...)	printf(fmt, ##__VA_ARGS__)
+#else
+#define	dprintf(fmt, ...)
+#endif
+
 static struct clint_softc *clint_sc;
 
 void
 clint_intr(void)
 {
 	struct clint_softc *sc;
+
+	dprintf("%s\n", __func__);
 
 	sc = clint_sc;
 
@@ -68,6 +79,8 @@ clint_start(void *arg, uint32_t usec)
 	uint32_t new;
 
 	sc = arg;
+
+	dprintf("%s: usec %u\n", __func__, usec);
 
 	low = RD4(sc, MTIME);
 	high = RD4(sc, MTIME + 0x4);
