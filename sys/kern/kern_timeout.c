@@ -75,6 +75,7 @@ callout_init(struct callout *c)
 {
 
 	c->state = 0;
+	c->flags = 0;
 }
 
 static uint32_t
