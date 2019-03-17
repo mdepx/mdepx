@@ -29,6 +29,8 @@
  * SUCH DAMAGE.
  */
 
+/* Round-Robin scheduler */
+
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 #include <sys/thread.h>
