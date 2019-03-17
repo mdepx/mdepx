@@ -69,6 +69,44 @@ dump_runq(void)
 		printf("%s: td %p name %s\n", __func__, td, td->td_name);
 }
 
+void
+sched_remove(struct thread *td)
+{
+
+	dprintf("%s\n", __func__);
+
+	if (td->td_next != NULL && td->td_prev != NULL) {
+		td->td_prev->td_next = td->td_next;
+		td->td_next->td_prev = td->td_prev;
+	} else if (td->td_next != NULL) {
+		runq = td->td_next;
+		runq->td_prev = NULL;
+	} else if (td->td_prev != NULL)
+		td->td_prev->td_next = NULL;
+	else
+		runq = NULL;
+
+	td->td_running = 0;
+}
+
+void
+sched_add(struct thread *td)
+{
+
+	dprintf("%s\n", __func__);
+
+	if (runq == NULL) {
+		td->td_prev = NULL;
+		td->td_next = NULL;
+	} else {
+		td->td_prev = NULL;
+		td->td_next = runq;
+		runq->td_prev = td;
+	}
+
+	runq = td;
+}
+
 /*
  * Remove curthread from run queue.
  */
