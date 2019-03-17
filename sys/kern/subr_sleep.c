@@ -30,12 +30,12 @@
 #include <sys/thread.h>
 
 void
-usleep(uint32_t usec)
+jsleep(uint32_t jiffies)
 {
 	struct callout c;
 
 	callout_init(&c);
-	callout_reset(&c, usec, NULL, NULL);
+	callout_reset(&c, jiffies, NULL, NULL);
 
 	while (c.state == 0)
 		cpu_idle();
