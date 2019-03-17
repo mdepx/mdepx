@@ -30,7 +30,7 @@
 #include <sys/thread.h>
 
 void
-rsleep(uint32_t ticks)
+raw_sleep(uint32_t ticks)
 {
 	struct callout c;
 
