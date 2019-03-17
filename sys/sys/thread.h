@@ -58,4 +58,7 @@ void md_setup_frame(struct trapframe *tf, void *entry,
     void *arg, void *terminate);
 void md_thread_terminate(void);
 
+void sched_remove(struct thread *td);
+void sched_add(struct thread *td);
+
 #endif /* !_SYS_THREAD_H_ */
