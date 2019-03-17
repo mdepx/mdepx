@@ -29,7 +29,7 @@
 
 void udelay(uint32_t usec);	/* microseconds polling delay */
 void usleep(uint32_t usec);	/* microseconds sleep */
-void jsleep(uint32_t jiffies);	/* raw timer sleep */
+void rsleep(uint32_t ticks);	/* raw timer sleep */
 
 void critical_enter(void);
 void critical_exit(void);
