@@ -29,14 +29,42 @@
 #include <sys/systm.h>
 #include <sys/thread.h>
 
+static void
+raw_sleep_cb(void *arg)
+{
+	struct callout *c;
+	struct thread *td;
+
+	KASSERT(curthread->td_critnest > 0,
+	    ("Not in critical section."));
+
+	c = arg;
+	td = c->td;
+
+	if (td->td_idle == 0)
+		sched_add(c->td);
+}
+
 void
 raw_sleep(uint32_t ticks)
 {
+	struct thread *td;
 	struct callout c;
 
-	callout_init(&c);
-	callout_reset(&c, ticks, NULL, NULL);
+	td = curthread;
 
-	while (c.state == 0)
-		cpu_idle();
+	callout_init(&c);
+	c.td = td;
+
+	if (td->td_idle) {
+		callout_reset(&c, ticks, raw_sleep_cb, &c);
+		while (c.state == 0)
+			cpu_idle();
+	} else {
+		critical_enter();
+		callout_reset(&c, ticks, raw_sleep_cb, &c);
+		sched_remove(td);
+		critical_exit();
+		__asm __volatile("svc 0");
+	}
 }

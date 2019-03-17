@@ -42,6 +42,7 @@ struct callout {
 	void *arg;
 	int flags;
 #define	CALLOUT_FLAG_RUNNING	(1 << 0)
+	struct thread *td;
 };
 
 struct mi_timer {
