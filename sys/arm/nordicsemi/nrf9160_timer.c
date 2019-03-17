@@ -90,20 +90,20 @@ timer_stop(void *arg)
 }
 
 static void
-timer_start(void *arg, uint32_t usec)
+timer_start(void *arg, uint32_t ticks)
 {
 	struct timer_softc *sc;
 	uint32_t reg;
 
-	dprintf("%s: usec %d\n", __func__, usec);
+	dprintf("%s: ticks %d\n", __func__, ticks);
 
 	sc = arg;
 
-	if (usec == 1)
-		usec++;
+	if (ticks == 1)
+		ticks++;
 	WR4(sc, TIMER_TASKS_CAPTURE(3), 1);
 	reg = RD4(sc, TIMER_CC(3));
-	WR4(sc, TIMER_CC(sc->cc_idx), reg + usec);
+	WR4(sc, TIMER_CC(sc->cc_idx), reg + ticks);
 	WR4(sc, TIMER_TASKS_START, 1);
 }
 
@@ -121,6 +121,5 @@ timer_init(struct timer_softc *sc, uint32_t base)
 	sc->mt.stop = timer_stop;
 	sc->mt.count = timer_count;
 	sc->mt.arg = sc;
-	sc->mt.ticks_per_usec = 1;
 	callout_register(&sc->mt);
 }

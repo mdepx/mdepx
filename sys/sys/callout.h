@@ -36,8 +36,8 @@ struct callout {
 	int state;
 	struct callout *next;
 	struct callout *prev;
-	uint32_t usec;
-	uint32_t usec_orig;
+	uint32_t ticks;
+	uint32_t ticks_orig;
 	void (*func)(void *arg);
 	void *arg;
 	int flags;
@@ -45,17 +45,16 @@ struct callout {
 };
 
 struct mi_timer {
-	void (*start)(void *arg, uint32_t usec);
+	void (*start)(void *arg, uint32_t ticks);
 	void (*stop)(void *arg);
 	uint32_t (*count)(void *arg);
 	void *arg;
-	uint32_t ticks_per_usec;
 	uint32_t count_saved;
 	int running;
 };
 
 void callout_init(struct callout *c);
-int callout_reset(struct callout *c, uint32_t usec,
+int callout_reset(struct callout *c, uint32_t ticks,
     void (*func)(void *arg), void *arg);
 int callout_callback(struct mi_timer *);
 int callout_register(struct mi_timer *);

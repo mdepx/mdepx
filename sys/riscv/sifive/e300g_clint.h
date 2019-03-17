@@ -44,7 +44,6 @@
 struct clint_softc {
 	uint32_t base;
 	struct mi_timer mt;
-	int ticks_per_usec;
 };
 
 int e300g_clint_init(struct clint_softc *sc, uint32_t base);

@@ -63,7 +63,7 @@ callout_dump(void)
 
 	i = 0;
 	do {
-		dprintf("callout%d: usec %u\n", i, c->usec);
+		dprintf("callout%d: ticks %u\n", i, c->ticks);
 		i += 1;
 		c = c->next;
 	} while (c);
@@ -81,7 +81,6 @@ static uint32_t
 get_elapsed(void)
 {
 	uint32_t ticks_elapsed;
-	uint32_t usec_elapsed;
 	uint32_t count;
 
 	count = mi_tmr->count(mi_tmr->arg);
@@ -90,26 +89,25 @@ get_elapsed(void)
 	else
 		ticks_elapsed = (0xffffffff - mi_tmr->count_saved + count);
 	mi_tmr->count_saved = count;
-	usec_elapsed = (ticks_elapsed / mi_tmr->ticks_per_usec);
 
-	dprintf("%s: usec_elapsed %u\n", __func__, usec_elapsed);
+	dprintf("%s: ticks_elapsed %u\n", __func__, ticks_elapsed);
 
-	return (usec_elapsed);
+	return (ticks_elapsed);
 }
 
 static void
 fix_timeouts(void)
 {
 	struct callout *c;
-	uint32_t usec_elapsed;
+	uint32_t ticks_elapsed;
 
-	usec_elapsed = get_elapsed();
+	ticks_elapsed = get_elapsed();
 
 	for (c = callouts; c != NULL; c = c->next)
-		if (usec_elapsed >= c->usec)
-			c->usec = 0;
+		if (ticks_elapsed >= c->ticks)
+			c->ticks = 0;
 		else
-			c->usec -= usec_elapsed;
+			c->ticks -= ticks_elapsed;
 }
 
 static void
@@ -131,7 +129,7 @@ callout_add(struct callout *c0)
 		c0->prev = NULL;
 		mi_tmr->count_saved = mi_tmr->count(mi_tmr->arg);
 		mi_tmr->running = 1;
-		mi_tmr->start(mi_tmr->arg, callouts->usec);
+		mi_tmr->start(mi_tmr->arg, callouts->ticks);
 
 #ifdef CALLOUT_DEBUG
 		callout_dump();
@@ -143,7 +141,7 @@ callout_add(struct callout *c0)
 		fix_timeouts();
 
 	for (c = callouts;
-	    (c != NULL && c->usec < c0->usec);
+	    (c != NULL && c->ticks < c0->ticks);
 	    (c = c->next));
 
 	if (c != NULL) {
@@ -154,7 +152,7 @@ callout_add(struct callout *c0)
 			callouts = c0;
 			if (mi_tmr->running)
 				mi_tmr->start(mi_tmr->arg,
-				    callouts->usec);
+				    callouts->ticks);
 		} else
 			c0->prev->next = c0;
 	} else {
@@ -170,7 +168,7 @@ callout_add(struct callout *c0)
 }
 
 int
-callout_reset(struct callout *c, uint32_t usec,
+callout_reset(struct callout *c, uint32_t ticks,
     void (*func)(void *arg), void *arg)
 {
 
@@ -183,16 +181,16 @@ callout_reset(struct callout *c, uint32_t usec,
 		return (-1);
 	}
 
-	dprintf("%s: adding callout usec %d\n", __func__, usec);
+	dprintf("%s: adding callout ticks %d\n", __func__, ticks);
 
-	if (usec == 0) {
+	if (ticks == 0) {
 		c->state = 1;
 		critical_exit();
 		return (0);
 	}
 
-	c->usec_orig = usec;
-	c->usec = usec;
+	c->ticks_orig = ticks;
+	c->ticks = ticks;
 	c->func = func;
 	c->arg = arg;
 
@@ -228,7 +226,7 @@ callout_callback(struct mi_timer *mt)
 	old = callouts;
 
 	for (c = callouts; c != NULL; c = c->next)
-		if (c->usec != 0)
+		if (c->ticks != 0)
 			break;
 
 	if (c != NULL && c->prev != NULL) {
@@ -257,7 +255,7 @@ callout_callback(struct mi_timer *mt)
 	if (callouts != NULL) {
 		if (mi_tmr->running == 0) {
 			mi_tmr->running = 1;
-			mi_tmr->start(mi_tmr->arg, callouts->usec);
+			mi_tmr->start(mi_tmr->arg, callouts->ticks);
 		}
 	} else {
 		mi_tmr->running = 0;

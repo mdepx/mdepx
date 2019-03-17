@@ -35,7 +35,6 @@
 
 struct mips_timer_softc {
 	uint32_t frequency;
-	uint32_t ticks_per_usec;
 	uint32_t usleep;
 	struct mi_timer mt;
 };

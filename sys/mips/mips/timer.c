@@ -70,7 +70,7 @@ mips_timer_usleep(struct mips_timer_softc *sc, uint32_t usec)
 
 	sc->usleep = usec;
 
-	ticks = (usec * sc->ticks_per_usec);
+	ticks = usec * (sc->frequency / 1000000);
 
 	flag = 0;
 
@@ -109,8 +109,8 @@ mips_timer_udelay(struct mips_timer_softc *sc, uint32_t usec)
 
 		first = last;
 
-		counts += delta / sc->ticks_per_usec;
-		delta %= sc->ticks_per_usec;
+		counts += delta / (sc->frequency / 1000000);
+		delta %= (sc->frequency / 1000000);
 	}
 }
 
@@ -136,18 +136,16 @@ timer_stop(void *arg)
 }
 
 static void
-timer_start(void *arg, uint32_t usec)
+timer_start(void *arg, uint32_t ticks)
 {
 	struct mips_timer_softc *sc;
 	uint32_t reg;
 
 	sc = arg;
 
-	dprintf("%s: usec %u, count %u\n",
-	    __func__, usec, (usec * sc->ticks_per_usec));
+	dprintf("%s: ticks %u\n", __func__, ticks);
 
-	reg = mips_rd_count();
-	reg += (usec * sc->ticks_per_usec);
+	reg = mips_rd_count() + ticks;
 	mips_wr_compare(reg);
 }
 
@@ -161,9 +159,6 @@ mips_timer_init(struct mips_timer_softc *sc, uint32_t freq)
 		printf("%s: can't initialize timer\n", __func__);
 
 	sc->frequency = freq;
-	sc->ticks_per_usec = freq / 1000000;
-
-	sc->mt.ticks_per_usec = sc->ticks_per_usec;
 	sc->mt.start = timer_start;
 	sc->mt.stop = timer_stop;
 	sc->mt.count = timer_count;

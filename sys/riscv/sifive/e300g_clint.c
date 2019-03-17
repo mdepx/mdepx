@@ -72,7 +72,7 @@ clint_stop(void *arg)
 }
 
 static void
-clint_start(void *arg, uint32_t usec)
+clint_start(void *arg, uint32_t ticks)
 {
 	struct clint_softc *sc;
 	uint32_t low, high;
@@ -80,15 +80,13 @@ clint_start(void *arg, uint32_t usec)
 
 	sc = arg;
 
-	dprintf("%s: usec %u\n", __func__, usec);
+	dprintf("%s: ticks %u\n", __func__, ticks);
 
 	low = RD4(sc, MTIME);
 	high = RD4(sc, MTIME + 0x4);
-
-	new = low + usec * sc->ticks_per_usec;
+	new = low + ticks;
 	if (new < low)
 		high += 1;
-
 	WR4(sc, MTIMECMP(0) + 0x4, high);
 	WR4(sc, MTIMECMP(0), new);
 
@@ -182,8 +180,6 @@ e300g_clint_init(struct clint_softc *sc, uint32_t base)
 	clint_sc = sc;
 	sc->base = base;
 
-	sc->ticks_per_usec = 100; /* TODO */
-	sc->mt.ticks_per_usec = sc->ticks_per_usec;
 	sc->mt.start = clint_start;
 	sc->mt.stop = clint_stop;
 	sc->mt.count = clint_mtime;
