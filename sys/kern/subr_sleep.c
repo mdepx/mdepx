@@ -65,6 +65,7 @@ raw_sleep(uint32_t ticks)
 		callout_reset(&c, ticks, raw_sleep_cb, &c);
 		sched_remove(td);
 		critical_exit();
-		__asm __volatile("svc 0");
+
+		md_thread_leave();
 	}
 }

@@ -54,11 +54,16 @@ struct trapframe *sched_next(struct trapframe *);
 struct thread *thread_create(const char *name, uint32_t quantum,
     void *entry, void *arg);
 void cpu_idle(void);
+
+/* Scheduler */
+void sched_remove(struct thread *td);
+void sched_add(struct thread *td);
+
+/* Thread MD part */
+void md_init(void);
+void md_thread_leave(void);
 void md_setup_frame(struct trapframe *tf, void *entry,
     void *arg, void *terminate);
 void md_thread_terminate(void);
-
-void sched_remove(struct thread *td);
-void sched_add(struct thread *td);
 
 #endif /* !_SYS_THREAD_H_ */
