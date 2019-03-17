@@ -30,7 +30,6 @@
 
 #include <machine/cpuregs.h>
 
-#include <riscv/include/machdep.h>
 #include <riscv/sifive/e300g_clint.h>
 
 #define	RD4(_sc, _reg)		\

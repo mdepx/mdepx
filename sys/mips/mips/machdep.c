@@ -28,7 +28,6 @@
 #include <sys/systm.h>
 #include <sys/thread.h>
 
-#include <machine/machdep.h>
 #include <machine/frame.h>
 #include <machine/cpufunc.h>
 
