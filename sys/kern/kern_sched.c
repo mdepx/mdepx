@@ -121,18 +121,7 @@ thread_terminate(void)
 
 	dprintf("%s: %s\n", __func__, td->td_name);
 
-	td->td_running = 0;
-
-	if (td->td_next != NULL && td->td_prev != NULL) {
-		td->td_prev->td_next = td->td_next;
-		td->td_next->td_prev = td->td_prev;
-	} else if (td->td_next != NULL) {
-		runq = td->td_next;
-		runq->td_prev = NULL;
-	} else if (td->td_prev != NULL)
-		td->td_prev->td_next = NULL;
-	else
-		runq = NULL;
+	sched_remove(td);
 
 	critical_exit();
 
