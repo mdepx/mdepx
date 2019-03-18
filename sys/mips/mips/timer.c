@@ -138,10 +138,7 @@ timer_stop(void *arg)
 static void
 timer_start(void *arg, uint32_t ticks)
 {
-	struct mips_timer_softc *sc;
 	uint32_t reg;
-
-	sc = arg;
 
 	dprintf("%s: ticks %u\n", __func__, ticks);
 
