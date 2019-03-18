@@ -85,7 +85,7 @@ md_setup_frame(struct trapframe *tf, void *entry,
 }
 
 void
-md_thread_leave(void)
+md_thread_yield(void)
 {
 
 	__asm __volatile("svc 0");
@@ -95,7 +95,7 @@ void
 md_thread_terminate(void)
 {
 
-	md_thread_leave();
+	md_thread_yield();
 }
 
 void

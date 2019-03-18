@@ -66,6 +66,6 @@ raw_sleep(uint32_t ticks)
 		sched_remove(td);
 		critical_exit();
 
-		md_thread_leave();
+		md_thread_yield();
 	}
 }

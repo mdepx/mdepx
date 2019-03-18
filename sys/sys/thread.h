@@ -61,7 +61,7 @@ void sched_add(struct thread *td);
 
 /* Thread MD part */
 void md_init(void);
-void md_thread_leave(void);
+void md_thread_yield(void);
 void md_setup_frame(struct trapframe *tf, void *entry,
     void *arg, void *terminate);
 void md_thread_terminate(void);
