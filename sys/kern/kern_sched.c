@@ -212,16 +212,31 @@ sched_next(struct trapframe *tf)
 	curthread->td_tf = tf;
 
 	if (runq == NULL) {
+		/*
+		 * Run queue is empty, so switch to idle thread.
+		 */
 		curthread = &thread0;
 		return (curthread->td_tf);
 	}
 
 	if (curthread != &thread0 &&
-	    curthread->td_running == 1)
+	    curthread->td_running == 1) {
+		/*
+		 * Current thread is still running and has quantum.
+		 * Do not switch.
+		 */
 		return (curthread->td_tf);
-	else if (curthread == &thread0)
+	} else if (curthread == &thread0) {
+		/*
+		 * Current thread is idle thread, but runq is not empty.
+		 * Switch to the first thread in runq.
+		 */
 		td = runq;
-	else {
+	} else {
+		/*
+		 * Current thread exhausted quantum, switch to next thread.
+		 * (The next thread can be the same thread.)
+		 */
 		td = curthread->td_next;
 		if (td == NULL)
 			td = runq;
