@@ -31,6 +31,12 @@
 #include <machine/frame.h>
 #include <machine/cpufunc.h>
 
+extern uint32_t _sbss;	/* Start of the BSS section */
+extern uint32_t _ebss; /* End of the BSS section */
+extern uint32_t _smem;	/* Start of data section on non-volatile memory */
+extern uint32_t _sdata; /* Start of data section in static RAM */
+extern uint32_t _edata; /* End of data section in static RAM */
+
 void
 critical_enter(void)
 {
@@ -90,9 +96,35 @@ md_thread_terminate(void)
 	md_thread_yield();
 }
 
+static void
+relocate_data(void)
+{
+	uint8_t *dst;
+	uint8_t *src;
+
+	for (src = (uint8_t *)&_smem, dst = (uint8_t *)&_sdata;
+	    dst < (uint8_t *)&_edata; )
+		*dst++ = *src++;
+}
+
+static void
+zero_bss(void)
+{
+	uint8_t *sbss;
+	uint8_t *ebss;
+
+	sbss = (uint8_t *)&_sbss;
+	ebss = (uint8_t *)&_ebss;
+
+	while (sbss < ebss)
+		*sbss++ = 0;
+}
+
 void
 md_init(void)
 {
 
+	zero_bss();
+	relocate_data();
 	thread0_init();
 }
