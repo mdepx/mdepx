@@ -1,6 +1,6 @@
 # Introduction
 
-Osfive is an RTOS/SDK for microcontrollers.
+Osfive is an SDK for microcontrollers that allows you to write applications for a bare-metal hardware.
 
 ## Key features
 - Application-centric
@@ -13,35 +13,34 @@ Osfive is an RTOS/SDK for microcontrollers.
 - BSD libc library
 - libaeabi
 - libFLAC
+- libfont
 - md5
+- mbedtls
 - tinycrypt
 - xz
 
 ## Supported platforms
 - ARM Cortex-M
-  * Maxim MAX32625
-  * Maxim MAX32660
-  * Nordic Semiconductor nRF52
-  * [Nordic Semiconductor nRF9160](https://github.com/osfive/nrf9160)
-  * NXP LPC43xx
-  * STM32xx
-- MIPS
-  * Bluespec Extensible RISC Implementation (BERI)
-  * Microchip PIC32
-- RISC-V
-  * Microsemi
-  * [SiFive E300G](https://github.com/osfive/hifive1-oled)
-  * [GFE P1 Processor (Bluespec Piccolo)](https://github.com/CTSRD-CHERI/piccolo-demo)
+- MIPS (32 and 64 bit)
+- RISC-V RV32
+
+## Featured applications
+  * [CTSRD CHERI device-model](https://github.com/CTSRD-CHERI/device-model)
+  * [Driving OLED display on HiFive1 board](https://github.com/osfive/hifive1-oled)
+  * [Setting up LTE 4G Link with nRF9160](https://github.com/osfive/nrf9160)
+  * [GFE (Government Furnished Equipment) Bluespec Piccolo demo](https://github.com/CTSRD-CHERI/piccolo-demo)
+  * [Driving MIPI DSI Display with STM32F469I-DISCO](https://github.com/osfive/stm32f469i-disco-dsi)
+  * [Driving IPS Display with PIC32MZDA Starter Kit](https://github.com/osfive/pic32mzdask-ips)
 
 # Getting started
 
-Osfive has no build system. You have to construct your own GNU or BSD makefile listing all the files you want to include to the build. See [example applications](https://github.com/osfive/).
+Osfive has no build system. You have to construct a GNU or BSD makefile for your application and list all the files you want to include to the build. See [example applications](https://github.com/osfive/).
 
 # Contributing
 
 Please submit patches on github.
 
-Note osfive uses FreeBSD [style(9)](https://www.freebsd.org/cgi/man.cgi?query=style&sektion=9) guide.
+Note that Osfive uses FreeBSD [style(9)](https://www.freebsd.org/cgi/man.cgi?query=style&sektion=9) guide.
 
 # License
 
