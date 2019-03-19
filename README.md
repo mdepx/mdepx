@@ -1,6 +1,6 @@
 # Introduction
 
-Osfive is an SDK for microcontrollers that allows you to write applications for a bare-metal hardware.
+Osfive is an SDK for microcontrollers that allows to write applications for a bare-metal hardware.
 
 ## Key features
 - Application-centric
@@ -9,7 +9,7 @@ Osfive is an SDK for microcontrollers that allows you to write applications for 
 - Tickless operation
 - Static/Dynamic memory allocation
 
-## Supported libraries
+## Included libraries
 - BSD libc library
 - libaeabi
 - libFLAC
