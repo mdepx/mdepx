@@ -1,6 +1,6 @@
 # Introduction
 
-Osfive is an SDK for microcontrollers that allows to write applications for a bare-metal hardware.
+Osfive is a framework for building bare-metal applications.
 
 ## Key features
 - Application-centric
@@ -8,6 +8,11 @@ Osfive is an SDK for microcontrollers that allows to write applications for a ba
 - Fully preemptible
 - Tickless operation
 - Static/Dynamic memory allocation
+
+## Supported platforms
+- ARM Cortex-M
+- MIPS (32 and 64 bit)
+- RISC-V RV32
 
 ## Included libraries
 - BSD libc library
@@ -19,16 +24,11 @@ Osfive is an SDK for microcontrollers that allows to write applications for a ba
 - tinycrypt
 - xz
 
-## Supported platforms
-- ARM Cortex-M
-- MIPS (32 and 64 bit)
-- RISC-V RV32
-
 ## Featured applications
-  * [CTSRD CHERI device-model](https://github.com/CTSRD-CHERI/device-model)
+  * CTSRD CHERI [device-model](https://github.com/CTSRD-CHERI/device-model)
   * [Driving OLED display on HiFive1 board](https://github.com/osfive/hifive1-oled)
   * [Setting up LTE 4G Link with nRF9160](https://github.com/osfive/nrf9160)
-  * [GFE (Government Furnished Equipment) Bluespec Piccolo demo](https://github.com/CTSRD-CHERI/piccolo-demo)
+  * GFE (Government Furnished Equipment) [Bluespec Piccolo demo](https://github.com/CTSRD-CHERI/piccolo-demo)
   * [Driving MIPI DSI Display with STM32F469I-DISCO](https://github.com/osfive/stm32f469i-disco-dsi)
   * [Driving IPS Display with PIC32MZDA Starter Kit](https://github.com/osfive/pic32mzdask-ips)
 
