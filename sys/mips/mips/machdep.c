@@ -102,6 +102,9 @@ relocate_data(void)
 	uint8_t *dst;
 	uint8_t *src;
 
+	if (&_smem == &_sdata)
+		return;
+
 	for (src = (uint8_t *)&_smem, dst = (uint8_t *)&_sdata;
 	    dst < (uint8_t *)&_edata; )
 		*dst++ = *src++;
