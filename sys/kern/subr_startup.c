@@ -27,9 +27,7 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 
-/*
- * Linker script symbols, defined by using PROVIDE keyword.
- */
+/* Symbols defined in linker script. */
 extern uint32_t _sbss;	/* Start of the BSS section */
 extern uint32_t _ebss;	/* End of the BSS section */
 extern uint32_t _smem;	/* Start of the data section on ROM */
