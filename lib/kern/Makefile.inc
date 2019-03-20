@@ -8,6 +8,7 @@ KERN_OBJECTS =						\
 		sys/kern/subr_console.o			\
 		sys/kern/subr_prf.o			\
 		sys/kern/subr_sleep.o			\
+		sys/kern/subr_startup.o			\
 
 MIPS_OBJECTS =						\
 		sys/mips/mips/cache_mipsNN.o		\
