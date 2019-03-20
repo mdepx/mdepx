@@ -42,4 +42,7 @@ void panic(const char *fmt, ...);
 		panic m;		\
 } while (0)
 
+void zero_bss(void);
+void relocate_data(void);
+
 #endif /* !_SYS_SYSTM_H_ */

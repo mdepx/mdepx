@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018-2019 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,73 +26,42 @@
 
 #include <sys/cdefs.h>
 #include <sys/systm.h>
-#include <sys/thread.h>
 
-#include <machine/frame.h>
-#include <machine/cpufunc.h>
+/*
+ * Linker script symbols, defined by using PROVIDE keyword.
+ */
+extern uint32_t _sbss;	/* Start of the BSS section */
+extern uint32_t _ebss;	/* End of the BSS section */
+extern uint32_t _smem;	/* Start of the data section on ROM */
+extern uint32_t _sdata;	/* Start of the data section in RAM */
+extern uint32_t _edata;	/* End of the data section in RAM */
 
+/*
+ * Relocate data section from ROM to RAM.
+ */
 void
-critical_enter(void)
+relocate_data(void)
 {
-	struct thread *td;
+	uint8_t *dst;
+	uint8_t *src;
 
-	td = curthread;
+	if (&_smem == &_sdata)
+		return;
 
-	if (td->td_critnest == 0) {
-		td->td_critnest = 1;
-		td->td_md.md_saved_intr = intr_disable();
-	} else
-		td->td_critnest++;
+	for (src = (uint8_t *)&_smem, dst = (uint8_t *)&_sdata;
+	    dst < (uint8_t *)&_edata; )
+		*dst++ = *src++;
 }
 
 void
-critical_exit(void)
+zero_bss(void)
 {
-	struct thread *td;
+	uint8_t *sbss;
+	uint8_t *ebss;
 
-	td = curthread;
+	sbss = (uint8_t *)&_sbss;
+	ebss = (uint8_t *)&_ebss;
 
-	td->td_critnest--;
-	if (td->td_critnest == 0)
-		intr_restore(td->td_md.md_saved_intr);
-}
-
-void
-cpu_idle(void)
-{
-
-	critical_enter();
-	__asm __volatile("wait");
-	critical_exit();
-}
-
-void
-md_setup_frame(struct trapframe *tf, void *entry,
-    void *arg, void *terminate)
-{
-
-	tf->tf_ra = (uint32_t)terminate;
-	tf->tf_pc = (uint32_t)entry;
-	tf->tf_a[0] = (uint32_t)arg;
-}
-
-void
-md_thread_yield(void)
-{
-
-	__asm __volatile("syscall");
-}
-
-void
-md_thread_terminate(void)
-{
-
-	md_thread_yield();
-}
-
-void
-md_init(void)
-{
-
-	thread0_init();
+	while (sbss < ebss)
+		*sbss++ = 0;
 }
