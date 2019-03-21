@@ -209,8 +209,10 @@ callout_cancel(struct callout *c)
 		if (c->next) {
 			c->prev->next = c->next;
 			c->next->prev = c->prev;
-		} else
+		} else {
 			c->prev->next = NULL;
+			callouts_tail = c->prev;
+		}
 	}
 
 	c->flags &= ~CALLOUT_FLAG_ACTIVE;
