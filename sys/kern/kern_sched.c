@@ -181,21 +181,6 @@ thread_create(const char *name, uint32_t quantum,
 	return (td);
 }
 
-void
-sched_yield(void)
-{
-	struct thread *td;
-
-	td = curthread;
-
-	critical_enter();
-	sched_remove(td);
-	callout_cancel(&td->td_c);
-	critical_exit();
-
-	md_thread_yield();
-}
-
 static void
 sched_cb(void *arg)
 {

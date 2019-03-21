@@ -56,11 +56,17 @@ raw_sleep(uint32_t ticks)
 	callout_init(&c);
 	c.td = td;
 
-	callout_reset(&c, ticks, raw_sleep_cb, &c);
-
 	if (td->td_idle) {
+		callout_reset(&c, ticks, raw_sleep_cb, &c);
 		while (c.state == 0)
 			cpu_idle();
-	} else
-		sched_yield();
+	} else {
+		critical_enter();
+		callout_reset(&c, ticks, raw_sleep_cb, &c);
+		sched_remove(td);
+		callout_cancel(&td->td_c);
+		critical_exit();
+
+		md_thread_yield();
+	}
 }
