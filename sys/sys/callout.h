@@ -41,7 +41,7 @@ struct callout {
 	void (*func)(void *arg);
 	void *arg;
 	int flags;
-#define	CALLOUT_FLAG_RUNNING	(1 << 0)
+#define	CALLOUT_FLAG_ACTIVE	(1 << 0)
 	struct thread *td;
 };
 
@@ -59,5 +59,6 @@ int callout_reset(struct callout *c, uint32_t ticks,
     void (*func)(void *arg), void *arg);
 int callout_callback(struct mi_timer *);
 int callout_register(struct mi_timer *);
+int callout_cancel(struct callout *c);
 
 #endif /* _SYS_CALLOUT_H_ */

@@ -169,15 +169,67 @@ callout_add(struct callout *c0)
 }
 
 int
+callout_cancel(struct callout *c)
+{
+
+	KASSERT(mi_tmr != NULL, ("mi timer is NULL"));
+
+	critical_enter();
+
+	if ((c->flags & CALLOUT_FLAG_ACTIVE) == 0) {
+		/* Callout c is not in the callouts queue. */
+		critical_exit();
+		return (-1);
+	}
+
+	if (c == callouts) {
+		/*
+		 * c is the currently running callout or the next
+		 * one to run (which is possible if this function
+		 * is called from another callout handler).
+		 */
+		if (mi_tmr->running)
+			fix_timeouts();
+		if (c->next) {
+			callouts = c->next;
+			callouts->prev = NULL;
+			if (mi_tmr->running)
+				mi_tmr->start(mi_tmr->arg,
+				    callouts->ticks);
+		} else {
+			callouts = NULL;
+			mi_tmr->running = 0;
+			mi_tmr->stop(mi_tmr->arg);
+		}
+	} else {
+		/*
+		 * Active but not running callout.
+		 * Just remove it from the list.
+		 */
+		if (c->next) {
+			c->prev->next = c->next;
+			c->next->prev = c->prev;
+		} else
+			c->prev->next = NULL;
+	}
+
+	c->flags &= ~CALLOUT_FLAG_ACTIVE;
+
+	critical_exit();
+
+	return (0);
+}
+
+int
 callout_reset(struct callout *c, uint32_t ticks,
     void (*func)(void *arg), void *arg)
 {
 
-	critical_enter();
-
 	KASSERT(mi_tmr != NULL, ("mi timer is NULL"));
 
-	if (c->flags & CALLOUT_FLAG_RUNNING) {
+	critical_enter();
+
+	if (c->flags & CALLOUT_FLAG_ACTIVE) {
 		critical_exit();
 		return (-1);
 	}
@@ -196,7 +248,7 @@ callout_reset(struct callout *c, uint32_t ticks,
 	c->arg = arg;
 
 	callout_add(c);
-	c->flags |= CALLOUT_FLAG_RUNNING;
+	c->flags |= CALLOUT_FLAG_ACTIVE;
 	critical_exit();
 
 	return (0);
@@ -247,7 +299,7 @@ callout_callback(struct mi_timer *mt)
 	while (c != NULL) {
 		tmp = c->next;	
 		c->state = 1;
-		c->flags &= ~CALLOUT_FLAG_RUNNING;
+		c->flags &= ~CALLOUT_FLAG_ACTIVE;
 		if (c->func)
 			c->func(c->arg);
 		c = tmp;
