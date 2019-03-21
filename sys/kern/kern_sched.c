@@ -122,6 +122,7 @@ thread_terminate(void)
 	dprintf("%s: %s\n", __func__, td->td_name);
 
 	sched_remove(td);
+	callout_cancel(&td->td_c);
 
 	critical_exit();
 
@@ -178,6 +179,21 @@ thread_create(const char *name, uint32_t quantum,
 	critical_exit();
 
 	return (td);
+}
+
+void
+sched_yield(void)
+{
+	struct thread *td;
+
+	td = curthread;
+
+	critical_enter();
+	sched_remove(td);
+	callout_cancel(&td->td_c);
+	critical_exit();
+
+	md_thread_yield();
 }
 
 static void
