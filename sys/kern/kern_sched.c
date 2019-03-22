@@ -135,7 +135,7 @@ thread_terminate(void)
 
 struct thread *
 thread_create(const char *name, uint32_t quantum,
-    void *entry, void *arg)
+    uint32_t stack_size, void *entry, void *arg)
 {
 	struct thread *td;
 
@@ -150,7 +150,7 @@ thread_create(const char *name, uint32_t quantum,
 	td->td_name = name;
 	td->td_quantum = quantum;
 	td->td_idle = 0;
-	td->td_mem_size = 1024;
+	td->td_mem_size = stack_size;
 	td->td_mem = malloc(td->td_mem_size);
 	if (td->td_mem == NULL) {
 		free(td);

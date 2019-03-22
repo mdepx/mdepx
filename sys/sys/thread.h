@@ -52,7 +52,7 @@ struct thread *curthread;
 void thread0_init(void);
 struct trapframe *sched_next(struct trapframe *);
 struct thread *thread_create(const char *name, uint32_t quantum,
-    void *entry, void *arg);
+    uint32_t stack_size, void *entry, void *arg);
 void cpu_idle(void);
 
 /* Scheduler */
