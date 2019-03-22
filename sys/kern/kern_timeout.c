@@ -119,7 +119,7 @@ callout_add(struct callout *c0)
 	KASSERT(curthread != NULL, ("curthread is NULL"));
 	KASSERT(curthread->td_critnest > 0, ("Not in critical section."));
 
-	dprintf("%s\n", __func__);
+	dprintf("%s: ticks %d\n", __func__, c0->ticks);
 
 	if (callouts == NULL) {
 		KASSERT(mi_tmr->running == 0,
@@ -198,6 +198,7 @@ callout_cancel(struct callout *c)
 				    callouts->ticks);
 		} else {
 			callouts = NULL;
+			callouts_tail = NULL;
 			mi_tmr->running = 0;
 			mi_tmr->stop(mi_tmr->arg);
 		}
@@ -293,18 +294,18 @@ callout_callback(struct mi_timer *mt)
 	if (callouts == NULL)
 		callouts_tail = NULL;
 
-	KASSERT(callouts != old, ("wrong"));
+	if (callouts != old) {
+		mi_tmr->running = 0;
 
-	mi_tmr->running = 0;
-
-	c = old;
-	while (c != NULL) {
-		tmp = c->next;	
-		c->state = 1;
-		c->flags &= ~CALLOUT_FLAG_ACTIVE;
-		if (c->func)
-			c->func(c->arg);
-		c = tmp;
+		c = old;
+		while (c != NULL) {
+			tmp = c->next;
+			c->state = 1;
+			c->flags &= ~CALLOUT_FLAG_ACTIVE;
+			if (c->func)
+				c->func(c->arg);
+			c = tmp;
+		}
 	}
 
 	if (callouts != NULL) {
