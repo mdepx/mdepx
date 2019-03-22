@@ -294,9 +294,8 @@ callout_callback(struct mi_timer *mt)
 	if (callouts == NULL)
 		callouts_tail = NULL;
 
+	mi_tmr->running = 0;
 	if (callouts != old) {
-		mi_tmr->running = 0;
-
 		c = old;
 		while (c != NULL) {
 			tmp = c->next;
