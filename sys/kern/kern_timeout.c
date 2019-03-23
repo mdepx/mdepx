@@ -201,6 +201,8 @@ callout_cancel(struct callout *c)
 		return (-1);
 	}
 
+	rerun = 0;
+
 	if (c == callouts) {
 		/*
 		 * c is the currently running callout or the next
