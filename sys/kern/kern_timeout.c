@@ -50,25 +50,14 @@ static struct callout *callouts;
 static struct callout *callouts_tail;
 static struct mi_timer *mi_tmr;
 
-#ifdef CALLOUT_DEBUG
-static void
+static void __unused
 callout_dump(void)
 {
 	struct callout *c;
-	int i;
 
-	c = callouts;
-	if (c == NULL)
-		return;
-
-	i = 0;
-	do {
-		dprintf("callout%d: ticks %u\n", i, c->ticks);
-		i += 1;
-		c = c->next;
-	} while (c);
+	for (c = callouts; c != NULL; c = c->next)
+		printf("callout: %u\n", c->ticks);
 }
-#endif
 
 void
 callout_init(struct callout *c)
@@ -81,19 +70,19 @@ callout_init(struct callout *c)
 static uint32_t
 get_elapsed(void)
 {
-	uint32_t ticks_elapsed;
+	uint32_t elapsed;
 	uint32_t count;
 
 	count = mi_tmr->count(mi_tmr->arg);
 	if (count > mi_tmr->count_saved)
-		ticks_elapsed = (count - mi_tmr->count_saved);
+		elapsed = (count - mi_tmr->count_saved);
 	else
-		ticks_elapsed = (0xffffffff - mi_tmr->count_saved + count);
+		elapsed = (0xffffffff - mi_tmr->count_saved + count);
 	mi_tmr->count_saved = count;
 
-	dprintf("%s: ticks_elapsed %u\n", __func__, ticks_elapsed);
+	dprintf("%s: elapsed %u\n", __func__, elapsed);
 
-	return (ticks_elapsed);
+	return (elapsed);
 }
 
 static void
