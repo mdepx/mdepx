@@ -51,7 +51,10 @@ struct mi_timer {
 	uint32_t (*count)(void *arg);
 	void *arg;
 	uint32_t count_saved;
-	int running;
+	int state;
+#define	MI_TIMER_READY		0
+#define	MI_TIMER_RUNNING	1
+#define	MI_TIMER_EXCP		2
 };
 
 void callout_init(struct callout *c);

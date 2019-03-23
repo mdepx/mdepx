@@ -149,21 +149,7 @@ callout_set_one(struct callout *c0)
 
 	dprintf("%s: ticks %d\n", __func__, c0->ticks);
 
-	if (callouts == NULL) {
-		KASSERT(mi_tmr->running == 0,
-		    ("mi timer is running, but callouts == NULL"));
-		callout_add(c0);
-		mi_tmr->count_saved = mi_tmr->count(mi_tmr->arg);
-		mi_tmr->running = 1;
-		mi_tmr->start(mi_tmr->arg, callouts->ticks);
-
-#ifdef CALLOUT_DEBUG
-		callout_dump();
-#endif
-		return;
-	}
-
-	if (mi_tmr->running)
+	if (mi_tmr->state == MI_TIMER_RUNNING)
 		fix_timeouts();
 
 	for (c = callouts;
@@ -174,15 +160,27 @@ callout_set_one(struct callout *c0)
 		c0->next = c;
 		c0->prev = c->prev;
 		c->prev = c0;
-		if (c0->prev == NULL) {
+		if (c0->prev == NULL)
 			callouts = c0;
-			if (mi_tmr->running)
-				mi_tmr->start(mi_tmr->arg,
-				    callouts->ticks);
-		} else
+		else
 			c0->prev->next = c0;
 	} else
 		callout_add(c0);
+
+	switch (mi_tmr->state) {
+	case MI_TIMER_RUNNING:
+		if (callouts == c0)
+			mi_tmr->start(mi_tmr->arg, callouts->ticks);
+		break;
+	case MI_TIMER_EXCP:
+		/* We are in the exception handler */
+		break;
+	case MI_TIMER_READY:
+		/* We are free to run. */
+		mi_tmr->state = MI_TIMER_RUNNING;
+		mi_tmr->count_saved = mi_tmr->count(mi_tmr->arg);
+		mi_tmr->start(mi_tmr->arg, callouts->ticks);
+	}
 
 #ifdef CALLOUT_DEBUG
 	callout_dump();
@@ -192,6 +190,7 @@ callout_set_one(struct callout *c0)
 int
 callout_cancel(struct callout *c)
 {
+	int rerun;
 
 	KASSERT(mi_tmr != NULL, ("mi timer is NULL"));
 	KASSERT(curthread->td_critnest > 0,
@@ -202,21 +201,25 @@ callout_cancel(struct callout *c)
 		return (-1);
 	}
 
-	/*
-	 * c is the currently running callout or the next
-	 * one to run (which is possible if this function
-	 * is called from another callout handler).
-	 */
-	if (mi_tmr->running)
-		fix_timeouts();
+	if (c == callouts) {
+		/*
+		 * c is the currently running callout or the next
+		 * one to run (which is possible if this function
+		 * is called from another callout handler).
+		 */
+		if (mi_tmr->state == MI_TIMER_RUNNING) {
+			fix_timeouts();
+			rerun = 1;
+		}
+	}
 
 	callout_remove(c);
 
 	if (callouts) {
-		if (mi_tmr->running)
+		if (rerun)
 			mi_tmr->start(mi_tmr->arg, callouts->ticks);
 	} else {
-		mi_tmr->running = 0;
+		mi_tmr->state = MI_TIMER_READY;
 		mi_tmr->stop(mi_tmr->arg);
 	}
 
@@ -297,7 +300,7 @@ callout_callback(struct mi_timer *mt)
 	if (callouts == NULL)
 		callouts_tail = NULL;
 
-	mi_tmr->running = 0;
+	mi_tmr->state = MI_TIMER_EXCP;
 
 	if (callouts != old) {
 		c = old;
@@ -312,12 +315,12 @@ callout_callback(struct mi_timer *mt)
 	}
 
 	if (callouts != NULL) {
-		if (mi_tmr->running == 0) {
-			mi_tmr->running = 1;
+		if (mi_tmr->state == MI_TIMER_EXCP) {
+			mi_tmr->state = MI_TIMER_RUNNING;
 			mi_tmr->start(mi_tmr->arg, callouts->ticks);
 		}
 	} else {
-		mi_tmr->running = 0;
+		mi_tmr->state = MI_TIMER_READY;
 		mi_tmr->stop(mi_tmr->arg);
 	}
 
@@ -332,7 +335,7 @@ callout_register(struct mi_timer *mt)
 		return (EEXIST);
 
 	mi_tmr = mt;
-	mi_tmr->running = 0;
+	mi_tmr->state = MI_TIMER_READY;
 
 	return (0);
 }
