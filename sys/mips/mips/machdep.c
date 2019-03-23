@@ -84,10 +84,9 @@ md_thread_yield(void)
 }
 
 void
-md_thread_terminate(void)
+md_thread_terminate(struct thread *td)
 {
 
-	md_thread_yield();
 }
 
 void

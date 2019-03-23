@@ -48,6 +48,7 @@
 
 static struct thread thread0;
 static struct thread *runq;
+static struct thread *runq_tail;
 
 void
 thread0_init(void)
@@ -81,12 +82,13 @@ sched_remove(struct thread *td)
 	} else if (td->td_next != NULL) {
 		runq = td->td_next;
 		runq->td_prev = NULL;
-	} else if (td->td_prev != NULL)
+	} else if (td->td_prev != NULL) {
 		td->td_prev->td_next = NULL;
-	else
+		runq_tail = td->td_prev;
+	} else {
 		runq = NULL;
-
-	td->td_running = 0;
+		runq_tail = NULL;
+	}
 }
 
 void
@@ -98,13 +100,14 @@ sched_add(struct thread *td)
 	if (runq == NULL) {
 		td->td_prev = NULL;
 		td->td_next = NULL;
+		runq = td;
+		runq_tail = td;
 	} else {
-		td->td_prev = NULL;
-		td->td_next = runq;
-		runq->td_prev = td;
+		td->td_prev = runq_tail;
+		td->td_next = NULL;
+		runq_tail->td_next = td;
+		runq_tail = td;
 	}
-
-	runq = td;
 }
 
 /*
@@ -115,18 +118,18 @@ thread_terminate(void)
 {
 	struct thread *td;
 
-	critical_enter();
+	dprintf("%s: %s\n", __func__, td->td_name);
 
 	td = curthread;
 
-	dprintf("%s: %s\n", __func__, td->td_name);
-
+	critical_enter();
+	td->td_state = TD_STATE_TERMINATING;
 	sched_remove(td);
 	callout_cancel(&td->td_c);
-
+	md_thread_terminate(td);
 	critical_exit();
 
-	md_thread_terminate();
+	md_thread_yield();
 
 	/* NOT REACHED */
 
@@ -139,13 +142,9 @@ thread_create(const char *name, uint32_t quantum,
 {
 	struct thread *td;
 
-	critical_enter();
-
 	td = malloc(sizeof(struct thread));
-	if (td == NULL) {
-		critical_exit();
+	if (td == NULL)
 		return (NULL);
-	}
 	memset(td, 0, sizeof(struct thread));
 	td->td_name = name;
 	td->td_quantum = quantum;
@@ -154,7 +153,6 @@ thread_create(const char *name, uint32_t quantum,
 	td->td_mem = malloc(td->td_mem_size);
 	if (td->td_mem == NULL) {
 		free(td);
-		critical_exit();
 		return (NULL);
 	}
 	memset(td->td_mem, 0, td->td_mem_size);
@@ -163,19 +161,10 @@ thread_create(const char *name, uint32_t quantum,
 	    + td->td_mem_size - sizeof(struct trapframe));
 	md_setup_frame(td->td_tf, entry, arg, thread_terminate);
 
-	td->td_running = 0;
+	td->td_state = TD_STATE_READY;
 
-	if (runq == NULL) {
-		runq = td;
-		td->td_next = NULL;
-		td->td_prev = NULL;
-	} else {
-		td->td_next = runq;
-		td->td_prev = NULL;
-		runq->td_prev = td;
-		runq = td;
-	}
-
+	critical_enter();
+	sched_add(td);
 	critical_exit();
 
 	return (td);
@@ -187,7 +176,7 @@ sched_cb(void *arg)
 	struct thread *td;
 
 	td = arg;
-	td->td_running = 0;
+	td->td_state = TD_STATE_READY;
 }
 
 struct trapframe *
@@ -195,44 +184,44 @@ sched_next(struct trapframe *tf)
 {
 	struct thread *td;
 
+	dprintf("%s\n", __func__);
+
 	KASSERT(curthread->td_critnest > 0,
-	    ("Not in critical section."));
+	    ("%s: Not in critical section. td name %s critnest %d",
+	    __func__, curthread->td_name, curthread->td_critnest));
 
 	/* Save old */   
 	curthread->td_tf = tf;
 
-	if (runq == NULL) {
-		/*
-		 * Run queue is empty, so switch to idle thread.
-		 */
+	if (curthread != &thread0) {
+		switch (curthread->td_state) {
+		case TD_STATE_TERMINATING:
+			break;
+		case TD_STATE_RUNNING:
+			/*
+			 * Current thread is still running and has quantum.
+			 * Do not switch.
+			 */
+			return (curthread->td_tf);
+		default:
+			sched_add(curthread);
+		}
+	}
+
+	for (td = runq; td != NULL; td = td->td_next) {
+		if (td->td_state == TD_STATE_SLEEPING)
+			continue;
+		break;
+	}
+
+	if (td == NULL) {
 		curthread = &thread0;
 		return (curthread->td_tf);
 	}
 
-	if (curthread != &thread0 &&
-	    curthread->td_running == 1) {
-		/*
-		 * Current thread is still running and has quantum.
-		 * Do not switch.
-		 */
-		return (curthread->td_tf);
-	} else if (curthread == &thread0) {
-		/*
-		 * Current thread is idle thread, but runq is not empty.
-		 * Switch to the first thread in runq.
-		 */
-		td = runq;
-	} else {
-		/*
-		 * Current thread exhausted quantum, switch to next thread.
-		 * (The next thread can be the same thread.)
-		 */
-		td = curthread->td_next;
-		if (td == NULL)
-			td = runq;
-	}
+	sched_remove(td);
 
-	td->td_running = 1;
+	td->td_state = TD_STATE_RUNNING;
 	callout_init(&td->td_c);
 	callout_reset(&td->td_c, td->td_quantum, sched_cb, td);
 

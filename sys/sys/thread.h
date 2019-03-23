@@ -41,10 +41,14 @@ struct thread {
 	uint8_t			td_index;
 	uint8_t			td_idle;
 	struct callout		td_c;
-	int			td_running;
 	struct thread *		td_next;
 	struct thread *		td_prev;
 	uint32_t		td_quantum;
+	int			td_state;
+#define	TD_STATE_READY		0
+#define	TD_STATE_RUNNING	1
+#define	TD_STATE_SLEEPING	2
+#define	TD_STATE_TERMINATING	3
 };
 
 struct thread *curthread;
@@ -64,6 +68,6 @@ void md_init(void);
 void md_thread_yield(void);
 void md_setup_frame(struct trapframe *tf, void *entry,
     void *arg, void *terminate);
-void md_thread_terminate(void);
+void md_thread_terminate(struct thread *td);
 
 #endif /* !_SYS_THREAD_H_ */

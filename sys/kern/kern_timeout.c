@@ -117,7 +117,8 @@ callout_add(struct callout *c0)
 	struct callout *c;
 
 	KASSERT(curthread != NULL, ("curthread is NULL"));
-	KASSERT(curthread->td_critnest > 0, ("Not in critical section."));
+	KASSERT(curthread->td_critnest > 0,
+	    ("%s: Not in critical section.", __func__));
 
 	dprintf("%s: ticks %d\n", __func__, c0->ticks);
 
@@ -173,12 +174,11 @@ callout_cancel(struct callout *c)
 {
 
 	KASSERT(mi_tmr != NULL, ("mi timer is NULL"));
-
-	critical_enter();
+	KASSERT(curthread->td_critnest > 0,
+	    ("%s: Not in critical section.", __func__));
 
 	if ((c->flags & CALLOUT_FLAG_ACTIVE) == 0) {
 		/* Callout c is not in the callouts queue. */
-		critical_exit();
 		return (-1);
 	}
 
@@ -217,8 +217,6 @@ callout_cancel(struct callout *c)
 	}
 
 	c->flags &= ~CALLOUT_FLAG_ACTIVE;
-
-	critical_exit();
 
 	return (0);
 }
@@ -262,7 +260,8 @@ callout_callback(struct mi_timer *mt)
 {
 	struct callout *c, *old, *tmp;
 
-	KASSERT(curthread->td_critnest > 0, ("Not in critical section."));
+	KASSERT(curthread->td_critnest > 0,
+	    ("%s: Not in critical section.", __func__));
 
 	dprintf("%s\n", __func__);
 
@@ -295,6 +294,7 @@ callout_callback(struct mi_timer *mt)
 		callouts_tail = NULL;
 
 	mi_tmr->running = 0;
+
 	if (callouts != old) {
 		c = old;
 		while (c != NULL) {
