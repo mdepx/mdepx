@@ -60,7 +60,7 @@ raw_sleep(uint32_t ticks)
 	critical_enter();
 	td->td_state = TD_STATE_SLEEPING;
 	callout_cancel(&td->td_c);
-	callout_reset(&c, ticks, raw_sleep_cb, &c);
+	callout_set(&c, ticks, raw_sleep_cb, &c);
 	critical_exit();
 
 	KASSERT(td->td_critnest == 0, ("critnest != 0"));

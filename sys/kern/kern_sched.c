@@ -223,7 +223,7 @@ sched_next(struct trapframe *tf)
 
 	td->td_state = TD_STATE_RUNNING;
 	callout_init(&td->td_c);
-	callout_reset(&td->td_c, td->td_quantum, sched_cb, td);
+	callout_set(&td->td_c, td->td_quantum, sched_cb, td);
 
 	curthread = td;
 

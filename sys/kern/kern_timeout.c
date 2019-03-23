@@ -101,7 +101,45 @@ fix_timeouts(void)
 }
 
 static void
-callout_add(struct callout *c0)
+callout_remove(struct callout *c)
+{
+
+	dprintf("%s\n", __func__);
+
+	if (c->next != NULL && c->prev != NULL) {
+		c->prev->next = c->next;
+		c->next->prev = c->prev;
+	} else if (c->next != NULL) {
+		callouts = c->next;
+		callouts->prev = NULL;
+	} else if (c->prev != NULL) {
+		c->prev->next = NULL;
+		callouts_tail = c->prev;
+	} else {
+		callouts = NULL;
+		callouts_tail = NULL;
+	}
+}
+
+static void
+callout_add(struct callout *c)
+{
+
+	if (callouts == NULL) {
+		callouts = c;
+		callouts_tail = c;
+		c->next = NULL;
+		c->prev = NULL;
+	} else {
+		c->prev = callouts_tail;
+		c->next = NULL;
+		callouts_tail->next = c;
+		callouts_tail = c;
+	}
+}
+
+static void
+callout_set_one(struct callout *c0)
 {
 	struct callout *c;
 
@@ -114,10 +152,7 @@ callout_add(struct callout *c0)
 	if (callouts == NULL) {
 		KASSERT(mi_tmr->running == 0,
 		    ("mi timer is running, but callouts == NULL"));
-		callouts = c0;
-		callouts_tail = c0;
-		c0->next = NULL;
-		c0->prev = NULL;
+		callout_add(c0);
 		mi_tmr->count_saved = mi_tmr->count(mi_tmr->arg);
 		mi_tmr->running = 1;
 		mi_tmr->start(mi_tmr->arg, callouts->ticks);
@@ -146,12 +181,8 @@ callout_add(struct callout *c0)
 				    callouts->ticks);
 		} else
 			c0->prev->next = c0;
-	} else {
-		callouts_tail->next = c0;
-		c0->prev = callouts_tail;
-		callouts_tail = c0;
-		callouts_tail->next = NULL;
-	}
+	} else
+		callout_add(c0);
 
 #ifdef CALLOUT_DEBUG
 	callout_dump();
@@ -171,38 +202,22 @@ callout_cancel(struct callout *c)
 		return (-1);
 	}
 
-	if (c == callouts) {
-		/*
-		 * c is the currently running callout or the next
-		 * one to run (which is possible if this function
-		 * is called from another callout handler).
-		 */
+	/*
+	 * c is the currently running callout or the next
+	 * one to run (which is possible if this function
+	 * is called from another callout handler).
+	 */
+	if (mi_tmr->running)
+		fix_timeouts();
+
+	callout_remove(c);
+
+	if (callouts) {
 		if (mi_tmr->running)
-			fix_timeouts();
-		if (c->next) {
-			callouts = c->next;
-			callouts->prev = NULL;
-			if (mi_tmr->running)
-				mi_tmr->start(mi_tmr->arg,
-				    callouts->ticks);
-		} else {
-			callouts = NULL;
-			callouts_tail = NULL;
-			mi_tmr->running = 0;
-			mi_tmr->stop(mi_tmr->arg);
-		}
+			mi_tmr->start(mi_tmr->arg, callouts->ticks);
 	} else {
-		/*
-		 * Active but not running callout.
-		 * Just remove it from the list.
-		 */
-		if (c->next) {
-			c->prev->next = c->next;
-			c->next->prev = c->prev;
-		} else {
-			c->prev->next = NULL;
-			callouts_tail = c->prev;
-		}
+		mi_tmr->running = 0;
+		mi_tmr->stop(mi_tmr->arg);
 	}
 
 	c->flags &= ~CALLOUT_FLAG_ACTIVE;
@@ -211,7 +226,7 @@ callout_cancel(struct callout *c)
 }
 
 int
-callout_reset(struct callout *c, uint32_t ticks,
+callout_set(struct callout *c, uint32_t ticks,
     void (*func)(void *arg), void *arg)
 {
 
@@ -237,7 +252,7 @@ callout_reset(struct callout *c, uint32_t ticks,
 	c->func = func;
 	c->arg = arg;
 
-	callout_add(c);
+	callout_set_one(c);
 	c->flags |= CALLOUT_FLAG_ACTIVE;
 	critical_exit();
 
