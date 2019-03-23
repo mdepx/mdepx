@@ -63,11 +63,11 @@ pic32_intc_intr(void *arg, struct trapframe *frame, int irq)
 			if (ifs & (1 << b)) {
 				ipend = (i * 32 + b);
 				if (sc->map[ipend].handler != NULL) {
+					pic32_intc_clear_pending(sc, ipend);
 					arg = sc->map[ipend].arg;
 					sc->map[ipend].handler(arg,
 					    frame, irq, ipend);
 					dprintf("intr %d\n", ipend);
-					pic32_intc_clear_pending(sc, ipend);
 				}
 			}
 		}
