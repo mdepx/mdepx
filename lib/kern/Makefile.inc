@@ -2,6 +2,7 @@ KERN_OBJECTS =						\
 		sys/kern/kern_malloc_fl.o		\
 		sys/kern/kern_malloc.o			\
 		sys/kern/kern_mbuf.o			\
+		sys/kern/kern_mutex.o			\
 		sys/kern/kern_panic.o			\
 		sys/kern/kern_sched.o			\
 		sys/kern/kern_timeout.o			\

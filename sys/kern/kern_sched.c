@@ -34,6 +34,7 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 #include <sys/thread.h>
+#include <sys/mutex.h>
 
 #include <machine/frame.h>
 
@@ -183,6 +184,7 @@ struct trapframe *
 sched_next(struct trapframe *tf)
 {
 	struct thread *td;
+	struct mutex *m;
 
 	dprintf("%s\n", __func__);
 
@@ -211,6 +213,13 @@ sched_next(struct trapframe *tf)
 	for (td = runq; td != NULL; td = td->td_next) {
 		if (td->td_state == TD_STATE_SLEEPING)
 			continue;
+		if (td->td_state == TD_STATE_MUTEX_WAIT) {
+			m = td->td_mtx_wait;
+			KASSERT(m != NULL, ("mtx wait is NULL"));
+			if (m->mtx_lock == 1)
+				continue;
+			td->td_state = TD_STATE_READY;
+		}
 		break;
 	}
 
