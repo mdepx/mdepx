@@ -63,7 +63,5 @@ raw_sleep(uint32_t ticks)
 	callout_set(&c, ticks, raw_sleep_cb, &c);
 	critical_exit();
 
-	KASSERT(td->td_critnest == 0, ("critnest != 0"));
-
 	md_thread_yield();
 }
