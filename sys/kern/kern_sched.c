@@ -241,3 +241,19 @@ sched_next(struct trapframe *tf)
 
 	return (curthread->td_tf);
 }
+
+void
+sched_enter(void)
+{
+	struct thread *td;
+
+	td = curthread;
+
+	KASSERT(td->td_idle == 1,
+	    ("sched_enter() called from non-idle thread"));
+
+	md_thread_yield();
+
+	while (1)
+		cpu_idle();
+}

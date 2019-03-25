@@ -64,6 +64,7 @@ void cpu_idle(void);
 /* Scheduler */
 void sched_remove(struct thread *td);
 void sched_add(struct thread *td);
+void sched_enter(void);
 
 /* Thread MD part */
 void md_init(void);
