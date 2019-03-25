@@ -47,20 +47,9 @@
 #define	dprintf(fmt, ...)
 #endif
 
-static struct thread thread0;
+extern struct thread thread0;
 static struct thread *runq;
 static struct thread *runq_tail;
-
-void
-thread0_init(void)
-{
-
-	thread0.td_name = "idle";
-	thread0.td_idle = 1;
-	curthread = &thread0;
-
-	runq = NULL;
-}
 
 static void __unused
 dump_runq(void)
@@ -109,66 +98,6 @@ sched_add(struct thread *td)
 		runq_tail->td_next = td;
 		runq_tail = td;
 	}
-}
-
-/*
- * Remove curthread from run queue.
- */
-static void
-thread_terminate(void)
-{
-	struct thread *td;
-
-	dprintf("%s: %s\n", __func__, td->td_name);
-
-	td = curthread;
-
-	critical_enter();
-	td->td_state = TD_STATE_TERMINATING;
-	sched_remove(td);
-	callout_cancel(&td->td_c);
-	md_thread_terminate(td);
-	critical_exit();
-
-	md_thread_yield();
-
-	/* NOT REACHED */
-
-	panic("md_thread_terminate() returned\n");
-}
-
-struct thread *
-thread_create(const char *name, uint32_t quantum,
-    uint32_t stack_size, void *entry, void *arg)
-{
-	struct thread *td;
-
-	td = malloc(sizeof(struct thread));
-	if (td == NULL)
-		return (NULL);
-	memset(td, 0, sizeof(struct thread));
-	td->td_name = name;
-	td->td_quantum = quantum;
-	td->td_idle = 0;
-	td->td_mem_size = stack_size;
-	td->td_mem = malloc(td->td_mem_size);
-	if (td->td_mem == NULL) {
-		free(td);
-		return (NULL);
-	}
-	memset(td->td_mem, 0, td->td_mem_size);
-
-	td->td_tf = (struct trapframe *)((uint8_t *)td->td_mem
-	    + td->td_mem_size - sizeof(struct trapframe));
-	md_setup_frame(td->td_tf, entry, arg, thread_terminate);
-
-	td->td_state = TD_STATE_READY;
-
-	critical_enter();
-	sched_add(td);
-	critical_exit();
-
-	return (td);
 }
 
 static void

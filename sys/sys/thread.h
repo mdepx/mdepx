@@ -60,6 +60,7 @@ struct trapframe *sched_next(struct trapframe *);
 struct thread *thread_create(const char *name, uint32_t quantum,
     uint32_t stack_size, void *entry, void *arg);
 void cpu_idle(void);
+void thread_terminate(void);
 
 /* Scheduler */
 void sched_remove(struct thread *td);
