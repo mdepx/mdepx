@@ -55,7 +55,7 @@ mutex_lock(struct mutex *m)
 		critical_enter();
 		ret = atomic_cmpset_acq_ptr(&(m)->mtx_lock, 0, 1);
 		if (ret) {
-			/* Lock obtained */
+			/* Lock acquired. */
 			critical_exit();
 			break;
 		}
@@ -68,6 +68,20 @@ mutex_lock(struct mutex *m)
 
 		md_thread_yield();
 	}
+}
+
+int
+mutex_trylock(struct mutex *m)
+{
+	int ret;
+
+	ret = atomic_cmpset_acq_ptr(&(m)->mtx_lock, 0, 1);
+	if (ret) {
+		/* Lock acquired. */
+		return (1);
+	}
+
+	return (0);
 }
 
 void

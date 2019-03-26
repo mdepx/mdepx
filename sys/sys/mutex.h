@@ -32,6 +32,7 @@ struct mutex {
 };
 
 void mutex_lock(struct mutex *m);
+int mutex_trylock(struct mutex *m);
 void mutex_unlock(struct mutex *m);
 
 #endif /* _SYS_MUTEX_H_ */
