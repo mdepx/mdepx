@@ -6,10 +6,10 @@ KERN_OBJECTS =						\
 		sys/kern/kern_panic.o			\
 		sys/kern/kern_thread.o			\
 		sys/kern/kern_sched.o			\
+		sys/kern/kern_sleep.o			\
 		sys/kern/kern_timeout.o			\
 		sys/kern/subr_console.o			\
 		sys/kern/subr_prf.o			\
-		sys/kern/subr_sleep.o			\
 		sys/kern/subr_startup.o			\
 
 MIPS_OBJECTS =						\
