@@ -155,6 +155,7 @@ callout_set_one(struct callout *c0)
 
 	dprintf("%s: ticks %d\n", __func__, c0->ticks);
 
+	elapsed = 0;
 	if (mi_tmr->state == MI_TIMER_RUNNING) {
 		elapsed = get_elapsed(NULL);
 		c0->ticks += elapsed;
