@@ -31,5 +31,6 @@
 
 void malloc_init(void);
 void malloc_add_region(uintptr_t base, int size);
+void * zalloc(size_t size);
 
 #endif /* !_SYS_MALLOC_H_ */

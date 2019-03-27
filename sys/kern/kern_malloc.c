@@ -36,6 +36,20 @@
 #include <sys/malloc.h>
 
 void *
+zalloc(size_t size)
+{
+	void *ret;
+
+	ret = malloc(size);
+	if (ret == NULL)
+		return (ret);
+
+	bzero(ret, size);
+
+	return (ret);
+}
+
+void *
 malloc(size_t size)
 {
 	void *ret;
