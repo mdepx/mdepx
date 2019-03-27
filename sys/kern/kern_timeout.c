@@ -212,17 +212,11 @@ callout_cancel(struct callout *c)
 	}
 
 	rerun = 0;
-
-	if (c == callouts) {
-		/*
-		 * c is the currently running callout or the next
-		 * one to run (which is possible if this function
-		 * is called from another callout handler).
-		 */
-		if (mi_tmr->state == MI_TIMER_RUNNING) {
-			elapsed = get_elapsed(NULL);
-			rerun = 1;
-		}
+	if (c == callouts &&
+	    mi_tmr->state == MI_TIMER_RUNNING) {
+		/* c is a running callout. */
+		elapsed = get_elapsed(NULL);
+		rerun = 1;
 	}
 
 	callout_remove(c);
