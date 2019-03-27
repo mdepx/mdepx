@@ -44,6 +44,7 @@ void
 mutex_lock(struct mutex *m)
 {
 	struct thread *td;
+	uintptr_t tid;
 	int ret;
 
 	td = curthread;
@@ -51,9 +52,11 @@ mutex_lock(struct mutex *m)
 	KASSERT(td->td_idle == 0,
 	    ("Can't lock mutex from idle thread"));
 
+	tid = (uintptr_t)td;
+
 	for (;;) {
 		critical_enter();
-		ret = atomic_cmpset_acq_ptr(&(m)->mtx_lock, 0, 1);
+		ret = atomic_cmpset_acq_ptr(&(m)->mtx_lock, 0, (tid));
 		if (ret) {
 			/* Lock acquired. */
 			critical_exit();
@@ -73,9 +76,12 @@ mutex_lock(struct mutex *m)
 int
 mutex_trylock(struct mutex *m)
 {
+	uintptr_t tid;
 	int ret;
 
-	ret = atomic_cmpset_acq_ptr(&(m)->mtx_lock, 0, 1);
+	tid = (uintptr_t)curthread;
+
+	ret = atomic_cmpset_acq_ptr(&(m)->mtx_lock, 0, (tid));
 	if (ret) {
 		/* Lock acquired. */
 		return (1);
@@ -87,6 +93,9 @@ mutex_trylock(struct mutex *m)
 void
 mutex_unlock(struct mutex *m)
 {
+	uintptr_t tid;
 
-	atomic_store_rel_ptr(&(m)->mtx_lock, 0);
+	tid = (uintptr_t)curthread;
+
+	atomic_cmpset_rel_ptr(&(m)->mtx_lock, (tid), 0);
 }
