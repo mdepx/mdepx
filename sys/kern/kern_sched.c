@@ -140,9 +140,10 @@ sched_next(struct trapframe *tf)
 	}
 
 	for (td = runq; td != NULL; td = td->td_next) {
-		if (td->td_state == TD_STATE_SLEEPING)
+		switch (td->td_state) {
+		case TD_STATE_SLEEPING:
 			continue;
-		if (td->td_state == TD_STATE_MUTEX_WAIT) {
+		case TD_STATE_MUTEX_WAIT:
 			m = td->td_mtx_wait;
 			KASSERT(m != NULL, ("mtx wait is NULL"));
 			if (m->mtx_lock == 1)
