@@ -68,7 +68,7 @@ callout_init(struct callout *c)
 }
 
 static uint32_t
-get_elapsed(void)
+get_elapsed(uint32_t *count_saved)
 {
 	uint32_t elapsed;
 	uint32_t count;
@@ -78,7 +78,9 @@ get_elapsed(void)
 		elapsed = (count - mi_tmr->count_saved);
 	else
 		elapsed = (0xffffffff - mi_tmr->count_saved + count);
-	mi_tmr->count_saved = count;
+
+	if (count_saved != NULL)
+		*count_saved = count;
 
 	dprintf("%s: elapsed %u\n", __func__, elapsed);
 
@@ -88,16 +90,19 @@ get_elapsed(void)
 static void
 fix_timeouts(void)
 {
-	struct callout *c;
 	uint32_t ticks_elapsed;
+	struct callout *c;
+	uint32_t count;
 
-	ticks_elapsed = get_elapsed();
+	ticks_elapsed = get_elapsed(&count);
 
 	for (c = callouts; c != NULL; c = c->next)
 		if (ticks_elapsed >= c->ticks)
 			c->ticks = 0;
 		else
 			c->ticks -= ticks_elapsed;
+
+	mi_tmr->count_saved = count;
 }
 
 static void
@@ -142,6 +147,7 @@ static void
 callout_set_one(struct callout *c0)
 {
 	struct callout *c;
+	uint32_t elapsed;
 
 	KASSERT(curthread != NULL, ("curthread is NULL"));
 	KASSERT(curthread->td_critnest > 0,
@@ -149,8 +155,10 @@ callout_set_one(struct callout *c0)
 
 	dprintf("%s: ticks %d\n", __func__, c0->ticks);
 
-	if (mi_tmr->state == MI_TIMER_RUNNING)
-		fix_timeouts();
+	if (mi_tmr->state == MI_TIMER_RUNNING) {
+		elapsed = get_elapsed(NULL);
+		c0->ticks += elapsed;
+	}
 
 	for (c = callouts;
 	    (c != NULL && c->ticks < c0->ticks);
@@ -170,7 +178,8 @@ callout_set_one(struct callout *c0)
 	switch (mi_tmr->state) {
 	case MI_TIMER_RUNNING:
 		if (callouts == c0)
-			mi_tmr->start(mi_tmr->arg, callouts->ticks);
+			mi_tmr->start(mi_tmr->arg,
+			    callouts->ticks - elapsed);
 		break;
 	case MI_TIMER_EXCP:
 		/* We are in the exception handler */
@@ -190,6 +199,7 @@ callout_set_one(struct callout *c0)
 int
 callout_cancel(struct callout *c)
 {
+	uint32_t elapsed;
 	int rerun;
 
 	KASSERT(mi_tmr != NULL, ("mi timer is NULL"));
@@ -210,7 +220,7 @@ callout_cancel(struct callout *c)
 		 * is called from another callout handler).
 		 */
 		if (mi_tmr->state == MI_TIMER_RUNNING) {
-			fix_timeouts();
+			elapsed = get_elapsed(NULL);
 			rerun = 1;
 		}
 	}
@@ -219,7 +229,8 @@ callout_cancel(struct callout *c)
 
 	if (callouts) {
 		if (rerun)
-			mi_tmr->start(mi_tmr->arg, callouts->ticks);
+			mi_tmr->start(mi_tmr->arg,
+			    callouts->ticks - elapsed);
 	} else {
 		mi_tmr->state = MI_TIMER_READY;
 		mi_tmr->stop(mi_tmr->arg);
