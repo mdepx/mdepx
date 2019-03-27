@@ -50,7 +50,7 @@ struct thread {
 #define	TD_STATE_SLEEPING	2
 #define	TD_STATE_MUTEX_WAIT	3
 #define	TD_STATE_TERMINATING	4
-	struct mutex *		td_mtx_wait;
+	struct mtx *		td_mtx_wait;
 };
 
 struct thread *curthread;

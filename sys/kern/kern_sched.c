@@ -113,7 +113,7 @@ struct trapframe *
 sched_next(struct trapframe *tf)
 {
 	struct thread *td;
-	struct mutex *m;
+	struct mtx *m;
 
 	dprintf("%s\n", __func__);
 

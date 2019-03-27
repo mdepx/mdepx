@@ -27,12 +27,12 @@
 #ifndef	_SYS_MUTEX_H_
 #define	_SYS_MUTEX_H_
 
-struct mutex {
+struct mtx {
 	uint32_t mtx_lock;
 };
 
-void mutex_lock(struct mutex *m);
-int mutex_trylock(struct mutex *m);
-int mutex_unlock(struct mutex *m);
+void mtx_lock(struct mtx *m);
+int mtx_trylock(struct mtx *m);
+int mtx_unlock(struct mtx *m);
 
 #endif /* _SYS_MUTEX_H_ */

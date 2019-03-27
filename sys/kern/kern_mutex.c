@@ -41,7 +41,7 @@
 #endif
 
 void
-mutex_lock(struct mutex *m)
+mtx_lock(struct mtx *m)
 {
 	struct thread *td;
 	uintptr_t tid;
@@ -74,7 +74,7 @@ mutex_lock(struct mutex *m)
 }
 
 int
-mutex_trylock(struct mutex *m)
+mtx_trylock(struct mtx *m)
 {
 	uintptr_t tid;
 	int ret;
@@ -91,7 +91,7 @@ mutex_trylock(struct mutex *m)
 }
 
 int
-mutex_unlock(struct mutex *m)
+mtx_unlock(struct mtx *m)
 {
 	uintptr_t tid;
 	int ret;
