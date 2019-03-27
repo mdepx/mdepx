@@ -33,6 +33,7 @@
 #include <sys/systm.h>
 #include <sys/thread.h>
 #include <sys/mutex.h>
+#include <sys/malloc.h>
 
 #include <machine/frame.h>
 
@@ -89,20 +90,18 @@ thread_create(const char *name, uint32_t quantum,
 {
 	struct thread *td;
 
-	td = malloc(sizeof(struct thread));
+	td = zalloc(sizeof(struct thread));
 	if (td == NULL)
 		return (NULL);
-	memset(td, 0, sizeof(struct thread));
 	td->td_name = name;
 	td->td_quantum = quantum;
 	td->td_idle = 0;
 	td->td_mem_size = stack_size;
-	td->td_mem = malloc(td->td_mem_size);
+	td->td_mem = zalloc(td->td_mem_size);
 	if (td->td_mem == NULL) {
 		free(td);
 		return (NULL);
 	}
-	memset(td->td_mem, 0, td->td_mem_size);
 
 	td->td_tf = (struct trapframe *)((uint8_t *)td->td_mem
 	    + td->td_mem_size - sizeof(struct trapframe));
