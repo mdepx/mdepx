@@ -90,12 +90,15 @@ mutex_trylock(struct mutex *m)
 	return (0);
 }
 
-void
+int
 mutex_unlock(struct mutex *m)
 {
 	uintptr_t tid;
+	int ret;
 
 	tid = (uintptr_t)curthread;
 
-	atomic_cmpset_rel_ptr(&(m)->mtx_lock, (tid), 0);
+	ret = atomic_cmpset_rel_ptr(&(m)->mtx_lock, (tid), 0);
+
+	return (ret);
 }
