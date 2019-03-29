@@ -52,10 +52,15 @@ raw_sleep(uint32_t ticks)
 
 	td = curthread;
 
-	KASSERT(td->td_idle == 0, ("Sleeping from idle thread"));
-
 	callout_init(&c);
 	c.td = td;
+
+	if (td->td_idle) {
+		callout_set(&c, ticks, raw_sleep_cb, &c);
+		while (c.state == 0)
+			cpu_idle();
+		return;
+	}
 
 	critical_enter();
 	td->td_state = TD_STATE_SLEEPING;
