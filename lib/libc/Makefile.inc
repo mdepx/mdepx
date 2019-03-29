@@ -12,6 +12,7 @@ LIBC_OBJECTS =						\
 		lib/libc/stdlib/atoi.o			\
 		lib/libc/stdlib/bsearch.o		\
 		lib/libc/stdlib/strtol.o		\
+		lib/libc/stdlib/strtoul.o		\
 		lib/libc/stdlib/qsort.o			\
 		lib/libc/string/bcmp.o			\
 		lib/libc/string/ffs.o			\
@@ -32,6 +33,7 @@ LIBC_OBJECTS =						\
 		lib/libc/string/strncat.o		\
 		lib/libc/string/strncmp.o		\
 		lib/libc/string/strnlen.o		\
+		lib/libc/string/strrchr.o		\
 		lib/libc/string/strsep.o		\
 		lib/libc/string/strstr.o		\
 		lib/libc/string/memset.o		\
