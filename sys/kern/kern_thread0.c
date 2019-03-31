@@ -24,54 +24,18 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_SYS_THREAD_H_
-#define	_SYS_THREAD_H_
+#include <sys/cdefs.h>
+#include <sys/thread.h>
 
-#include <sys/callout.h>
+struct thread *curthread;
+struct thread thread0;
 
-#include <machine/thread.h>
+void
+thread0_init(void)
+{
 
-struct thread {
-	const char *		td_name;
-	struct mdthread		td_md;
-	volatile u_int		td_critnest;
-	struct trapframe *	td_tf;
-	uint8_t *		td_mem;
-	uint32_t		td_mem_size;
-	uint8_t			td_index;
-	uint8_t			td_idle;
-	struct callout		td_c;
-	struct thread *		td_next;
-	struct thread *		td_prev;
-	uint32_t		td_quantum;
-	int			td_state;
-#define	TD_STATE_READY		0
-#define	TD_STATE_RUNNING	1
-#define	TD_STATE_SLEEPING	2
-#define	TD_STATE_MUTEX_WAIT	3
-#define	TD_STATE_TERMINATING	4
-	struct mtx *		td_mtx_wait;
-};
-
-extern struct thread *curthread;
-
-void thread0_init(void);
-struct trapframe *sched_next(struct trapframe *);
-struct thread *thread_create(const char *name, uint32_t quantum,
-    uint32_t stack_size, void *entry, void *arg);
-void cpu_idle(void);
-void thread_terminate(void);
-
-/* Scheduler */
-void sched_remove(struct thread *td);
-void sched_add(struct thread *td);
-void sched_enter(void);
-
-/* Thread MD part */
-void md_init(void);
-void md_thread_yield(void);
-void md_setup_frame(struct trapframe *tf, void *entry,
-    void *arg, void *terminate);
-void md_thread_terminate(struct thread *td);
-
-#endif /* !_SYS_THREAD_H_ */
+	bzero(&thread0, sizeof(struct thread));
+	thread0.td_name = "idle";
+	thread0.td_idle = 1;
+	curthread = &thread0;
+}
