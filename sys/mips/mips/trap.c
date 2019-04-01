@@ -115,7 +115,11 @@ mips_exception(struct trapframe *frame)
 
 	dprintf("Exception cause: %x, code %d\n", cause, exc_code);
 
+#ifdef	CONFIG_SCHED
 	ret = sched_next(frame);
+#else
+	ret = frame;
+#endif
 
 	td->td_critnest--;
 

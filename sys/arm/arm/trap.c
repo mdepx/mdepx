@@ -90,7 +90,11 @@ arm_exception(struct trapframe *tf, int exc_code)
 	} else
 		handle_exception(tf, exc_code);
 
+#ifdef	CONFIG_SCHED
 	ret = sched_next(tf);
+#else
+	ret = tf;
+#endif
 
 	td->td_critnest--;
 

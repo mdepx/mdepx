@@ -101,7 +101,11 @@ riscv_exception(struct trapframe *tf)
 	} else
 		handle_exception(tf);
 
+#ifdef	CONFIG_SCHED
 	ret = sched_next(tf);
+#else
+	ret = tf;
+#endif
 
 	td->td_critnest--;
 
