@@ -5,6 +5,7 @@ KERN_OBJECTS =						\
 		sys/kern/kern_mutex.o			\
 		sys/kern/kern_panic.o			\
 		sys/kern/kern_thread.o			\
+		sys/kern/kern_thread0.o			\
 		sys/kern/kern_sched.o			\
 		sys/kern/kern_sleep.o			\
 		sys/kern/kern_timeout.o			\
