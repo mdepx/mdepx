@@ -1,4 +1,5 @@
-.for lib in ${LIBRARIES}
+.for lib0 in ${LIBRARIES}
+lib=${lib0:tu}
 .if empty(${lib}_OBJECTS)
 .error Error: library "${lib}" not found
 .endif
