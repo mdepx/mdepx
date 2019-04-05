@@ -1,4 +1,4 @@
-LIBAEABI_OBJECTS =		\
+LIBAEABI_OBJS =			\
 	lib/libaeabi/crt.o	\
 	lib/libaeabi/divdi3.o	\
 	lib/libaeabi/idiv.o	\

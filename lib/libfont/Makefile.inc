@@ -1,1 +1,1 @@
-LIBFONT_OBJECTS =	lib/libfont/libfont.o
+LIBFONT_OBJS =	lib/libfont/libfont.o

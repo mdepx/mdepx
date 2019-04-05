@@ -1,4 +1,4 @@
-KERN_OBJECTS =						\
+KERN_OBJS =						\
 		sys/kern/kern_malloc_fl.o		\
 		sys/kern/kern_malloc.o			\
 		sys/kern/kern_mbuf.o			\
@@ -13,7 +13,7 @@ KERN_OBJECTS =						\
 		sys/kern/subr_prf.o			\
 		sys/kern/subr_startup.o			\
 
-MIPS_OBJECTS =						\
+MIPS_OBJS =						\
 		sys/mips/mips/cache_mipsNN.o		\
 		sys/mips/mips/exception.o		\
 		sys/mips/mips/machdep.o			\
@@ -21,14 +21,14 @@ MIPS_OBJECTS =						\
 		sys/mips/mips/timer.o			\
 		sys/mips/mips/trap.o			\
 
-ARM_OBJECTS =						\
+ARM_OBJS =						\
 		sys/arm/arm/exception.o			\
 		sys/arm/arm/machdep.o			\
 		sys/arm/arm/nvic.o			\
 		sys/arm/arm/scb.o			\
 		sys/arm/arm/trap.o			\
 
-RISCV_OBJECTS =						\
+RISCV_OBJS =						\
 		sys/riscv/riscv/exception.o		\
 		sys/riscv/riscv/intr.o			\
 		sys/riscv/riscv/machdep.o		\

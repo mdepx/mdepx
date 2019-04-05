@@ -1,4 +1,4 @@
-LIBC_OBJECTS =						\
+LIBC_OBJS =						\
 		lib/libc/stdio/printf.o			\
 		lib/libc/stdio/fprintf.o		\
 		lib/libc/stdio/feof.o			\
@@ -44,7 +44,7 @@ LIBC_OBJECTS =						\
 		lib/libc/string/bzero.o			\
 		lib/libc/sys/fstat.o
 
-LIBC_QUAD_OBJECTS =					\
+LIBC_QUAD_OBJS =					\
 		lib/libc/quad/qdivrem.o			\
 		lib/libc/quad/udivdi3.o			\
 		lib/libc/quad/umoddi3.o

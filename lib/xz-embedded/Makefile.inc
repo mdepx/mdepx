@@ -1,4 +1,4 @@
-XZ_OBJECTS =	lib/xz-embedded/linux/lib/xz/xz_crc32.o		\
+XZ_OBJS =	lib/xz-embedded/linux/lib/xz/xz_crc32.o		\
 		lib/xz-embedded/linux/lib/xz/xz_dec_bcj.o	\
 		lib/xz-embedded/linux/lib/xz/xz_dec_lzma2.o	\
 		lib/xz-embedded/linux/lib/xz/xz_dec_stream.o

@@ -1,4 +1,4 @@
-LIBFDT_OBJECTS =			\
+LIBFDT_OBJS =				\
 	lib/libfdt/fdt_addresses.o	\
 	lib/libfdt/fdt_empty_tree.o	\
 	lib/libfdt/fdt_overlay.o	\

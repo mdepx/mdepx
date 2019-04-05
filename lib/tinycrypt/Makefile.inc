@@ -1,4 +1,4 @@
-TINYCRYPT =						\
+TINYCRYPT_OBJS =					\
 		lib/tinycrypt/source/aes_decrypt.o	\
 		lib/tinycrypt/source/aes_encrypt.o	\
 		lib/tinycrypt/source/cbc_mode.o		\
