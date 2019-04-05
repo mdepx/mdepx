@@ -1,17 +1,17 @@
 KERN_OBJS =						\
-		sys/kern/kern_malloc_fl.o		\
-		sys/kern/kern_malloc.o			\
-		sys/kern/kern_mbuf.o			\
-		sys/kern/kern_mutex.o			\
-		sys/kern/kern_panic.o			\
-		sys/kern/kern_thread.o			\
-		sys/kern/kern_thread0.o			\
-		sys/kern/kern_sched.o			\
-		sys/kern/kern_sleep.o			\
-		sys/kern/kern_timeout.o			\
-		sys/kern/subr_console.o			\
-		sys/kern/subr_prf.o			\
-		sys/kern/subr_startup.o			\
+		sys/kern/malloc_fl.o			\
+		sys/kern/malloc.o			\
+		sys/kern/mbuf.o				\
+		sys/kern/mutex.o			\
+		sys/kern/panic.o			\
+		sys/kern/thread.o			\
+		sys/kern/thread0.o			\
+		sys/kern/sched.o			\
+		sys/kern/sleep.o			\
+		sys/kern/callout.o			\
+		sys/kern/console.o			\
+		sys/kern/printf.o			\
+		sys/kern/startup.o			\
 
 MIPS_OBJS =						\
 		sys/mips/mips/cache_mipsNN.o		\
