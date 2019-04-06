@@ -5,6 +5,7 @@ KERN_OBJS =						\
 		sys/kern/mutex.o			\
 		sys/kern/panic.o			\
 		sys/kern/thread/thread.o		\
+		sys/kern/thread/thread_alloc.o		\
 		sys/kern/thread/thread0.o		\
 		sys/kern/sched.o			\
 		sys/kern/sleep.o			\
