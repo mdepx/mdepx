@@ -1,11 +1,11 @@
 KERN_OBJS =						\
-		sys/kern/malloc_fl.o			\
-		sys/kern/malloc.o			\
+		sys/kern/malloc/malloc_fl.o		\
+		sys/kern/malloc/malloc.o		\
 		sys/kern/mbuf.o				\
 		sys/kern/mutex.o			\
 		sys/kern/panic.o			\
-		sys/kern/thread.o			\
-		sys/kern/thread0.o			\
+		sys/kern/thread/thread.o		\
+		sys/kern/thread/thread0.o		\
 		sys/kern/sched.o			\
 		sys/kern/sleep.o			\
 		sys/kern/callout.o			\
