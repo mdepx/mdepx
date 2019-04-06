@@ -72,18 +72,43 @@ thread_terminate(void)
 	panic("md_thread_terminate() returned\n");
 }
 
+int
+thread_setup(struct thread *td, const char *name,
+    uint32_t quantum, void *entry, void *arg)
+{
+
+	if (td == NULL || td->td_mem == NULL)
+		return (-1);
+
+	if (quantum == 0)
+		return (-1);
+
+	if (entry == NULL)
+		return (-1);
+
+	td->td_name = name;
+	td->td_quantum = quantum;
+	td->td_idle = 0;
+	td->td_state = TD_STATE_READY;
+	td->td_tf = (struct trapframe *)((uint8_t *)td->td_mem
+	    + td->td_mem_size - sizeof(struct trapframe));
+	md_setup_frame(td->td_tf, entry, arg, thread_terminate);
+
+	critical_enter();
+	sched_add(td);
+	critical_exit();
+
+	return (0);
+}
+
 struct thread *
-thread_create(const char *name, uint32_t quantum,
-    uint32_t stack_size, void *entry, void *arg)
+thread_alloc(uint32_t stack_size)
 {
 	struct thread *td;
 
 	td = zalloc(sizeof(struct thread));
 	if (td == NULL)
 		return (NULL);
-	td->td_name = name;
-	td->td_quantum = quantum;
-	td->td_idle = 0;
 	td->td_mem_size = stack_size;
 	td->td_mem = zalloc(td->td_mem_size);
 	if (td->td_mem == NULL) {
@@ -91,15 +116,20 @@ thread_create(const char *name, uint32_t quantum,
 		return (NULL);
 	}
 
-	td->td_tf = (struct trapframe *)((uint8_t *)td->td_mem
-	    + td->td_mem_size - sizeof(struct trapframe));
-	md_setup_frame(td->td_tf, entry, arg, thread_terminate);
+	return (td);
+}
 
-	td->td_state = TD_STATE_READY;
+struct thread *
+thread_create(const char *name, uint32_t quantum,
+    uint32_t stack_size, void *entry, void *arg)
+{
+	struct thread *td;
 
-	critical_enter();
-	sched_add(td);
-	critical_exit();
+	td = thread_alloc(stack_size);
+	if (td == NULL)
+		return (NULL);
+
+	thread_setup(td, name, quantum, entry, arg);
 
 	return (td);
 }
