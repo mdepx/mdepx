@@ -40,6 +40,8 @@
 #define	dprintf(fmt, ...)
 #endif
 
+extern struct thread thread0;
+
 void
 mtx_lock(struct mtx *m)
 {
@@ -49,7 +51,7 @@ mtx_lock(struct mtx *m)
 
 	td = curthread;
 
-	KASSERT(td->td_idle == 0,
+	KASSERT(td == &thread0,
 	    ("Can't lock mutex from idle thread"));
 
 	tid = (uintptr_t)td;

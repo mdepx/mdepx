@@ -36,6 +36,5 @@ thread0_init(void)
 
 	bzero(&thread0, sizeof(struct thread));
 	thread0.td_name = "idle";
-	thread0.td_idle = 1;
 	curthread = &thread0;
 }

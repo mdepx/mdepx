@@ -179,7 +179,7 @@ sched_enter(void)
 
 	td = curthread;
 
-	KASSERT(td->td_idle == 1,
+	KASSERT(td == &thread0,
 	    ("sched_enter() called from non-idle thread"));
 
 	md_thread_yield();

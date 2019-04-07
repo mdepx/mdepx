@@ -38,7 +38,6 @@ struct thread {
 	struct trapframe *	td_tf;
 	uint8_t *		td_mem;
 	uint32_t		td_mem_size;
-	uint8_t			td_idle;
 	struct callout		td_c;
 	struct thread *		td_next;
 	struct thread *		td_prev;
