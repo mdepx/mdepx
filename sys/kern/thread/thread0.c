@@ -27,8 +27,11 @@
 #include <sys/cdefs.h>
 #include <sys/thread.h>
 
-struct thread *curthread;
-struct thread thread0;
+struct thread thread0 = {
+	.td_name = "idle",
+};
+
+struct thread *curthread = &thread0;
 
 void
 thread0_init(void)
