@@ -11,7 +11,6 @@ KERN_OBJS =						\
 		sys/kern/sleep.o			\
 		sys/kern/callout.o			\
 		sys/kern/console.o			\
-		sys/kern/printf.o			\
 		sys/kern/startup.o			\
 
 MIPS_OBJS =						\

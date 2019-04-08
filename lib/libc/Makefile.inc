@@ -1,5 +1,4 @@
 LIBC_OBJS =						\
-		lib/libc/stdio/printf.o			\
 		lib/libc/stdio/fprintf.o		\
 		lib/libc/stdio/feof.o			\
 		lib/libc/stdio/fopen.o			\
@@ -9,6 +8,8 @@ LIBC_OBJS =						\
 		lib/libc/stdio/fseek.o			\
 		lib/libc/stdio/ftell.o			\
 		lib/libc/stdio/fileno.o			\
+		lib/libc/stdio/kvprintf.o		\
+		lib/libc/stdio/printf.o			\
 		lib/libc/stdlib/atoi.o			\
 		lib/libc/stdlib/bsearch.o		\
 		lib/libc/stdlib/strtol.o		\
