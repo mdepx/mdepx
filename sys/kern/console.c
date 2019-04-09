@@ -24,7 +24,7 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/types.h>
+#include <sys/cdefs.h>
 #include <sys/console.h>
 
 struct kernel_console kern_console;
