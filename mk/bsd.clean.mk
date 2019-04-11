@@ -3,4 +3,4 @@
 .endif
 
 __clean:
-	rm -f ${OBJECTS:M*} ${APP}.elf ${APP}.bin ${APP}.srec
+	rm -f ${OBJECTS:M*} ${.OBJDIR}/machine ${APP}.elf ${APP}.bin ${APP}.srec

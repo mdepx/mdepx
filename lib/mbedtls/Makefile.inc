@@ -1,4 +1,4 @@
-MBEDTLS_MDSHA_OBJECTS = 		\
+MBEDTLS_MDSHA_OBJS = 			\
 	lib/mbedtls/library/md_wrap.o	\
 	lib/mbedtls/library/md.o	\
 	lib/mbedtls/library/md2.o	\

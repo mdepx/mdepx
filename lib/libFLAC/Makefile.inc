@@ -1,4 +1,4 @@
-LIBFLAC_OBJECTS =					\
+LIBFLAC_OBJS =						\
 		lib/libFLAC/libFLAC/bitmath.o		\
 		lib/libFLAC/libFLAC/bitreader.o		\
 		lib/libFLAC/libFLAC/crc.o		\

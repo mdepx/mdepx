@@ -25,80 +25,19 @@
  */
 
 #include <sys/cdefs.h>
-#include <sys/systm.h>
 #include <sys/thread.h>
-#include <sys/mutex.h>
 
-#include <machine/atomic.h>
+struct thread thread0 = {
+	.td_name = "idle",
+};
 
-#define	MUTEX_DEBUG
-#undef	MUTEX_DEBUG
-
-#ifdef	MUTEX_DEBUG
-#define	dprintf(fmt, ...)	printf(fmt, ##__VA_ARGS__)
-#else
-#define	dprintf(fmt, ...)
-#endif
+struct thread *curthread = &thread0;
 
 void
-mtx_lock(struct mtx *m)
+thread0_init(void)
 {
-	struct thread *td;
-	uintptr_t tid;
-	int ret;
 
-	td = curthread;
-
-	KASSERT(td->td_idle == 0,
-	    ("Can't lock mutex from idle thread"));
-
-	tid = (uintptr_t)td;
-
-	for (;;) {
-		critical_enter();
-		ret = atomic_cmpset_acq_ptr(&(m)->mtx_lock, 0, (tid));
-		if (ret) {
-			/* Lock acquired. */
-			critical_exit();
-			break;
-		}
-
-		/* Lock is owned by other thread, sleep */
-		td->td_state = TD_STATE_MUTEX_WAIT;
-		td->td_mtx_wait = m;
-		callout_cancel(&td->td_c);
-		critical_exit();
-
-		md_thread_yield();
-	}
-}
-
-int
-mtx_trylock(struct mtx *m)
-{
-	uintptr_t tid;
-	int ret;
-
-	tid = (uintptr_t)curthread;
-
-	ret = atomic_cmpset_acq_ptr(&(m)->mtx_lock, 0, (tid));
-	if (ret) {
-		/* Lock acquired. */
-		return (1);
-	}
-
-	return (0);
-}
-
-int
-mtx_unlock(struct mtx *m)
-{
-	uintptr_t tid;
-	int ret;
-
-	tid = (uintptr_t)curthread;
-
-	ret = atomic_cmpset_rel_ptr(&(m)->mtx_lock, (tid), 0);
-
-	return (ret);
+	bzero(&thread0, sizeof(struct thread));
+	thread0.td_name = "idle";
+	curthread = &thread0;
 }

@@ -29,6 +29,8 @@
 #include <sys/systm.h>
 #include <sys/thread.h>
 
+extern struct thread thread0;
+
 static void
 raw_sleep_cb(void *arg)
 {
@@ -55,7 +57,7 @@ raw_sleep(uint32_t ticks)
 	callout_init(&c);
 	c.td = td;
 
-	if (td->td_idle) {
+	if (td == &thread0) {
 		callout_set(&c, ticks, raw_sleep_cb, &c);
 		while (c.state == 0)
 			cpu_idle();

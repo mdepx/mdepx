@@ -1,5 +1,4 @@
-LIBC_OBJECTS =						\
-		lib/libc/stdio/printf.o			\
+LIBC_OBJS =						\
 		lib/libc/stdio/fprintf.o		\
 		lib/libc/stdio/feof.o			\
 		lib/libc/stdio/fopen.o			\
@@ -9,6 +8,8 @@ LIBC_OBJECTS =						\
 		lib/libc/stdio/fseek.o			\
 		lib/libc/stdio/ftell.o			\
 		lib/libc/stdio/fileno.o			\
+		lib/libc/stdio/kvprintf.o		\
+		lib/libc/stdio/printf.o			\
 		lib/libc/stdlib/atoi.o			\
 		lib/libc/stdlib/bsearch.o		\
 		lib/libc/stdlib/strtol.o		\
@@ -44,7 +45,7 @@ LIBC_OBJECTS =						\
 		lib/libc/string/bzero.o			\
 		lib/libc/sys/fstat.o
 
-LIBC_QUAD_OBJECTS =					\
+LIBC_QUAD_OBJS =					\
 		lib/libc/quad/qdivrem.o			\
 		lib/libc/quad/udivdi3.o			\
 		lib/libc/quad/umoddi3.o
