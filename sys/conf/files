@@ -12,7 +12,7 @@ sys/kern/mutex.o			sched
 sys/kern/of.o				fdt
 sys/kern/panic.o
 sys/kern/sched.o			sched
-sys/kern/sleep.o			sched
+sys/kern/sleep.o
 sys/kern/startup.o
 sys/kern/thread/thread.o		sched
 sys/kern/thread/thread_alloc.o		sched malloc
