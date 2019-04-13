@@ -1,0 +1,29 @@
+sys/arm/arm/exception.o			arm
+sys/arm/arm/machdep.o			arm
+sys/arm/arm/nvic.o			arm
+sys/arm/arm/scb.o			arm
+sys/arm/arm/trap.o			arm
+sys/kern/callout.o
+sys/kern/console.o
+sys/kern/malloc/malloc_fl.o		malloc
+sys/kern/malloc/malloc.o		malloc
+sys/kern/mbuf.o				net malloc
+sys/kern/mutex.o			sched
+sys/kern/of.o				fdt
+sys/kern/panic.o
+sys/kern/sched.o			sched
+sys/kern/sleep.o			sched
+sys/kern/startup.o
+sys/kern/thread/thread.o		sched
+sys/kern/thread/thread_alloc.o		sched malloc
+sys/kern/thread/thread0.o
+sys/mips/mips/cache_mipsNN.o		mips mips_cache
+sys/mips/mips/exception.o		mips
+sys/mips/mips/machdep.o			mips
+sys/mips/mips/saverestore.o		mips
+sys/mips/mips/timer.o			mips
+sys/mips/mips/trap.o			mips
+sys/riscv/riscv/exception.o		riscv
+sys/riscv/riscv/intr.o			riscv
+sys/riscv/riscv/machdep.o		riscv
+sys/riscv/riscv/trap.o			riscv
