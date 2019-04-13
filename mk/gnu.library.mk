@@ -11,4 +11,5 @@ $(foreach lib0,${LIBRARIES},						\
 			${eval CFLAGS_${OSOBJDIR}/${obj} +=		\
 			    -I${CURDIR}/${OSDIR}/${inc}}		\
 		)							\
-))
+	)								\
+)
