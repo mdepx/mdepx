@@ -1,22 +1,29 @@
 import sys
+import os
 
 args = sys.argv
 if len(args) <= 1:
 	sys.exit(1)
 
-f = open(args[1], "r")
+filename = args[1]
 options = args[2:]
+
+if not os.path.isfile(filename):
+	sys.exit(2)
 
 result = []
 
+f = open(filename, "r")
 for line in f:
-	spl = line.strip().split()
-	filename = spl[0]
-	if filename.startswith("#"):
+	if line.startswith("#"):
 		continue
+	spl = line.strip().split()
+	if not spl:
+		continue
+	obj = spl[0]
 	dep_str = " ".join(spl[1:])
 	if not dep_str:
-		result.append(filename)
+		result.append(obj)
 		continue
 	groups = dep_str.split("|")
 	for group in groups:
@@ -27,7 +34,8 @@ for line in f:
 				add = 0
 				break
 		if add:
-			result.append(filename)
+			result.append(obj)
 
-if result:
-	print(" ".join(set(result)))
+f.close()
+
+print(" ".join(set(result)))
