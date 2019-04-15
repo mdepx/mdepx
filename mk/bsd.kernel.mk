@@ -7,7 +7,7 @@ PYTHON_PATH != which ${PYTHON}
 .endif
 
 KOBJECTS != ${PYTHON} ${.CURDIR}/${OSDIR}/tools/files.py	\
-	${.CURDIR}/${OSDIR} sys/conf/files.${ARCH} ${KERNEL}
+	${.CURDIR}/${OSDIR} sys/conf/files.${MACHINE} ${KERNEL}
 
 .for obj in ${KOBJECTS}
 OBJECTS+=${OSDIR}/${obj}

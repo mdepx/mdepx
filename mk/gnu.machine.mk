@@ -1,13 +1,13 @@
-ifndef ARCH
-$(error Error: ARCH must be defined)
+ifndef MACHINE
+$(error Error: MACHINE must be defined)
 endif
 
-ARCHES = arm mips riscv
+MACHINES = arm mips riscv
 
-ifeq ($(filter $(ARCH),$(ARCHES)),)
-$(error Error: unknown arch ${ARCH}. Available arches: ${ARCHES}.)
+ifeq ($(filter $(MACHINE),$(MACHINES)),)
+$(error Error: unknown arch ${MACHINE}. Available arches: ${MACHINES}.)
 endif
 
 __machine:
 	@rm -f ${OBJDIR}/machine
-	@ln -s ${CURDIR}/${OSDIR}/sys/${ARCH}/include ${OBJDIR}/machine
+	@ln -s ${CURDIR}/${OSDIR}/sys/${MACHINE}/include ${OBJDIR}/machine

@@ -1,19 +1,19 @@
-.ifndef ARCH
-.error "ARCH must be defined"
+.ifndef MACHINE
+.error "MACHINE must be defined"
 .endif
 
-ARCHES = arm mips riscv
+MACHINES = arm mips riscv
 
-.for arch in ${ARCHES}
-.if ${arch} != ${ARCH}
-ARCHES_TMP += ${arch}
+.for arch in ${MACHINES}
+.if ${arch} != ${MACHINE}
+MACHINES_TMP += ${arch}
 .endif
 .endfor
 
-.if "${ARCHES} == "${ARCHES_TMP}"
-.error Error: unknown arch ${ARCH}. Available arches: ${ARCHES}.
+.if "${MACHINES} == "${MACHINES_TMP}"
+.error Error: unknown arch ${MACHINE}. Available arches: ${MACHINES}.
 .endif
 
 __machine:
 	@rm -f ${.OBJDIR}/machine
-	@ln -s ${.CURDIR}/${OSDIR}/sys/${ARCH}/include ${.OBJDIR}/machine
+	@ln -s ${.CURDIR}/${OSDIR}/sys/${MACHINE}/include ${.OBJDIR}/machine
