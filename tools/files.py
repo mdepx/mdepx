@@ -2,7 +2,7 @@ import sys
 import os
 
 args = sys.argv
-if len(args) <= 1:
+if len(args) < 3:
 	sys.exit(1)
 
 osdir = args[1]
