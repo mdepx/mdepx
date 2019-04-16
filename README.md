@@ -44,6 +44,10 @@ Basic rules for the makefiles:
   * Define a toolchain paths to CC, LD and OBJCOPY.
   * Include bsd.mk or gnu.mk
 
+## Kernel options
+  * sched - includes round-robin scheduler and threads management code
+  * malloc - includes free-list memory allocator
+
 # Contributing
 
 Please submit pull requests on github or send patches to br@bsdpad.com.
