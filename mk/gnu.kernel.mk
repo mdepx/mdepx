@@ -2,7 +2,7 @@ ifndef MACHINE
 $(error Error: MACHINE must be defined)
 endif
 
-ifeq ("$(wildcard ${OSDIR}/sys/conf/files.${MACHINE})","")
+ifeq ("$(wildcard ${OSDIR}/sys/conf/files.${MACHINE})", "")
 $(error Error: machine files not found)
 endif
 
@@ -16,5 +16,5 @@ KOBJECTS = $(shell ${PYTHON} ${OSDIR}/tools/files.py		\
 	${OSDIR} sys/conf/files.${MACHINE} ${KERNEL})
 
 $(foreach obj, ${KOBJECTS},					\
-	${eval OBJECTS+=${OSOBJDIR}/${obj}}			\
+	${eval OBJECTS += ${OSOBJDIR}/${obj}}			\
 )

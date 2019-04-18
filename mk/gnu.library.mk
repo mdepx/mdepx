@@ -1,5 +1,5 @@
-$(foreach lib0,${LIBRARIES},						\
-	${eval lib=$(shell echo ${lib0} | tr '[:lower:]' '[:upper:]')}	\
+$(foreach itm, ${LIBRARIES},						\
+	${eval lib = $(shell echo ${itm} | tr '[:lower:]' '[:upper:]')}	\
 	$(if $(filter %, ${${lib}_OBJS}),,				\
 		$(error Error: library "${lib}" not found)		\
 	endif)								\
