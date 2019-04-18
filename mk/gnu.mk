@@ -9,4 +9,5 @@ include ${OSDIR}/mk/gnu.info.mk
 include ${OSDIR}/mk/gnu.kernel.mk
 include ${OSDIR}/mk/gnu.library.mk
 include ${OSDIR}/mk/gnu.link.mk
+include ${OSDIR}/mk/gnu.machine.mk
 include ${OSDIR}/mk/gnu.user.mk

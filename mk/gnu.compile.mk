@@ -22,5 +22,3 @@ ${OBJDIR}/%.o: %.S GNUmakefile
 	${CC} ${CFLAGS} -c -o $@ $<
 
 __compile: __machine ${OBJECTS}
-
-include ${OSDIR}/mk/gnu.machine.mk
