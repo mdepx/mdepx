@@ -8,8 +8,9 @@ CFLAGS += ${INCS} ${CFLAGS_$@} -D__OSFIVE__
 
 #
 # Add ${OBJDIR} prefix to each member of OBJECTS.
-# Since this file is loaded before gnu.library.mk
-# the list does not include libraries objects.
+# Note this is for objects provided by user only
+# (gnu.library.mk and gnu.kernel.mk are loaded
+# after this file)
 #
 OBJECTS := $(addprefix $(OBJDIR)/,${OBJECTS})
 
