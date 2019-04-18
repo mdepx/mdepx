@@ -5,6 +5,7 @@ OSOBJDIR = ${OBJDIR}/${OSDIR}
 include ${OSDIR}/mk/gnu.binutils.mk
 include ${OSDIR}/mk/gnu.clean.mk
 include ${OSDIR}/mk/gnu.compile.mk
+include ${OSDIR}/mk/gnu.host.mk
 include ${OSDIR}/mk/gnu.info.mk
 include ${OSDIR}/mk/gnu.kernel.mk
 include ${OSDIR}/mk/gnu.library.mk
