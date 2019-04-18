@@ -1,5 +1,12 @@
-PYTHON ?= python3
+.ifndef MACHINE
+.error "MACHINE must be defined"
+.endif
 
+.if !exists(${.CURDIR}/${OSDIR}/sys/conf/files.${MACHINE})
+.error Error: machine files not found.
+.endif
+
+PYTHON ?= python3
 PYTHON_PATH != which ${PYTHON}
 
 .if "${PYTHON_PATH}" == ""

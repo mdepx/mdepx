@@ -1,3 +1,11 @@
+ifndef MACHINE
+$(error Error: MACHINE must be defined)
+endif
+
+ifeq ("$(wildcard ${CURDIR}/${OSDIR}/sys/conf/files.${MACHINE})","")
+$(error Error: machine files not found)
+endif
+
 PYTHON ?= python3
 
 ifeq (, $(shell which ${PYTHON}))
