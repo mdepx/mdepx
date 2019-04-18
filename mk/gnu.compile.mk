@@ -21,11 +21,11 @@ ${OBJDIR}/%.o: %.c Makefile
 	@mkdir -p $(dir $@)
 	${CC} ${CFLAGS} -c -o $@ $<
 
-${OBJDIR}/%.o: %.S Makefile
+${OBJDIR}/%.o: %.S GNUmakefile
 	@mkdir -p $(dir $@)
 	${CC} ${CFLAGS} -c -o $@ $<
 
-${OBJDIR}/%.o: %.S GNUmakefile
+${OBJDIR}/%.o: %.S Makefile
 	@mkdir -p $(dir $@)
 	${CC} ${CFLAGS} -c -o $@ $<
 
