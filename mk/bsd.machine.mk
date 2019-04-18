@@ -2,16 +2,8 @@
 .error "MACHINE must be defined"
 .endif
 
-MACHINES = arm mips riscv
-
-.for arch in ${MACHINES}
-.if ${arch} != ${MACHINE}
-MACHINES_TMP += ${arch}
-.endif
-.endfor
-
-.if "${MACHINES} == "${MACHINES_TMP}"
-.error Error: unknown arch ${MACHINE}. Available arches: ${MACHINES}.
+.if !exists(${.CURDIR}/${OSDIR}/sys/${MACHINE}/include)
+.error Error: machine headers not found.
 .endif
 
 __machine:

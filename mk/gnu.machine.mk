@@ -2,10 +2,8 @@ ifndef MACHINE
 $(error Error: MACHINE must be defined)
 endif
 
-MACHINES = arm mips riscv
-
-ifeq ($(filter $(MACHINE),$(MACHINES)),)
-$(error Error: unknown arch ${MACHINE}. Available arches: ${MACHINES}.)
+ifeq ("$(wildcard ${CURDIR}/${OSDIR}/sys/${MACHINE}/include)","")
+$(error Error: machine headers not found)
 endif
 
 __machine:
