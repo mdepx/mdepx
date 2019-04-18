@@ -13,11 +13,11 @@ CFLAGS += ${INCS} ${CFLAGS_$@} -D__OSFIVE__
 #
 OBJECTS := $(addprefix $(OBJDIR)/,${OBJECTS})
 
-${OBJDIR}/%.o: %.c GNUmakefile
+${OBJDIR}/%.o: %.c GNUmakefile Makefile
 	@mkdir -p $(dir $@)
 	${CC} ${CFLAGS} -c -o $@ $<
 
-${OBJDIR}/%.o: %.S GNUmakefile
+${OBJDIR}/%.o: %.S GNUmakefile Makefile
 	@mkdir -p $(dir $@)
 	${CC} ${CFLAGS} -c -o $@ $<
 
