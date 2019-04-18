@@ -35,14 +35,14 @@ Osfive is a framework for building bare-metal applications.
 
 # Getting started
 
-Osfive has a Makefile-based build system. You have to construct a makefile for your application. Both GNU and BSD make supported. See [example applications](https://github.com/osfive/).
+Osfive has a Makefile-based build system. You have to construct a GNU makefile for your application. See [example applications](https://github.com/osfive/).
 
 Basic rules for the makefiles:
   * Define APP name, MACHINE you target, KERNEL options and list of LIBRARIES.
   * Define list of OBJECTS including your app files and kernel drivers.
   * Provide an LDSCRIPT.
   * Define a toolchain paths to CC, LD and OBJCOPY.
-  * Include bsd.mk or gnu.mk
+  * Include gnu.mk
 
 ## Kernel options
   * sched - includes round-robin scheduler and threads management code
