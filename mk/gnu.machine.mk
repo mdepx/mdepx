@@ -8,4 +8,5 @@ endif
 
 __machine:
 	@rm -f ${OBJDIR}/machine
+	@mkdir -p ${OBJDIR}
 	@ln -s ${OSDIR}/sys/${MACHINE}/include ${OBJDIR}/machine

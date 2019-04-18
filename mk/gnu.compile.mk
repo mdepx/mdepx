@@ -21,7 +21,6 @@ ${OBJDIR}/%.o: %.S GNUmakefile
 	@mkdir -p $(dir $@)
 	${CC} ${CFLAGS} -c -o $@ $<
 
-__compile: __objdir __machine ${OBJECTS}
+__compile: __machine ${OBJECTS}
 
-include ${OSDIR}/mk/gnu.objdir.mk
 include ${OSDIR}/mk/gnu.machine.mk
