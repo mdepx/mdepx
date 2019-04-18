@@ -1,12 +1,12 @@
-OSDIR ?= osfive
-OBJDIR ?= obj
+OSDIR ?= ${CURDIR}/osfive
+OBJDIR ?= ${CURDIR}/obj
 OSOBJDIR = ${OBJDIR}/${OSDIR}
 
-include ${CURDIR}/${OSDIR}/mk/gnu.binutils.mk
-include ${CURDIR}/${OSDIR}/mk/gnu.clean.mk
-include ${CURDIR}/${OSDIR}/mk/gnu.compile.mk
-include ${CURDIR}/${OSDIR}/mk/gnu.info.mk
-include ${CURDIR}/${OSDIR}/mk/gnu.kernel.mk
-include ${CURDIR}/${OSDIR}/mk/gnu.library.mk
-include ${CURDIR}/${OSDIR}/mk/gnu.link.mk
-include ${CURDIR}/${OSDIR}/mk/gnu.user.mk
+include ${OSDIR}/mk/gnu.binutils.mk
+include ${OSDIR}/mk/gnu.clean.mk
+include ${OSDIR}/mk/gnu.compile.mk
+include ${OSDIR}/mk/gnu.info.mk
+include ${OSDIR}/mk/gnu.kernel.mk
+include ${OSDIR}/mk/gnu.library.mk
+include ${OSDIR}/mk/gnu.link.mk
+include ${OSDIR}/mk/gnu.user.mk

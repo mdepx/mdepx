@@ -9,7 +9,7 @@ $(foreach lib0,${LIBRARIES},						\
 		${eval OBJECTS+=${OSOBJDIR}/${obj}}			\
 		$(foreach inc,${${lib}_INCS},				\
 			${eval CFLAGS_${OSOBJDIR}/${obj} +=		\
-			    -I${CURDIR}/${OSDIR}/${inc}}		\
+			    -I${OSDIR}/${inc}}				\
 		)							\
 	)								\
 )

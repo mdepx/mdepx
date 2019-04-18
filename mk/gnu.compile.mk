@@ -1,8 +1,8 @@
 INCS += -I${OBJDIR}
 INCS += -I${CURDIR}
-INCS += -I${CURDIR}/${OSDIR}/include
-INCS += -I${CURDIR}/${OSDIR}/sys
-INCS += -I${CURDIR}/${OSDIR}/lib
+INCS += -I${OSDIR}/include
+INCS += -I${OSDIR}/sys
+INCS += -I${OSDIR}/lib
 
 CFLAGS += ${INCS} ${CFLAGS_$@} -D__OSFIVE__
 
