@@ -12,7 +12,7 @@ CFLAGS += ${INCS} ${CFLAGS_$@} -D__OSFIVE__
 # (gnu.library.mk and gnu.kernel.mk are loaded
 # after this file)
 #
-OBJECTS := $(addprefix $(OBJDIR)/,${OBJECTS})
+OBJECTS := $(addprefix ${OBJDIR}/, ${OBJECTS})
 
 ${OBJDIR}/%.o: %.c GNUmakefile
 	@mkdir -p $(dir $@)
