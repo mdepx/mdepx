@@ -5,7 +5,6 @@ $(foreach lib0,${LIBRARIES},						\
 	endif)								\
 	$(foreach obj,${${lib}_OBJS},					\
 		${eval CFLAGS_${OSOBJDIR}/${obj} += ${${lib}_CFLAGS}}	\
-		${eval CFLAGS_${OSOBJDIR}/${obj} += -I${OBJDIR}/machine/}\
 		${eval OBJECTS+=${OSOBJDIR}/${obj}}			\
 		$(foreach inc,${${lib}_INCS},				\
 			${eval CFLAGS_${OSOBJDIR}/${obj} +=		\
