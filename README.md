@@ -38,11 +38,11 @@ Osfive is a framework for building bare-metal applications.
 Osfive has a Makefile-based build system. You have to construct a GNU makefile for your application. See [example applications](https://github.com/osfive/).
 
 Basic rules for the makefiles:
-  * Define APP name, MACHINE you target, KERNEL options and list of LIBRARIES.
+  * Define APP name, MACHINE you target, KERNEL options and the list of LIBRARIES if required.
   * Define list of OBJECTS including your app files and kernel drivers.
   * Provide an LDSCRIPT.
-  * Define a toolchain paths to CC, LD and OBJCOPY.
-  * Include gnu.mk
+  * Define a CROSS_COMPILE triple.
+  * Include default.mk and gnu-toolchain.mk.
 
 ## Kernel options
   * sched - includes round-robin scheduler and threads management code
