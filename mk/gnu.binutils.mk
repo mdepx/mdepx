@@ -2,8 +2,8 @@ ifndef APP
 $(error Error: APP must be defined)
 endif
 
-__o:
-	${CROSS_COMPILE}objdump -d ${OBJDIR}/${APP}.elf ${ARGS} | less
+_objdump:
+	${CROSS_COMPILE}objdump -d ${OBJDIR}/${APP}.elf | less
 
-__r:
-	${CROSS_COMPILE}readelf -a ${OBJDIR}/${APP}.elf ${ARGS} | less
+_readelf:
+	${CROSS_COMPILE}readelf -a ${OBJDIR}/${APP}.elf | less
