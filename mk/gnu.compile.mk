@@ -21,4 +21,4 @@ ${OBJDIR}/%.o: %.S GNUmakefile
 	@mkdir -p $(dir $@)
 	${CC} ${CFLAGS} -c -o $@ $<
 
-__compile: __machine ${OBJECTS}
+_compile: _machine ${OBJECTS}

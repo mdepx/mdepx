@@ -11,6 +11,6 @@ ${OBJDIR}/${APP}.bin: ${OBJDIR}/${APP}.elf
 ${OBJDIR}/${APP}.srec: ${OBJDIR}/${APP}.elf
 	${OBJCOPY} -O srec ${OBJDIR}/${APP}.elf ${OBJDIR}/${APP}.srec
 
-__link:	${OBJDIR}/${APP}.elf
-__binary: ${OBJDIR}/${APP}.bin
-__srec:	${OBJDIR}/${APP}.srec
+_link:	${OBJDIR}/${APP}.elf
+_binary: ${OBJDIR}/${APP}.bin
+_srec:	${OBJDIR}/${APP}.srec
