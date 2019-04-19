@@ -35,11 +35,14 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
-uarte_intr(void *arg, uint32_t irqno)
+uarte_intr(void *arg, struct trapframe *tf, int irq)
 {
 	struct uarte_softc *sc;
 
 	sc = arg;
+
+	if (sc->cb != NULL)
+		sc->cb(sc->rx_data[0], sc->cb_arg);
 
 	WR4(sc, UARTE_EVENTS_RXDRDY, 0);
 	WR4(sc, UARTE_RXD_MAXCNT, 8);
@@ -88,6 +91,15 @@ uarte_start(struct uarte_softc *sc)
 	WR4(sc, UARTE_RXD_MAXCNT, 8);
 
 	WR4(sc, UARTE_TASKS_STARTRX, 1);
+}
+
+void
+uarte_register_callback(struct uarte_softc *sc,
+    void (*func)(int c, void *arg), void *arg)
+{
+
+	sc->cb = func;
+	sc->cb_arg = arg;
 }
 
 void
