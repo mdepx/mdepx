@@ -48,9 +48,9 @@ thread_alloc(uint32_t stack_size)
 	td = zalloc(sizeof(struct thread));
 	if (td == NULL)
 		return (NULL);
-	td->td_mem_size = stack_size;
-	td->td_mem = zalloc(td->td_mem_size);
-	if (td->td_mem == NULL) {
+	td->td_stack_size = stack_size;
+	td->td_stack = zalloc(td->td_stack_size);
+	if (td->td_stack == NULL) {
 		free(td);
 		return (NULL);
 	}

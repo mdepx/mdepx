@@ -75,7 +75,7 @@ thread_setup(struct thread *td, const char *name,
     uint32_t quantum, void *entry, void *arg)
 {
 
-	if (td == NULL || td->td_mem == NULL)
+	if (td == NULL || td->td_stack == NULL)
 		return (-1);
 
 	if (quantum == 0)
@@ -87,8 +87,8 @@ thread_setup(struct thread *td, const char *name,
 	td->td_name = name;
 	td->td_quantum = quantum;
 	td->td_state = TD_STATE_READY;
-	td->td_tf = (struct trapframe *)((uint8_t *)td->td_mem
-	    + td->td_mem_size - sizeof(struct trapframe));
+	td->td_tf = (struct trapframe *)((uint8_t *)td->td_stack
+	    + td->td_stack_size - sizeof(struct trapframe));
 	md_setup_frame(td->td_tf, entry, arg, thread_terminate);
 
 	critical_enter();
