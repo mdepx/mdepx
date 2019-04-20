@@ -34,7 +34,12 @@ def process(fullpath):
 			deps = group.split()
 			add = 1
 			for dep in deps:
-				if dep not in options:
+				if dep.startswith("!"):
+					d = dep.lstrip("!")
+					if d in options:
+						add = 0
+						break
+				elif dep not in options:
 					add = 0
 					break
 			if add:
