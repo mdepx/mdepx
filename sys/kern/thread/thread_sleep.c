@@ -54,14 +54,17 @@ raw_sleep(uint32_t ticks)
 
 	td = curthread;
 
-	KASSERT(td == &thread0,
-	    ("%s: sleeping from unknown thread.", __func__));
+	KASSERT(td != &thread0,
+	    ("%s: sleeping from idle thread.", __func__));
 
 	callout_init(&c);
 	c.td = td;
 
+	critical_enter();
+	td->td_state = TD_STATE_SLEEPING;
+	callout_cancel(&td->td_c);
 	callout_set(&c, ticks, raw_sleep_cb, &c);
+	critical_exit();
 
-	while (c.state == 0)
-		cpu_idle();
+	md_thread_yield();
 }
