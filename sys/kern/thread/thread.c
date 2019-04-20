@@ -45,7 +45,7 @@
 #endif
 
 /*
- * Remove curthread from run queue.
+ * Used by thread to terminate itself.
  */
 void
 thread_terminate(void)
