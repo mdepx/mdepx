@@ -60,6 +60,9 @@ dump_runq(void)
 		printf("%s: td %p name %s\n", __func__, td, td->td_name);
 }
 
+/*
+ * Remove td from the run queue.
+ */
 void
 sched_remove(struct thread *td)
 {
@@ -81,6 +84,9 @@ sched_remove(struct thread *td)
 	}
 }
 
+/*
+ * Add td to the run queue.
+ */
 void
 sched_add(struct thread *td)
 {
