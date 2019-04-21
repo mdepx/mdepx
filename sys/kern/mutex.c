@@ -109,11 +109,11 @@ mtx_unlock(struct mtx *m)
 {
 	struct thread *td;
 	uintptr_t tid;
-	int ret;
 
 	tid = (uintptr_t)curthread;
 
-	ret = atomic_cmpset_rel_ptr(&(m)->mtx_lock, (tid), 0);
+	if (!atomic_cmpset_rel_ptr(&(m)->mtx_lock, (tid), 0))
+		return (0);
 
 	critical_enter();
 	td = m->td_first;
@@ -127,5 +127,5 @@ mtx_unlock(struct mtx *m)
 	}
 	critical_exit();
 
-	return (ret);
+	return (1);
 }
