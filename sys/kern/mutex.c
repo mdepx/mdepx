@@ -51,7 +51,7 @@ mtx_lock(struct mtx *m)
 
 	td = curthread;
 
-	KASSERT(td == &thread0,
+	KASSERT(td != &thread0,
 	    ("Can't lock mutex from idle thread"));
 
 	tid = (uintptr_t)td;
