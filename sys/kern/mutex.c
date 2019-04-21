@@ -124,10 +124,8 @@ mtx_unlock(struct mtx *m)
 			m->td_last = NULL;
 		td->td_state = TD_STATE_READY;
 		sched_add_head(td);
-		critical_exit();
-		md_thread_yield();
-	} else
-		critical_exit();
+	}
+	critical_exit();
 
 	return (ret);
 }
