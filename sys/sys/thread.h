@@ -48,7 +48,6 @@ struct thread {
 #define	TD_STATE_SLEEPING	2
 #define	TD_STATE_MUTEX_WAIT	3
 #define	TD_STATE_TERMINATING	4
-	struct mtx *		td_mtx_wait;
 };
 
 extern struct thread *curthread;
@@ -66,6 +65,7 @@ void thread_terminate(void);
 /* Scheduler */
 void sched_remove(struct thread *td);
 void sched_add_tail(struct thread *td);
+void sched_add_head(struct thread *td);
 void sched_enter(void);
 
 /* Thread MD part */

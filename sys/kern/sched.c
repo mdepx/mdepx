@@ -106,6 +106,28 @@ sched_add_tail(struct thread *td)
 	}
 }
 
+/*
+ * Add td to the head of run queue.
+ */
+void
+sched_add_head(struct thread *td)
+{
+
+	dprintf("%s\n", __func__);
+
+	if (runq == NULL) {
+		td->td_prev = NULL;
+		td->td_next = NULL;
+		runq = td;
+		runq_tail = td;
+	} else {
+		td->td_prev = NULL;
+		td->td_next = runq;
+		runq->td_prev = td;
+		runq = td;
+	}
+}
+
 static void
 sched_cb(void *arg)
 {
@@ -119,7 +141,6 @@ struct trapframe *
 sched_next(struct trapframe *tf)
 {
 	struct thread *td;
-	struct mtx *m;
 
 	dprintf("%s\n", __func__);
 
@@ -133,6 +154,7 @@ sched_next(struct trapframe *tf)
 	if (curthread != &thread0) {
 		switch (curthread->td_state) {
 		case TD_STATE_TERMINATING:
+		case TD_STATE_MUTEX_WAIT:
 			break;
 		case TD_STATE_RUNNING:
 			/*
@@ -149,12 +171,6 @@ sched_next(struct trapframe *tf)
 		switch (td->td_state) {
 		case TD_STATE_SLEEPING:
 			continue;
-		case TD_STATE_MUTEX_WAIT:
-			m = td->td_mtx_wait;
-			KASSERT(m != NULL, ("mtx wait is NULL"));
-			if (m->mtx_lock == 1)
-				continue;
-			td->td_state = TD_STATE_READY;
 		}
 		break;
 	}

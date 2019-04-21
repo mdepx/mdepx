@@ -29,6 +29,8 @@
 
 struct mtx {
 	uintptr_t mtx_lock;
+	struct thread *td_first;
+	struct thread *td_last;
 };
 
 void mtx_lock(struct mtx *m);

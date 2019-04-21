@@ -65,9 +65,21 @@ mtx_lock(struct mtx *m)
 			break;
 		}
 
-		/* Lock is owned by other thread, sleep */
+		/* Lock is owned by another thread, sleep. */
 		td->td_state = TD_STATE_MUTEX_WAIT;
-		td->td_mtx_wait = m;
+
+		if (m->td_first == NULL) {
+			td->td_next = NULL;
+			td->td_prev = NULL;
+			m->td_first = td;
+			m->td_last = td;
+		} else {
+			td->td_prev = m->td_last;
+			td->td_next = NULL;
+			m->td_last->td_next = td;
+			m->td_last = td;
+		}
+
 		callout_cancel(&td->td_c);
 		critical_exit();
 
@@ -95,12 +107,27 @@ mtx_trylock(struct mtx *m)
 int
 mtx_unlock(struct mtx *m)
 {
+	struct thread *td;
 	uintptr_t tid;
 	int ret;
 
 	tid = (uintptr_t)curthread;
 
 	ret = atomic_cmpset_rel_ptr(&(m)->mtx_lock, (tid), 0);
+
+	critical_enter();
+	td = m->td_first;
+	if (td) {
+		/* Someone is waiting for the mutex. */
+		m->td_first = td->td_next;
+		if (td->td_next == NULL)
+			m->td_last = NULL;
+		td->td_state = TD_STATE_READY;
+		sched_add_head(td);
+		critical_exit();
+		md_thread_yield();
+	} else
+		critical_exit();
 
 	return (ret);
 }
