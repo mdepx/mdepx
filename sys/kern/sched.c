@@ -85,10 +85,10 @@ sched_remove(struct thread *td)
 }
 
 /*
- * Add td to the run queue.
+ * Add td to the tail of run queue.
  */
 void
-sched_add(struct thread *td)
+sched_add_tail(struct thread *td)
 {
 
 	dprintf("%s\n", __func__);
@@ -141,7 +141,7 @@ sched_next(struct trapframe *tf)
 			 */
 			return (curthread->td_tf);
 		default:
-			sched_add(curthread);
+			sched_add_tail(curthread);
 		}
 	}
 

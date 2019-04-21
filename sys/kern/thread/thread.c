@@ -92,7 +92,7 @@ thread_setup(struct thread *td, const char *name,
 	md_setup_frame(td->td_tf, entry, arg, thread_terminate);
 
 	critical_enter();
-	sched_add(td);
+	sched_add_tail(td);
 	critical_exit();
 
 	return (0);

@@ -65,7 +65,7 @@ void thread_terminate(void);
 
 /* Scheduler */
 void sched_remove(struct thread *td);
-void sched_add(struct thread *td);
+void sched_add_tail(struct thread *td);
 void sched_enter(void);
 
 /* Thread MD part */
