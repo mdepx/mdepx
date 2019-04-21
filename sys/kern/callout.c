@@ -88,24 +88,6 @@ get_elapsed(uint32_t *count_saved)
 }
 
 static void
-fix_timeouts(void)
-{
-	uint32_t ticks_elapsed;
-	struct callout *c;
-	uint32_t count;
-
-	ticks_elapsed = get_elapsed(&count);
-
-	for (c = callouts; c != NULL; c = c->next)
-		if (ticks_elapsed >= c->ticks)
-			c->ticks = 0;
-		else
-			c->ticks -= ticks_elapsed;
-
-	mi_tmr->count_saved = count;
-}
-
-static void
 callout_remove(struct callout *c)
 {
 
@@ -273,13 +255,13 @@ callout_set(struct callout *c, uint32_t ticks,
 int
 callout_callback(struct mi_timer *mt)
 {
-	struct callout *c, *old, *tmp;
-
-	KASSERT(curthread->td_critnest > 0,
-	    ("%s: Not in critical section.", __func__));
+	struct callout *c, *new, *old, *tmp;
+	uint32_t ticks_elapsed;
 
 	dprintf("%s\n", __func__);
 
+	KASSERT(curthread->td_critnest > 0,
+	    ("%s: Not in critical section.", __func__));
 	KASSERT(mi_tmr != NULL,
 	    ("%s: mi timer is not registered", __func__));
 	KASSERT(mi_tmr == mt,
@@ -288,31 +270,34 @@ callout_callback(struct mi_timer *mt)
 	if (callouts == NULL)
 		return (0);
 
-	KASSERT(callouts != NULL,
-	    ("%s: callouts is NULL", __func__));
+	new = NULL;
 
-	fix_timeouts();
+	ticks_elapsed = get_elapsed(&mi_tmr->count_saved);
+
+	for (c = callouts; c != NULL; c = c->next)
+		if (ticks_elapsed >= c->ticks)
+			c->ticks = 0;
+		else {
+			c->ticks -= ticks_elapsed;
+			if (new == NULL)
+				new = c;
+		}
 
 	old = callouts;
 
-	for (c = callouts; c != NULL; c = c->next)
-		if (c->ticks != 0)
-			break;
-
-	if (c != NULL && c->prev != NULL) {
-		c->prev->next = NULL;
-		c->prev = NULL;
+	if (new != NULL && new->prev != NULL) {
+		new->prev->next = NULL;
+		new->prev = NULL;
 	}
 
-	callouts = c;
+	callouts = new;
 	if (callouts == NULL)
 		callouts_tail = NULL;
 
 	mi_tmr->state = MI_TIMER_EXCP;
 
-	if (callouts != old) {
-		c = old;
-		while (c != NULL) {
+	if (new != old) {
+		for (c = old; c != NULL; ) {
 			tmp = c->next;
 			c->state = 1;
 			c->flags &= ~CALLOUT_FLAG_ACTIVE;
