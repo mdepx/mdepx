@@ -201,7 +201,7 @@ int
 callout_cancel(struct callout *c)
 {
 	uint32_t elapsed;
-	int rerun;
+	bool rerun;
 
 	KASSERT(mi_tmr != NULL, ("mi timer is NULL"));
 	KASSERT(curthread->td_critnest > 0,
@@ -212,12 +212,12 @@ callout_cancel(struct callout *c)
 		return (-1);
 	}
 
-	rerun = 0;
+	rerun = false;
 	if (c == callouts &&
 	    mi_tmr->state == MI_TIMER_RUNNING) {
 		/* c is a running callout. */
 		elapsed = get_elapsed(NULL);
-		rerun = 1;
+		rerun = true;
 	}
 
 	callout_remove(c);
