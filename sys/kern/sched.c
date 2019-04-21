@@ -155,6 +155,7 @@ sched_next(struct trapframe *tf)
 		switch (curthread->td_state) {
 		case TD_STATE_TERMINATING:
 		case TD_STATE_MUTEX_WAIT:
+		case TD_STATE_SLEEPING:
 			break;
 		case TD_STATE_RUNNING:
 			/*
@@ -167,18 +168,12 @@ sched_next(struct trapframe *tf)
 		}
 	}
 
-	for (td = runq; td != NULL; td = td->td_next) {
-		switch (td->td_state) {
-		case TD_STATE_SLEEPING:
-			continue;
-		}
-		break;
-	}
-
-	if (td == NULL) {
+	if (runq == NULL) {
 		curthread = &thread0;
 		return (curthread->td_tf);
 	}
+
+	td = runq;
 
 	sched_remove(td);
 
