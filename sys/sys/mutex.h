@@ -28,7 +28,7 @@
 #define	_SYS_MUTEX_H_
 
 struct mtx {
-	uint32_t mtx_lock;
+	uintptr_t mtx_lock;
 };
 
 void mtx_lock(struct mtx *m);
