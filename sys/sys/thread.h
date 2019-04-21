@@ -36,8 +36,8 @@ struct thread {
 	struct mdthread		td_md;
 	volatile u_int		td_critnest;
 	struct trapframe *	td_tf;
-	uint8_t *		td_mem;
-	uint32_t		td_mem_size;
+	uint8_t *		td_stack;
+	uint32_t		td_stack_size;
 	struct callout		td_c;
 	struct thread *		td_next;
 	struct thread *		td_prev;
