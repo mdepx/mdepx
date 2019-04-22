@@ -155,6 +155,7 @@ sched_next(struct trapframe *tf)
 		switch (curthread->td_state) {
 		case TD_STATE_TERMINATING:
 		case TD_STATE_MUTEX_WAIT:
+		case TD_STATE_SEM_WAIT:
 		case TD_STATE_SLEEPING:
 			break;
 		case TD_STATE_RUNNING:

@@ -24,56 +24,20 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_SYS_THREAD_H_
-#define	_SYS_THREAD_H_
+#ifndef	_SYS_SEM_H_
+#define	_SYS_SEM_H_
 
-#include <sys/callout.h>
-
-#include <machine/thread.h>
-
-struct thread {
-	const char *		td_name;
-	struct mdthread		td_md;
-	volatile u_int		td_critnest;
-	struct trapframe *	td_tf;
-	uint8_t *		td_stack;
-	uint32_t		td_stack_size;
-	struct callout		td_c;
-	struct thread *		td_next;
-	struct thread *		td_prev;
-	uint32_t		td_quantum;
-	int			td_state;
-#define	TD_STATE_READY		0
-#define	TD_STATE_RUNNING	1
-#define	TD_STATE_SLEEPING	2
-#define	TD_STATE_MUTEX_WAIT	3
-#define	TD_STATE_SEM_WAIT	4
-#define	TD_STATE_TERMINATING	5
+struct semaphore {
+	int sem_count;
+	int sem_count_initial;
+	struct thread *td_first;
+	struct thread *td_last;
 };
 
-extern struct thread *curthread;
+typedef struct semaphore sem_t;
 
-void thread0_init(void);
-struct trapframe *sched_next(struct trapframe *);
-struct thread *thread_create(const char *name, uint32_t quantum,
-    uint32_t stack_size, void *entry, void *arg);
-struct thread * thread_alloc(uint32_t stack_size);
-int thread_setup(struct thread *td, const char *name,
-    uint32_t quantum, void *entry, void *arg);
-void cpu_idle(void);
-void thread_terminate(void);
+void sem_init(sem_t *sem, int count);
+void sem_take(sem_t *sem);
+int sem_post(sem_t *sem);
 
-/* Scheduler */
-void sched_remove(struct thread *td);
-void sched_add_tail(struct thread *td);
-void sched_add_head(struct thread *td);
-void sched_enter(void);
-
-/* Thread MD part */
-void md_init(void);
-void md_thread_yield(void);
-void md_setup_frame(struct trapframe *tf, void *entry,
-    void *arg, void *terminate);
-void md_thread_terminate(struct thread *td);
-
-#endif /* !_SYS_THREAD_H_ */
+#endif /* _SYS_SEM_H_ */
