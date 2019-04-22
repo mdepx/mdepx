@@ -15,6 +15,6 @@ endif
 KOBJECTS = $(shell ${PYTHON} ${OSDIR}/tools/files.py		\
 	${OSDIR} sys/conf/files.${MACHINE} ${KERNEL})
 
-$(foreach obj, ${KOBJECTS},					\
+$(foreach obj, $(sort ${KOBJECTS}),				\
 	${eval OBJECTS += ${OSOBJDIR}/${obj}}			\
 )
