@@ -1,3 +1,5 @@
+OSOBJDIR = ${OBJDIR}/${OSDIR}
+
 $(foreach itm, ${LIBRARIES},						\
 	${eval lib = $(shell echo ${itm} | tr '[:lower:]' '[:upper:]')}	\
 	$(if $(filter %, ${${lib}_OBJS}),,				\

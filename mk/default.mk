@@ -1,6 +1,11 @@
+# Absolute path to osfive
 OSDIR ?= ${CURDIR}/osfive
+
+# Ensure OSDIR is absolute path
+OSDIR := ${shell realpath ${OSDIR}}
+
+# Object files directory
 OBJDIR ?= ${CURDIR}/obj
-OSOBJDIR = ${OBJDIR}/${OSDIR}
 
 include ${OSDIR}/lib/libaeabi/Makefile.inc
 include ${OSDIR}/lib/libc/Makefile.inc
