@@ -2,7 +2,7 @@ ifndef APP
 $(error Error: APP must be defined)
 endif
 
-${OBJDIR}/${APP}.elf: _machine ${LDSCRIPT} ${sort ${OBJECTS}}
+${OBJDIR}/${APP}.elf: ${LDSCRIPT} ${sort ${OBJECTS}}
 	@echo LD ${OBJDIR}/${APP}.elf
 	@${LD} -T ${LDSCRIPT} ${OBJECTS} ${OBJECTS_LINK} -o ${OBJDIR}/${APP}.elf
 
