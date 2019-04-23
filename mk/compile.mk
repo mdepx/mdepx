@@ -8,9 +8,6 @@ CFLAGS += ${INCS} ${CFLAGS_$@} -D__OSFIVE__
 
 #
 # Add ${OBJDIR} prefix to each member of OBJECTS.
-# Note this is for objects provided by user only
-# (gnu.library.mk and gnu.kernel.mk are loaded
-# after this file)
 #
 OBJECTS := $(addprefix ${OBJDIR}/, ${OBJECTS})
 
@@ -34,4 +31,4 @@ ${OBJDIR}/%.o: %.S Makefile
 	@mkdir -p $(dir $@)
 	@${CC} ${CFLAGS} -c -o $@ $<
 
-_compile: _machine ${OBJECTS}
+_compile: _machine ${sort ${OBJECTS}}

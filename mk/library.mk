@@ -7,12 +7,10 @@ $(foreach itm, ${LIBRARIES},						\
 	endif)								\
 	$(foreach obj, ${${lib}_OBJS},					\
 		${eval CFLAGS_${OSOBJDIR}/${obj} += ${${lib}_CFLAGS}}	\
-		${eval LOBJECTS += ${OSOBJDIR}/${obj}}			\
+		${eval OBJECTS += ${OSDIR}/${obj}}			\
 		$(foreach inc, ${${lib}_INCS},				\
 			${eval CFLAGS_${OSOBJDIR}/${obj} +=		\
 			    -I${OSDIR}/${inc}}				\
 		)							\
 	)								\
 )
-
-OBJECTS += $(sort ${LOBJECTS})
