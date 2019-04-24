@@ -5,7 +5,7 @@ OSDIR ?= ${CURDIR}/osfive
 OSDIR := ${shell realpath ${OSDIR}}
 
 # Object files directory
-OBJDIR ?= ${CURDIR}/obj
+OBJDIR ?= obj
 
 include ${OSDIR}/lib/libaeabi/Makefile.inc
 include ${OSDIR}/lib/libc/Makefile.inc
