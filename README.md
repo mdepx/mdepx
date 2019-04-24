@@ -37,10 +37,6 @@ Osfive is a framework for building bare-metal applications.
 
 Osfive has a Makefile-based build system. You have to construct a GNU makefile for your application. See [example applications](https://github.com/osfive/).
 
-## Kernel options
-  * sched - includes round-robin scheduler and threads management code
-  * malloc - includes free-list memory allocator
-
 # Contributing
 
 Please submit pull requests on github or send patches to br@bsdpad.com.
