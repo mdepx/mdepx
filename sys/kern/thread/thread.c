@@ -72,7 +72,7 @@ thread_terminate(void)
 
 int
 thread_setup(struct thread *td, const char *name,
-    uint32_t quantum, void *entry, void *arg)
+    int prio, uint32_t quantum, void *entry, void *arg)
 {
 
 	if (td == NULL || td->td_stack == NULL)
@@ -89,10 +89,11 @@ thread_setup(struct thread *td, const char *name,
 	td->td_state = TD_STATE_READY;
 	td->td_tf = (struct trapframe *)((uint8_t *)td->td_stack
 	    + td->td_stack_size - sizeof(struct trapframe));
+	td->td_prio = prio;
 	md_setup_frame(td->td_tf, entry, arg, thread_terminate);
 
 	critical_enter();
-	sched_add_tail(td);
+	sched_add(td);
 	critical_exit();
 
 	return (0);

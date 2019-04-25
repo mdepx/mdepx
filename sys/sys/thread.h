@@ -42,6 +42,7 @@ struct thread {
 	struct thread *		td_next;
 	struct thread *		td_prev;
 	uint32_t		td_quantum;
+	int			td_prio;
 	int			td_state;
 #define	TD_STATE_READY		0
 #define	TD_STATE_RUNNING	1
@@ -55,11 +56,12 @@ extern struct thread *curthread;
 
 void thread0_init(void);
 struct trapframe *sched_next(struct trapframe *);
-struct thread *thread_create(const char *name, uint32_t quantum,
-    uint32_t stack_size, void *entry, void *arg);
+struct thread *thread_create(const char *name, int prio,
+    uint32_t quantum, uint32_t stack_size,
+    void *entry, void *arg);
 struct thread * thread_alloc(uint32_t stack_size);
 int thread_setup(struct thread *td, const char *name,
-    uint32_t quantum, void *entry, void *arg);
+    int prio, uint32_t quantum, void *entry, void *arg);
 void cpu_idle(void);
 void thread_terminate(void);
 
@@ -67,6 +69,7 @@ void thread_terminate(void);
 void sched_remove(struct thread *td);
 void sched_add_tail(struct thread *td);
 void sched_add_head(struct thread *td);
+void sched_add(struct thread *td0);
 void sched_enter(void);
 
 /* Thread MD part */

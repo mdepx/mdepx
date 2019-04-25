@@ -44,7 +44,7 @@ raw_sleep_cb(void *arg)
 
 	td = c->td;
 	td->td_state = TD_STATE_READY;
-	sched_add_tail(td);
+	sched_add(td);
 }
 
 void

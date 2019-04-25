@@ -108,7 +108,7 @@ sem_post(sem_t *sem)
 		if (td->td_next == NULL)
 			sem->td_last = NULL;
 		td->td_state = TD_STATE_READY;
-		sched_add_head(td);
+		sched_add(td);
 	}
 	critical_exit();
 

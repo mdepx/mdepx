@@ -123,7 +123,7 @@ mtx_unlock(struct mtx *m)
 		if (td->td_next == NULL)
 			m->td_last = NULL;
 		td->td_state = TD_STATE_READY;
-		sched_add_head(td);
+		sched_add(td);
 	}
 	critical_exit();
 

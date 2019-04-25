@@ -128,6 +128,36 @@ sched_add_head(struct thread *td)
 	}
 }
 
+/*
+ * Add td to the run queue.
+ */
+void
+sched_add(struct thread *td0)
+{
+	struct thread *td;
+
+	critical_enter();
+
+	for (td = runq;
+	    (td != NULL && td->td_prio >= td0->td_prio);
+	    (td = td->td_next));
+
+	if (td == NULL)
+		sched_add_tail(td0);
+	else {
+		/* Insert td0 before td. */
+		td0->td_next = td;
+		td0->td_prev = td->td_prev;
+		td->td_prev = td0;
+		if (td0->td_prev == NULL)
+			runq = td0;
+		else
+			td0->td_prev->td_next = td0;
+	}
+
+	critical_exit();
+}
+
 static void
 sched_cb(void *arg)
 {
@@ -165,7 +195,7 @@ sched_next(struct trapframe *tf)
 			 */
 			return (curthread->td_tf);
 		default:
-			sched_add_tail(curthread);
+			sched_add(curthread);
 		}
 	}
 
