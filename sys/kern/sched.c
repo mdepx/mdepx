@@ -181,36 +181,31 @@ sched_next(struct trapframe *tf)
 	/* Save old */   
 	curthread->td_tf = tf;
 
-	if (curthread != &thread0) {
-		switch (curthread->td_state) {
-		case TD_STATE_TERMINATING:
-		case TD_STATE_MUTEX_WAIT:
-		case TD_STATE_SEM_WAIT:
-		case TD_STATE_SLEEPING:
-			break;
-		case TD_STATE_RUNNING:
-			/*
-			 * Current thread is still running and has quantum.
-			 * Do not switch.
-			 */
-			return (curthread->td_tf);
-		default:
-			sched_add(curthread);
-		}
-	}
-
-	if (runq == NULL) {
-		curthread = &thread0;
+	switch (curthread->td_state) {
+	case TD_STATE_TERMINATING:
+	case TD_STATE_MUTEX_WAIT:
+	case TD_STATE_SEM_WAIT:
+	case TD_STATE_SLEEPING:
+		break;
+	case TD_STATE_RUNNING:
+		/*
+		 * Current thread is still running and has quantum.
+		 * Do not switch.
+		 */
 		return (curthread->td_tf);
+	default:
+		sched_add(curthread);
 	}
 
 	td = runq;
 
 	sched_remove(td);
 
-	td->td_state = TD_STATE_RUNNING;
-	callout_init(&td->td_c);
-	callout_set(&td->td_c, td->td_quantum, sched_cb, td);
+	if (td->td_quantum > 0) {
+		td->td_state = TD_STATE_RUNNING;
+		callout_init(&td->td_c);
+		callout_set(&td->td_c, td->td_quantum, sched_cb, td);
+	}
 
 	curthread = td;
 

@@ -39,5 +39,12 @@ thread0_init(void)
 
 	bzero(&thread0, sizeof(struct thread));
 	thread0.td_name = "idle";
+	thread0.td_quantum = 0;
+	thread0.td_prio = 0;
+	thread0.td_state = TD_STATE_READY;
 	curthread = &thread0;
+
+#ifdef CONFIG_SCHED
+	sched_add(&thread0);
+#endif
 }
