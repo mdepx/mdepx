@@ -3,11 +3,11 @@ sys/kern/console.o
 sys/kern/malloc/malloc_fl.o		malloc
 sys/kern/malloc/malloc.o		malloc
 sys/kern/mbuf.o				net malloc
-sys/kern/mutex.o			sched
+sys/kern/mutex.o			sched mutex
 sys/kern/of.o				fdt
 sys/kern/panic.o
 sys/kern/sched.o			sched
-sys/kern/sem.o				sem
+sys/kern/sem.o				sched sem
 sys/kern/sleep.o			!sched
 sys/kern/startup.o
 sys/kern/thread/thread.o		sched
