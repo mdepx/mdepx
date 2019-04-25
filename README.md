@@ -6,9 +6,10 @@ Osfive is a framework for building bare-metal applications.
 - Application-centric
 - Multi-threading supported
 - Fully preemptible
+- Priority based time sliced round-robin scheduling
 - Tickless operation
 - Static/Dynamic memory allocation
-- Mutexes
+- Mutexes, Semaphores
 
 ## Supported platforms
 - ARM Cortex-M
