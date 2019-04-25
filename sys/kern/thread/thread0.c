@@ -29,6 +29,9 @@
 
 struct thread thread0 = {
 	.td_name = "idle",
+	.td_quantum = 0,
+	.td_prio = 0,
+	.td_state = TD_STATE_READY,
 };
 
 struct thread *curthread = &thread0;
@@ -43,8 +46,4 @@ thread0_init(void)
 	thread0.td_prio = 0;
 	thread0.td_state = TD_STATE_READY;
 	curthread = &thread0;
-
-#ifdef CONFIG_SCHED
-	sched_add(&thread0);
-#endif
 }
