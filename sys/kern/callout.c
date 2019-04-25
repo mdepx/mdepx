@@ -77,7 +77,7 @@ get_elapsed(uint32_t *count_saved)
 	if (count > mi_tmr->count_saved)
 		elapsed = (count - mi_tmr->count_saved);
 	else
-		elapsed = (mi_tmr->maxval - mi_tmr->count_saved + count);
+		elapsed = (mi_tmr->width - mi_tmr->count_saved + count);
 
 	if (count_saved != NULL)
 		*count_saved = count;
@@ -327,11 +327,11 @@ callout_register(struct mi_timer *mt)
 	if (mi_tmr != NULL)
 		return (EEXIST);
 
-	if (mi_tmr->maxval == 0 ||
+	if (mi_tmr->width == 0 ||
 	    mi_tmr->start == NULL ||
 	    mi_tmr->stop == NULL ||
 	    mi_tmr->count == NULL) {
-		printf("%s: maxval not set\n", __func__);
+		printf("%s: can't register timer\n", __func__);
 		return (ENXIO);
 	}
 

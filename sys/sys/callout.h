@@ -51,7 +51,7 @@ struct mi_timer {
 	uint32_t (*count)(void *arg);
 	void *arg;
 	uint32_t count_saved;
-	uint32_t maxval;
+	uint32_t width;
 	int state;
 #define	MI_TIMER_READY		0
 #define	MI_TIMER_RUNNING	1
