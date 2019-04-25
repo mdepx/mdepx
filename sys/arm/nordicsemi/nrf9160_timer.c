@@ -120,6 +120,7 @@ timer_init(struct timer_softc *sc, uint32_t base)
 	sc->mt.start = timer_start;
 	sc->mt.stop = timer_stop;
 	sc->mt.count = timer_count;
+	sc->mt.width = 0xffffffff;
 	sc->mt.arg = sc;
 	callout_register(&sc->mt);
 }

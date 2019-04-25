@@ -182,6 +182,7 @@ e300g_clint_init(struct clint_softc *sc, uint32_t base)
 	sc->mt.start = clint_start;
 	sc->mt.stop = clint_stop;
 	sc->mt.count = clint_mtime;
+	sc->mt.width = 0xffffffff;
 	sc->mt.arg = sc;
 
 	callout_register(&sc->mt);
