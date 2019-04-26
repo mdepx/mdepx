@@ -93,36 +93,30 @@ callout_remove(struct callout *c)
 
 	dprintf("%s\n", __func__);
 
-	if (c->next != NULL && c->prev != NULL) {
-		c->prev->next = c->next;
+	if (c->next != NULL)
 		c->next->prev = c->prev;
-	} else if (c->next != NULL) {
-		callouts = c->next;
-		callouts->prev = NULL;
-	} else if (c->prev != NULL) {
-		c->prev->next = NULL;
+	else
 		callouts_tail = c->prev;
-	} else {
-		callouts = NULL;
-		callouts_tail = NULL;
-	}
+
+	if (c->prev != NULL)
+		c->prev->next = c->next;
+	else
+		callouts = c->next;
 }
 
 static void
 callout_add(struct callout *c)
 {
 
-	if (callouts == NULL) {
+	c->prev = callouts_tail;
+	c->next = NULL;
+
+	if (callouts == NULL)
 		callouts = c;
-		callouts_tail = c;
-		c->next = NULL;
-		c->prev = NULL;
-	} else {
-		c->prev = callouts_tail;
-		c->next = NULL;
+	else
 		callouts_tail->next = c;
-		callouts_tail = c;
-	}
+
+	callouts_tail = c;
 }
 
 static void

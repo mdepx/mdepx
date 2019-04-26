@@ -69,19 +69,15 @@ sched_remove(struct thread *td)
 
 	dprintf("%s\n", __func__);
 
-	if (td->td_next != NULL && td->td_prev != NULL) {
-		td->td_prev->td_next = td->td_next;
+	if (td->td_next != NULL)
 		td->td_next->td_prev = td->td_prev;
-	} else if (td->td_next != NULL) {
-		runq = td->td_next;
-		runq->td_prev = NULL;
-	} else if (td->td_prev != NULL) {
-		td->td_prev->td_next = NULL;
+	else
 		runq_tail = td->td_prev;
-	} else {
-		runq = NULL;
-		runq_tail = NULL;
-	}
+
+	if (td->td_prev != NULL)
+		td->td_prev->td_next = td->td_next;
+	else
+		runq = td->td_next;
 }
 
 /*
@@ -93,17 +89,15 @@ sched_add_tail(struct thread *td)
 
 	dprintf("%s\n", __func__);
 
-	if (runq == NULL) {
-		td->td_prev = NULL;
-		td->td_next = NULL;
+	td->td_prev = runq_tail;
+	td->td_next = NULL;
+
+	if (runq == NULL)
 		runq = td;
-		runq_tail = td;
-	} else {
-		td->td_prev = runq_tail;
-		td->td_next = NULL;
+	else
 		runq_tail->td_next = td;
-		runq_tail = td;
-	}
+
+	runq_tail = td;
 }
 
 /*
@@ -115,17 +109,15 @@ sched_add_head(struct thread *td)
 
 	dprintf("%s\n", __func__);
 
-	if (runq == NULL) {
-		td->td_prev = NULL;
-		td->td_next = NULL;
-		runq = td;
+	td->td_prev = NULL;
+	td->td_next = runq;
+
+	if (runq == NULL)
 		runq_tail = td;
-	} else {
-		td->td_prev = NULL;
-		td->td_next = runq;
+	else
 		runq->td_prev = td;
-		runq = td;
-	}
+
+	runq = td;
 }
 
 /*
