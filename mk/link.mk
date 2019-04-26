@@ -5,6 +5,7 @@ endif
 ${OBJDIR}/${APP}.elf: ${LDSCRIPT} ${sort ${OBJECTS}}
 	@echo "  LD      ${OBJDIR}/${APP}.elf"
 	@${LD} -T ${LDSCRIPT} ${OBJECTS} ${OBJECTS_LINK} -o ${OBJDIR}/${APP}.elf
+	@${SIZE} ${OBJDIR}/${APP}.elf
 
 ${OBJDIR}/${APP}.bin: ${OBJDIR}/${APP}.elf
 	@echo "  OBJCOPY ${OBJDIR}/${APP}.bin"
