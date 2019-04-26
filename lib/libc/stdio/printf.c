@@ -36,8 +36,6 @@
  *	@(#)subr_prf.c	8.3 (Berkeley) 1/21/94
  */
 
-/* __FBSDID("$FreeBSD: head/sys/kern/subr_prf.c 326656 2017-12-07 07:55:38Z bde $"); */
-
 #include <sys/cdefs.h>
 #include <sys/stdarg.h>
 #include <sys/console.h>

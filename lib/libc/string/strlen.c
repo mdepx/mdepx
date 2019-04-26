@@ -26,8 +26,6 @@
  * SUCH DAMAGE.
  */
 
-/* __FBSDID("$FreeBSD: head/lib/libc/string/strlen.c 326193 2017-11-25 17:12:48Z pfg $"); */
-
 #include <sys/limits.h>
 #include <sys/types.h>
 #include <string.h>

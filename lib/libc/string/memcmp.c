@@ -33,7 +33,6 @@
  */
 
 #include <sys/cdefs.h>
-/* __FBSDID("$FreeBSD: head/sys/libkern/memcmp.c 326023 2017-11-20 19:43:44Z pfg $"); */
 
 /*
  * Compare memory regions.
