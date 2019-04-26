@@ -7,3 +7,6 @@ _objdump:
 
 _readelf:
 	${READELF} -a ${OBJDIR}/${APP}.elf | less
+
+_nm:
+	${NM} --print-size --size-sort --radix=d ${OBJDIR}/${APP}.elf | less
