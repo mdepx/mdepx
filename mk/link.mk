@@ -13,7 +13,7 @@ ${OBJDIR}/${APP}.bin: ${OBJDIR}/${APP}.elf
 
 ${OBJDIR}/${APP}.srec: ${OBJDIR}/${APP}.elf
 	@echo "  OBJCOPY ${OBJDIR}/${APP}.srec"
-	${OBJCOPY} -O srec ${OBJDIR}/${APP}.elf ${OBJDIR}/${APP}.srec
+	@${OBJCOPY} -O srec ${OBJDIR}/${APP}.elf ${OBJDIR}/${APP}.srec
 
 _link:	${OBJDIR}/${APP}.elf
 _binary: ${OBJDIR}/${APP}.bin
