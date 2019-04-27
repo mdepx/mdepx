@@ -32,8 +32,7 @@ ${OBJDIR}/%.o: %.S Makefile
 
 ${OBJDIR}/${APP}.elf: ${OBJDIR}/machine ${LDSCRIPT} ${sort ${OBJECTS}}
 	@echo "  LD      ${OBJDIR}/${APP}.elf"
-	@${LD} -T ${LDSCRIPT} ${OBJECTS} ${OBJECTS_LINK}		\
-		-o ${OBJDIR}/${APP}.elf
+	@${LD} -T ${LDSCRIPT} ${OBJECTS} ${LDADD} -o ${OBJDIR}/${APP}.elf
 	@${SIZE} ${OBJDIR}/${APP}.elf
 
 ${OBJDIR}/${APP}.bin: ${OBJDIR}/${APP}.elf
