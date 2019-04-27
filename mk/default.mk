@@ -21,10 +21,8 @@ include ${OSDIR}/lib/xz-embedded/Makefile.inc
 include ${OSDIR}/mk/kernel.mk
 include ${OSDIR}/mk/library.mk
 
-include ${OSDIR}/mk/binutils.mk
 include ${OSDIR}/mk/clean.mk
 include ${OSDIR}/mk/compile.mk
-include ${OSDIR}/mk/host.mk
 include ${OSDIR}/mk/link.mk
 include ${OSDIR}/mk/machine.mk
 include ${OSDIR}/mk/user.mk
