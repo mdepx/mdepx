@@ -4,9 +4,9 @@ Osfive is a framework for building bare-metal applications.
 
 ## Key features
 - Application-centric
-- Multi-threading supported
-- Fully preemptible
+- Real-time
 - Priority based time sliced round-robin scheduling
+- Fully preemptible
 - Tickless operation
 - Static/Dynamic memory allocation
 - Mutexes, Semaphores
