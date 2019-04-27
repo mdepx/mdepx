@@ -35,7 +35,8 @@ include ${OSDIR}/mk/library.mk
 OBJECTS := $(addprefix ${OBJDIR}/, ${OBJECTS})
 
 #
-# Check if user provided CROSS_COMPILE variable for this app.
+# Check if user has provided CROSS_COMPILE variable
+# or extra targets for this app.
 #
 include ${OSDIR}/mk/user.mk
 
