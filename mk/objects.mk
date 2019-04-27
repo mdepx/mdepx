@@ -1,3 +1,15 @@
+ifdef CROSS_COMPILE
+LD		= ${CROSS_COMPILE}ld
+CC		= ${CROSS_COMPILE}gcc
+AR		= ${CROSS_COMPILE}ar
+NM		= ${CROSS_COMPILE}nm
+STRIP		= ${CROSS_COMPILE}strip
+OBJCOPY		= ${CROSS_COMPILE}objcopy
+OBJDUMP		= ${CROSS_COMPILE}objdump
+READELF		= ${CROSS_COMPILE}readelf
+SIZE		= ${CROSS_COMPILE}size
+endif
+
 ${OBJDIR}/%.o: %.c GNUmakefile
 	@echo "  CC      $(patsubst ${CURDIR}/%,%,$<)"
 	@mkdir -p $(dir $@)
