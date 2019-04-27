@@ -7,6 +7,7 @@ OSDIR := ${shell realpath ${OSDIR}}
 # Object files directory
 OBJDIR ?= obj
 
+# Check if application name is set
 ifndef APP
 $(error Error: APP must be defined)
 endif
@@ -24,7 +25,7 @@ INCS += -I${OSDIR}/lib
 CFLAGS += ${INCS} ${CFLAGS_$@} -D__OSFIVE__
 
 #
-# Populate kernel and library objects first
+# Populate kernel and library objects first.
 #
 include ${OSDIR}/mk/kernel.mk
 include ${OSDIR}/mk/library.mk
@@ -36,7 +37,7 @@ OBJECTS := $(addprefix ${OBJDIR}/, ${OBJECTS})
 
 #
 # Check if user has provided CROSS_COMPILE variable
-# or extra targets for this app.
+# or any extra targets for this app.
 #
 include ${OSDIR}/mk/user.mk
 
