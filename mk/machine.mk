@@ -6,7 +6,6 @@ ifeq ("$(wildcard ${OSDIR}/sys/${MACHINE}/include)","")
 $(error Error: machine headers not found)
 endif
 
-_machine:
-	@rm -f ${OBJDIR}/machine
+${OBJDIR}/machine:
 	@mkdir -p ${OBJDIR}
-	@ln -s ${OSDIR}/sys/${MACHINE}/include ${OBJDIR}/machine
+	@ln -sf ${OSDIR}/sys/${MACHINE}/include ${OBJDIR}/machine

@@ -1,3 +1,19 @@
+ifndef APP
+$(error Error: APP must be defined)
+endif
+
+ifndef LDSCRIPT
+$(error Error: LDSCRIPT must be defined)
+endif
+
+ifndef OBJDIR
+$(error Error: OBJDIR must be defined)
+endif
+
+ifndef OSDIR
+$(error Error: OSDIR must be defined)
+endif
+
 INCS += -I${OBJDIR}
 INCS += -I${CURDIR}
 INCS += -I${OSDIR}/include
@@ -31,4 +47,16 @@ ${OBJDIR}/%.o: %.S Makefile
 	@mkdir -p $(dir $@)
 	@${CC} ${CFLAGS} -c -o $@ $<
 
-_compile: _machine ${sort ${OBJECTS}}
+${OBJDIR}/${APP}.elf: ${OBJDIR}/machine ${LDSCRIPT} ${sort ${OBJECTS}}
+	@echo "  LD      ${OBJDIR}/${APP}.elf"
+	@${LD} -T ${LDSCRIPT} ${OBJECTS} ${OBJECTS_LINK}		\
+		-o ${OBJDIR}/${APP}.elf
+	@${SIZE} ${OBJDIR}/${APP}.elf
+
+${OBJDIR}/${APP}.bin: ${OBJDIR}/${APP}.elf
+	@echo "  OBJCOPY ${OBJDIR}/${APP}.bin"
+	@${OBJCOPY} -O binary ${OBJDIR}/${APP}.elf ${OBJDIR}/${APP}.bin
+
+${OBJDIR}/${APP}.srec: ${OBJDIR}/${APP}.elf
+	@echo "  OBJCOPY ${OBJDIR}/${APP}.srec"
+	@${OBJCOPY} -O srec ${OBJDIR}/${APP}.elf ${OBJDIR}/${APP}.srec
