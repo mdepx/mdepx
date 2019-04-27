@@ -14,3 +14,14 @@ sys/kern/thread/thread.o		sched
 sys/kern/thread/thread_alloc.o		sched malloc
 sys/kern/thread/thread_sleep.o		sched
 sys/kern/thread/thread0.o
+sys/net/if.o				net malloc
+sys/net/if_ether.o			net malloc
+sys/net/if_ethersubr.o			net
+sys/netinet/in.o			net malloc
+sys/netinet/in_cksum.o			net
+sys/netinet/if_ether.o			net malloc
+sys/netinet/if_ethersubr.o		net
+sys/netinet/ip_icmp.o			net
+sys/netinet/ip_input.o			net
+sys/netinet/ip_output.o			net
+sys/netinet6/ip6_input.o		net
