@@ -29,9 +29,9 @@
 #include <dev/uart/uart_16550.h>
 
 #define	RD1(_sc, _reg)		\
-	*(volatile uint8_t *)((_sc)->base + _reg)
+	*(volatile uint8_t *)((_sc)->base + (_reg << (_sc)->reg_shift))
 #define	WR1(_sc, _reg, _val)	\
-	*(volatile uint8_t *)((_sc)->base + _reg) = _val
+	*(volatile uint8_t *)((_sc)->base + (_reg << (_sc)->reg_shift)) = _val
 
 void
 uart_16550_putc(struct uart_16550_softc *sc, char c)
@@ -47,12 +47,13 @@ uart_16550_putc(struct uart_16550_softc *sc, char c)
 
 int
 uart_16550_init(struct uart_16550_softc *sc, uint32_t base,
-    uint32_t uart_freq, uint32_t baud_rate)
+    uint32_t uart_freq, uint32_t baud_rate, uint8_t reg_shift)
 {
 	uint32_t reg;
 	int divisor;
 
 	sc->base = base;
+	sc->reg_shift = reg_shift;
 
 	divisor = uart_freq / (16 * baud_rate);
 
