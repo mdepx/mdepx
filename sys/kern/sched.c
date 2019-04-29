@@ -178,6 +178,7 @@ sched_next(struct trapframe *tf)
 	case TD_STATE_MUTEX_WAIT:
 	case TD_STATE_SEM_WAIT:
 	case TD_STATE_SLEEPING:
+	case TD_STATE_WAKEUP:
 		break;
 	case TD_STATE_RUNNING:
 		/*

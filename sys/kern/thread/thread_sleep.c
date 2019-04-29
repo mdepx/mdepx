@@ -43,7 +43,7 @@ raw_sleep_cb(void *arg)
 	c = arg;
 
 	td = c->td;
-	td->td_state = TD_STATE_READY;
+	td->td_state = TD_STATE_WAKEUP;
 	sched_add(td);
 }
 

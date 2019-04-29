@@ -47,9 +47,10 @@ struct thread {
 #define	TD_STATE_READY		0
 #define	TD_STATE_RUNNING	1
 #define	TD_STATE_SLEEPING	2
-#define	TD_STATE_MUTEX_WAIT	3
-#define	TD_STATE_SEM_WAIT	4
-#define	TD_STATE_TERMINATING	5
+#define	TD_STATE_WAKEUP		3
+#define	TD_STATE_MUTEX_WAIT	4
+#define	TD_STATE_SEM_WAIT	5
+#define	TD_STATE_TERMINATING	6
 };
 
 extern struct thread *curthread;
