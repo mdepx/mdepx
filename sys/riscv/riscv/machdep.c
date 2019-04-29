@@ -74,8 +74,6 @@ md_setup_frame(struct trapframe *tf, void *entry,
     void *arg, void *terminate)
 {
 
-	printf("%s\n", __func__);
-
 	tf->tf_mepc = (register_t)entry;
 	tf->tf_a[0] = (register_t)arg;
 	tf->tf_ra = (register_t)terminate;
