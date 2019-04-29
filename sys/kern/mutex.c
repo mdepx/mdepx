@@ -122,7 +122,7 @@ mtx_unlock(struct mtx *m)
 		m->td_first = td->td_next;
 		if (td->td_next == NULL)
 			m->td_last = NULL;
-		td->td_state = TD_STATE_READY;
+		td->td_state = TD_STATE_WAKEUP;
 		sched_add(td);
 	}
 	critical_exit();
