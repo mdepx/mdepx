@@ -242,7 +242,7 @@ callout_cancel(struct callout *c)
 int
 callout_callback(struct mi_timer *mt)
 {
-	struct callout *c, *new, *old, *tmp;
+	struct callout *c, *old, *tmp;
 	uint32_t ticks_elapsed;
 
 	dprintf("%s\n", __func__);
@@ -257,8 +257,6 @@ callout_callback(struct mi_timer *mt)
 	if (callouts == NULL)
 		return (0);
 
-	new = NULL;
-
 	ticks_elapsed = get_elapsed(&mi_tmr->count_saved);
 
 	for (c = callouts; c != NULL; c = c->next)
@@ -267,24 +265,23 @@ callout_callback(struct mi_timer *mt)
 			c->ticks = 0;
 		} else {
 			c->ticks -= ticks_elapsed;
-			new = c;
 			break;
 		}
 
 	old = callouts;
 
-	if (new != NULL && new->prev != NULL) {
-		new->prev->next = NULL;
-		new->prev = NULL;
+	if (c != NULL && c->prev != NULL) {
+		c->prev->next = NULL;
+		c->prev = NULL;
 	}
 
-	callouts = new;
+	callouts = c;
 	if (callouts == NULL)
 		callouts_tail = NULL;
 
 	mi_tmr->state = MI_TIMER_EXCP;
 
-	if (new != old) {
+	if (callouts != old) {
 		for (c = old; c != NULL; ) {
 			tmp = c->next;
 			c->state = 1;
