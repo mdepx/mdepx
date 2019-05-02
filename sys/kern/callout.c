@@ -227,12 +227,7 @@ callout_cancel(struct callout *c)
 		return (-1);
 	}
 
-	if (c == callouts) {
-		callout_remove(c);
-		if (mi_tmr->state == MI_TIMER_RUNNING)
-			callout_callback(mi_tmr);
-	} else
-		callout_remove(c);
+	callout_remove(c);
 
 	c->flags &= ~CALLOUT_FLAG_ACTIVE;
 
