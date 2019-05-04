@@ -32,10 +32,10 @@
 #ifndef	_SYS_CALLOUT_H_
 #define	_SYS_CALLOUT_H_
 
+#include <sys/list.h>
+
 struct callout {
 	int state;
-	struct callout *next;
-	struct callout *prev;
 	uint32_t ticks;
 	uint32_t ticks_orig;
 	void (*func)(void *arg);
@@ -43,6 +43,7 @@ struct callout {
 	int flags;
 #define	CALLOUT_FLAG_ACTIVE	(1 << 0)
 	struct thread *td;
+	struct entry node;
 };
 
 struct mi_timer {
