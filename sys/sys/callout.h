@@ -42,7 +42,6 @@ struct callout {
 	void *arg;
 	int flags;
 #define	CALLOUT_FLAG_ACTIVE	(1 << 0)
-	struct thread *td;
 	struct entry node;
 };
 

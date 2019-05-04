@@ -34,15 +34,12 @@ extern struct thread thread0;
 static void
 raw_sleep_cb(void *arg)
 {
-	struct callout *c;
 	struct thread *td;
 
 	KASSERT(curthread->td_critnest > 0,
 	    ("%s: Not in critical section.", __func__));
 
-	c = arg;
-
-	td = c->td;
+	td = arg;
 	td->td_state = TD_STATE_WAKEUP;
 	sched_add(td);
 }
@@ -59,12 +56,11 @@ raw_sleep(uint32_t ticks)
 	    ("%s: sleeping from idle thread.", __func__));
 
 	callout_init(&c);
-	c.td = td;
 
 	critical_enter();
 	td->td_state = TD_STATE_SLEEPING;
 	callout_cancel(&td->td_c);
-	callout_set(&c, ticks, raw_sleep_cb, &c);
+	callout_set(&c, ticks, raw_sleep_cb, td);
 	critical_exit();
 
 	md_thread_yield();

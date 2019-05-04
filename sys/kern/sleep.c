@@ -40,9 +40,7 @@ raw_sleep_cb(void *arg)
 	KASSERT(curthread->td_critnest > 0,
 	    ("%s: Not in critical section.", __func__));
 
-	c = arg;
-
-	td = c->td;
+	td = arg;
 	td->td_state = TD_STATE_READY;
 }
 
@@ -58,9 +56,8 @@ raw_sleep(uint32_t ticks)
 	    ("%s: sleeping from unknown thread.", __func__));
 
 	callout_init(&c);
-	c.td = td;
 
-	callout_set(&c, ticks, raw_sleep_cb, &c);
+	callout_set(&c, ticks, raw_sleep_cb, td);
 
 	while (c.state == 0)
 		cpu_idle();
