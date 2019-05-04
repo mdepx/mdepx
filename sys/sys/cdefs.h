@@ -53,4 +53,9 @@
 #define	__GLOBL1(sym)	__asm__(".globl " #sym)
 #define	__GLOBL(sym)	__GLOBL1(sym)
 
+#define	offsetof(st, m) __builtin_offsetof(st, m)
+
+#define	CONTAINER_OF(ptr, type, field)	\
+	((type *)((char *)ptr - offsetof(type, field)))
+
 #endif	/* !_SYS_CDEFS_H_ */
