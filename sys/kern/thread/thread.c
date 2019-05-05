@@ -58,7 +58,6 @@ thread_terminate(void)
 
 	critical_enter();
 	td->td_state = TD_STATE_TERMINATING;
-	sched_remove(td);
 	callout_cancel(&td->td_c);
 	md_thread_terminate(td);
 	critical_exit();
