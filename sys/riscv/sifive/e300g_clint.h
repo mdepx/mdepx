@@ -38,7 +38,7 @@
 #define	MSIP(hart)	(0x4 * (hart))
 
 /* Timer Registers (32 KiB) */
-#define	MTIMECMP(hart)	(0x4000 + 0x4 * (hart))
+#define	MTIMECMP(hart)	(0x4000 + 0x8 * (hart))
 #define	MTIME		0xBFF8
 
 struct clint_softc {
