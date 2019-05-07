@@ -24,8 +24,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _SYS_KERN_CONSOLE_H_
-#define _SYS_KERN_CONSOLE_H_
+#ifndef _SYS_CONSOLE_H_
+#define _SYS_CONSOLE_H_
 
 struct kernel_console {
 	void (*console_putchar)(int, void*);
@@ -34,4 +34,4 @@ struct kernel_console {
 
 void console_register(void (*func)(int, void*), void *arg);
 
-#endif /* !_SYS_KERN_CONSOLE_H_ */
+#endif /* !_SYS_CONSOLE_H_ */
