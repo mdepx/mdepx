@@ -35,12 +35,14 @@ void
 critical_enter(void)
 {
 	struct thread *td;
+	register_t reg;
 
 	td = curthread;
 
 	if (td->td_critnest == 0) {
+		reg = intr_disable();
 		td->td_critnest = 1;
-		td->td_md.md_saved_intr = intr_disable();
+		td->td_md.md_saved_intr = reg;
 	} else
 		td->td_critnest++;
 }
