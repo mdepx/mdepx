@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,30 +24,13 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_MACHINE_ASM_H_
-#define	_MACHINE_ASM_H_
+#ifndef	_MACHINE_ABI_H_
+#define	_MACHINE_ABI_H_
 
-#include <machine/abi.h>
-
-#define	ENTRY(sym)					\
-	.text; .globl sym; .ent sym; sym:
-
-#define	GLOBAL(sym)					\
-	.globl sym; sym:
-
-#define	ASM_ENTRY(sym)					\
-	.text; .globl sym; .type sym,@function; sym:
-
-#define	END(sym) .size sym, . - sym
-
-#if REG_SIZE == 4
-#define	REG_S		sw
-#define	REG_L		lw
-#define	PTR_LA		la
-#elif REG_SIZE == 8
-#define	REG_S		sd
-#define	REG_L		ld
-#define	PTR_LA		lla
+#if __riscv_xlen == 64
+#define	REG_SIZE	8
+#else
+#define	REG_SIZE	4
 #endif
 
-#endif	/* !_MACHINE_ASM_H_ */
+#endif	/* !_MACHINE_ABI_H_ */
