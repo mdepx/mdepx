@@ -47,7 +47,7 @@
 #define	REG_DLM		0x01 /* divisor latch high (rw) */
 
 struct uart_16550_softc {
-	uint32_t base;
+	size_t base;
 	uint8_t reg_shift;
 };
 

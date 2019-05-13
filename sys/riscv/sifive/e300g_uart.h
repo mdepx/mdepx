@@ -43,7 +43,7 @@
 #define	UART_DIV	0x018 /* Baud rate divisor */
 
 struct uart_softc {
-	uint32_t base;
+	size_t base;
 };
 
 int e300g_uart_init(struct uart_softc *sc, uint32_t base,
