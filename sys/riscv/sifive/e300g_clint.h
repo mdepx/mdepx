@@ -42,7 +42,7 @@
 #define	MTIME		0xBFF8
 
 struct clint_softc {
-	uint32_t base;
+	size_t base;
 	struct mi_timer mt;
 };
 
@@ -50,5 +50,7 @@ int e300g_clint_init(struct clint_softc *sc, uint32_t base);
 int clint_get_cpu_freq(struct clint_softc *sc, uint32_t osc_freq);
 void clint_udelay(struct clint_softc *sc, uint32_t usec, uint32_t osc_freq);
 void clint_intr(void);
+void clint_set_sip(int hart_id);
+void clint_intr_software(void);
 
 #endif /* !_SYS_RISCV_SIFIVE_E300G_CLINT_H_ */
