@@ -27,99 +27,101 @@
 #include <machine/asm.h>
 
 .macro save_registers el
-	addi	sp, sp, -(35 * 4)
+	addi	sp, sp, -(35 * REG_SIZE)
 
-	sw	ra, (0 * 4)(sp)
-	sw	sp, (1 * 4)(sp)
-	sw	gp, (2 * 4)(sp)
-	sw	tp, (3 * 4)(sp)
+	REG_S	ra, (0 * REG_SIZE)(sp)
+	REG_S	sp, (1 * REG_SIZE)(sp)
+	REG_S	gp, (2 * REG_SIZE)(sp)
+	REG_S	tp, (3 * REG_SIZE)(sp)
 
-	sw	t0, (4 * 4)(sp)
-	sw	t1, (5 * 4)(sp)
-	sw	t2, (6 * 4)(sp)
-	sw	t3, (7 * 4)(sp)
-	sw	t4, (8 * 4)(sp)
-	sw	t5, (9 * 4)(sp)
-	sw	t6, (10 * 4)(sp)
+	REG_S	t0, (4 * REG_SIZE)(sp)
+	REG_S	t1, (5 * REG_SIZE)(sp)
+	REG_S	t2, (6 * REG_SIZE)(sp)
+	REG_S	t3, (7 * REG_SIZE)(sp)
+	REG_S	t4, (8 * REG_SIZE)(sp)
+	REG_S	t5, (9 * REG_SIZE)(sp)
+	REG_S	t6, (10 * REG_SIZE)(sp)
 
-	sw	s0, (11 * 4)(sp)
-	sw	s1, (12 * 4)(sp)
-	sw	s2, (13 * 4)(sp)
-	sw	s3, (14 * 4)(sp)
-	sw	s4, (15 * 4)(sp)
-	sw	s5, (16 * 4)(sp)
-	sw	s6, (17 * 4)(sp)
-	sw	s7, (18 * 4)(sp)
-	sw	s8, (19 * 4)(sp)
-	sw	s9, (20 * 4)(sp)
-	sw	s10, (21 * 4)(sp)
-	sw	s11, (22 * 4)(sp)
+	REG_S	s0, (11 * REG_SIZE)(sp)
+	REG_S	s1, (12 * REG_SIZE)(sp)
+	REG_S	s2, (13 * REG_SIZE)(sp)
+	REG_S	s3, (14 * REG_SIZE)(sp)
+	REG_S	s4, (15 * REG_SIZE)(sp)
+	REG_S	s5, (16 * REG_SIZE)(sp)
+	REG_S	s6, (17 * REG_SIZE)(sp)
+	REG_S	s7, (18 * REG_SIZE)(sp)
+	REG_S	s8, (19 * REG_SIZE)(sp)
+	REG_S	s9, (20 * REG_SIZE)(sp)
+	REG_S	s10, (21 * REG_SIZE)(sp)
+	REG_S	s11, (22 * REG_SIZE)(sp)
 
-	sw	a0, (23 * 4)(sp)
-	sw	a1, (24 * 4)(sp)
-	sw	a2, (25 * 4)(sp)
-	sw	a3, (26 * 4)(sp)
-	sw	a4, (27 * 4)(sp)
-	sw	a5, (28 * 4)(sp)
-	sw	a6, (29 * 4)(sp)
-	sw	a7, (30 * 4)(sp)
+	REG_S	a0, (23 * REG_SIZE)(sp)
+	REG_S	a1, (24 * REG_SIZE)(sp)
+	REG_S	a2, (25 * REG_SIZE)(sp)
+	REG_S	a3, (26 * REG_SIZE)(sp)
+	REG_S	a4, (27 * REG_SIZE)(sp)
+	REG_S	a5, (28 * REG_SIZE)(sp)
+	REG_S	a6, (29 * REG_SIZE)(sp)
+	REG_S	a7, (30 * REG_SIZE)(sp)
 
 	csrr	t0, mepc
-	sw	t0, (31 * 4)(sp)
+	REG_S	t0, (31 * REG_SIZE)(sp)
 	csrr	t0, mstatus
-	sw	t0, (32 * 4)(sp)
+	REG_S	t0, (32 * REG_SIZE)(sp)
 	csrr	t0, mbadaddr
-	sw	t0, (33 * 4)(sp)
+	REG_S	t0, (33 * REG_SIZE)(sp)
 	csrr	t0, mcause
-	sw	t0, (34 * 4)(sp)
+	REG_S	t0, (34 * REG_SIZE)(sp)
 .endm
 
 .macro load_registers el
-	lw	t0, (31 * 4)(sp)
+	REG_L	t0, (31 * REG_SIZE)(sp)
 	csrw	mepc, t0
+	REG_L	t0, (32 * REG_SIZE)(sp)
+	csrw	mstatus, t0
 
-	lw	ra, (0 * 4)(sp)
-	lw	gp, (2 * 4)(sp)
-	lw	tp, (3 * 4)(sp)
+	REG_L	ra, (0 * REG_SIZE)(sp)
+	REG_L	tp, (3 * REG_SIZE)(sp)
 
-	lw	t0, (4 * 4)(sp)
-	lw	t1, (5 * 4)(sp)
-	lw	t2, (6 * 4)(sp)
-	lw	t3, (7 * 4)(sp)
-	lw	t4, (8 * 4)(sp)
-	lw	t5, (9 * 4)(sp)
-	lw	t6, (10 * 4)(sp)
+	REG_L	t0, (4 * REG_SIZE)(sp)
+	REG_L	t1, (5 * REG_SIZE)(sp)
+	REG_L	t2, (6 * REG_SIZE)(sp)
+	REG_L	t3, (7 * REG_SIZE)(sp)
+	REG_L	t4, (8 * REG_SIZE)(sp)
+	REG_L	t5, (9 * REG_SIZE)(sp)
+	REG_L	t6, (10 * REG_SIZE)(sp)
 
-	lw	s0, (11 * 4)(sp)
-	lw	s1, (12 * 4)(sp)
-	lw	s2, (13 * 4)(sp)
-	lw	s3, (14 * 4)(sp)
-	lw	s4, (15 * 4)(sp)
-	lw	s5, (16 * 4)(sp)
-	lw	s6, (17 * 4)(sp)
-	lw	s7, (18 * 4)(sp)
-	lw	s8, (19 * 4)(sp)
-	lw	s9, (20 * 4)(sp)
-	lw	s10, (21 * 4)(sp)
-	lw	s11, (22 * 4)(sp)
+	REG_L	s0, (11 * REG_SIZE)(sp)
+	REG_L	s1, (12 * REG_SIZE)(sp)
+	REG_L	s2, (13 * REG_SIZE)(sp)
+	REG_L	s3, (14 * REG_SIZE)(sp)
+	REG_L	s4, (15 * REG_SIZE)(sp)
+	REG_L	s5, (16 * REG_SIZE)(sp)
+	REG_L	s6, (17 * REG_SIZE)(sp)
+	REG_L	s7, (18 * REG_SIZE)(sp)
+	REG_L	s8, (19 * REG_SIZE)(sp)
+	REG_L	s9, (20 * REG_SIZE)(sp)
+	REG_L	s10, (21 * REG_SIZE)(sp)
+	REG_L	s11, (22 * REG_SIZE)(sp)
 
-	lw	a0, (23 * 4)(sp)
-	lw	a1, (24 * 4)(sp)
-	lw	a2, (25 * 4)(sp)
-	lw	a3, (26 * 4)(sp)
-	lw	a4, (27 * 4)(sp)
-	lw	a5, (28 * 4)(sp)
-	lw	a6, (29 * 4)(sp)
-	lw	a7, (30 * 4)(sp)
+	REG_L	a0, (23 * REG_SIZE)(sp)
+	REG_L	a1, (24 * REG_SIZE)(sp)
+	REG_L	a2, (25 * REG_SIZE)(sp)
+	REG_L	a3, (26 * REG_SIZE)(sp)
+	REG_L	a4, (27 * REG_SIZE)(sp)
+	REG_L	a5, (28 * REG_SIZE)(sp)
+	REG_L	a6, (29 * REG_SIZE)(sp)
+	REG_L	a7, (30 * REG_SIZE)(sp)
 
-	addi	sp, sp, (35 * 4)
+	addi	sp, sp, (35 * REG_SIZE)
 .endm
 
+	.align 2
 ASM_ENTRY(cpu_exception_handler)
 	save_registers 1
-	mv a0, sp
-	jal riscv_exception
-	mv sp, a0
+	mv	a0, sp
+	jal	riscv_exception
+	mv	sp, a0
 	load_registers 1
 	mret
 END(cpu_exception_handler)
