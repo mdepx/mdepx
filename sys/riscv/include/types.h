@@ -68,10 +68,6 @@ typedef	__uint64_t		__uintmax_t;
 typedef	__int64_t		__intmax_t;
 typedef	__uint8_t		__u_char_t;
 
-/* Move to limits.h */
-#define	__UINT_MAX		0xffffffff
-#define	__INT_MAX		0x7fffffff
-
 #define	NBBY			8
 
 #endif /* !_MACHINE_TYPES_H_ */
