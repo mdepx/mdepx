@@ -27,6 +27,7 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 #include <sys/thread.h>
+#include <sys/pcpu.h>
 
 #include <machine/frame.h>
 #include <machine/cpuregs.h>
@@ -92,8 +93,26 @@ riscv_exception(struct trapframe *tf)
 	int irq;
 
 	td = curthread;
-
 	td->td_critnest++;
+
+#ifdef	CONFIG_SCHED
+#if 0
+	/*
+	 * Unsubscribe from notifications since this CPU
+	 * just returned back from sleeping.
+	 */
+	struct pcpu *p;
+	p = curpcpu;
+	if (td->td_idle) {
+		sched_lock();
+		list_remove(&p->pc_node);
+		sched_unlock();
+	}
+#endif
+
+	/* Check if this thread went to sleep */
+	sched_park(tf);
+#endif
 
 	if (tf->tf_mcause & EXCP_INTR) {
 		irq = (tf->tf_mcause & EXCP_MASK);
@@ -107,6 +126,7 @@ riscv_exception(struct trapframe *tf)
 	ret = tf;
 #endif
 
+	td = curthread;
 	td->td_critnest--;
 
 	return (ret);

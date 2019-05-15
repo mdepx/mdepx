@@ -35,8 +35,12 @@
 #include <sys/systm.h>
 #include <sys/thread.h>
 #include <sys/mutex.h>
+#include <sys/spinlock.h>
+#include <sys/pcpu.h>
 
 #include <machine/frame.h>
+
+#include <riscv/sifive/e300g_clint.h>
 
 #define	SCHED_DEBUG
 #undef	SCHED_DEBUG
@@ -47,9 +51,10 @@
 #define	dprintf(fmt, ...)
 #endif
 
-extern struct thread thread0;
 static struct thread *runq;
 static struct thread *runq_tail;
+static struct spinlock l;
+static struct entry pcpu_list = LIST_INIT(&pcpu_list);
 
 static void __unused
 dump_runq(void)
@@ -78,6 +83,18 @@ sched_remove(struct thread *td)
 		td->td_prev->td_next = td->td_next;
 	else
 		runq = td->td_next;
+}
+
+static struct thread *
+sched_picknext(void)
+{
+	struct thread *td;
+
+	td = runq;
+
+	sched_remove(td);
+
+	return (td);
 }
 
 /*
@@ -147,6 +164,22 @@ sched_add(struct thread *td0)
 			td0->td_prev->td_next = td0;
 	}
 
+#if MAXCPU > 1
+	struct pcpu *p;
+	p = curpcpu;
+	list_remove(&p->pc_node);
+
+	/*
+	 * Check if some hart is available to pick up this thread.
+	 */
+	if (!list_empty(&pcpu_list)) {
+		p = CONTAINER_OF(pcpu_list.next, struct pcpu, pc_node);
+		KASSERT(curpcpu != p,
+		    ("Adding new threads from idle thread."));
+		send_ipi(p->pc_cpuid);
+	}
+#endif
+
 	critical_exit();
 }
 
@@ -156,7 +189,31 @@ sched_cb(void *arg)
 	struct thread *td;
 
 	td = arg;
-	td->td_state = TD_STATE_READY;
+
+	if (td->td_state == TD_STATE_RUNNING)
+		td->td_state = TD_STATE_READY;
+}
+
+void
+sched_park(struct trapframe *tf)
+{
+	struct thread *td;
+
+	td = curthread;
+
+	/* Save old */
+	td->td_tf = tf;
+
+	switch (td->td_state) {
+	case TD_STATE_TERMINATING:
+	case TD_STATE_MUTEX_WAIT:
+	case TD_STATE_SEM_WAIT:
+	case TD_STATE_SLEEPING:
+		td->td_state = TD_STATE_ACK;
+	case TD_STATE_WAKEUP:
+	default:
+		break;
+	}
 }
 
 struct trapframe *
@@ -164,48 +221,82 @@ sched_next(struct trapframe *tf)
 {
 	struct thread *td;
 
-	dprintf("%s\n", __func__);
+	dprintf("%s%d\n", __func__, PCPU_GET(cpuid));
 
 	KASSERT(curthread->td_critnest > 0,
 	    ("%s: Not in critical section. td name %s critnest %d",
 	    __func__, curthread->td_name, curthread->td_critnest));
 
-	/* Save old */   
-	curthread->td_tf = tf;
+	td = curthread;
 
-	switch (curthread->td_state) {
+	/* Save old */   
+	td->td_tf = tf;
+
+	switch (td->td_state) {
 	case TD_STATE_TERMINATING:
 	case TD_STATE_MUTEX_WAIT:
 	case TD_STATE_SEM_WAIT:
 	case TD_STATE_SLEEPING:
+		td->td_state = TD_STATE_ACK;
 	case TD_STATE_WAKEUP:
+	case TD_STATE_ACK:
+		td->td_critnest--;
 		break;
 	case TD_STATE_RUNNING:
 		/*
 		 * Current thread is still running and has quantum.
 		 * Do not switch.
 		 */
-		return (curthread->td_tf);
+		return (td->td_tf);
 	default:
-		sched_add(curthread);
+		td->td_critnest--;
+
+		KASSERT(td->td_critnest == 0,
+		    ("adding wrong critnest %d, td_name %s, td_state %d",
+		    td->td_critnest, td->td_name, td->td_state));
+
+		sched_lock();
+		sched_add(td);
+		sched_unlock();
 	}
 
-	td = runq;
+	sched_lock();
+	td = sched_picknext();
+	struct pcpu *p;
+	p = curpcpu;
+	if (td->td_idle)
+		list_append(&pcpu_list, &p->pc_node);
+	sched_unlock();
 
-	sched_remove(td);
+	PCPU_SET(curthread, td);
 
-	if (td->td_quantum > 0) {
+	td->td_critnest++;
+
+	if (!td->td_idle) {
 		td->td_state = TD_STATE_RUNNING;
 		callout_init(&td->td_c);
 		callout_set(&td->td_c, td->td_quantum, sched_cb, td);
 	}
 
-	curthread = td;
-
-	dprintf("%s: curthread %p, tf %p, name %s\n",
-	    __func__, td, td->td_tf, td->td_name);
+	dprintf("%s%d: curthread %p, tf %p, name %s, idx %x\n",
+	    __func__, PCPU_GET(cpuid), td, td->td_tf,
+		td->td_name, (uint32_t)td->td_index);
 
 	return (curthread->td_tf);
+}
+
+void
+sched_lock(void)
+{
+
+	sl_lock(&l);
+}
+
+void
+sched_unlock(void)
+{
+
+	sl_unlock(&l);
 }
 
 void
@@ -215,11 +306,27 @@ sched_enter(void)
 
 	td = curthread;
 
-	KASSERT(td == &thread0,
+	KASSERT(td->td_idle == 1,
 	    ("sched_enter() called from non-idle thread"));
 
 	md_thread_yield();
 
 	while (1)
 		cpu_idle();
+}
+
+void
+sched_add_cpu(struct pcpu *pcpup)
+{
+
+	sched_lock();
+	list_append(&pcpu_list, &pcpup->pc_node);
+	sched_unlock();
+}
+
+void
+sched_init(void)
+{
+
+	sl_init(&l);
 }

@@ -27,10 +27,13 @@
 #ifndef	_SYS_MUTEX_H_
 #define	_SYS_MUTEX_H_
 
+#include <sys/spinlock.h>
+
 struct mtx {
 	uintptr_t mtx_lock;
 	struct thread *td_first;
 	struct thread *td_last;
+	struct spinlock l;
 };
 
 void mtx_lock(struct mtx *m);

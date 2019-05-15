@@ -27,10 +27,37 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 #include <sys/thread.h>
+#include <sys/pcpu.h>
 
+#include <machine/atomic.h>
 #include <machine/frame.h>
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
+#include <machine/smp.h>
+
+static struct thread idle_threads[MAXCPU];
+static struct pcpu __pcpu[MAXCPU];
+static uint32_t ncpus;
+static size_t cpu_stacks[MAXCPU][4096]; /* Interrupt stack */
+
+uint8_t __riscv_boot_ap[MAXCPU];
+uint8_t secondary_stacks[MAXCPU][4096]; /* Idle thread stacks */
+
+static void
+thread_init(int thread_id)
+{
+	struct thread *t;
+
+	t = &idle_threads[thread_id];
+	bzero(t, sizeof(struct thread));
+	t->td_name = "idle";
+	t->td_quantum = 0;
+	t->td_prio = 0;
+	t->td_idle = 1;
+	t->td_state = TD_STATE_READY;
+
+	PCPU_SET(curthread, t);
+}
 
 void
 critical_enter(void)
@@ -76,6 +103,8 @@ md_setup_frame(struct trapframe *tf, void *entry,
     void *arg, void *terminate)
 {
 
+	bzero(tf, sizeof(struct trapframe));
+	tf->tf_mstatus = MSTATUS_MPIE | (MSTATUS_MPP_MASK << MSTATUS_MPP_SHIFT);
 	tf->tf_mepc = (register_t)entry;
 	tf->tf_a[0] = (register_t)arg;
 	tf->tf_ra = (register_t)terminate;
@@ -95,8 +124,58 @@ md_thread_terminate(struct thread *td)
 }
 
 void
-md_init(void)
+md_init_secondary(int hart)
 {
+	struct pcpu *pcpup;
+	int cpu;
 
-	thread0_init();
+	cpu = atomic_fetchadd_int(&ncpus, 1);
+
+	pcpup = &__pcpu[cpu];
+	pcpup->pc_cpuid = hart;
+	pcpup->pc_stack = (uintptr_t)&cpu_stacks[hart] + 4096 * 8;
+	__asm __volatile("mv gp, %0" :: "r"(pcpup));
+	csr_write(mscratch, pcpup->pc_stack);
+
+	csr_set(mie, MIE_MSIE);
+
+	csr_clear(mie, MIE_MTIE);
+	csr_clear(mip, MIP_MTIP);
+
+	thread_init(hart);
+	sched_add_cpu(pcpup);
+
+	intr_enable();
+	sched_enter();
+}
+
+void
+md_init(int hart)
+{
+	struct pcpu *pcpup;
+	struct thread *td;
+
+	ncpus = 0;
+
+	pcpup = &__pcpu[ncpus++];
+	pcpup->pc_cpuid = hart;
+	pcpup->pc_stack = (uintptr_t)&cpu_stacks[hart] + 4096 * 8;
+	__asm __volatile("mv gp, %0" :: "r"(pcpup));
+	csr_write(mscratch, pcpup->pc_stack);
+
+	thread_init(hart);
+	sched_init();
+
+	csr_set(mie, MIE_MSIE);
+
+	/* Allow the app to register malloc and timer. */
+	app_init();
+
+	td = thread_create("main", 1, 10000, 4096, main, NULL);
+	if (td == NULL)
+		panic("can't create the main thread\n");
+
+	sched_add_cpu(pcpup);
+	intr_enable();
+	sched_enter();
 }

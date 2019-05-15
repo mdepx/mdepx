@@ -42,6 +42,8 @@ struct thread {
 	struct thread *		td_next;
 	struct thread *		td_prev;
 	uint32_t		td_quantum;
+	uint8_t			td_idle;
+	uint32_t		td_index;
 	int			td_prio;
 	int			td_state;
 #define	TD_STATE_READY		0
@@ -51,9 +53,8 @@ struct thread {
 #define	TD_STATE_MUTEX_WAIT	4
 #define	TD_STATE_SEM_WAIT	5
 #define	TD_STATE_TERMINATING	6
+#define	TD_STATE_ACK		7
 };
-
-extern struct thread *curthread;
 
 void thread0_init(void);
 struct trapframe *sched_next(struct trapframe *);
@@ -72,12 +73,23 @@ void sched_add_tail(struct thread *td);
 void sched_add_head(struct thread *td);
 void sched_add(struct thread *td0);
 void sched_enter(void);
+void sched_init(void);
+void sched_lock(void);
+void sched_unlock(void);
+void sched_park(struct trapframe *tf);
+void sched_add_cpu(struct pcpu *pcpup);
 
 /* Thread MD part */
-void md_init(void);
+void md_init(int cpuid);
 void md_thread_yield(void);
 void md_setup_frame(struct trapframe *tf, void *entry,
     void *arg, void *terminate);
 void md_thread_terminate(struct thread *td);
+void md_init_secondary(int cpuid);
+
+void send_ipi(int cpuid);
+
+int main(void);
+int app_init(void);
 
 #endif /* !_SYS_THREAD_H_ */

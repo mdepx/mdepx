@@ -28,8 +28,7 @@
 #include <sys/callout.h>
 #include <sys/systm.h>
 #include <sys/thread.h>
-
-extern struct thread thread0;
+#include <sys/pcpu.h>
 
 static void
 raw_sleep_cb(void *arg)
@@ -40,8 +39,12 @@ raw_sleep_cb(void *arg)
 	    ("%s: Not in critical section.", __func__));
 
 	td = arg;
-	td->td_state = TD_STATE_WAKEUP;
+
+	sched_lock();
+	KASSERT(td->td_state == TD_STATE_ACK,
+		("not sleeping, %d", td->td_state));
 	sched_add(td);
+	sched_unlock();
 }
 
 void
@@ -52,7 +55,7 @@ raw_sleep(uint32_t ticks)
 
 	td = curthread;
 
-	KASSERT(td != &thread0,
+	KASSERT(td->td_idle == 0,
 	    ("%s: sleeping from idle thread.", __func__));
 
 	callout_init(&c);
@@ -61,7 +64,6 @@ raw_sleep(uint32_t ticks)
 	td->td_state = TD_STATE_SLEEPING;
 	callout_cancel(&td->td_c);
 	callout_set(&c, ticks, raw_sleep_cb, td);
-	critical_exit();
-
 	md_thread_yield();
+	critical_exit();
 }

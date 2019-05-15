@@ -33,6 +33,7 @@
 #define	_SYS_CALLOUT_H_
 
 #include <sys/list.h>
+#include <sys/pcpu.h>
 
 struct callout {
 	int state;
@@ -50,9 +51,9 @@ struct mi_timer {
 	void (*stop)(void *arg);
 	uint32_t (*count)(void *arg);
 	void *arg;
-	uint32_t count_saved;
+	uint32_t count_saved[MAXCPU];
 	uint32_t width;
-	int state;
+	int state[MAXCPU];
 #define	MI_TIMER_READY		0
 #define	MI_TIMER_RUNNING	1
 #define	MI_TIMER_EXCP		2

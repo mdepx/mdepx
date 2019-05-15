@@ -26,24 +26,4 @@
 
 #include <sys/cdefs.h>
 #include <sys/thread.h>
-
-struct thread thread0 = {
-	.td_name = "idle",
-	.td_quantum = 0,
-	.td_prio = 0,
-	.td_state = TD_STATE_READY,
-};
-
-struct thread *curthread = &thread0;
-
-void
-thread0_init(void)
-{
-
-	bzero(&thread0, sizeof(struct thread));
-	thread0.td_name = "idle";
-	thread0.td_quantum = 0;
-	thread0.td_prio = 0;
-	thread0.td_state = TD_STATE_READY;
-	curthread = &thread0;
-}
+#include <sys/pcpu.h>

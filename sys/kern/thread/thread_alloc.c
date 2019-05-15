@@ -63,12 +63,18 @@ thread_create(const char *name, int prio, uint32_t quantum,
     uint32_t stack_size, void *entry, void *arg)
 {
 	struct thread *td;
+	int ret;
 
 	td = thread_alloc(stack_size);
 	if (td == NULL)
 		return (NULL);
 
-	thread_setup(td, name, prio, quantum, entry, arg);
+	ret = thread_setup(td, name, prio, quantum, entry, arg);
+	if (ret != 0) {
+		free(td->td_stack);
+		free(td);
+		td = NULL;
+	}
 
 	return (td);
 }

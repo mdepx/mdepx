@@ -27,6 +27,8 @@
 /* Core Local Interruptor (CLINT) */
 
 #include <sys/cdefs.h>
+#include <sys/systm.h>
+#include <sys/pcpu.h>
 
 #include <machine/cpuregs.h>
 
@@ -47,6 +49,29 @@
 #endif
 
 static struct clint_softc *clint_sc;
+
+void
+clint_intr_software(void)
+{
+	struct clint_softc *sc;
+	int cpuid;
+
+	sc = clint_sc;
+
+	cpuid = PCPU_GET(cpuid);
+
+	WR4(sc, MSIP(cpuid), 0);
+}
+
+void
+clint_set_sip(int hart_id)
+{
+	struct clint_softc *sc;
+
+	sc = clint_sc;
+
+	WR4(sc, MSIP(hart_id), 1);
+}
 
 void
 clint_intr(void)
@@ -76,20 +101,31 @@ clint_start(void *arg, uint32_t ticks)
 	struct clint_softc *sc;
 	uint32_t low, high;
 	uint32_t new;
+	int cpuid;
 
 	sc = arg;
 
+	cpuid = PCPU_GET(cpuid);
+
 	dprintf("%s: ticks %u\n", __func__, ticks);
+	dprintf("%s%d: ticks %u\n", __func__, cpuid, ticks);
+#if 0
+	if (ticks > 4094967295)
+		panic("ticks %u\n", ticks);
+	if (ticks == 0)
+		panic("ticks %u\n", ticks);
+#endif
 
 	low = RD4(sc, MTIME);
 	high = RD4(sc, MTIME + 0x4);
 	new = low + ticks;
+	dprintf("%s%d: ticks %u, low %u, high %u, new %u\n",
+	    __func__, PCPU_GET(cpuid), ticks, low, high, new);
 	if (new < low)
 		high += 1;
-	WR4(sc, MTIMECMP(0) + 0x4, high);
-	WR4(sc, MTIMECMP(0), new);
+	WR4(sc, MTIMECMP(cpuid) + 0x4, high);
+	WR4(sc, MTIMECMP(cpuid), new);
 
-	csr_clear(mip, MIP_MTIP);
 	csr_set(mie, MIE_MTIE);
 }
 

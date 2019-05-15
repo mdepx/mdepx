@@ -28,6 +28,8 @@
 #include <sys/systm.h>
 #include <sys/thread.h>
 #include <sys/sem.h>
+#include <sys/pcpu.h>
+#include <sys/spinlock.h>
 
 #include <machine/atomic.h>
 
@@ -40,8 +42,6 @@
 #define	dprintf(fmt, ...)
 #endif
 
-extern struct thread thread0;
-
 void
 sem_init(sem_t *sem, int count)
 {
@@ -50,6 +50,7 @@ sem_init(sem_t *sem, int count)
 	sem->sem_count_initial = count;
 	sem->td_first = NULL;
 	sem->td_last = NULL;
+	sl_init(&sem->l);
 }
 
 void
@@ -59,13 +60,15 @@ sem_take(sem_t *sem)
 
 	td = curthread;
 
-	KASSERT(td != &thread0,
+	KASSERT(td->td_idle == 0,
 	    ("Can't take semaphore from idle thread"));
 
 	for (;;) {
 		critical_enter();
+		sl_lock(&sem->l);
 		if (sem->sem_count > 0) {
 			sem->sem_count--;
+			sl_unlock(&sem->l);
 			critical_exit();
 			break;
 		}
@@ -86,6 +89,8 @@ sem_take(sem_t *sem)
 		}
 
 		callout_cancel(&td->td_c);
+
+		sl_unlock(&sem->l);
 		critical_exit();
 
 		md_thread_yield();
@@ -99,6 +104,7 @@ sem_post(sem_t *sem)
 
 	critical_enter();
 
+	sl_lock(&sem->l);
 	sem->sem_count += 1;
 
 	td = sem->td_first;
@@ -107,9 +113,14 @@ sem_post(sem_t *sem)
 		sem->td_first = td->td_next;
 		if (td->td_next == NULL)
 			sem->td_last = NULL;
+
+		while (td->td_state != TD_STATE_ACK);
 		td->td_state = TD_STATE_WAKEUP;
+		sched_lock();
 		sched_add(td);
+		sched_unlock();
 	}
+	sl_unlock(&sem->l);
 	critical_exit();
 
 	return (1);

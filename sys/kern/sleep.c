@@ -29,12 +29,9 @@
 #include <sys/systm.h>
 #include <sys/thread.h>
 
-extern struct thread thread0;
-
 static void
 raw_sleep_cb(void *arg)
 {
-	struct callout *c;
 	struct thread *td;
 
 	KASSERT(curthread->td_critnest > 0,
@@ -52,7 +49,7 @@ raw_sleep(uint32_t ticks)
 
 	td = curthread;
 
-	KASSERT(td == &thread0,
+	KASSERT(td->td_idle == 1,
 	    ("%s: sleeping from unknown thread.", __func__));
 
 	callout_init(&c);

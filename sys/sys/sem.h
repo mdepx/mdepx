@@ -27,11 +27,14 @@
 #ifndef	_SYS_SEM_H_
 #define	_SYS_SEM_H_
 
+#include <sys/spinlock.h>
+
 struct semaphore {
 	int sem_count;
 	int sem_count_initial;
 	struct thread *td_first;
 	struct thread *td_last;
+	struct spinlock l;
 };
 
 typedef struct semaphore sem_t;

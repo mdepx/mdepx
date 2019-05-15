@@ -53,8 +53,11 @@ riscv_intr(struct trapframe *tf, int irq)
 	case IRQ_TIMER_MACHINE:
 		clint_intr();
 		break;
+	case IRQ_SOFTWARE_MACHINE:
+		clint_intr_software();
+		break;
 	default:
-		printf("%s: %d\n", __func__, irq);
+		printf("%s%d: %d\n", __func__, PCPU_GET(cpuid), irq);
 		break;
 	}
 }

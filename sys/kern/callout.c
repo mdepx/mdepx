@@ -34,19 +34,25 @@
 #include <sys/errno.h>
 #include <sys/callout.h>
 #include <sys/thread.h>
+#include <sys/spinlock.h>
+#include <sys/pcpu.h>
 
 static struct mi_timer *mi_tmr;
-static struct entry callouts_list = LIST_INIT(&callouts_list);
+static struct entry callouts_list[MAXCPU];
+static struct spinlock l;
 
 static struct callout *
 first(void)
 {
 	struct callout *c;
+	int cpuid;
 
-	if (list_empty(&callouts_list))
+	cpuid = PCPU_GET(cpuid);
+
+	if (list_empty(&callouts_list[cpuid]))
 		return (NULL);
 
-	c = CONTAINER_OF(callouts_list.next, struct callout, node);
+	c = CONTAINER_OF(callouts_list[cpuid].next, struct callout, node);
 
 	return (c);
 }
@@ -55,8 +61,11 @@ static struct callout *
 next(struct callout *c0)
 {
 	struct callout *c;
+	int cpuid;
 
-	if (c0->node.next == &callouts_list)
+	cpuid = PCPU_GET(cpuid);
+
+	if (c0->node.next == &callouts_list[cpuid])
 		return (NULL);
 
 	c = CONTAINER_OF(c0->node.next, struct callout, node);
@@ -77,12 +86,15 @@ get_elapsed(uint32_t *count_saved)
 {
 	uint32_t elapsed;
 	uint32_t count;
+	int cpuid;
+
+	cpuid = PCPU_GET(cpuid);
 
 	count = mi_tmr->count(mi_tmr->arg);
-	if (count > mi_tmr->count_saved)
-		elapsed = (count - mi_tmr->count_saved);
+	if (count > mi_tmr->count_saved[cpuid])
+		elapsed = (count - mi_tmr->count_saved[cpuid]);
 	else
-		elapsed = (mi_tmr->width - mi_tmr->count_saved + count);
+		elapsed = (mi_tmr->width - mi_tmr->count_saved[cpuid] + count);
 	if (count_saved != NULL)
 		*count_saved = count;
 
@@ -94,13 +106,16 @@ callout_set_one(struct callout *c0)
 {
 	struct callout *c;
 	uint32_t elapsed;
+	int cpuid;
+
+	cpuid = PCPU_GET(cpuid);
 
 	KASSERT(curthread != NULL, ("curthread is NULL"));
 	KASSERT(curthread->td_critnest > 0,
 	    ("%s: Not in critical section.", __func__));
 
 	elapsed = 0;
-	if (mi_tmr->state == MI_TIMER_RUNNING) {
+	if (mi_tmr->state[cpuid] == MI_TIMER_RUNNING) {
 		elapsed = get_elapsed(NULL);
 		c0->ticks += elapsed;
 	}
@@ -115,9 +130,9 @@ callout_set_one(struct callout *c0)
 	}
 
 	if (c == NULL)
-		list_append(&callouts_list, &c0->node);
+		list_append(&callouts_list[cpuid], &c0->node);
 
-	switch (mi_tmr->state) {
+	switch (mi_tmr->state[cpuid]) {
 	case MI_TIMER_RUNNING:
 		if (c0 == first())
 			mi_tmr->start(mi_tmr->arg, c0->ticks - elapsed);
@@ -127,8 +142,8 @@ callout_set_one(struct callout *c0)
 		break;
 	case MI_TIMER_READY:
 		/* We are free to run. */
-		mi_tmr->state = MI_TIMER_RUNNING;
-		mi_tmr->count_saved = mi_tmr->count(mi_tmr->arg);
+		mi_tmr->state[cpuid] = MI_TIMER_RUNNING;
+		mi_tmr->count_saved[cpuid] = mi_tmr->count(mi_tmr->arg);
 		mi_tmr->start(mi_tmr->arg, first()->ticks);
 	}
 }
@@ -159,8 +174,8 @@ callout_set(struct callout *c, uint32_t ticks,
 	c->arg = arg;
 
 	callout_set_one(c);
-
 	c->flags |= CALLOUT_FLAG_ACTIVE;
+
 	critical_exit();
 
 	return (0);
@@ -196,6 +211,9 @@ callout_callback(struct mi_timer *mt)
 {
 	struct callout *c, *tmp;
 	uint32_t ticks_elapsed;
+	int cpuid;
+
+	cpuid = PCPU_GET(cpuid);
 
 	KASSERT(curthread->td_critnest > 0,
 	    ("%s: Not in critical section.", __func__));
@@ -204,12 +222,12 @@ callout_callback(struct mi_timer *mt)
 	KASSERT(mi_tmr == mt,
 	    ("%s: callback for the wrong device", __func__));
 
-	if (list_empty(&callouts_list))
+	if (list_empty(&callouts_list[cpuid]))
 		return (0);
 
-	ticks_elapsed = get_elapsed(&mi_tmr->count_saved);
+	ticks_elapsed = get_elapsed(&mi_tmr->count_saved[cpuid]);
 
-	mi_tmr->state = MI_TIMER_EXCP;
+	mi_tmr->state[cpuid] = MI_TIMER_EXCP;
 
 	for (c = first(); c != NULL; ) {
 		tmp = next(c);
@@ -229,12 +247,12 @@ callout_callback(struct mi_timer *mt)
 	}
 
 	if ((c = first()) != NULL) {
-		if (mi_tmr->state == MI_TIMER_EXCP) {
-			mi_tmr->state = MI_TIMER_RUNNING;
+		if (mi_tmr->state[cpuid] == MI_TIMER_EXCP) {
+			mi_tmr->state[cpuid] = MI_TIMER_RUNNING;
 			mi_tmr->start(mi_tmr->arg, c->ticks);
 		}
 	} else {
-		mi_tmr->state = MI_TIMER_READY;
+		mi_tmr->state[cpuid] = MI_TIMER_READY;
 		mi_tmr->stop(mi_tmr->arg);
 	}
 
@@ -244,6 +262,7 @@ callout_callback(struct mi_timer *mt)
 int
 callout_register(struct mi_timer *mt)
 {
+	int i;
 
 	if (mi_tmr != NULL)
 		return (EEXIST);
@@ -256,8 +275,15 @@ callout_register(struct mi_timer *mt)
 		return (ENXIO);
 	}
 
+	sl_init(&l);
+
 	mi_tmr = mt;
-	mi_tmr->state = MI_TIMER_READY;
+
+	for (i = 0; i < MAXCPU; i++) {
+		list_init(&callouts_list[i]);
+		mi_tmr->state[i] = MI_TIMER_READY;
+		mi_tmr->count_saved[i] = 0;
+	}
 
 	return (0);
 }

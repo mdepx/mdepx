@@ -28,6 +28,8 @@
 #include <sys/systm.h>
 #include <sys/thread.h>
 #include <sys/mutex.h>
+#include <sys/spinlock.h>
+#include <sys/pcpu.h>
 
 #include <machine/atomic.h>
 
@@ -40,8 +42,6 @@
 #define	dprintf(fmt, ...)
 #endif
 
-extern struct thread thread0;
-
 void
 mtx_lock(struct mtx *m)
 {
@@ -51,21 +51,24 @@ mtx_lock(struct mtx *m)
 
 	td = curthread;
 
-	KASSERT(td != &thread0,
+	KASSERT(td->td_idle == 0,
 	    ("Can't lock mutex from idle thread"));
 
 	tid = (uintptr_t)td;
 
 	for (;;) {
 		critical_enter();
+		sl_lock(&m->l);
 		ret = atomic_cmpset_acq_ptr(&(m)->mtx_lock, 0, (tid));
 		if (ret) {
 			/* Lock acquired. */
+			sl_unlock(&m->l);
 			critical_exit();
 			break;
 		}
 
 		/* Lock is owned by another thread, sleep. */
+		callout_cancel(&td->td_c);
 		td->td_state = TD_STATE_MUTEX_WAIT;
 
 		if (m->td_first == NULL) {
@@ -79,11 +82,11 @@ mtx_lock(struct mtx *m)
 			m->td_last->td_next = td;
 			m->td_last = td;
 		}
-
-		callout_cancel(&td->td_c);
-		critical_exit();
+		sl_unlock(&m->l);
 
 		md_thread_yield();
+
+		critical_exit();
 	}
 }
 
@@ -112,19 +115,30 @@ mtx_unlock(struct mtx *m)
 
 	tid = (uintptr_t)curthread;
 
-	if (!atomic_cmpset_rel_ptr(&(m)->mtx_lock, (tid), 0))
-		return (0);
-
 	critical_enter();
+	sl_lock(&m->l);
+
+	if (!atomic_cmpset_rel_ptr(&(m)->mtx_lock, (tid), 0))
+		panic("Can't unlock mutex.\n");
+
 	td = m->td_first;
 	if (td) {
 		/* Someone is waiting for the mutex. */
 		m->td_first = td->td_next;
 		if (td->td_next == NULL)
 			m->td_last = NULL;
+
+		sched_lock();
+		while (td->td_state != TD_STATE_ACK);
+		KASSERT(td->td_state == TD_STATE_ACK,
+		    ("wrong state %d\n", td->td_state));
+
 		td->td_state = TD_STATE_WAKEUP;
+		KASSERT(td != curthread, ("td is curthread"));
 		sched_add(td);
+		sched_unlock();
 	}
+	sl_unlock(&m->l);
 	critical_exit();
 
 	return (1);
