@@ -47,6 +47,13 @@ sl_lock(struct spinlock *l)
 	while (atomic_cmpset_acq_ptr(&l->v, 0, 1) == 0);
 }
 
+static inline int
+sl_trylock(struct spinlock *l)
+{
+
+	return (atomic_cmpset_acq_ptr(&l->v, 0, 1));
+}
+
 static inline void
 sl_unlock(struct spinlock *l)
 {
