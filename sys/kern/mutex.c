@@ -128,11 +128,12 @@ mtx_unlock(struct mtx *m)
 		if (td->td_next == NULL)
 			m->td_last = NULL;
 
-		sched_lock();
+		/* Ensure td left CPU. */
 		while (td->td_state != TD_STATE_ACK);
 		KASSERT(td->td_state == TD_STATE_ACK,
 		    ("wrong state %d\n", td->td_state));
 
+		sched_lock();
 		td->td_state = TD_STATE_WAKEUP;
 		KASSERT(td != curthread, ("td is curthread"));
 		sched_add(td);
