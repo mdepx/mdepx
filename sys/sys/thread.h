@@ -57,7 +57,6 @@ struct thread {
 };
 
 void thread0_init(void);
-struct trapframe *sched_next(struct trapframe *);
 struct thread *thread_create(const char *name, int prio,
     uint32_t quantum, uint32_t stack_size,
     void *entry, void *arg);
@@ -68,6 +67,7 @@ void cpu_idle(void);
 void thread_terminate(void);
 
 /* Scheduler */
+struct thread *sched_next(void);
 void sched_remove(struct thread *td);
 void sched_add_tail(struct thread *td);
 void sched_add_head(struct thread *td);
@@ -76,7 +76,7 @@ void sched_enter(void);
 void sched_init(void);
 void sched_lock(void);
 void sched_unlock(void);
-void sched_park(struct trapframe *tf);
+int sched_park(struct thread *td, struct trapframe *tf);
 void sched_add_cpu(struct pcpu *pcpup);
 
 /* Thread MD part */

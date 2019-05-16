@@ -85,16 +85,15 @@ sched_remove(struct thread *td)
 		runq = td->td_next;
 }
 
-static struct thread *
-sched_picknext(void)
+static void
+sched_cb(void *arg)
 {
 	struct thread *td;
 
-	td = runq;
+	td = arg;
 
-	sched_remove(td);
-
-	return (td);
+	if (td->td_state == TD_STATE_RUNNING)
+		td->td_state = TD_STATE_READY;
 }
 
 /*
@@ -166,8 +165,6 @@ sched_add(struct thread *td0)
 
 #if MAXCPU > 1
 	struct pcpu *p;
-	p = curpcpu;
-	list_remove(&p->pc_node);
 
 	/*
 	 * Check if some hart is available to pick up this thread.
@@ -183,25 +180,11 @@ sched_add(struct thread *td0)
 	critical_exit();
 }
 
-static void
-sched_cb(void *arg)
+int
+sched_park(struct thread *td, struct trapframe *tf)
 {
-	struct thread *td;
 
-	td = arg;
-
-	if (td->td_state == TD_STATE_RUNNING)
-		td->td_state = TD_STATE_READY;
-}
-
-void
-sched_park(struct trapframe *tf)
-{
-	struct thread *td;
-
-	td = curthread;
-
-	/* Save old */
+	/* Save the frame address */
 	td->td_tf = tf;
 
 	switch (td->td_state) {
@@ -210,67 +193,40 @@ sched_park(struct trapframe *tf)
 	case TD_STATE_SEM_WAIT:
 	case TD_STATE_SLEEPING:
 		td->td_state = TD_STATE_ACK;
-	case TD_STATE_WAKEUP:
-	default:
 		break;
-	}
-}
-
-struct trapframe *
-sched_next(struct trapframe *tf)
-{
-	struct thread *td;
-
-	dprintf("%s%d\n", __func__, PCPU_GET(cpuid));
-
-	KASSERT(curthread->td_critnest > 0,
-	    ("%s: Not in critical section. td name %s critnest %d",
-	    __func__, curthread->td_name, curthread->td_critnest));
-
-	td = curthread;
-
-	/* Save old */   
-	td->td_tf = tf;
-
-	switch (td->td_state) {
-	case TD_STATE_TERMINATING:
-	case TD_STATE_MUTEX_WAIT:
-	case TD_STATE_SEM_WAIT:
-	case TD_STATE_SLEEPING:
-		td->td_state = TD_STATE_ACK;
 	case TD_STATE_WAKEUP:
-	case TD_STATE_ACK:
-		td->td_critnest--;
-		break;
+		panic("could we get here ?");
 	case TD_STATE_RUNNING:
 		/*
 		 * Current thread is still running and has quantum.
 		 * Do not switch.
 		 */
-		return (td->td_tf);
+		return (0);
 	default:
-		td->td_critnest--;
-
-		KASSERT(td->td_critnest == 0,
-		    ("adding wrong critnest %d, td_name %s, td_state %d",
-		    td->td_critnest, td->td_name, td->td_state));
-
 		sched_lock();
 		sched_add(td);
 		sched_unlock();
 	}
 
-	sched_lock();
-	td = sched_picknext();
+	PCPU_SET(curthread, NULL);
+
+	return (1);
+}
+
+struct thread *
+sched_next(void)
+{
+	struct thread *td;
 	struct pcpu *p;
+
 	p = curpcpu;
+
+	sched_lock();
+	td = runq;
+	sched_remove(td);
 	if (td->td_idle)
 		list_append(&pcpu_list, &p->pc_node);
 	sched_unlock();
-
-	PCPU_SET(curthread, td);
-
-	td->td_critnest++;
 
 	if (!td->td_idle) {
 		td->td_state = TD_STATE_RUNNING;
@@ -282,7 +238,7 @@ sched_next(struct trapframe *tf)
 	    __func__, PCPU_GET(cpuid), td, td->td_tf,
 		td->td_name, (uint32_t)td->td_index);
 
-	return (curthread->td_tf);
+	return (td);
 }
 
 void
