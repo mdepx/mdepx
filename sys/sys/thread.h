@@ -76,7 +76,8 @@ void sched_enter(void);
 void sched_init(void);
 void sched_lock(void);
 void sched_unlock(void);
-int sched_park(struct thread *td, struct trapframe *tf);
+int sched_ack(struct thread *td, struct trapframe *tf);
+int sched_park(struct thread *td);
 void sched_add_cpu(struct pcpu *pcpup);
 
 /* Thread MD part */

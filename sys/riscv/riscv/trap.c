@@ -91,15 +91,12 @@ struct trapframe *
 riscv_exception(struct trapframe *tf)
 {
 	struct thread *td;
+	struct pcpu *p;
 	bool released;
 	bool intr;
 	int irq;
 
 	td = curthread;
-
-#ifdef	CONFIG_SCHED
-	struct pcpu *p;
-
 	p = curpcpu;
 
 	/*
@@ -112,7 +109,10 @@ riscv_exception(struct trapframe *tf)
 		list_remove(&p->pc_node);
 		sched_unlock();
 	}
-#endif
+
+	/* Switch to the interrupt thread */
+	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
+	critical_enter();
 
 	released = false;
 	intr = false;
@@ -125,33 +125,25 @@ riscv_exception(struct trapframe *tf)
 		handle_exception(tf);
 
 	/*
-	 * Check if this thread went to sleep or exhausted its quantum
-	 * and release it.
+	 * Check if this thread went to sleep.
 	 *
 	 * Note: tf can not be used after this call since this thread
 	 * could be added back to scheduler in riscv_intr().
 	 */
-	released = sched_park(td, tf);
-	if (released) {
-		/*
-		 * We dont have a curthread anymore, so switch to the
-		 * interrupt thread.
-		 */
-		td = &intr_thread[PCPU_GET(cpuid)];
-		PCPU_SET(curthread, td);
-	}
+	released = sched_ack(td, tf);
 
-	critical_enter();
 	if (intr)
 		riscv_intr(tf, irq); /* TODO: remove tf from this call */
 
-#ifdef	CONFIG_SCHED
+	/* Check if this thread has no more CPU time. */
+	if (!released)
+		released = sched_park(td);
+
 	if (released)
 		td = sched_next();
-#endif
-	critical_exit();
 
 	/* Switch to the new thread */
+	critical_exit();
 	PCPU_SET(curthread, td);
 
 	return (td->td_tf);

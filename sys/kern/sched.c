@@ -92,8 +92,11 @@ sched_cb(void *arg)
 
 	td = arg;
 
-	if (td->td_state == TD_STATE_RUNNING)
+	sched_lock();
+	if (td->td_state == TD_STATE_RUNNING) {
 		td->td_state = TD_STATE_READY;
+	}
+	sched_unlock();
 }
 
 /*
@@ -181,7 +184,7 @@ sched_add(struct thread *td0)
 }
 
 int
-sched_park(struct thread *td, struct trapframe *tf)
+sched_ack(struct thread *td, struct trapframe *tf)
 {
 
 	/* Save the frame address */
@@ -193,7 +196,19 @@ sched_park(struct thread *td, struct trapframe *tf)
 	case TD_STATE_SEM_WAIT:
 	case TD_STATE_SLEEPING:
 		td->td_state = TD_STATE_ACK;
+		return (1);
+	default:
 		break;
+	}
+
+	return (0);
+}
+
+int
+sched_park(struct thread *td)
+{
+
+	switch (td->td_state) {
 	case TD_STATE_WAKEUP:
 		panic("could we get here ?");
 	case TD_STATE_RUNNING:
@@ -206,11 +221,9 @@ sched_park(struct thread *td, struct trapframe *tf)
 		sched_lock();
 		sched_add(td);
 		sched_unlock();
+
+		return (1);
 	}
-
-	PCPU_SET(curthread, NULL);
-
-	return (1);
 }
 
 struct thread *
@@ -232,6 +245,7 @@ sched_next(void)
 		td->td_state = TD_STATE_RUNNING;
 		callout_init(&td->td_c);
 		callout_set(&td->td_c, td->td_quantum, sched_cb, td);
+		//printf(",");
 	}
 
 	dprintf("%s%d: curthread %p, tf %p, name %s, idx %x\n",
@@ -245,7 +259,7 @@ void
 sched_lock(void)
 {
 
-	sl_lock(&l);
+	while (sl_trylock(&l) == 0);
 }
 
 void
