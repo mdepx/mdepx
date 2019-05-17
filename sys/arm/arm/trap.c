@@ -28,6 +28,7 @@
 #include <sys/systm.h>
 #include <sys/thread.h>
 
+#include <machine/pcpu.h>
 #include <machine/cpuregs.h>
 #include <machine/frame.h>
 
@@ -74,14 +75,52 @@ handle_exception(struct trapframe *tf, int exc_code)
 	}
 }
 
+#ifdef CONFIG_SCHED
+
 struct trapframe *
 arm_exception(struct trapframe *tf, int exc_code)
 {
-	struct trapframe *ret;
+	struct thread *td;
+	uint32_t irq;
+	bool released;
+	bool intr;
+
+	td = curthread;
+
+	released = false;
+	intr = false;
+
+	/* TODO: switch stack and curthread for kernel */
+
+	if (exc_code >= 16) {
+		irq = exc_code - 16;
+		intr = true;
+	} else
+		handle_exception(tf, exc_code);
+
+	released = sched_ack(td, tf);
+
+	if (intr)
+		arm_nvic_intr(irq, tf);
+
+	if (!released)
+		released = sched_park(td);
+	if (released)
+		td = sched_next();
+
+	return (td->td_tf);
+}
+
+#else
+
+struct trapframe *
+arm_exception(struct trapframe *tf, int exc_code)
+{
 	struct thread *td;
 	uint32_t irq;
 
 	td = curthread;
+	td->td_tf = tf;
 	td->td_critnest++;
 
 	if (exc_code >= 16) {
@@ -90,13 +129,9 @@ arm_exception(struct trapframe *tf, int exc_code)
 	} else
 		handle_exception(tf, exc_code);
 
-#ifdef	CONFIG_SCHED
-	ret = sched_next(tf);
-#else
-	ret = tf;
-#endif
-
 	td->td_critnest--;
 
-	return (ret);
+	return (td->td_tf);
 }
+
+#endif

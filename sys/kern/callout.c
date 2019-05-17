@@ -35,7 +35,8 @@
 #include <sys/callout.h>
 #include <sys/thread.h>
 #include <sys/spinlock.h>
-#include <sys/pcpu.h>
+
+#include <machine/pcpu.h>
 
 static struct mi_timer *mi_tmr;
 static struct entry callouts_list[MAXCPU];

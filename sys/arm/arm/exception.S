@@ -43,3 +43,11 @@ exception:
 	msr 	msp, r0			/* Restore sp. */
 	msr	primask, r3		/* Restore interrupts. */
 	bx	r14
+
+	.globl __start
+	.text
+	.thumb_func
+	.type __start, function
+__start:
+	mov	r0, 0
+	bl	md_init

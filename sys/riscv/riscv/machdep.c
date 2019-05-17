@@ -35,29 +35,12 @@
 #include <machine/cpufunc.h>
 #include <machine/smp.h>
 
-static struct thread idle_threads[MAXCPU];
 static struct pcpu __pcpu[MAXCPU];
 static uint32_t ncpus;
 static size_t cpu_stacks[MAXCPU][4096]; /* Interrupt stack */
 
 uint8_t __riscv_boot_ap[MAXCPU];
 uint8_t secondary_stacks[MAXCPU][4096]; /* Idle thread stacks */
-
-static void
-thread_init(int thread_id)
-{
-	struct thread *t;
-
-	t = &idle_threads[thread_id];
-	bzero(t, sizeof(struct thread));
-	t->td_name = "idle";
-	t->td_quantum = 0;
-	t->td_prio = 0;
-	t->td_idle = 1;
-	t->td_state = TD_STATE_READY;
-
-	PCPU_SET(curthread, t);
-}
 
 void
 critical_enter(void)

@@ -56,7 +56,7 @@ struct thread {
 #define	TD_STATE_ACK		7
 };
 
-void thread0_init(void);
+void thread_init(int cpuid);
 struct thread *thread_create(const char *name, int prio,
     uint32_t quantum, uint32_t stack_size,
     void *entry, void *arg);

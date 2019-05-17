@@ -24,20 +24,41 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _SYS_PCPU_H_
-#define _SYS_PCPU_H_
+#ifndef	_MACHINE_PCPU_H_
+#define	_MACHINE_PCPU_H_
 
-#include <sys/list.h>
+#include <sys/thread.h>
+#include <sys/pcpu.h>
 
-#ifndef MAXCPU
-#define	MAXCPU	1
-#endif
+extern struct pcpu __pcpu;
 
-struct pcpu {
-	struct thread	*pc_curthread;
-	size_t		pc_stack;
-	int		pc_cpuid;
-	struct entry	pc_node;
-};
+static inline struct pcpu *
+get_pcpu(void)
+{
+	struct pcpu *p;
 
-#endif /* !_SYS_PCPU_H_ */
+	p = &__pcpu;
+
+	return (p);
+}
+
+static inline struct thread *
+get_curthread(void)
+{
+	struct thread *td;
+
+	td = get_pcpu()->pc_curthread;
+
+	return (td);
+}
+
+#define	curthread get_curthread()
+#define	curpcpu get_pcpu()
+
+#define	PCPU_GET(member)	(get_pcpu()->pc_ ## member)
+#define	PCPU_ADD(member, value)	(get_pcpu()->pc_ ## member += (value))
+#define	PCPU_INC(member)	PCPU_ADD(member, 1)
+#define	PCPU_PTR(member)	(&get_pcpu()->pc_ ## member)
+#define	PCPU_SET(member, value)	(get_pcpu()->pc_ ## member = (value))
+
+#endif /* !_MACHINE_PCPU_H_ */

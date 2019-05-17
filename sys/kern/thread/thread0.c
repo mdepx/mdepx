@@ -26,4 +26,23 @@
 
 #include <sys/cdefs.h>
 #include <sys/thread.h>
-#include <sys/pcpu.h>
+
+#include <machine/pcpu.h>
+
+static struct thread idle_threads[MAXCPU];
+
+void
+thread_init(int cpuid)
+{
+	struct thread *t;
+
+	t = &idle_threads[cpuid];
+	bzero(t, sizeof(struct thread));
+	t->td_name = "idle";
+	t->td_quantum = 0;
+	t->td_prio = 0;
+	t->td_idle = 1;
+	t->td_state = TD_STATE_READY;
+
+	PCPU_SET(curthread, t);
+}
