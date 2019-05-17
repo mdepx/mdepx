@@ -33,7 +33,8 @@
 #define	_SYS_CALLOUT_H_
 
 #include <sys/list.h>
-#include <sys/pcpu.h>
+
+#include <machine/pcpu.h>
 
 struct callout {
 	int state;

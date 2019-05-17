@@ -28,8 +28,8 @@
 
 #include <sys/cdefs.h>
 #include <sys/systm.h>
-#include <sys/pcpu.h>
 
+#include <machine/pcpu.h>
 #include <machine/cpuregs.h>
 
 #include <riscv/sifive/e300g_clint.h>

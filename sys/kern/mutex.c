@@ -29,8 +29,8 @@
 #include <sys/thread.h>
 #include <sys/mutex.h>
 #include <sys/spinlock.h>
-#include <sys/pcpu.h>
 
+#include <machine/pcpu.h>
 #include <machine/atomic.h>
 
 #define	MUTEX_DEBUG
