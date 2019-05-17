@@ -28,6 +28,7 @@
 #define	_SYS_THREAD_H_
 
 #include <sys/callout.h>
+#include <sys/pcpu.h>
 
 #include <machine/thread.h>
 

@@ -27,8 +27,6 @@
 #ifndef	_MACHINE_PCPU_H_
 #define	_MACHINE_PCPU_H_
 
-#include <sys/pcpu.h>
-
 static inline struct pcpu *
 get_pcpu(void)
 {

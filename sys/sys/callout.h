@@ -32,9 +32,8 @@
 #ifndef	_SYS_CALLOUT_H_
 #define	_SYS_CALLOUT_H_
 
+#include <sys/pcpu.h>
 #include <sys/list.h>
-
-#include <machine/pcpu.h>
 
 struct callout {
 	int state;

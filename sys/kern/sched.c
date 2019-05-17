@@ -36,8 +36,8 @@
 #include <sys/thread.h>
 #include <sys/mutex.h>
 #include <sys/spinlock.h>
+#include <sys/pcpu.h>
 
-#include <machine/pcpu.h>
 #include <machine/frame.h>
 
 #include <riscv/sifive/e300g_clint.h>

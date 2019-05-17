@@ -29,8 +29,8 @@
 #include <sys/thread.h>
 #include <sys/sem.h>
 #include <sys/spinlock.h>
+#include <sys/pcpu.h>
 
-#include <machine/pcpu.h>
 #include <machine/atomic.h>
 
 #define	SEM_DEBUG

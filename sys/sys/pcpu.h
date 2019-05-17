@@ -28,6 +28,7 @@
 #define _SYS_PCPU_H_
 
 #include <sys/list.h>
+#include <machine/pcpu.h>
 
 #ifndef MAXCPU
 #define	MAXCPU	1

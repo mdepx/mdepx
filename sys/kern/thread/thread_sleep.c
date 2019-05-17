@@ -28,8 +28,7 @@
 #include <sys/callout.h>
 #include <sys/systm.h>
 #include <sys/thread.h>
-
-#include <machine/pcpu.h>
+#include <sys/pcpu.h>
 
 static void
 raw_sleep_cb(void *arg)

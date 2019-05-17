@@ -27,9 +27,6 @@
 #ifndef	_MACHINE_PCPU_H_
 #define	_MACHINE_PCPU_H_
 
-#include <sys/thread.h>
-#include <sys/pcpu.h>
-
 extern struct pcpu __pcpu;
 
 static inline struct pcpu *
@@ -47,7 +44,7 @@ get_curthread(void)
 {
 	struct thread *td;
 
-	td = get_pcpu()->pc_curthread;
+	td = (struct thread *)*(uintptr_t *)get_pcpu();
 
 	return (td);
 }

@@ -26,8 +26,7 @@
 
 #include <sys/cdefs.h>
 #include <sys/thread.h>
-
-#include <machine/pcpu.h>
+#include <sys/pcpu.h>
 
 static struct thread idle_threads[MAXCPU];
 
