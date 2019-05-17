@@ -35,6 +35,7 @@
 #include <arm/arm/nvic.h>
 
 struct trapframe *arm_exception(struct trapframe *tf, int irq);
+static struct thread intr_thread[MAXCPU];
 
 static void
 dump_frame(struct trapframe *tf)
@@ -90,7 +91,10 @@ arm_exception(struct trapframe *tf, int exc_code)
 	released = false;
 	intr = false;
 
-	/* TODO: switch stack and curthread for kernel */
+	/* TODO: use interrupt stack. */
+
+	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
+	curthread->td_critnest++;
 
 	if (exc_code >= 16) {
 		irq = exc_code - 16;
@@ -107,6 +111,10 @@ arm_exception(struct trapframe *tf, int exc_code)
 		released = sched_park(td);
 	if (released)
 		td = sched_next();
+
+	/* Switch to the new thread. */
+	curthread->td_critnest--;
+	PCPU_SET(curthread, td);
 
 	return (td->td_tf);
 }
