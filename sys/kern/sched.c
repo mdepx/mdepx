@@ -286,7 +286,17 @@ sched_enter(void)
 }
 
 void
-sched_add_cpu(struct pcpu *pcpup)
+sched_cpu_remove(struct pcpu *pcpup)
+{
+
+
+	sched_lock();
+	list_remove(&pcpup->pc_node);
+	sched_unlock();
+}
+
+void
+sched_cpu_add(struct pcpu *pcpup)
 {
 
 	sched_lock();

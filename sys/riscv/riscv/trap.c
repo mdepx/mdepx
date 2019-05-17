@@ -98,24 +98,16 @@ riscv_exception(struct trapframe *tf)
 
 	td = curthread;
 	p = curpcpu;
+	released = false;
+	intr = false;
 
-	/*
-	 * Unsubscribe from notifications if
-	 * sleeping thread was interrupted.
-	 */
-
-	if (td->td_idle) {
-		sched_lock();
-		list_remove(&p->pc_node);
-		sched_unlock();
-	}
+	/* This CPU could not pick up new threads for a moment. */
+	if (td->td_idle)
+		sched_cpu_remove(p);
 
 	/* Switch to the interrupt thread */
 	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
 	critical_enter();
-
-	released = false;
-	intr = false;
 
 	/* Check the trapframe first before we release this thread. */
 	if (tf->tf_mcause & EXCP_INTR) {
@@ -125,10 +117,10 @@ riscv_exception(struct trapframe *tf)
 		handle_exception(tf);
 
 	/*
-	 * Check if this thread went to sleep.
-	 *
-	 * Note: tf can not be used after this call since this thread
-	 * could be added back to scheduler in riscv_intr().
+	 * Check if this thread went to sleep and release it from this CPU.
+	 * Note that tf can not be used after this call since this thread
+	 * could be added back to run queue by another CPU in mtx_unlock()
+	 * or by this cpu in riscv_intr().
 	 */
 	released = sched_ack(td, tf);
 
@@ -139,10 +131,11 @@ riscv_exception(struct trapframe *tf)
 	if (!released)
 		released = sched_park(td);
 
+	/* Pickup new thread if we don't have one anymore. */
 	if (released)
 		td = sched_next();
 
-	/* Switch to the new thread */
+	/* Switch to the new thread. */
 	critical_exit();
 	PCPU_SET(curthread, td);
 
