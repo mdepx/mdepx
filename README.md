@@ -10,11 +10,12 @@ Osfive is a framework for building bare-metal applications.
 - Tickless operation
 - Static/Dynamic memory allocation
 - Mutexes, Semaphores
+- Symmetric Multiprocessing (SMP)
 
 ## Supported platforms
-- ARM Cortex-M
-- MIPS (32 and 64 bit)
-- RISC-V RV32
+- ARM Cortex-M family (ARMv7, ARMv8)
+- MIPS32, MIPS64
+- RISC-V rv32ima, rv64ima
 
 ## Included libraries
 - BSD libc library
