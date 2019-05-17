@@ -64,6 +64,7 @@ raw_sleep(uint32_t ticks)
 	td->td_state = TD_STATE_SLEEPING;
 	callout_cancel(&td->td_c);
 	callout_set(&c, ticks, raw_sleep_cb, td);
-	md_thread_yield();
 	critical_exit();
+
+	md_thread_yield();
 }

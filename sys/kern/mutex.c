@@ -84,9 +84,9 @@ mtx_lock(struct mtx *m)
 		}
 		sl_unlock(&m->l);
 
-		md_thread_yield();
-
 		critical_exit();
+
+		md_thread_yield();
 	}
 }
 
