@@ -40,8 +40,6 @@
 
 #include <machine/frame.h>
 
-#include <riscv/sifive/e300g_clint.h>
-
 #define	SCHED_DEBUG
 #undef	SCHED_DEBUG
 
@@ -97,6 +95,22 @@ sched_cb(void *arg)
 		td->td_state = TD_STATE_READY;
 	}
 	sched_unlock();
+}
+
+static void
+sched_cpu_notify(void)
+{
+	struct pcpu *p;
+
+	/*
+	 * Check if some hart is available to pick up new thread.
+	 */
+	if (!list_empty(&pcpu_list)) {
+		p = CONTAINER_OF(pcpu_list.next, struct pcpu, pc_node);
+		KASSERT(curpcpu != p,
+		    ("Found myself in a list of available CPUs."));
+		send_ipi(p->pc_cpuid);
+	}
 }
 
 /*
@@ -167,17 +181,7 @@ sched_add(struct thread *td0)
 	}
 
 #if MAXCPU > 1
-	struct pcpu *p;
-
-	/*
-	 * Check if some hart is available to pick up this thread.
-	 */
-	if (!list_empty(&pcpu_list)) {
-		p = CONTAINER_OF(pcpu_list.next, struct pcpu, pc_node);
-		KASSERT(curpcpu != p,
-		    ("Adding new threads from idle thread."));
-		send_ipi(p->pc_cpuid);
-	}
+	sched_cpu_notify();
 #endif
 
 	critical_exit();
@@ -245,7 +249,6 @@ sched_next(void)
 		td->td_state = TD_STATE_RUNNING;
 		callout_init(&td->td_c);
 		callout_set(&td->td_c, td->td_quantum, sched_cb, td);
-		//printf(",");
 	}
 
 	dprintf("%s%d: curthread %p, tf %p, name %s, idx %x\n",
@@ -259,7 +262,7 @@ void
 sched_lock(void)
 {
 
-	while (sl_trylock(&l) == 0);
+	sl_lock(&l);
 }
 
 void
