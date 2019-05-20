@@ -127,6 +127,9 @@
 #define	MIE_STIE	(1 << 5)
 #define	MIE_HTIE	(1 << 6)
 #define	MIE_MTIE	(1 << 7)
+#define	MIE_UEIE	(1 << 8)
+#define	MIE_SEIE	(1 << 9)
+#define	MIE_MEIE	(1 << 11)
 
 #define	MIP_USIP	(1 << 0)
 #define	MIP_SSIP	(1 << 1)
