@@ -191,13 +191,13 @@ callout_cancel(struct callout *c)
 	KASSERT(curthread->td_critnest > 0,
 	    ("%s: Not in critical section.", __func__));
 
-	KASSERT(c->cpuid == PCPU_GET(cpuid),
-		("cancelling callout for another CPU is not supported"));
-
 	if ((c->flags & CALLOUT_FLAG_ACTIVE) == 0) {
 		/* Callout c is not in the callouts queue. */
 		return (-1);
 	}
+
+	KASSERT(c->cpuid == PCPU_GET(cpuid),
+		("cancelling callout for another CPU is not supported"));
 
 	n = next(c);
 	if (n != NULL)
