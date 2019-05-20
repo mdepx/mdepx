@@ -44,6 +44,7 @@ struct callout {
 	int flags;
 #define	CALLOUT_FLAG_ACTIVE	(1 << 0)
 	struct entry node;
+	int cpuid;
 };
 
 struct mi_timer {

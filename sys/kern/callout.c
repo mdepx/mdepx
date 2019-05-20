@@ -172,6 +172,7 @@ callout_set(struct callout *c, uint32_t ticks,
 	c->ticks = ticks;
 	c->func = func;
 	c->arg = arg;
+	c->cpuid = PCPU_GET(cpuid);
 
 	callout_set_one(c);
 	c->flags |= CALLOUT_FLAG_ACTIVE;
@@ -189,6 +190,9 @@ callout_cancel(struct callout *c)
 	KASSERT(mi_tmr != NULL, ("mi timer is NULL"));
 	KASSERT(curthread->td_critnest > 0,
 	    ("%s: Not in critical section.", __func__));
+
+	KASSERT(c->cpuid == PCPU_GET(cpuid),
+		("cancelling callout for another CPU is not supported"));
 
 	if ((c->flags & CALLOUT_FLAG_ACTIVE) == 0) {
 		/* Callout c is not in the callouts queue. */
