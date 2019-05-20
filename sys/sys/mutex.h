@@ -36,6 +36,7 @@ struct mtx {
 	struct spinlock l;
 };
 
+int mtx_timedlock(struct mtx *m, int timeout);
 void mtx_lock(struct mtx *m);
 int mtx_trylock(struct mtx *m);
 int mtx_unlock(struct mtx *m);
