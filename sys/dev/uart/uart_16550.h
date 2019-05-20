@@ -29,6 +29,7 @@
 
 #define	REG_DATA	0x00 /* data register (rw) */
 #define	REG_IER		0x01 /* interrupt enable register (wo) */
+#define	 IER_ERXRDY	(1 << 0)
 #define	REG_IIR		0x02 /* interrupt identification register (ro) */
 #define	REG_LCR		0x03 /* line control register (rw) */
 #define	 LCR_BITS_S	0
@@ -39,6 +40,7 @@
 #define	REG_MCR		0x04 /* modem control register (rw) */
 #define	 MCR_RTS	(1 << 1)
 #define	REG_LSR		0x05 /* line status register (rw) */
+#define	 LSR_RXRDY	(1 << 0)
 #define	 LSR_THRE	(1 << 5)
 #define	REG_MSR		0x06 /* modem status register (rw) */
 #define	REG_SCR		0x07 /* scratch register (rw) */
@@ -54,5 +56,6 @@ struct uart_16550_softc {
 int uart_16550_init(struct uart_16550_softc *sc, uint32_t base,
     uint32_t uart_freq, uint32_t baud_rate, uint8_t reg_shift);
 void uart_16550_putc(struct uart_16550_softc *sc, char c);
+char uart_16550_getc(struct uart_16550_softc *sc);
 
 #endif /* !_DEV_UART_UART_16550_H */

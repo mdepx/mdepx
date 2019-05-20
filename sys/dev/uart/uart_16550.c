@@ -33,6 +33,21 @@
 #define	WR1(_sc, _reg, _val)	\
 	*(volatile uint8_t *)((_sc)->base + (_reg << (_sc)->reg_shift)) = _val
 
+char
+uart_16550_getc(struct uart_16550_softc *sc)
+{
+	int status;
+	char c;
+
+	do {
+		status = RD1(sc, REG_LSR);
+	} while ((status & LSR_RXRDY) == 0);
+
+	c = RD1(sc, REG_DATA);
+
+	return (c);
+}
+
 void
 uart_16550_putc(struct uart_16550_softc *sc, char c)
 {
