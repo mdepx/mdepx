@@ -66,7 +66,7 @@ mtx_cb(void *arg)
 	t->timeout = 1;
 
 	KASSERT(td->td_state == TD_STATE_ACK,
-	    ("wrong state %d\n", td->td_state));
+	    ("%s: wrong state %d\n", __func__, td->td_state));
 
 	if (td->td_next != NULL)
 		td->td_next->td_prev = td->td_prev;
