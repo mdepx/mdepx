@@ -33,15 +33,6 @@
 
 #include <machine/atomic.h>
 
-#define	MUTEX_DEBUG
-#undef	MUTEX_DEBUG
-
-#ifdef	MUTEX_DEBUG
-#define	dprintf(fmt, ...)	printf(fmt, ##__VA_ARGS__)
-#else
-#define	dprintf(fmt, ...)
-#endif
-
 struct token {
 	struct thread *td;
 	struct mtx *m;

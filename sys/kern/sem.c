@@ -33,15 +33,6 @@
 
 #include <machine/atomic.h>
 
-#define	SEM_DEBUG
-#undef	SEM_DEBUG
-
-#ifdef	SEM_DEBUG
-#define	dprintf(fmt, ...)	printf(fmt, ##__VA_ARGS__)
-#else
-#define	dprintf(fmt, ...)
-#endif
-
 void
 sem_init(sem_t *sem, int count)
 {
