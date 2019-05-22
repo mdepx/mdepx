@@ -109,7 +109,7 @@ sched_cpu_notify(void)
 	 * Check if some hart is available to pick up new thread.
 	 */
 	if (!list_empty(&pcpu_list)) {
-		p = CONTAINER_OF(pcpu_list.next, struct pcpu, pc_node);
+		p = CONTAINER_OF(pcpu_list.next, struct pcpu, pc_avail);
 		KASSERT(curpcpu != p,
 		    ("Found myself in a list of available CPUs."));
 		send_ipi((1 << p->pc_cpuid), IPI_IPI);
@@ -245,7 +245,7 @@ sched_next(void)
 	td = runq;
 	sched_remove(td);
 	if (td->td_idle)
-		list_append(&pcpu_list, &p->pc_node);
+		list_append(&pcpu_list, &p->pc_avail);
 	sched_unlock();
 
 	if (!td->td_idle) {
@@ -278,12 +278,14 @@ sched_enter(void)
 }
 
 void
-sched_cpu_remove(struct pcpu *pcpup)
+sched_cpu_avail(struct pcpu *pcpup, bool available)
 {
 
-
 	sched_lock();
-	list_remove(&pcpup->pc_node);
+	if (available)
+		list_append(&pcpu_list, &pcpup->pc_avail);
+	else
+		list_remove(&pcpup->pc_avail);
 	sched_unlock();
 }
 
@@ -292,7 +294,6 @@ sched_cpu_add(struct pcpu *pcpup)
 {
 
 	sched_lock();
-	list_append(&pcpu_list, &pcpup->pc_node);
 	list_append(&pcpu_all, &pcpup->pc_all);
 	sched_unlock();
 }

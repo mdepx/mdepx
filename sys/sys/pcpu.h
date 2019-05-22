@@ -38,8 +38,8 @@ struct pcpu {
 	struct thread	*pc_curthread;
 	size_t		pc_stack;
 	int		pc_cpuid;
-	struct entry	pc_node;
-	struct entry	pc_all;
+	struct entry	pc_avail;	/* CPUs that run idle task. */
+	struct entry	pc_all;		/* List of all available CPUs. */
 	uint32_t	pc_pending_ipis;
 };
 

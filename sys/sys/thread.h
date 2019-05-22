@@ -81,7 +81,7 @@ void sched_unlock(void);
 int sched_ack(struct thread *td, struct trapframe *tf);
 int sched_park(struct thread *td);
 void sched_cpu_add(struct pcpu *pcpup);
-void sched_cpu_remove(struct pcpu *pcpup);
+void sched_cpu_avail(struct pcpu *pcpup, bool available);
 
 /* Thread MD part */
 void md_init(int cpuid);

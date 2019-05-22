@@ -103,7 +103,7 @@ riscv_exception(struct trapframe *tf)
 
 	/* This CPU could not pick up new threads for a moment. */
 	if (td->td_idle)
-		sched_cpu_remove(p);
+		sched_cpu_avail(p, false);
 
 	/* Switch to the interrupt thread */
 	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);

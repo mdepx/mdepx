@@ -127,7 +127,9 @@ md_init_secondary(int hart)
 	csr_clear(mip, MIP_MTIP);
 
 	thread_init(hart);
+
 	sched_cpu_add(pcpup);
+	sched_cpu_avail(pcpup, true);
 
 	intr_enable();
 	sched_enter();
@@ -161,6 +163,8 @@ md_init(int hart)
 		panic("can't create the main thread\n");
 
 	sched_cpu_add(pcpup);
+	sched_cpu_avail(pcpup, true);
+
 	intr_enable();
 	sched_enter();
 }
