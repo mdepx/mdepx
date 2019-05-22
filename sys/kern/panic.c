@@ -26,6 +26,7 @@
 
 #include <sys/cdefs.h>
 #include <sys/systm.h>
+#include <sys/smp.h>
 
 static void
 vpanic(const char *fmt, va_list ap)
@@ -36,6 +37,13 @@ vpanic(const char *fmt, va_list ap)
 	printf("\n");
 }
 
+static void
+panic_stop(void *arg)
+{
+
+	while (1);
+}
+
 void 
 panic(const char *fmt, ...)
 {
@@ -44,5 +52,5 @@ panic(const char *fmt, ...)
 	va_start(ap, fmt);
 	vpanic(fmt, ap);
 
-	while (1);
+	smp_tryst_cpus(0xf, panic_stop, NULL);
 }
