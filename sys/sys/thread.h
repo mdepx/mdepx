@@ -55,6 +55,7 @@ struct thread {
 #define	TD_STATE_SEM_WAIT	5
 #define	TD_STATE_TERMINATING	6
 #define	TD_STATE_ACK		7
+#define	TD_STATE_UNLOCK		8
 };
 
 void thread_init(int cpuid);
@@ -89,8 +90,6 @@ void md_setup_frame(struct trapframe *tf, void *entry,
     void *arg, void *terminate);
 void md_thread_terminate(struct thread *td);
 void md_init_secondary(int cpuid);
-
-void send_ipi(int cpuid);
 
 int main(void);
 int app_init(void);

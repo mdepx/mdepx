@@ -63,6 +63,12 @@ mtx_cb(void *arg)
 	    ("Not in critical section"));
 
 	sl_lock(&m->l);
+
+	if (td->td_state == TD_STATE_UNLOCK) {
+		/* too late */
+		sl_unlock(&m->l);
+		return;
+	}
 	t->timeout = 1;
 
 	KASSERT(td->td_state == TD_STATE_ACK,
@@ -203,14 +209,26 @@ mtx_unlock(struct mtx *m)
 		/* Ensure td left CPU. */
 		while (td->td_state != TD_STATE_ACK);
 
-		sched_lock();
+		/*
+		 * Ensure mtx_cb will not pick up this thread just
+		 * after sl_unlock() and before callout_cancel().
+		 */
+		td->td_state = TD_STATE_UNLOCK;
+		sl_unlock(&m->l);
+
+		/* mtx_cb could be called here by another CPU. */
+
 		callout_cancel(&td->td_c);
+
+		sched_lock();
+		KASSERT(td->td_state == TD_STATE_UNLOCK, ("wrong state"));
 		td->td_state = TD_STATE_WAKEUP;
 		KASSERT(td != curthread, ("td is curthread"));
 		sched_add(td);
 		sched_unlock();
-	}
-	sl_unlock(&m->l);
+	} else
+		sl_unlock(&m->l);
+
 	critical_exit();
 
 	return (1);
