@@ -37,7 +37,9 @@
 #include <sys/mutex.h>
 #include <sys/spinlock.h>
 #include <sys/pcpu.h>
+#include <sys/smp.h>
 
+#include <machine/smp.h>
 #include <machine/frame.h>
 
 #define	SCHED_DEBUG
@@ -53,6 +55,7 @@ static struct thread *runq;
 static struct thread *runq_tail;
 static struct spinlock l;
 static struct entry pcpu_list = LIST_INIT(&pcpu_list);
+struct entry pcpu_all = LIST_INIT(&pcpu_all);
 
 static void __unused
 dump_runq(void)
@@ -109,7 +112,7 @@ sched_cpu_notify(void)
 		p = CONTAINER_OF(pcpu_list.next, struct pcpu, pc_node);
 		KASSERT(curpcpu != p,
 		    ("Found myself in a list of available CPUs."));
-		send_ipi(p->pc_cpuid);
+		send_ipi((1 << p->pc_cpuid), IPI_IPI);
 	}
 }
 
@@ -259,20 +262,6 @@ sched_next(void)
 }
 
 void
-sched_lock(void)
-{
-
-	sl_lock(&l);
-}
-
-void
-sched_unlock(void)
-{
-
-	sl_unlock(&l);
-}
-
-void
 sched_enter(void)
 {
 	struct thread *td;
@@ -304,7 +293,22 @@ sched_cpu_add(struct pcpu *pcpup)
 
 	sched_lock();
 	list_append(&pcpu_list, &pcpup->pc_node);
+	list_append(&pcpu_all, &pcpup->pc_all);
 	sched_unlock();
+}
+
+void
+sched_lock(void)
+{
+
+	sl_lock(&l);
+}
+
+void
+sched_unlock(void)
+{
+
+	sl_unlock(&l);
 }
 
 void

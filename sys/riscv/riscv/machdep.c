@@ -28,6 +28,7 @@
 #include <sys/systm.h>
 #include <sys/thread.h>
 #include <sys/pcpu.h>
+#include <sys/smp.h>
 
 #include <machine/atomic.h>
 #include <machine/frame.h>
@@ -148,6 +149,7 @@ md_init(int hart)
 
 	thread_init(hart);
 	sched_init();
+	smp_init();
 
 	csr_set(mie, MIE_MSIE);
 

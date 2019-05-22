@@ -29,8 +29,11 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 #include <sys/pcpu.h>
+#include <sys/smp.h>
 
+#include <machine/atomic.h>
 #include <machine/cpuregs.h>
+#include <machine/smp.h>
 
 #include <riscv/sifive/e300g_clint.h>
 
@@ -49,6 +52,54 @@
 #endif
 
 static struct clint_softc *clint_sc;
+extern struct entry pcpu_all;
+
+void
+ipi_handler(void)
+{
+	uint32_t ipi_bitmap;
+	uint32_t ipi;
+	int bit;
+
+	ipi_bitmap = atomic_readandclear_int(PCPU_PTR(pending_ipis));
+	if (ipi_bitmap == 0)
+		return;
+
+	while ((bit = ffs(ipi_bitmap))) {
+		bit -= 1;
+		ipi = (1 << bit);
+		ipi_bitmap &= ~ipi;
+
+		switch (ipi) {
+		case IPI_IPI:
+			break;
+		case IPI_TRYST:
+			smp_tryst_action();
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+void
+send_ipi(int cpumask, int ipi)
+{
+	struct pcpu *p;
+
+	KASSERT(MAXCPU <= 32, ("cpumask is 32 bit"));
+	KASSERT(!list_empty(&pcpu_all), ("no cpus"));
+
+	for (p = CONTAINER_OF(pcpu_all.next, struct pcpu, pc_all);;
+	    (p = CONTAINER_OF(p->pc_all.next, struct pcpu, pc_all))) {
+		if (cpumask & (1 << p->pc_cpuid)) {
+			atomic_set_32(&p->pc_pending_ipis, ipi);
+			clint_set_sip(p->pc_cpuid);
+		}
+		if (p->pc_all.next == &pcpu_all)
+			break;
+	}
+}
 
 void
 clint_intr_software(void)
@@ -61,6 +112,8 @@ clint_intr_software(void)
 	cpuid = PCPU_GET(cpuid);
 
 	WR4(sc, MSIP(cpuid), 0);
+
+	ipi_handler();
 }
 
 void

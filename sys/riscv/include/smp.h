@@ -24,23 +24,10 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _SYS_PCPU_H_
-#define _SYS_PCPU_H_
+#ifndef	_MACHINE_SMP_H_
+#define	_MACHINE_SMP_H_
 
-#include <sys/list.h>
-#include <machine/pcpu.h>
+#define	IPI_IPI		(1 << 0)
+#define	IPI_TRYST	(1 << 1)
 
-#ifndef MAXCPU
-#define	MAXCPU	1
-#endif
-
-struct pcpu {
-	struct thread	*pc_curthread;
-	size_t		pc_stack;
-	int		pc_cpuid;
-	struct entry	pc_node;
-	struct entry	pc_all;
-	uint32_t	pc_pending_ipis;
-};
-
-#endif /* !_SYS_PCPU_H_ */
+#endif /* !_MACHINE_SMP_H_ */
