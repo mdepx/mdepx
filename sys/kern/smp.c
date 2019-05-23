@@ -43,6 +43,34 @@ static uint32_t smp_tryst_room[2];
 static struct spinlock smp_lock;
 
 void
+ipi_handler(void)
+{
+	uint32_t ipi_bitmap;
+	uint32_t ipi;
+	int bit;
+
+	ipi_bitmap = atomic_readandclear_int(PCPU_PTR(pending_ipis));
+	if (ipi_bitmap == 0)
+		return;
+
+	while ((bit = ffs(ipi_bitmap))) {
+		bit -= 1;
+		ipi = (1 << bit);
+		ipi_bitmap &= ~ipi;
+
+		switch (ipi) {
+		case IPI_IPI:
+			break;
+		case IPI_TRYST:
+			smp_tryst_action();
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+void
 smp_tryst_action(void)
 {
 	void (*local_func)(void *);
