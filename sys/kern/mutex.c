@@ -212,7 +212,8 @@ mtx_unlock(struct mtx *m)
 		callout_cancel(&td->td_c);
 
 		sched_lock();
-		KASSERT(td->td_state == TD_STATE_UNLOCK, ("wrong state"));
+		KASSERT(td->td_state == TD_STATE_UNLOCK,
+		    ("%s: wrong state %d\n", __func__, td->td_state));
 		td->td_state = TD_STATE_WAKEUP;
 		KASSERT(td != curthread, ("td is curthread"));
 		sched_add(td);
