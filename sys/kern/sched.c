@@ -111,7 +111,7 @@ sched_cpu_notify(void)
 	if (!list_empty(&pcpu_list)) {
 		p = CONTAINER_OF(pcpu_list.next, struct pcpu, pc_avail);
 		KASSERT(curpcpu != p,
-		    ("Found myself in a list of available CPUs."));
+		    ("Found myself in the list of available CPUs."));
 		send_ipi((1 << p->pc_cpuid), IPI_IPI);
 	}
 }
