@@ -36,7 +36,6 @@
 #include <sys/thread.h>
 #include <sys/spinlock.h>
 #include <sys/pcpu.h>
-#include <sys/smp.h>
 
 static struct mi_timer *mi_tmr;
 static struct entry callouts_list[MAXCPU];
@@ -115,7 +114,6 @@ callout_set_one(struct callout *c0)
 		c0->ticks += elapsed;
 	}
 
-	callout_lock(cpuid);
 	for (c = first(cpuid); c != NULL; c = next(cpuid, c)) {
 		if (c->ticks > c0->ticks) {
 			c->ticks -= c0->ticks;
@@ -142,26 +140,22 @@ callout_set_one(struct callout *c0)
 		mi_tmr->count_saved[cpuid] = mi_tmr->count(mi_tmr->arg);
 		mi_tmr->start(mi_tmr->arg, first(cpuid)->ticks);
 	}
-	callout_unlock(cpuid);
 }
 
 int
-callout_set(struct callout *c, uint32_t ticks,
+callout_set_locked(struct callout *c, uint32_t ticks,
     void (*func)(void *arg), void *arg)
 {
 
 	KASSERT(mi_tmr != NULL, ("mi timer is NULL"));
+	KASSERT(curthread->td_critnest > 0,
+	    ("%s: Not in critical section.", __func__));
 
-	critical_enter();
-
-	if (c->flags & CALLOUT_FLAG_ACTIVE) {
-		critical_exit();
+	if (c->flags & CALLOUT_FLAG_ACTIVE)
 		return (-1);
-	}
 
 	if (ticks == 0) {
 		c->state = 1;
-		critical_exit();
 		return (0);
 	}
 
@@ -174,9 +168,27 @@ callout_set(struct callout *c, uint32_t ticks,
 	callout_set_one(c);
 	c->flags |= CALLOUT_FLAG_ACTIVE;
 
+	return (0);
+}
+
+int
+callout_set(struct callout *c, uint32_t ticks,
+    void (*func)(void *arg), void *arg)
+{
+	int cpuid;
+	int error;
+
+	critical_enter();
+
+	cpuid = PCPU_GET(cpuid);
+
+	callout_lock(cpuid);
+	error = callout_set_locked(c, ticks, func, arg);
+	callout_unlock(cpuid);
+
 	critical_exit();
 
-	return (0);
+	return (error);
 }
 
 static int
@@ -186,7 +198,7 @@ callout_cancel_locked(struct callout *c)
 
 	if ((c->flags & CALLOUT_FLAG_ACTIVE) == 0) {
 		/* Callout c is not in the callouts queue. */
-		return (-1);
+		return (1);
 	}
 
 	n = next(c->cpuid, c);
@@ -203,22 +215,17 @@ callout_cancel_locked(struct callout *c)
 int
 callout_cancel(struct callout *c)
 {
-	int cpuid;
+	int error;
 
 	KASSERT(mi_tmr != NULL, ("mi timer is NULL"));
 	KASSERT(curthread->td_critnest > 0,
 	    ("%s: Not in critical section.", __func__));
 
-	cpuid = PCPU_GET(cpuid);
-
 	callout_lock(c->cpuid);
-	if (cpuid == c->cpuid)
-		callout_cancel_locked(c);
-	else
-		smp_tryst_cpus((1 << c->cpuid), callout_cancel_locked, c);
+	error = callout_cancel_locked(c);
 	callout_unlock(c->cpuid);
 
-	return (0);
+	return (error);
 }
 
 int
@@ -280,12 +287,14 @@ void
 callout_lock(int cpuid)
 {
 
+	sl_lock(&l[cpuid]);
 }
 
 void
 callout_unlock(int cpuid)
 {
 
+	sl_unlock(&l[cpuid]);
 }
 
 int

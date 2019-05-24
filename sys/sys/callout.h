@@ -61,6 +61,8 @@ struct mi_timer {
 };
 
 void callout_init(struct callout *c);
+int callout_set_locked(struct callout *c, uint32_t ticks,
+    void (*func)(void *arg), void *arg);
 int callout_set(struct callout *c, uint32_t ticks,
     void (*func)(void *arg), void *arg);
 int callout_callback(struct mi_timer *);
