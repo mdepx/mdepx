@@ -76,6 +76,9 @@ smp_tryst_action(void)
 	void (*local_func)(void *);
 	void *local_arg;
 
+	KASSERT(curthread->td_critnest > 0,
+	    ("%s: Not in critical section.", __func__));
+
 	atomic_add_acq_int(&smp_tryst_room[0], 1);
 
 	/* Wait all the CPUs to enter the room. */
@@ -97,6 +100,9 @@ smp_tryst_cpus(uint32_t cpus, void (*fn), void *arg)
 	int ncpus;
 	int i;
 
+	KASSERT(curthread->td_critnest > 0,
+	    ("%s: Not in critical section.", __func__));
+
 	ncpus = 0;
 	for (i = 0; i < MAXCPU; i++)
 		if (cpus & (1 << i))
@@ -105,7 +111,6 @@ smp_tryst_cpus(uint32_t cpus, void (*fn), void *arg)
 	if (ncpus == 0)
 		panic("smp_tryst_cpus with cpu mask == 0");
 
-	critical_enter();
 	while (!sl_trylock(&smp_lock))
 		ipi_handler();
 
@@ -125,7 +130,6 @@ smp_tryst_cpus(uint32_t cpus, void (*fn), void *arg)
 		;
 
 	sl_unlock(&smp_lock);
-	critical_exit();
 }
 
 void
