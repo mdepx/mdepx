@@ -36,6 +36,7 @@
 #include <sys/thread.h>
 #include <sys/spinlock.h>
 #include <sys/pcpu.h>
+#include <sys/smp.h>
 
 static struct mi_timer *mi_tmr;
 static struct entry callouts_list[MAXCPU];
@@ -179,7 +180,7 @@ callout_set(struct callout *c, uint32_t ticks,
 }
 
 static int
-callout_cancel_locked(int cpuid, struct callout *c)
+callout_cancel_locked(struct callout *c)
 {
 	struct callout *n;
 
@@ -188,7 +189,7 @@ callout_cancel_locked(int cpuid, struct callout *c)
 		return (-1);
 	}
 
-	n = next(cpuid, c);
+	n = next(c->cpuid, c);
 	if (n != NULL)
 		n->ticks += c->ticks;
 
@@ -202,13 +203,19 @@ callout_cancel_locked(int cpuid, struct callout *c)
 int
 callout_cancel(struct callout *c)
 {
+	int cpuid;
 
 	KASSERT(mi_tmr != NULL, ("mi timer is NULL"));
 	KASSERT(curthread->td_critnest > 0,
 	    ("%s: Not in critical section.", __func__));
 
+	cpuid = PCPU_GET(cpuid);
+
 	callout_lock(c->cpuid);
-	callout_cancel_locked(c->cpuid, c);
+	if (cpuid == c->cpuid)
+		callout_cancel_locked(c);
+	else
+		smp_tryst_cpus((1 << c->cpuid), callout_cancel_locked, c);
 	callout_unlock(c->cpuid);
 
 	return (0);
@@ -273,14 +280,12 @@ void
 callout_lock(int cpuid)
 {
 
-	sl_lock(&l[cpuid]);
 }
 
 void
 callout_unlock(int cpuid)
 {
 
-	sl_unlock(&l[cpuid]);
 }
 
 int
