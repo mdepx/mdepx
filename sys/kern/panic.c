@@ -52,5 +52,9 @@ panic(const char *fmt, ...)
 	va_start(ap, fmt);
 	vpanic(fmt, ap);
 
+#ifdef SMP
 	smp_tryst_cpus(0xff, panic_stop, NULL);
+#else
+	panic_stop(NULL);
+#endif
 }

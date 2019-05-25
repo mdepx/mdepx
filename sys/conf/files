@@ -9,7 +9,7 @@ sys/kern/panic.o
 sys/kern/sched.o			sched
 sys/kern/sem.o				sched sem
 sys/kern/sleep.o			!sched
-sys/kern/smp.o
+sys/kern/smp.o				sched smp
 sys/kern/startup.o
 sys/kern/thread/thread.o		sched
 sys/kern/thread/thread_alloc.o		sched malloc

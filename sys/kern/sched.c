@@ -183,7 +183,7 @@ sched_add(struct thread *td0)
 			td0->td_prev->td_next = td0;
 	}
 
-#if MAXCPU > 1
+#ifdef SMP
 	sched_cpu_notify();
 #endif
 
