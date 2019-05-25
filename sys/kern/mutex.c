@@ -55,8 +55,9 @@ mtx_cb(void *arg)
 
 	sl_lock(&m->l);
 
-	if (td->td_state == TD_STATE_UNLOCK) {
+	if (td->td_state == TD_STATE_MTX_UNLOCK) {
 		/* too late */
+		td->td_state = TD_STATE_MTX_UNLOCK_ACK;
 		sl_unlock(&m->l);
 		return;
 	}
@@ -117,7 +118,7 @@ mtx_timedlock(struct mtx *m, int ticks)
 		if (ticks)
 			callout_set(&td->td_c, ticks, mtx_cb, &t);
 
-		td->td_state = TD_STATE_MUTEX_WAIT;
+		td->td_state = TD_STATE_MTX_WAIT;
 
 		if (m->td_first == NULL) {
 			td->td_next = NULL;
@@ -179,6 +180,7 @@ mtx_unlock(struct mtx *m)
 {
 	struct thread *td;
 	uintptr_t tid;
+	int error;
 
 	tid = (uintptr_t)curthread;
 
@@ -204,15 +206,21 @@ mtx_unlock(struct mtx *m)
 		 * Ensure mtx_cb will not pick up this thread just
 		 * after sl_unlock() and before callout_cancel().
 		 */
-		td->td_state = TD_STATE_UNLOCK;
+		td->td_state = TD_STATE_MTX_UNLOCK;
 		sl_unlock(&m->l);
 
 		/* mtx_cb could be called here by another CPU. */
 
-		callout_cancel(&td->td_c);
+		error = callout_cancel(&td->td_c);
+		if (error) {
+			/* mtx_cb is already called. */
+			if (td->td_state != TD_STATE_MTX_UNLOCK_ACK)
+				panic("%s: wrong state", __func__);
+		}
 
 		sched_lock();
-		KASSERT(td->td_state == TD_STATE_UNLOCK,
+		KASSERT(td->td_state == TD_STATE_MTX_UNLOCK ||
+			td->td_state == TD_STATE_MTX_UNLOCK_ACK,
 		    ("%s: wrong state %d\n", __func__, td->td_state));
 		td->td_state = TD_STATE_WAKEUP;
 		KASSERT(td != curthread, ("td is curthread"));

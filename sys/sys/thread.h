@@ -51,11 +51,12 @@ struct thread {
 #define	TD_STATE_RUNNING	1
 #define	TD_STATE_SLEEPING	2
 #define	TD_STATE_WAKEUP		3
-#define	TD_STATE_MUTEX_WAIT	4
-#define	TD_STATE_SEM_WAIT	5
-#define	TD_STATE_TERMINATING	6
-#define	TD_STATE_ACK		7
-#define	TD_STATE_UNLOCK		8
+#define	TD_STATE_SEM_WAIT	4
+#define	TD_STATE_TERMINATING	5
+#define	TD_STATE_ACK		6
+#define	TD_STATE_MTX_WAIT	7
+#define	TD_STATE_MTX_UNLOCK	8
+#define	TD_STATE_MTX_UNLOCK_ACK	9
 };
 
 void thread_init(int cpuid);
