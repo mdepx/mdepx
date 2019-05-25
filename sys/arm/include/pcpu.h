@@ -44,7 +44,8 @@ get_curthread(void)
 {
 	struct thread *td;
 
-	td = (struct thread *)*(uintptr_t *)get_pcpu();
+	/* pc_curthread is the first member of struct pcpu. */
+	td = (struct thread *)*(uintptr_t *)&__pcpu;
 
 	return (td);
 }
