@@ -103,7 +103,7 @@ sem_timedwait(sem_t *sem, int ticks)
 	td = curthread;
 
 	KASSERT(td->td_idle == 0,
-	    ("Can't lock mutex from idle thread"));
+	    ("Can't lock mutex/sem from the idle thread"));
 
 	for (;;) {
 		critical_enter();
@@ -198,7 +198,7 @@ sem_post(sem_t *sem)
 
 	td = sem->td_first;
 	if (td) {
-		/* Someone is waiting for the mutex. */
+		/* Someone is waiting for the semaphore. */
 		sem->td_first = td->td_next;
 		if (td->td_next != NULL)
 			td->td_next->td_prev = NULL;
