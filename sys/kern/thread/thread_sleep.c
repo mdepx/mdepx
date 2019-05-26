@@ -40,11 +40,10 @@ raw_sleep_cb(void *arg)
 
 	td = arg;
 
-	sched_lock();
 	KASSERT(td->td_state == TD_STATE_ACK,
 		("not sleeping, %d", td->td_state));
+
 	sched_add(td);
-	sched_unlock();
 }
 
 void

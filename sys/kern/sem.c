@@ -87,10 +87,10 @@ sem_cb(void *arg)
 	else
 		sem->td_first = td->td_next;
 
-	sched_lock();
 	td->td_state = TD_STATE_WAKEUP;
+
 	sched_add(td);
-	sched_unlock();
+
 	sl_unlock(&sem->l);
 }
 
@@ -224,14 +224,14 @@ sem_post(sem_t *sem)
 				panic("%s: wrong state", __func__);
 		}
 
-		sched_lock();
 		KASSERT(td->td_state == TD_STATE_SEM_UNLOCK ||
 			td->td_state == TD_STATE_SEM_UNLOCK_ACK,
 		    ("%s: wrong state %d\n", __func__, td->td_state));
-		td->td_state = TD_STATE_WAKEUP;
 		KASSERT(td != curthread, ("td is curthread"));
+
+		td->td_state = TD_STATE_WAKEUP;
+
 		sched_add(td);
-		sched_unlock();
 	} else
 		sl_unlock(&sem->l);
 

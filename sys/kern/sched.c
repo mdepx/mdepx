@@ -53,9 +53,17 @@
 
 static struct thread *runq;
 static struct thread *runq_tail;
-static struct spinlock l;
 static struct entry pcpu_list = LIST_INIT(&pcpu_list);
 struct entry pcpu_all = LIST_INIT(&pcpu_all);
+
+#ifdef SMP
+static struct spinlock	l;
+#define	sched_lock()	sl_lock(&l)
+#define	sched_unlock()	sl_unlock(&l)
+#else
+#define	sched_lock()
+#define	sched_unlock()
+#endif
 
 static void __unused
 dump_runq(void)
@@ -69,7 +77,7 @@ dump_runq(void)
 /*
  * Remove td from the run queue.
  */
-void
+static void
 sched_remove(struct thread *td)
 {
 
@@ -94,9 +102,8 @@ sched_cb(void *arg)
 	td = arg;
 
 	sched_lock();
-	if (td->td_state == TD_STATE_RUNNING) {
+	if (td->td_state == TD_STATE_RUNNING)
 		td->td_state = TD_STATE_READY;
-	}
 	sched_unlock();
 }
 
@@ -167,6 +174,7 @@ sched_add(struct thread *td0)
 	struct thread *td;
 
 	critical_enter();
+	sched_lock();
 
 	for (td = runq;
 	    (td != NULL && td->td_prio >= td0->td_prio);
@@ -189,12 +197,16 @@ sched_add(struct thread *td0)
 	sched_cpu_notify();
 #endif
 
+	sched_unlock();
 	critical_exit();
 }
 
 int
 sched_ack(struct thread *td, struct trapframe *tf)
 {
+
+	KASSERT(curthread->td_critnest > 0,
+	    ("%s: Not in critical section.", __func__));
 
 	/* Save the frame address */
 	td->td_tf = tf;
@@ -216,6 +228,9 @@ int
 sched_park(struct thread *td)
 {
 
+	KASSERT(curthread->td_critnest > 0,
+	    ("%s: Not in critical section.", __func__));
+
 	switch (td->td_state) {
 	case TD_STATE_WAKEUP:
 		panic("could we get here ?");
@@ -226,9 +241,7 @@ sched_park(struct thread *td)
 		 */
 		return (0);
 	default:
-		sched_lock();
 		sched_add(td);
-		sched_unlock();
 
 		return (1);
 	}
@@ -239,6 +252,9 @@ sched_next(void)
 {
 	struct thread *td;
 	struct pcpu *p;
+
+	KASSERT(curthread->td_critnest > 0,
+	    ("%s: Not in critical section.", __func__));
 
 	p = curpcpu;
 
@@ -300,22 +316,10 @@ sched_cpu_add(struct pcpu *pcpup)
 }
 
 void
-sched_lock(void)
-{
-
-	sl_lock(&l);
-}
-
-void
-sched_unlock(void)
-{
-
-	sl_unlock(&l);
-}
-
-void
 sched_init(void)
 {
 
+#ifdef SMP
 	sl_init(&l);
+#endif
 }

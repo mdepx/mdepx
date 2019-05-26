@@ -70,14 +70,11 @@ void thread_terminate(void);
 
 /* Scheduler */
 struct thread *sched_next(void);
-void sched_remove(struct thread *td);
 void sched_add_tail(struct thread *td);
 void sched_add_head(struct thread *td);
 void sched_add(struct thread *td0);
 void sched_enter(void);
 void sched_init(void);
-void sched_lock(void);
-void sched_unlock(void);
 int sched_ack(struct thread *td, struct trapframe *tf);
 int sched_park(struct thread *td);
 void sched_cpu_add(struct pcpu *pcpup);
