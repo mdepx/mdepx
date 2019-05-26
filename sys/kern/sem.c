@@ -118,12 +118,13 @@ sem_timedwait(sem_t *sem, int ticks)
 
 		/* Lock is owned by another thread, sleep. */
 		callout_cancel(&td->td_c);
-		callout_init(&td->td_c);
-		t.td = td;
-		t.sem = sem;
-		t.timeout = 0;
-		if (ticks)
+		if (ticks) {
+			t.td = td;
+			t.sem = sem;
+			t.timeout = 0;
+			callout_init(&td->td_c);
 			callout_set(&td->td_c, ticks, sem_cb, &t);
+		}
 
 		td->td_state = TD_STATE_SEM_WAIT;
 
