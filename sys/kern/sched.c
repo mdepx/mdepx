@@ -199,7 +199,6 @@ sched_ack(struct thread *td, struct trapframe *tf)
 
 	switch (td->td_state) {
 	case TD_STATE_TERMINATING:
-	case TD_STATE_MTX_WAIT:
 	case TD_STATE_SEM_WAIT:
 	case TD_STATE_SLEEPING:
 		td->td_state = TD_STATE_ACK;

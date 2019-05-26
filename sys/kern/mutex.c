@@ -28,208 +28,48 @@
 #include <sys/systm.h>
 #include <sys/thread.h>
 #include <sys/mutex.h>
-#include <sys/spinlock.h>
-#include <sys/pcpu.h>
+#include <sys/sem.h>
 
-#include <machine/atomic.h>
-
-struct token {
-	struct thread *td;
-	struct mtx *m;
-	bool timeout;
-};
-
-static void
-mtx_cb(void *arg)
+void
+mtx_init(struct mtx *m)
 {
-	struct thread *td;
-	struct token *t;
-	struct mtx *m;
 
-	t = arg;
-	m = t->m;
-	td = t->td;
-
-	KASSERT(curthread->td_critnest > 0,
-	    ("Not in critical section"));
-
-	sl_lock(&m->l);
-
-	if (td->td_state == TD_STATE_MTX_UNLOCK) {
-		/* too late */
-		td->td_state = TD_STATE_MTX_UNLOCK_ACK;
-		sl_unlock(&m->l);
-		return;
-	}
-	t->timeout = 1;
-
-	KASSERT(td->td_state == TD_STATE_ACK,
-	    ("%s: wrong state %d\n", __func__, td->td_state));
-
-	if (td->td_next != NULL)
-		td->td_next->td_prev = td->td_prev;
-	else
-		m->td_last = td->td_prev;
-
-	if (td->td_prev != NULL)
-		td->td_prev->td_next = td->td_next;
-	else
-		m->td_first = td->td_next;
-
-	sched_lock();
-	td->td_state = TD_STATE_WAKEUP;
-	sched_add(td);
-	sched_unlock();
-	sl_unlock(&m->l);
+	sem_init(&m->sem, 1);
 }
 
 int
 mtx_timedlock(struct mtx *m, int ticks)
 {
-	struct token t;
-	struct thread *td;
-	uintptr_t tid;
 	int ret;
 
-	td = curthread;
+	ret = sem_timedwait(&m->sem, ticks);
 
-	KASSERT(td->td_idle == 0,
-	    ("Can't lock mutex from idle thread"));
-
-	tid = (uintptr_t)td;
-
-	for (;;) {
-		critical_enter();
-		sl_lock(&m->l);
-		ret = atomic_cmpset_acq_ptr(&(m)->mtx_lock, 0, (tid));
-		if (ret) {
-			/* Lock acquired. */
-			sl_unlock(&m->l);
-			critical_exit();
-			break;
-		}
-
-		/* Lock is owned by another thread, sleep. */
-		callout_cancel(&td->td_c);
-		callout_init(&td->td_c);
-		t.td = td;
-		t.m = m;
-		t.timeout = 0;
-		if (ticks)
-			callout_set(&td->td_c, ticks, mtx_cb, &t);
-
-		td->td_state = TD_STATE_MTX_WAIT;
-
-		if (m->td_first == NULL) {
-			td->td_next = NULL;
-			td->td_prev = NULL;
-			m->td_first = td;
-			m->td_last = td;
-		} else {
-			td->td_prev = m->td_last;
-			td->td_next = NULL;
-			m->td_last->td_next = td;
-			m->td_last = td;
-		}
-		sl_unlock(&m->l);
-		critical_exit();
-
-		md_thread_yield();
-
-		/*
-		 * We are here by one of the reasons:
-		 * 1. mtx_unlock adds us to the sched
-		 * 2. mtx_cb added us to the sched
-		 *
-		 * td_c is cancelled here
-		 */
-
-		if (ticks && t.timeout)
-			return (0);
-	}
-
-	return (1);
+	return (ret);
 }
 
 void
 mtx_lock(struct mtx *m)
 {
 
-	mtx_timedlock(m, 0);
+	sem_wait(&m->sem);
 }
 
 int
 mtx_trylock(struct mtx *m)
 {
-	uintptr_t tid;
 	int ret;
 
-	tid = (uintptr_t)curthread;
+	ret = sem_trywait(&m->sem);
 
-	ret = atomic_cmpset_acq_ptr(&(m)->mtx_lock, 0, (tid));
-	if (ret) {
-		/* Lock acquired. */
-		return (1);
-	}
-
-	return (0);
+	return (ret);
 }
 
 int
 mtx_unlock(struct mtx *m)
 {
-	struct thread *td;
-	uintptr_t tid;
-	int error;
+	int ret;
 
-	tid = (uintptr_t)curthread;
+	ret = sem_post(&m->sem);
 
-	critical_enter();
-	sl_lock(&m->l);
-
-	if (!atomic_cmpset_rel_ptr(&(m)->mtx_lock, (tid), 0))
-		panic("Can't unlock mutex.\n");
-
-	td = m->td_first;
-	if (td) {
-		/* Someone is waiting for the mutex. */
-		m->td_first = td->td_next;
-		if (td->td_next != NULL)
-			td->td_next->td_prev = NULL;
-		else
-			m->td_last = NULL;
-
-		/* Ensure td left CPU. */
-		while (td->td_state != TD_STATE_ACK);
-
-		/*
-		 * Ensure mtx_cb will not pick up this thread just
-		 * after sl_unlock() and before callout_cancel().
-		 */
-		td->td_state = TD_STATE_MTX_UNLOCK;
-		sl_unlock(&m->l);
-
-		/* mtx_cb could be called here by another CPU. */
-
-		error = callout_cancel(&td->td_c);
-		if (error) {
-			/* mtx_cb is already called. */
-			if (td->td_state != TD_STATE_MTX_UNLOCK_ACK)
-				panic("%s: wrong state", __func__);
-		}
-
-		sched_lock();
-		KASSERT(td->td_state == TD_STATE_MTX_UNLOCK ||
-			td->td_state == TD_STATE_MTX_UNLOCK_ACK,
-		    ("%s: wrong state %d\n", __func__, td->td_state));
-		td->td_state = TD_STATE_WAKEUP;
-		KASSERT(td != curthread, ("td is curthread"));
-		sched_add(td);
-		sched_unlock();
-	} else
-		sl_unlock(&m->l);
-
-	critical_exit();
-
-	return (1);
+	return (ret);
 }
