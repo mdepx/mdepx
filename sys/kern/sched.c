@@ -100,6 +100,7 @@ sched_cb(void *arg)
 	sched_unlock();
 }
 
+#ifdef SMP
 static void
 sched_cpu_notify(void)
 {
@@ -115,6 +116,7 @@ sched_cpu_notify(void)
 		send_ipi((1 << p->pc_cpuid), IPI_IPI);
 	}
 }
+#endif
 
 /*
  * Add td to the tail of run queue.
