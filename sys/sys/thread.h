@@ -57,6 +57,8 @@ struct thread {
 #define	TD_STATE_MTX_WAIT	7
 #define	TD_STATE_MTX_UNLOCK	8
 #define	TD_STATE_MTX_UNLOCK_ACK	9
+#define	TD_STATE_SEM_UNLOCK	10
+#define	TD_STATE_SEM_UNLOCK_ACK	11
 };
 
 void thread_init(int cpuid);

@@ -33,6 +33,12 @@
 
 #include <machine/atomic.h>
 
+struct token {
+	struct thread *td;
+	sem_t *sem;
+	bool timeout;
+};
+
 void
 sem_init(sem_t *sem, int count)
 {
@@ -44,27 +50,81 @@ sem_init(sem_t *sem, int count)
 	sl_init(&sem->l);
 }
 
-void
-sem_take(sem_t *sem)
+static void
+sem_cb(void *arg)
 {
+	struct thread *td;
+	struct token *t;
+	sem_t *sem;
+
+	t = arg;
+	sem = t->sem;
+	td = t->td;
+
+	KASSERT(curthread->td_critnest > 0,
+	    ("Not in critical section"));
+
+	sl_lock(&sem->l);
+
+	if (td->td_state == TD_STATE_SEM_UNLOCK) {
+		/* too late */
+		td->td_state = TD_STATE_SEM_UNLOCK_ACK;
+		sl_unlock(&sem->l);
+		return;
+	}
+	t->timeout = 1;
+
+	KASSERT(td->td_state == TD_STATE_ACK,
+	    ("%s: wrong state %d\n", __func__, td->td_state));
+
+	if (td->td_next != NULL)
+		td->td_next->td_prev = td->td_prev;
+	else
+		sem->td_last = td->td_prev;
+
+	if (td->td_prev != NULL)
+		td->td_prev->td_next = td->td_next;
+	else
+		sem->td_first = td->td_next;
+
+	sched_lock();
+	td->td_state = TD_STATE_WAKEUP;
+	sched_add(td);
+	sched_unlock();
+	sl_unlock(&sem->l);
+}
+
+int
+sem_timedwait(sem_t *sem, int ticks)
+{
+	struct token t;
 	struct thread *td;
 
 	td = curthread;
 
 	KASSERT(td->td_idle == 0,
-	    ("Can't take semaphore from idle thread"));
+	    ("Can't lock mutex from idle thread"));
 
 	for (;;) {
 		critical_enter();
 		sl_lock(&sem->l);
 		if (sem->sem_count > 0) {
 			sem->sem_count--;
+			/* Lock acquired. */
 			sl_unlock(&sem->l);
 			critical_exit();
 			break;
 		}
 
-		/* Semaphore count is zero, sleep. */
+		/* Lock is owned by another thread, sleep. */
+		callout_cancel(&td->td_c);
+		callout_init(&td->td_c);
+		t.td = td;
+		t.sem = sem;
+		t.timeout = 0;
+		if (ticks)
+			callout_set(&td->td_c, ticks, sem_cb, &t);
+
 		td->td_state = TD_STATE_SEM_WAIT;
 
 		if (sem->td_first == NULL) {
@@ -78,40 +138,103 @@ sem_take(sem_t *sem)
 			sem->td_last->td_next = td;
 			sem->td_last = td;
 		}
-
-		callout_cancel(&td->td_c);
-
 		sl_unlock(&sem->l);
 		critical_exit();
 
 		md_thread_yield();
+
+		/*
+		 * We are here by one of the reasons:
+		 * 1. sem_post added us to the sched
+		 * 2. sem_cb added us to the sched
+		 *
+		 * td_c is cancelled here
+		 */
+
+		if (ticks && t.timeout)
+			return (0);
 	}
+
+	return (1);
+}
+
+void
+sem_wait(sem_t *m)
+{
+
+	sem_timedwait(m, 0);
+}
+
+int
+sem_trywait(sem_t *sem)
+{
+	int ret;
+
+	critical_enter();
+	sl_lock(&sem->l);
+
+	if (sem->sem_count > 0) {
+		sem->sem_count--;
+		ret = 1;
+	} else
+		ret = 0;
+
+	sl_unlock(&sem->l);
+	critical_exit();
+
+	return (ret);
 }
 
 int
 sem_post(sem_t *sem)
 {
 	struct thread *td;
+	int error;
 
 	critical_enter();
-
 	sl_lock(&sem->l);
+
 	sem->sem_count += 1;
 
 	td = sem->td_first;
 	if (td) {
-		/* Someone is waiting for the semaphore. */
+		/* Someone is waiting for the mutex. */
 		sem->td_first = td->td_next;
-		if (td->td_next == NULL)
+		if (td->td_next != NULL)
+			td->td_next->td_prev = NULL;
+		else
 			sem->td_last = NULL;
 
+		/* Ensure td left CPU. */
 		while (td->td_state != TD_STATE_ACK);
-		td->td_state = TD_STATE_WAKEUP;
+
+		/*
+		 * Ensure sem_cb will not pick up this thread just
+		 * after sl_unlock() and before callout_cancel().
+		 */
+		td->td_state = TD_STATE_SEM_UNLOCK;
+		sl_unlock(&sem->l);
+
+		/* sem_cb could be called here by another CPU. */
+
+		error = callout_cancel(&td->td_c);
+		if (error) {
+			/* sem_cb is already called. */
+			if (td->td_state != TD_STATE_SEM_UNLOCK_ACK)
+				panic("%s: wrong state", __func__);
+		}
+
 		sched_lock();
+		KASSERT(td->td_state == TD_STATE_SEM_UNLOCK ||
+			td->td_state == TD_STATE_SEM_UNLOCK_ACK,
+		    ("%s: wrong state %d\n", __func__, td->td_state));
+		td->td_state = TD_STATE_WAKEUP;
+		KASSERT(td != curthread, ("td is curthread"));
 		sched_add(td);
 		sched_unlock();
-	}
-	sl_unlock(&sem->l);
+	} else
+		sl_unlock(&sem->l);
+
 	critical_exit();
 
 	return (1);

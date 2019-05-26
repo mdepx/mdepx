@@ -40,7 +40,9 @@ struct semaphore {
 typedef struct semaphore sem_t;
 
 void sem_init(sem_t *sem, int count);
-void sem_take(sem_t *sem);
+void sem_wait(sem_t *sem);
+int sem_timedwait(sem_t *sem, int ticks);
+int sem_trywait(sem_t *sem);
 int sem_post(sem_t *sem);
 
 #endif /* _SYS_SEM_H_ */
