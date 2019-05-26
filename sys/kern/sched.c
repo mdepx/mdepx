@@ -99,6 +99,9 @@ sched_cb(void *arg)
 {
 	struct thread *td;
 
+	KASSERT(curthread->td_critnest > 0,
+	    ("%s: Not in critical section.", __func__));
+
 	td = arg;
 
 	sched_lock();
@@ -298,21 +301,25 @@ void
 sched_cpu_avail(struct pcpu *pcpup, bool available)
 {
 
+	critical_enter();
 	sched_lock();
 	if (available)
 		list_append(&pcpu_list, &pcpup->pc_avail);
 	else
 		list_remove(&pcpup->pc_avail);
 	sched_unlock();
+	critical_exit();
 }
 
 void
 sched_cpu_add(struct pcpu *pcpup)
 {
 
+	critical_enter();
 	sched_lock();
 	list_append(&pcpu_all, &pcpup->pc_all);
 	sched_unlock();
+	critical_exit();
 }
 
 void
