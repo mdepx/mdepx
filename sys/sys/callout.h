@@ -68,7 +68,5 @@ int callout_set(struct callout *c, uint32_t ticks,
 int callout_callback(struct mi_timer *);
 int callout_register(struct mi_timer *);
 int callout_cancel(struct callout *c);
-void callout_lock(int cpuid);
-void callout_unlock(int cpuid);
 
 #endif /* _SYS_CALLOUT_H_ */

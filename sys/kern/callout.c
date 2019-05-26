@@ -39,7 +39,20 @@
 
 static struct mi_timer *mi_tmr;
 static struct entry callouts_list[MAXCPU];
+
+/*
+ * Lock is only required in the SMP case when we need to cancel a callout
+ * that belongs to another CPU, otherwise callout code is lock-free.
+ */
+
+#ifdef SMP
 static struct spinlock l[MAXCPU];
+#define	callout_lock(cpuid)	sl_lock(&(l)[cpuid]);
+#define	callout_unlock(cpuid)	sl_unlock(&(l)[cpuid]);
+#else
+#define	callout_lock(cpuid)	(void)cpuid;
+#define	callout_unlock(cpuid)	(void)cpuid;
+#endif
 
 static struct callout *
 first(int cpuid)
@@ -283,20 +296,6 @@ callout_callback(struct mi_timer *mt)
 	return (0);
 }
 
-void
-callout_lock(int cpuid)
-{
-
-	sl_lock(&l[cpuid]);
-}
-
-void
-callout_unlock(int cpuid)
-{
-
-	sl_unlock(&l[cpuid]);
-}
-
 int
 callout_register(struct mi_timer *mt)
 {
@@ -316,7 +315,9 @@ callout_register(struct mi_timer *mt)
 	mi_tmr = mt;
 
 	for (i = 0; i < MAXCPU; i++) {
+#ifdef SMP
 		sl_init(&l[i]);
+#endif
 		list_init(&callouts_list[i]);
 		mi_tmr->state[i] = MI_TIMER_READY;
 		mi_tmr->count_saved[i] = 0;
