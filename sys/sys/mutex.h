@@ -31,6 +31,7 @@
 
 struct mtx {
 	sem_t sem;
+	struct thread *td;
 };
 
 void mtx_init(struct mtx *m);
