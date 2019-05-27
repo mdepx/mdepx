@@ -32,8 +32,7 @@
 struct semaphore {
 	int sem_count;
 	int sem_count_initial;
-	struct thread *td_first;
-	struct thread *td_last;
+	struct entry td_list;
 	struct spinlock l;
 };
 

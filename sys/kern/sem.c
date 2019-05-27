@@ -45,8 +45,7 @@ sem_init(sem_t *sem, int count)
 
 	sem->sem_count = count;
 	sem->sem_count_initial = count;
-	sem->td_first = NULL;
-	sem->td_last = NULL;
+	list_init(&sem->td_list);
 	sl_init(&sem->l);
 }
 
@@ -77,15 +76,7 @@ sem_cb(void *arg)
 	KASSERT(td->td_state == TD_STATE_ACK,
 	    ("%s: wrong state %d\n", __func__, td->td_state));
 
-	if (td->td_next != NULL)
-		td->td_next->td_prev = td->td_prev;
-	else
-		sem->td_last = td->td_prev;
-
-	if (td->td_prev != NULL)
-		td->td_prev->td_next = td->td_next;
-	else
-		sem->td_first = td->td_next;
+	list_remove(&td->td_node);
 
 	td->td_state = TD_STATE_WAKEUP;
 
@@ -128,17 +119,8 @@ sem_timedwait(sem_t *sem, int ticks)
 
 		td->td_state = TD_STATE_SEM_WAIT;
 
-		if (sem->td_first == NULL) {
-			td->td_next = NULL;
-			td->td_prev = NULL;
-			sem->td_first = td;
-			sem->td_last = td;
-		} else {
-			td->td_prev = sem->td_last;
-			td->td_next = NULL;
-			sem->td_last->td_next = td;
-			sem->td_last = td;
-		}
+		list_append(&sem->td_list, &td->td_node);
+
 		sl_unlock(&sem->l);
 		critical_exit();
 
@@ -197,14 +179,10 @@ sem_post(sem_t *sem)
 
 	sem->sem_count += 1;
 
-	td = sem->td_first;
-	if (td) {
+	if (!list_empty(&sem->td_list)) {
 		/* Someone is waiting for the semaphore. */
-		sem->td_first = td->td_next;
-		if (td->td_next != NULL)
-			td->td_next->td_prev = NULL;
-		else
-			sem->td_last = NULL;
+		td = CONTAINER_OF(sem->td_list.next, struct thread, td_node);
+		list_remove(&td->td_node);
 
 		/* Ensure td left CPU. */
 		while (td->td_state != TD_STATE_ACK);

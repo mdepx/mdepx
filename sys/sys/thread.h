@@ -41,8 +41,6 @@ struct thread {
 	uint32_t		td_stack_size;
 	struct entry		td_node;
 	struct callout		td_c;
-	struct thread *		td_next;
-	struct thread *		td_prev;
 	uint32_t		td_quantum;
 	uint8_t			td_idle;
 	uint32_t		td_index;
