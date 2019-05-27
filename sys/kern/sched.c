@@ -55,7 +55,7 @@
 #define	CONFIG_NPRIO	10
 #endif
 
-static struct entry runqueue[CONFIG_NPRIO];
+static struct entry runq[CONFIG_NPRIO];
 static struct entry pcpu_list = LIST_INIT(&pcpu_list);
 struct entry pcpu_all = LIST_INIT(&pcpu_all);
 
@@ -75,9 +75,9 @@ sched_pick(void)
 	int i;
 
 	for (i = (CONFIG_NPRIO - 1); i >= 0; i--) {
-		if (list_empty(&runqueue[i]))
+		if (list_empty(&runq[i]))
 			continue;
-		td = CONTAINER_OF(runqueue[i].next, struct thread, td_node);
+		td = CONTAINER_OF(runq[i].next, struct thread, td_node);
 		list_remove(&td->td_node);
 
 		return (td);
@@ -133,9 +133,9 @@ sched_add(struct thread *td)
 	sched_lock();
 
 	KASSERT(td->td_prio < CONFIG_NPRIO,
-		("td_prio %d, CONFIG_NPRIO %d\n", td->td_prio, CONFIG_NPRIO));
+	    ("td_prio(%d) >= CONFIG_NPRIO(%d)\n", td->td_prio, CONFIG_NPRIO));
 
-	list_append(&runqueue[td->td_prio], &td->td_node);
+	list_append(&runq[td->td_prio], &td->td_node);
 
 #ifdef SMP
 	sched_cpu_notify();
@@ -268,7 +268,7 @@ sched_init(void)
 	int i;
 
 	for (i = 0; i < CONFIG_NPRIO; i++)
-		list_init(&runqueue[i]);
+		list_init(&runq[i]);
 
 #ifdef SMP
 	sl_init(&l);
