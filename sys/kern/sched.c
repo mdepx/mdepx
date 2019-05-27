@@ -51,8 +51,11 @@
 #define	dprintf(fmt, ...)
 #endif
 
-static struct thread *runq;
-static struct thread *runq_tail;
+#ifndef	CONFIG_NPRIO
+#define	CONFIG_NPRIO	10
+#endif
+
+static struct entry runqueue[CONFIG_NPRIO];
 static struct entry pcpu_list = LIST_INIT(&pcpu_list);
 struct entry pcpu_all = LIST_INIT(&pcpu_all);
 
@@ -65,33 +68,24 @@ static struct spinlock	l;
 #define	sched_unlock()
 #endif
 
-static void __unused
-dump_runq(void)
+static struct thread *
+sched_pick(void)
 {
 	struct thread *td;
+	int i;
 
-	for (td = runq; td != NULL; td = td->td_next)
-		printf("%s: td %p name %s\n", __func__, td, td->td_name);
-}
+	for (i = (CONFIG_NPRIO - 1); i >= 0; i--) {
+		if (list_empty(&runqueue[i]))
+			continue;
+		td = CONTAINER_OF(runqueue[i].next, struct thread, td_node);
+		list_remove(&td->td_node);
 
-/*
- * Remove td from the run queue.
- */
-static void
-sched_remove(struct thread *td)
-{
+		return (td);
+	}
 
-	dprintf("%s\n", __func__);
+	panic("%s: thread not found\n", __func__);
 
-	if (td->td_next != NULL)
-		td->td_next->td_prev = td->td_prev;
-	else
-		runq_tail = td->td_prev;
-
-	if (td->td_prev != NULL)
-		td->td_prev->td_next = td->td_next;
-	else
-		runq = td->td_next;
+	return (NULL);
 }
 
 static void
@@ -129,72 +123,19 @@ sched_cpu_notify(void)
 #endif
 
 /*
- * Add td to the tail of run queue.
- */
-void
-sched_add_tail(struct thread *td)
-{
-
-	dprintf("%s\n", __func__);
-
-	td->td_prev = runq_tail;
-	td->td_next = NULL;
-
-	if (runq == NULL)
-		runq = td;
-	else
-		runq_tail->td_next = td;
-
-	runq_tail = td;
-}
-
-/*
- * Add td to the head of run queue.
- */
-void
-sched_add_head(struct thread *td)
-{
-
-	dprintf("%s\n", __func__);
-
-	td->td_prev = NULL;
-	td->td_next = runq;
-
-	if (runq == NULL)
-		runq_tail = td;
-	else
-		runq->td_prev = td;
-
-	runq = td;
-}
-
-/*
  * Add td to the run queue.
  */
 void
-sched_add(struct thread *td0)
+sched_add(struct thread *td)
 {
-	struct thread *td;
 
 	critical_enter();
 	sched_lock();
 
-	for (td = runq;
-	    (td != NULL && td->td_prio >= td0->td_prio);
-	    (td = td->td_next));
+	KASSERT(td->td_prio < CONFIG_NPRIO,
+		("td_prio %d, CONFIG_NPRIO %d\n", td->td_prio, CONFIG_NPRIO));
 
-	if (td == NULL)
-		sched_add_tail(td0);
-	else {
-		/* Insert td0 before td. */
-		td0->td_next = td;
-		td0->td_prev = td->td_prev;
-		td->td_prev = td0;
-		if (td0->td_prev == NULL)
-			runq = td0;
-		else
-			td0->td_prev->td_next = td0;
-	}
+	list_append(&runqueue[td->td_prio], &td->td_node);
 
 #ifdef SMP
 	sched_cpu_notify();
@@ -262,8 +203,7 @@ sched_next(void)
 	p = curpcpu;
 
 	sched_lock();
-	td = runq;
-	sched_remove(td);
+	td = sched_pick();
 	if (td->td_idle)
 		list_append(&pcpu_list, &p->pc_avail);
 	sched_unlock();
@@ -325,6 +265,10 @@ sched_cpu_add(struct pcpu *pcpup)
 void
 sched_init(void)
 {
+	int i;
+
+	for (i = 0; i < CONFIG_NPRIO; i++)
+		list_init(&runqueue[i]);
 
 #ifdef SMP
 	sl_init(&l);
