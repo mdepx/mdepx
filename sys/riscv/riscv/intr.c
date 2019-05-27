@@ -46,7 +46,7 @@
 #endif
 
 void
-riscv_intr(struct trapframe *tf, int irq)
+riscv_intr(int irq)
 {
 
 	switch (irq) {

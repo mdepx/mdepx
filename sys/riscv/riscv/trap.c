@@ -125,7 +125,7 @@ riscv_exception(struct trapframe *tf)
 	released = sched_ack(td, tf);
 
 	if (intr)
-		riscv_intr(tf, irq); /* TODO: remove tf from this call */
+		riscv_intr(irq);
 
 	/* Check if this thread has no more CPU time. */
 	if (!released)

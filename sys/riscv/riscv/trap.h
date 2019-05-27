@@ -27,7 +27,7 @@
 #ifndef	_RISCV_RISCV_TRAP_H_
 #define	_RISCV_RISCV_TRAP_H_
 
-struct trapframe *riscv_exception(struct trapframe *frame);
-void riscv_intr(struct trapframe *tf, int irq);
+struct trapframe *riscv_exception(struct trapframe *tf);
+void riscv_intr(int irq);
 
 #endif /* !_RISCV_RISCV_TRAP_H_ */
