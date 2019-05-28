@@ -27,9 +27,12 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 #include <sys/thread.h>
+#include <sys/pcpu.h>
 
 #include <machine/frame.h>
 #include <machine/cpufunc.h>
+
+struct pcpu __pcpu;
 
 void
 critical_enter(void)
@@ -92,8 +95,33 @@ md_thread_terminate(struct thread *td)
 }
 
 void
-md_init(void)
+md_init(int cpuid)
 {
+	struct pcpu *pcpup;
 
-	thread0_init();
+	zero_bss();
+	relocate_data();
+
+	pcpup = &__pcpu;
+	pcpup->pc_cpuid = cpuid;
+	__asm __volatile("move $28, %0" :: "r"(pcpup));
+
+	thread_init(cpuid);
+
+#ifdef CONFIG_SCHED
+	sched_init();
+#endif
+
+	/* Allow the app to register malloc and timer. */
+	app_init();
+
+#ifdef CONFIG_SCHED
+	struct thread *td;
+	td = thread_create("main", 1, 50000000, 4096, main, NULL);
+	if (td == NULL)
+		panic("can't create the main thread\n");
+	sched_enter();
+#else
+	main();
+#endif
 }

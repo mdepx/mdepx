@@ -153,7 +153,6 @@
 	REG_L	s6, (REG_SIZE * 23)(sp)
 	REG_L	s7, (REG_SIZE * 24)(sp)
 
-	REG_L	gp, (REG_SIZE * 25)(sp)
 	REG_L	s8, (REG_SIZE * 27)(sp)
 	REG_L	ra, (REG_SIZE * 28)(sp)
 

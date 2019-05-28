@@ -47,6 +47,10 @@
 #define	dprintf(fmt, ...)
 #endif
 
+#ifdef CONFIG_SCHED
+static struct thread intr_thread[MAXCPU];
+#endif
+
 static void
 dump_frame(struct trapframe *tf)
 {
@@ -114,18 +118,38 @@ mips_install_intr_map(const struct mips_intr_entry *m)
 	map = m;
 }
 
-struct trapframe *
-mips_exception(struct trapframe *frame)
+static void
+mips_handle_intr(int cause)
 {
-	struct trapframe *ret;
+	int i;
+
+	for (i = 0; i < MIPS_N_INTR; i++)
+		if (cause & MIPS_CR_IP(i)) {
+			if (map[i].handler != NULL)
+				map[i].handler(map[i].arg, NULL, i);
+			else
+				printf("%s: spurious intr %d\n",
+				    __func__, i);
+		}
+}
+
+struct trapframe *
+mips_exception(struct trapframe *tf)
+{
 	struct thread *td;
 	uint32_t exc_code;
 	uint32_t cause;
-	int i;
+	bool released;
+	bool intr;
+
+	released = false;
+	intr = false;
 
 	td = curthread;
 
-	td->td_critnest++;
+	/* Switch to the interrupt thread. */
+	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
+	curthread->td_critnest++;
 
 	cause = mips_rd_cause();
 	dprintf("%s: cause %x\n", __func__, cause);
@@ -133,41 +157,39 @@ mips_exception(struct trapframe *frame)
 	    MIPS_CR_EXC_CODE_S;
 	switch (exc_code) {
 	case MIPS_CR_EXC_CODE_INT:
-		for (i = 0; i < MIPS_N_INTR; i++)
-			if (cause & MIPS_CR_IP(i)) {
-				if (map[i].handler != NULL)
-					map[i].handler(map[i].arg, frame, i);
-				else
-					printf("%s: spurious intr %d\n",
-					    __func__, i);
-			}
+		intr = true;
 		break;
 	case MIPS_CR_EXC_CODE_SYS:
-		frame->tf_pc += 4;
+		tf->tf_pc += 4;
 		break;
 	case MIPS_CR_EXC_CODE_RI:
-		dump_frame(frame);
+		dump_frame(tf);
 		panic("%s: reserved instruction at pc %zx, badvaddr %zx\n",
-		    __func__, frame->tf_pc, frame->tf_badvaddr);
+		    __func__, tf->tf_pc, tf->tf_badvaddr);
 	case MIPS_CR_EXC_CODE_ADEL:
-		dump_frame(frame);
+		dump_frame(tf);
 		panic("%s: load address error at pc %zx, badvaddr %zx\n",
-		    __func__, frame->tf_pc, frame->tf_badvaddr);
+		    __func__, tf->tf_pc, tf->tf_badvaddr);
 	default:
-		dump_frame(frame);
+		dump_frame(tf);
 		panic("%s: no handler: exc_code %d, pc %zx, badvaddr %zx\n",
-		    __func__, exc_code, frame->tf_pc, frame->tf_badvaddr);
+		    __func__, exc_code, tf->tf_pc, tf->tf_badvaddr);
 	}
 
 	dprintf("Exception cause: %x, code %d\n", cause, exc_code);
 
-#ifdef	CONFIG_SCHED
-	ret = sched_next(frame);
-#else
-	ret = frame;
-#endif
+	released = sched_ack(td, tf);
+	if (intr)
+		mips_handle_intr(cause);
 
-	td->td_critnest--;
+	if (!released) 
+		released = sched_park(td);
 
-	return (ret);
+	if (released)
+		td = sched_next();
+
+	curthread->td_critnest--;
+	PCPU_SET(curthread, td);
+
+	return (td->td_tf);
 }
