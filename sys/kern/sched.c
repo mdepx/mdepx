@@ -39,7 +39,6 @@
 #include <sys/pcpu.h>
 #include <sys/smp.h>
 
-#include <machine/smp.h>
 #include <machine/frame.h>
 
 #define	SCHED_DEBUG
