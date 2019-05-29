@@ -32,7 +32,7 @@
 #include <machine/frame.h>
 #include <machine/cpufunc.h>
 
-struct pcpu __pcpu;
+struct pcpu __pcpu[MAXCPU];
 
 void
 critical_enter(void)
@@ -99,10 +99,9 @@ md_init(int cpuid)
 {
 	struct pcpu *pcpup;
 
-	zero_bss();
-	relocate_data();
+	cpuid = 0;
 
-	pcpup = &__pcpu;
+	pcpup = &__pcpu[cpuid];
 	pcpup->pc_cpuid = cpuid;
 	__asm __volatile("move $28, %0" :: "r"(pcpup));
 
@@ -124,4 +123,6 @@ md_init(int cpuid)
 #else
 	main();
 #endif
+
+	panic("md_init returned");
 }
