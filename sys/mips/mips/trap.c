@@ -184,7 +184,11 @@ mips_exception(struct trapframe *tf)
 
 	dprintf("Exception cause: %x, code %d\n", cause, exc_code);
 
+#ifdef CONFIG_SCHED
 	released = sched_ack(td, tf);
+#else
+	td->td_tf = tf;
+#endif
 	if (intr)
 		mips_handle_intr(cause);
 
