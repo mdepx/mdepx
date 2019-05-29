@@ -32,7 +32,7 @@ struct entry {
 	struct entry *prev;
 };
 
-#define	LIST_INIT(l) 	{ l, l }
+#define	LIST_INIT_STATIC(l)	{ l, l }
 
 static inline void
 list_init(struct entry *e)

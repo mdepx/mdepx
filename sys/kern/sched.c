@@ -55,8 +55,8 @@
 #endif
 
 static struct entry runq[CONFIG_NPRIO];
-static struct entry pcpu_list = LIST_INIT(&pcpu_list);
-struct entry pcpu_all = LIST_INIT(&pcpu_all);
+static struct entry pcpu_list = LIST_INIT_STATIC(&pcpu_list);
+struct entry pcpu_all = LIST_INIT_STATIC(&pcpu_all);
 
 #ifdef SMP
 static struct spinlock	l;
