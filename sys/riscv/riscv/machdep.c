@@ -34,7 +34,6 @@
 #include <machine/frame.h>
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
-#include <machine/smp.h>
 
 static struct pcpu __pcpu[MAXCPU];
 static uint32_t ncpus;

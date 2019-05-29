@@ -33,7 +33,6 @@
 
 #include <machine/atomic.h>
 #include <machine/cpuregs.h>
-#include <machine/smp.h>
 
 #include <riscv/sifive/e300g_clint.h>
 

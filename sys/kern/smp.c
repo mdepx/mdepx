@@ -34,7 +34,6 @@
 #include <machine/frame.h>
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
-#include <machine/smp.h>
 
 static void (*smp_tryst_func)(void *arg);
 static void *smp_tryst_arg;
