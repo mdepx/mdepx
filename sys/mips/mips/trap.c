@@ -148,7 +148,9 @@ mips_exception(struct trapframe *tf)
 	td = curthread;
 
 	/* Switch to the interrupt thread. */
+#ifdef CONFIG_SCHED
 	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
+#endif
 	curthread->td_critnest++;
 
 	cause = mips_rd_cause();
@@ -159,6 +161,10 @@ mips_exception(struct trapframe *tf)
 	case MIPS_CR_EXC_CODE_INT:
 		intr = true;
 		break;
+	case MIPS_CR_EXC_CODE_ADES:
+		dump_frame(tf);
+		panic("%s: Address error (store) pc %zx, badvaddr %zx\n",
+		    __func__, tf->tf_pc, tf->tf_badvaddr);
 	case MIPS_CR_EXC_CODE_SYS:
 		tf->tf_pc += 4;
 		break;
@@ -182,11 +188,13 @@ mips_exception(struct trapframe *tf)
 	if (intr)
 		mips_handle_intr(cause);
 
+#ifdef CONFIG_SCHED
 	if (!released) 
 		released = sched_park(td);
 
 	if (released)
 		td = sched_next();
+#endif
 
 	curthread->td_critnest--;
 	PCPU_SET(curthread, td);
