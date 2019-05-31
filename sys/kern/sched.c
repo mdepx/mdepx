@@ -54,6 +54,8 @@
 #define	CONFIG_NPRIO	10
 #endif
 
+CTASSERT(CONFIG_NPRIO > 1);
+
 static struct entry runq[CONFIG_NPRIO];
 static struct entry pcpu_list = LIST_INIT_STATIC(&pcpu_list);
 struct entry pcpu_all = LIST_INIT_STATIC(&pcpu_all);
@@ -223,11 +225,8 @@ sched_next(void)
 void
 sched_enter(void)
 {
-	struct thread *td;
 
-	td = curthread;
-
-	KASSERT(td->td_idle == 1,
+	KASSERT(curthread->td_idle == 1,
 	    ("sched_enter() called from non-idle thread"));
 
 	md_thread_yield();
