@@ -132,6 +132,13 @@
 #define	CP0_WATCHHI	$19,0
 #define	CP0_ERRCTL	$26,0
 
+/* MIPS Exception Vectors */
+#define	MIPS_EXC_VEC_RESET	((intptr_t)(int32_t)0xBFC00000)
+#define	MIPS_EXC_VEC_UTLB_MISS	((intptr_t)(int32_t)0x80000000)
+#define	MIPS_EXC_VEC_XTLB_MISS	((intptr_t)(int32_t)0x80000080)
+#define	MIPS_EXC_VEC_CACHE_ERR	((intptr_t)(int32_t)0x80000100)
+#define	MIPS_EXC_VEC_GENERAL	((intptr_t)(int32_t)0x80000180)
+
 #define	MIPS_KUSEG_START		0x00000000
 #define	MIPS_KSEG0_START		((intptr_t)(int32_t)0x80000000)
 #define	MIPS_KSEG0_END			((intptr_t)(int32_t)0x9fffffff)
