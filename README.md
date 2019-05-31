@@ -1,15 +1,14 @@
 # Introduction
 
-Osfive is a framework for building bare-metal applications.
+Osfive is an operating system for embedded applications.
 
 ## Key features
-- Application-centric
 - Real-time
 - Priority based time sliced round-robin scheduling
 - Fully preemptible
 - Tickless operation
 - Static/Dynamic memory allocation
-- Mutexes, Semaphores
+- Timed Mutexes, Semaphores
 - Symmetric Multiprocessing (SMP)
 
 ## Supported platforms
