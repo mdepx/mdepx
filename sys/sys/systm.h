@@ -46,6 +46,8 @@ void panic(const char *fmt, ...);
 } while (0)
 #endif
 
+#define	CTASSERT(x)	_Static_assert(x, "compile-time assertion failed")
+
 void zero_bss(void);
 void relocate_data(void);
 
