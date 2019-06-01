@@ -106,6 +106,10 @@
 #define	MIPS_CR0_BE		(1 << 15)
 
 /* CP0 registers */
+#define	CP0_TLB_INDEX	$0
+#define	CP0_TLB_RANDOM	$1
+#define	CP0_TLB_LO0	$2
+#define	CP0_TLB_LO1	$3
 #define	CP0_USERLOCAL	$4,2
 #define	CP0_PAGEMASK	$5,0
 #define	CP0_TLB_SPEC	$5,4
