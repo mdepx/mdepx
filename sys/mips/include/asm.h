@@ -59,4 +59,10 @@
 #define	PTR_LA		dla
 #endif
 
+/*
+ * See Chapter 8. MIPS® Architecture For Programmers Vol. III:
+ * MIPS32® / microMIPS32™ Privileged Resource Architecture.
+ */
+#define	HAZARD_CLEAR	nop;nop;nop;nop;ehb
+
 #endif	/* !_MACHINE_ASM_H_ */
