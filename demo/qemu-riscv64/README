@@ -1,0 +1,17 @@
+1. Build QEMU
+
+    $ git clone https://github.com/qemu/qemu
+    $ cd qemu
+    $ mkdir build
+    $ cd build
+    $ ../configure --target-list=riscv32-softmmu,riscv64-softmmu
+    $ gmake -j8
+
+2. Build mdepx
+
+    $ export CROSS_COMPILE=riscv64-unknown-elf-
+    $ make clean all
+
+3. Run
+
+    $ qemu/build/riscv64-softmmu/qemu-system-riscv64 -smp cpus=8 -machine virt -m 1024 -kernel demo/qemu-riscv64/obj/qemu-riscv64.elf -nographic
