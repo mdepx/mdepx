@@ -32,6 +32,7 @@
 #include <machine/frame.h>
 #include <machine/cpufunc.h>
 
+uint8_t secondary_stacks[MAXCPU][4096]; /* Idle thread stacks */
 struct pcpu __pcpu[MAXCPU];
 
 void
@@ -76,9 +77,9 @@ md_setup_frame(struct trapframe *tf, void *entry,
     void *arg, void *terminate)
 {
 
-	tf->tf_ra = (uint32_t)terminate;
-	tf->tf_pc = (uint32_t)entry;
-	tf->tf_a[0] = (uint32_t)arg;
+	tf->tf_ra = (uintptr_t)terminate;
+	tf->tf_pc = (uintptr_t)entry;
+	tf->tf_a[0] = (uintptr_t)arg;
 }
 
 void
