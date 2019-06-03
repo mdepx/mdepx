@@ -61,7 +61,7 @@ uart_16550_putc(struct uart_16550_softc *sc, char c)
 }
 
 int
-uart_16550_init(struct uart_16550_softc *sc, uint32_t base,
+uart_16550_init(struct uart_16550_softc *sc, size_t base,
     uint32_t uart_freq, uint32_t baud_rate, uint8_t reg_shift)
 {
 	uint32_t reg;
