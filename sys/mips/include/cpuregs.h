@@ -45,9 +45,9 @@
 #define	MIPS_SR_UM	(1 << 4)
 #define	MIPS_SR_KSU_S	3
 #define	MIPS_SR_KSU_M	(0x3 << MIPS_SR_KSU_S)
-#define	MIPS_SR_UX	5
-#define	MIPS_SR_SX	6
-#define	MIPS_SR_KX	7
+#define	MIPS_SR_UX	(1 << 5)
+#define	MIPS_SR_SX	(1 << 6)
+#define	MIPS_SR_KX	(1 << 7)
 #define	MIPS_SR_IM_S	8
 #define	MIPS_SR_IM_M	(0xff << MIPS_SR_IM_S)
 #define	MIPS_SR_IM(n)	(1 << (MIPS_SR_IM_S + (n)))
