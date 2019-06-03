@@ -1,9 +1,8 @@
 1. Build QEMU
 
     $ git clone https://github.com/qemu/qemu
-    $ cd qemu
-    $ mkdir build
-    $ cd build
+    $ mkdir qemu/build
+    $ cd qemu/build
     $ ../configure --target-list=riscv32-softmmu,riscv64-softmmu
     $ gmake -j8
 
