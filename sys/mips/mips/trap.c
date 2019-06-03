@@ -139,10 +139,14 @@ mips_exception(struct trapframe *tf)
 	struct thread *td;
 	uint32_t exc_code;
 	uint32_t cause;
+#ifdef CONFIG_SCHED
 	bool released;
+#endif
 	bool intr;
 
+#ifdef CONFIG_SCHED
 	released = false;
+#endif
 	intr = false;
 
 	td = curthread;
@@ -201,7 +205,9 @@ mips_exception(struct trapframe *tf)
 #endif
 
 	curthread->td_critnest--;
+#ifdef CONFIG_SCHED
 	PCPU_SET(curthread, td);
+#endif
 
 	return (td->td_tf);
 }
