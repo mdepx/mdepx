@@ -1,0 +1,18 @@
+Demo for a big-endian 64-bit MIPS
+
+1. Build QEMU
+
+    $ git clone https://github.com/qemu/qemu
+    $ mkdir qemu/build
+    $ cd qemu/build
+    $ ../configure --target-list=mips64-softmmu
+    $ gmake -j8
+
+2. Build mdepx
+
+    $ export CROSS_COMPILE=mips64-unknown-freebsd12.0-
+    $ make clean all
+
+3. Run
+
+    $ qemu/build/mips64-softmmu/qemu-system-mips64 -m 2048 -M malta -kernel ${OBJDIR}/qemu-mips64.elf -nographic
