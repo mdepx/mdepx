@@ -45,6 +45,7 @@ extern char MipsException[], MipsExceptionEnd[];
 static struct mips_timer_softc timer_sc;
 static struct uart_16550_softc uart_sc;
 
+#define	USEC_TO_TICKS(n)	(100 * (n))	/* 100MHz clock. */
 #define	UART_BASE		0x180003f8
 #define	UART_CLOCK_RATE		3686400
 #define	DEFAULT_BAUDRATE	115200
@@ -127,7 +128,8 @@ app_init(void)
 
 	mips_install_intr_map(mips_intr_map);
 
-	mips_timer_init(&timer_sc, MIPS_DEFAULT_FREQ, 250);
+	mips_timer_init(&timer_sc, MIPS_DEFAULT_FREQ,
+	    USEC_TO_TICKS(1));
 
 	malloc_init();
 	malloc_base = BASE_ADDR + 0x01000000;
@@ -150,7 +152,7 @@ test_thr1(void *arg)
 
 	while (1) {
 		printf("%s\n", __func__);
-		raw_sleep(200000);
+		raw_sleep(USEC_TO_TICKS(2000));
 	}
 }
 
@@ -160,11 +162,12 @@ main(void)
 
 	printf("%s\n", __func__);
 
-	thread_create("test", 1, 10000, 4096, test_thr1, (void *)0);
+	thread_create("test", 1, USEC_TO_TICKS(1000),
+	    4096, test_thr1, (void *)0);
 
 	while (1) {
 		printf("%s\n", __func__);
-		raw_sleep(1000000);
+		raw_sleep(USEC_TO_TICKS(1000));
 	}
 
 	return (0);
