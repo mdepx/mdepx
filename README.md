@@ -1,6 +1,6 @@
 # Introduction
 
-Osfive is an operating system for embedded applications.
+Mdepx is an operating system for embedded applications.
 
 ## Key features
 - Real-time
@@ -36,13 +36,13 @@ Osfive is an operating system for embedded applications.
 
 # Getting started
 
-Osfive has a Makefile-based build system. You have to construct a GNU makefile for your application. See [example applications](https://github.com/osfive/).
+Mdepx has a Makefile-based build system. You have to construct a GNU makefile for your application. See [example applications](https://github.com/osfive/).
 
 # Contributing
 
 Please submit pull requests on github or send patches to br@bsdpad.com.
 
-Note that Osfive uses FreeBSD [style(9)](https://www.freebsd.org/cgi/man.cgi?query=style&sektion=9) guide.
+Note that Mdepx uses FreeBSD [style(9)](https://www.freebsd.org/cgi/man.cgi?query=style&sektion=9) guide.
 
 # License
 

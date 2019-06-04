@@ -1,5 +1,5 @@
-# Absolute path to osfive
-OSDIR ?= ${CURDIR}/osfive
+# Absolute path to mdepx
+OSDIR ?= ${CURDIR}/mdepx
 
 # Ensure OSDIR is absolute path
 OSDIR := ${shell realpath ${OSDIR}}

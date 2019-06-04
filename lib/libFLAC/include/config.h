@@ -11,6 +11,6 @@
 #define	FLAC__INTEGER_ONLY_LIBRARY	1
 #define	HAVE_LROUND			1
 #define	FLAC__INTEGER_ONLY_LIBRARY	1
-#define	VERSION				"maya"
-#define	PACKAGE_VERSION			"osfive"
+#define	VERSION				"mdepx"
+#define	PACKAGE_VERSION			"mdepx"
 #define	FLAC__HAS_OGG			0
