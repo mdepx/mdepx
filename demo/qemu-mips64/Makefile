@@ -40,7 +40,7 @@ WARNFLAGS =			\
 CFLAGS = -march=mips64 -mabi=64 -g -nostdinc -G0		\
 	-mno-abicalls -msoft-float -fwrapv -fno-builtin-printf	\
 	${WARNFLAGS} -DBASE_ADDR=${BASE_ADDR} -DMAXCPU=10	\
-	-DCONFIG_SCHED
+	-DCONFIG_SCHED -DCONFIG_CPU_IDLE_IE
 
 all:	${OBJDIR}/${APP}.bin
 
