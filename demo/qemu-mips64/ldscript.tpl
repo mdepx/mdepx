@@ -1,4 +1,3 @@
-TARGET(elf64-tradbigmips-freebsd)
 ENTRY(_start)
 
 SECTIONS

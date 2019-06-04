@@ -38,8 +38,10 @@ WARNFLAGS =			\
 	-Wmissing-include-dirs
 
 CFLAGS = -march=mips64 -mabi=64 -g -nostdinc -G0		\
+	-nostdinc -fno-builtin-printf -ffreestanding		\
 	-mno-abicalls -msoft-float -fwrapv -fno-builtin-printf	\
-	${WARNFLAGS} -DBASE_ADDR=${BASE_ADDR} -DMAXCPU=10	\
+	-D__mips_n64 -nostdlib ${WARNFLAGS}			\
+	-DBASE_ADDR=${BASE_ADDR} -DMAXCPU=10			\
 	-DCONFIG_SCHED -DCONFIG_CPU_IDLE_IE
 
 all:	${OBJDIR}/${APP}.bin
