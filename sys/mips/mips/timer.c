@@ -138,16 +138,22 @@ timer_stop(void *arg)
 static void
 timer_start(void *arg, uint32_t ticks)
 {
+	struct mips_timer_softc *sc;
 	uint32_t reg;
 
 	dprintf("%s: ticks %u\n", __func__, ticks);
+
+	sc = arg;
+	if (ticks < sc->minticks)
+		ticks = sc->minticks;
 
 	reg = mips_rd_count() + ticks;
 	mips_wr_compare(reg);
 }
 
 void
-mips_timer_init(struct mips_timer_softc *sc, uint32_t freq)
+mips_timer_init(struct mips_timer_softc *sc, uint32_t freq,
+    uint32_t minticks)
 {
 	uint32_t reg;
 
@@ -155,6 +161,7 @@ mips_timer_init(struct mips_timer_softc *sc, uint32_t freq)
 	if ((reg & CONFIG7_WII) == 0)
 		printf("%s: can't initialize timer\n", __func__);
 
+	sc->minticks = minticks;
 	sc->frequency = freq;
 	sc->mt.start = timer_start;
 	sc->mt.stop = timer_stop;

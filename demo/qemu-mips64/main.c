@@ -127,7 +127,7 @@ app_init(void)
 
 	mips_install_intr_map(mips_intr_map);
 
-	mips_timer_init(&timer_sc, MIPS_DEFAULT_FREQ);
+	mips_timer_init(&timer_sc, MIPS_DEFAULT_FREQ, 250);
 
 	malloc_init();
 	malloc_base = BASE_ADDR + 0x01000000;

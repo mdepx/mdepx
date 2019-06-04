@@ -36,10 +36,12 @@
 struct mips_timer_softc {
 	uint32_t frequency;
 	uint32_t usleep;
+	uint32_t minticks;
 	struct mi_timer mt;
 };
 
-void mips_timer_init(struct mips_timer_softc *sc, uint32_t freq);
+void mips_timer_init(struct mips_timer_softc *sc, uint32_t freq,
+    uint32_t minticks);
 void mips_timer_udelay(struct mips_timer_softc *sc, uint32_t usec);
 void mips_timer_intr(void *arg, struct trapframe *frame, int irq);
 void mips_timer_usleep(struct mips_timer_softc *sc, uint32_t usec);
