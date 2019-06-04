@@ -63,6 +63,18 @@ critical_exit(void)
 		intr_restore(td->td_md.md_saved_intr);
 }
 
+/*
+ * This should be based on WII bit in Config7 register, however some
+ * implementations (e.g. BERI CPU) do not set WII bit correctly.
+ */
+#ifdef CONFIG_CPU_IDLE_IE
+void
+cpu_idle(void)
+{
+
+	__asm __volatile("wait");
+}
+#else
 void
 cpu_idle(void)
 {
@@ -71,6 +83,7 @@ cpu_idle(void)
 	__asm __volatile("wait");
 	critical_exit();
 }
+#endif
 
 void
 md_setup_frame(struct trapframe *tf, void *entry,
