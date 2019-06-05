@@ -148,11 +148,16 @@ timer_start(void *arg, uint32_t ticks)
 		ticks = sc->minticks;
 
 #ifdef	CONFIG_QEMU
-	uint32_t new;
+	uint32_t new, old;
+	int wrapped;
 	int diff;
 
-	do {
-		reg = mips_rd_count() + ticks;
+	for (;;) {
+		wrapped = 0;
+		old = mips_rd_count();
+		reg = old + ticks;
+		if (reg < old)
+			wrapped = 1;
 
 		/*
 		 * Note QEMU could context-switch here on the HOST OS.
@@ -162,8 +167,17 @@ timer_start(void *arg, uint32_t ticks)
 
 		/* Check if QEMU context switched. */
 		new = mips_rd_count();
+		if (wrapped) {
+			if (new > old)
+				break;
+		} else {
+			if (new < old)
+				continue;
+		}
 		diff = reg - new;
-	} while (diff < 0);
+		if (diff > 0)
+			break;
+	}
 #else
 	reg = mips_rd_count() + ticks;
 	mips_wr_compare(reg);
