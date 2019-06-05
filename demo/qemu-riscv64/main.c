@@ -47,6 +47,7 @@
 #define	UART_BASE		0x10000000
 #define	UART_CLOCK_RATE		3686400
 #define	DEFAULT_BAUDRATE	115200
+#define	USEC_TO_TICKS(n)	(10 * (n))
 
 static struct uart_16550_softc uart_sc;
 static struct clint_softc clint_sc;
@@ -210,25 +211,22 @@ hello(void *arg)
 int
 main(void)
 {
+	int j;
 
 	printf("cpu%d: pcpu size %d\n", PCPU_GET(cpuid), sizeof(struct pcpu));
 	sl_init(&l1);
 
 	printf("Releasing CPUs...\n");
-	__riscv_boot_ap[1] = 1;
-	__riscv_boot_ap[2] = 1;
-	__riscv_boot_ap[3] = 1;
-	__riscv_boot_ap[4] = 1;
-	__riscv_boot_ap[5] = 1;
-	__riscv_boot_ap[6] = 1;
-	__riscv_boot_ap[7] = 1;
+	for (j = 0; j < 8; j++)
+		__riscv_boot_ap[j] = 1;
 
 	/* Some testing routines. */
 #if 0
 	struct thread *td;
 	size_t i;
 	for (i = 0; i < 20; i++) {
-		td = thread_create("test", 1, 10000, 4096, test_thr, (void *)i);
+		td = thread_create("test", 1, USEC_TO_TICKS(1000),
+		    4096, test_thr, (void *)i);
 		if (td == NULL)
 			break;
 		printf("td %p created\n", td);
@@ -239,8 +237,8 @@ main(void)
 	struct thread *td;
 	size_t i;
 	for (i = 1; i < 500; i++) {
-		td = thread_create("test", 1, (10000 * i), 4096,
-		    test_thr, (void *)i);
+		td = thread_create("test", 1, (USEC_TO_TICKS(1000) * i),
+		    4096, test_thr, (void *)i);
 		td->td_index = i;
 		if (td == NULL)
 			break;
@@ -248,25 +246,31 @@ main(void)
 #endif
 
 #if 0
-	thread_create("test", 1, 10000, 4096, test_thr1, (void *)0);
-	thread_create("test", 1, 20000, 4096, test_thr2, (void *)1);
-	thread_create("test", 1, 20000, 4096, test_thr2, (void *)2);
+	thread_create("test", 1, USEC_TO_TICKS(1000),
+	    4096, test_thr1, (void *)0);
+	thread_create("test", 1, USEC_TO_TICKS(2000),
+	    4096, test_thr2, (void *)1);
+	thread_create("test", 1, USEC_TO_TICKS(2000),
+	    4096, test_thr2, (void *)2);
 #endif
 
 #if 0
 	struct thread *td;
-	td = thread_create("test1", 1, 5000, 4096, test_m0, (void *)0);
+	td = thread_create("test1", 1, USEC_TO_TICKS(500),
+	    4096, test_m0, (void *)0);
 	td->td_index = 0;
-	td = thread_create("test2", 1, 5000, 4096, test_m1, (void *)1);
+	td = thread_create("test2", 1, USEC_TO_TICKS(500),
+	    4096, test_m1, (void *)1);
 	td->td_index = 1;
-	td = thread_create("test3", 1, 5000, 4096, test_m2, (void *)2);
+	td = thread_create("test3", 1, USEC_TO_TICKS(500),
+	    4096, test_m2, (void *)2);
 	td->td_index = 2;
 #endif
 
 #if 1
-	int j;
 	for (j = 0; j < 100; j++)
-		callout_set(&c1[j], 1000000 * j, cb, (void *)&c1[j]);
+		callout_set(&c1[j], USEC_TO_TICKS(100000) * j, cb,
+		    (void *)&c1[j]);
 #endif
 
 #if 1
@@ -283,7 +287,7 @@ main(void)
 
 	while (1) {
 		printf("Hello world\n");
-		raw_sleep(10000000);
+		raw_sleep(USEC_TO_TICKS(1000000));
 	}
 
 	return (0);
