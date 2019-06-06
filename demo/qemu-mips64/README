@@ -16,3 +16,5 @@ Demo for a big-endian 64-bit MIPS
 3. Run
 
     $ qemu/build/mips64-softmmu/qemu-system-mips64 -m 2048 -M malta -kernel ${OBJDIR}/qemu-mips64.elf -nographic
+
+4. To quit from QEMU press ctrl-a x

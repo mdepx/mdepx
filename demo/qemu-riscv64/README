@@ -14,3 +14,5 @@
 3. Run
 
     $ qemu/build/riscv64-softmmu/qemu-system-riscv64 -smp cpus=8 -machine virt -m 1024 -kernel demo/qemu-riscv64/obj/qemu-riscv64.elf -nographic
+
+4. To quit from QEMU press ctrl-a x
