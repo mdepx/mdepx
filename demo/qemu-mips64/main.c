@@ -30,6 +30,7 @@
 #include <sys/thread.h>
 #include <sys/systm.h>
 #include <sys/malloc.h>
+#include <sys/mutex.h>
 
 #include <machine/frame.h>
 #include <machine/cpuregs.h>
@@ -44,6 +45,7 @@ extern char MipsException[], MipsExceptionEnd[];
 
 static struct mips_timer_softc timer_sc;
 static struct uart_16550_softc uart_sc;
+static struct mtx m;
 
 #define	USEC_TO_TICKS(n)	(100 * (n))	/* 100MHz clock. */
 #define	UART_BASE		0x180003f8
@@ -147,28 +149,40 @@ app_init(void)
 }
 
 static void __unused
-test_thr1(void *arg)
+test_thr(void *arg)
 {
 
 	while (1) {
-		printf("%s\n", __func__);
-		raw_sleep(USEC_TO_TICKS(2000));
+		if (!mtx_timedlock(&m, 1000))
+			continue;
+		printf("cpu%d: hello from thread%04d cn %d\n",
+		    PCPU_GET(cpuid), (size_t)arg, curthread->td_critnest);
+		mtx_unlock(&m);
+
+		raw_sleep(1000);
 	}
 }
 
 int
 main(void)
 {
+	struct thread *td;
+	size_t i;
 
 	printf("%s\n", __func__);
 
-	thread_create("test", 1, USEC_TO_TICKS(1000),
-	    4096, test_thr1, (void *)0);
+	mtx_init(&m);
 
-	while (1) {
-		printf("%s\n", __func__);
-		raw_sleep(USEC_TO_TICKS(1000));
+	for (i = 1; i < 500; i++) {
+		td = thread_create("test", 1, (USEC_TO_TICKS(1000) * i),
+		    4096, test_thr, (void *)i);
+		td->td_index = i;
+		if (td == NULL)
+			break;
 	}
+
+	while (1)
+		raw_sleep(USEC_TO_TICKS(1000));
 
 	return (0);
 }

@@ -19,7 +19,7 @@ OBJECTS =							\
 	${OSDIR}/sys/dev/uart/uart_16550.o			\
 	${OSDIR}/lib/libc/gen/assert.o
 
-KERNEL = malloc mips_cache sched
+KERNEL = malloc mips_cache sched mutex
 LIBRARIES = libc
 
 WARNFLAGS =			\
