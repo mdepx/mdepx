@@ -33,19 +33,19 @@
 #include <machine/thread.h>
 
 struct thread {
-	const char *		td_name;
-	struct mdthread		td_md;
-	volatile u_int		td_critnest;
-	struct trapframe *	td_tf;
-	uint8_t *		td_stack;
-	uint32_t		td_stack_size;
-	struct entry		td_node;
-	struct callout		td_c;
-	uint32_t		td_quantum;
-	uint8_t			td_idle;
-	uint32_t		td_index;
-	int			td_prio;
-	int			td_state;
+	const char *		td_name;	/* Name of the thread. */
+	struct mdthread		td_md;		/* Machine dependent. */
+	volatile u_int		td_critnest;	/* Critical section nesting. */
+	struct trapframe *	td_tf;		/* Trapframe on stack. */
+	uint8_t *		td_stack;	/* Pointer to stack. */
+	uint32_t		td_stack_size;	/* Size of the stack. */
+	struct entry		td_node;	/* Entry in runq or mtx q */
+	struct callout		td_c;		/* Thread deadline callout. */
+	uint32_t		td_quantum;	/* Time slice. */
+	uint8_t			td_idle;	/* This is an idle thread. */
+	uint32_t		td_index;	/* For debugging only. */
+	int			td_prio;	/* Priority. 0 for idle. */
+	int			td_state;	/* Current state. */
 #define	TD_STATE_READY		0
 #define	TD_STATE_RUNNING	1
 #define	TD_STATE_SLEEPING	2
