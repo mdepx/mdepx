@@ -24,74 +24,65 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_SYS_SPINLOCK_H_
-#define	_SYS_SPINLOCK_H_
+#include <machine/asm.h>
 
-#include <machine/atomic.h>
+ASM_ENTRY(_start)
+	fence.i
+	fence
 
-struct spinlock {
-	uintptr_t v;
-};
+	la	t0, cpu_exception_handler
+	csrw	mtvec, t0
 
-static inline void
-sl_init(struct spinlock *l)
-{
+	/*
+	 * CPU0 does not support lr/sc.
+	 * Don't use it in SMP environment.
+	 */
 
-	l->v = 0;
-}
+	li	t0, 1
+	bne	a0, t0, mpentry
 
-static inline void
-sl_lock(struct spinlock *l)
-{
+	/* Clear BSS. */
+	la	t0, _sbss
+	la	t1, _ebss
+1:
+	beq	t0, t1, 2f
+	li	t2, 0
+	sb	t2, 0(t0)
+	addi	t0, t0, 1
+	j	1b
+2:
 
-	KASSERT(curthread->td_critnest > 0,
-	    ("%s: Not in critical section", __func__));
+	/* Load our stack pointer. */
+	la	t0, secondary_stacks
+	li	t1, 4096
+	mulw	t2, t1, a0
+	add	t2, t2, t1
+	add	sp, t2, t0
 
-#ifdef SMP
-	while (atomic_cmpset_acq_ptr(&l->v, 0, 1) == 0);
-#else
-	KASSERT(l->v == 0,
-	    ("%s: lock is already held", __func__));
+	fence
 
-	l->v = 1;
-#endif
-}
+	j	md_init
 
-static inline int
-sl_trylock(struct spinlock *l)
-{
+	/* NOT REACHED */
 
-	KASSERT(curthread->td_critnest > 0,
-	    ("%s: Not in critical section", __func__));
+ASM_ENTRY(mpentry)
+	la	t0, __riscv_boot_ap
+	add	t0, t0, a0
 
-#ifdef SMP
-	return (atomic_cmpset_acq_ptr(&l->v, 0, 1));
-#else
-	KASSERT(l->v == 0,
-	    ("%s: lock is already held", __func__));
+1:
+	lb	t1, 0(t0)
+	beqz	t1, 1b
 
-	l->v = 1;
+	la	t0, secondary_stacks
+	li	t1, 4096
+	mulw	t2, t1, a0
+	add	t2, t2, t1
+	add	sp, t2, t0
 
-	return (1);
-#endif
-}
+	fence
 
-static inline void
-sl_unlock(struct spinlock *l)
-{
+	j	md_init_secondary
+END(mpentry)
 
-	KASSERT(curthread->td_critnest > 0,
-	    ("%s: Not in critical section", __func__));
-
-#ifdef SMP
-	if (!atomic_cmpset_rel_ptr(&l->v, 1, 0))
-		panic("lock is not taken");
-#else
-	KASSERT(l->v == 1,
-	    ("%s: lock is not taken", __func__));
-
-	l->v = 0;
-#endif
-}
-
-#endif /* _SYS_SPINLOCK_H_ */
+cpu_lottery:
+	.space 4

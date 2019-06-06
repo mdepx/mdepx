@@ -41,9 +41,11 @@ CFLAGS = -march=mips64 -mabi=64 -g -nostdinc -G0		\
 	-nostdinc -fno-builtin-printf -ffreestanding		\
 	-mno-abicalls -msoft-float -fwrapv -fno-builtin-printf	\
 	-D__mips_n64 -nostdlib ${WARNFLAGS}			\
-	-DBASE_ADDR=${BASE_ADDR} -DMAXCPU=10			\
+	-DBASE_ADDR=${BASE_ADDR}				\
 	-DCONFIG_QEMU						\
-	-DCONFIG_SCHED -DCONFIG_CPU_IDLE_IE
+	-DCONFIG_NPRIO=2					\
+	-DCONFIG_SCHED						\
+	-DCONFIG_CPU_IDLE_IE
 
 all:	${OBJDIR}/${APP}.bin
 

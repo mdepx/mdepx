@@ -39,7 +39,6 @@
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
 
-#include <dev/uart/uart_16550.h>
 #include <riscv/sifive/e300g_clint.h>
 #include <riscv/sifive/e300g_uart.h>
 
@@ -49,7 +48,7 @@
 #define	DEFAULT_BAUDRATE	115200
 #define	USEC_TO_TICKS(n)	(10 * (n))
 
-static struct uart_16550_softc uart_sc;
+static struct uart_softc uart_sc;
 static struct clint_softc clint_sc;
 
 extern uint8_t __riscv_boot_ap[2];
@@ -65,7 +64,7 @@ static sem_t sem;
 static void
 uart_putchar(int c, void *arg)
 {
-	struct uart_16550_softc *sc;
+	struct uart_softc *sc;
 
 	sc = arg;
 
@@ -73,9 +72,9 @@ uart_putchar(int c, void *arg)
 		return;
 
 	if (c == '\n')
-		uart_16550_putc(sc, '\r');
+		e300g_uart_putc(sc, '\r');
 
-	uart_16550_putc(sc, c);
+	e300g_uart_putc(sc, c);
 }
 
 static void __unused
@@ -179,16 +178,14 @@ app_init(void)
 	malloc_init();
 	malloc_add_region(0x80800000, 0x7800000);
 
-	uart_16550_init(&uart_sc, UART_BASE,
-	    UART_CLOCK_RATE, DEFAULT_BAUDRATE, 0);
+	e300g_uart_init(&uart_sc, 0x10010000,
+	    500000000, DEFAULT_BAUDRATE);
 	console_register(uart_putchar, (void *)&uart_sc);
 
 	sem_init(&sem, 1);
 	mtx_init(&m);
 
 	e300g_clint_init(&clint_sc, CLINT_BASE);
-
-	printf("Hello World\n");
 
 	return (0);
 }
@@ -214,10 +211,11 @@ main(void)
 	int j;
 
 	printf("cpu%d: pcpu size %d\n", PCPU_GET(cpuid), sizeof(struct pcpu));
+
 	sl_init(&l1);
 
 	printf("Releasing CPUs...\n");
-	for (j = 0; j < 8; j++)
+	for (j = 2; j < 5; j++)
 		__riscv_boot_ap[j] = 1;
 
 	/* Some testing routines. */
@@ -271,18 +269,6 @@ main(void)
 	for (j = 0; j < 100; j++)
 		callout_set(&c1[j], USEC_TO_TICKS(100000) * j, cb,
 		    (void *)&c1[j]);
-#endif
-
-#if 1
-	char a;
-	while (1) {
-		a = uart_16550_getc(&uart_sc);
-		if (a == 0x61) {
-			critical_enter();
-			smp_tryst_cpus(0xf, hello, NULL);
-			critical_exit();
-		}
-	}
 #endif
 
 	while (1) {

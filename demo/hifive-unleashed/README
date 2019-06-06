@@ -1,0 +1,13 @@
+An SMP demo for 4 x U54 cores of HiFive Unleashed.
+
+1. Build mdepx
+
+    $ export CROSS_COMPILE=riscv64-unknown-elf-
+    $ make clean all
+
+2. Run on HiFive Unleashed, from U-Boot:
+
+    $ setenv ipaddr 10.10.0.10
+    $ setenv serverip 10.10.0.1
+    $ tftp /tftpboot/hifive-unleashed.bin
+    $ go 0x80000000
