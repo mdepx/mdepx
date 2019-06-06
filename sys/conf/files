@@ -7,7 +7,7 @@ sys/kern/mutex.o			sched mutex
 sys/kern/of.o				fdt
 sys/kern/panic.o
 sys/kern/sched.o			sched
-sys/kern/sem.o				sched sem
+sys/kern/sem.o				sched sem | sched mutex
 sys/kern/sleep.o			!sched
 sys/kern/smp.o				sched smp
 sys/kern/startup.o
