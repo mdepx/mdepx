@@ -36,13 +36,6 @@ ASM_ENTRY(_start)
 	li	t0, 0
 	bne	a0, t0, mpentry
 
-#if 0
-	la	t0, cpu_lottery
-	li	t1, 1
-	amoadd.w t0, t1, 0(t0)
-	bnez	t0, mpentry
-#endif
-
 	/* Clear BSS. */
 	la	t0, _sbss
 	la	t1, _ebss
