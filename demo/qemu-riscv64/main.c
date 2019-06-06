@@ -239,9 +239,9 @@ main(void)
 	for (i = 1; i < 500; i++) {
 		td = thread_create("test", 1, (USEC_TO_TICKS(1000) * i),
 		    4096, test_thr, (void *)i);
-		td->td_index = i;
 		if (td == NULL)
 			break;
+		td->td_index = i;
 	}
 #endif
 
