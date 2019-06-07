@@ -49,6 +49,8 @@ panic(const char *fmt, ...)
 {
 	va_list ap;
 
+	critical_enter();
+
 	va_start(ap, fmt);
 	vpanic(fmt, ap);
 

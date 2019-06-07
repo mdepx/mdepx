@@ -61,6 +61,8 @@ static struct mtx m1 __unused;
 static struct callout c1[1000] __unused;
 static sem_t sem;
 
+uint8_t mp_release __section(".data") = 0;
+
 static void
 uart_putchar(int c, void *arg)
 {

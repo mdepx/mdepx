@@ -61,23 +61,6 @@ ASM_ENTRY(_start)
 	/* NOT REACHED */
 
 ASM_ENTRY(mpentry)
-	la	t0, __riscv_boot_ap
-	add	t0, t0, a0
-
 1:
-	lb	t1, 0(t0)
-	beqz	t1, 1b
-
-	la	t0, secondary_stacks
-	li	t1, 4096
-	mulw	t2, t1, a0
-	add	t2, t2, t1
-	add	sp, t2, t0
-
-	fence
-
-	j	md_init_secondary
+	j	1b
 END(mpentry)
-
-cpu_lottery:
-	.space 4
