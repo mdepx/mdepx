@@ -95,6 +95,3 @@ ASM_ENTRY(mpentry)
 
 	j	md_init_secondary
 END(mpentry)
-
-cpu_lottery:
-	.space 4
