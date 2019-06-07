@@ -160,7 +160,8 @@ timer_start(void *arg, uint32_t ticks)
 			wrapped = 1;
 
 		/*
-		 * Note QEMU could context-switch here on the HOST OS.
+		 * Note that QEMU could context-switch here on the
+		 * host OS and return with an outdated count value.
 		 */
 
 		mips_wr_compare(reg);
