@@ -56,38 +56,38 @@ dump_frame(struct trapframe *tf)
 {
 	int i;
 
-	printf("tf->tf_at == %x\n", tf->tf_at);
+	printf("tf->tf_at == %zx\n", tf->tf_at);
 
 	for (i = 0; i < 2; i++)
-		printf("tf->tf_v%d == %x\n", i, tf->tf_v[i]);
+		printf("tf->tf_v%d == %zx\n", i, tf->tf_v[i]);
 
 #if defined(__mips_n32) || defined(__mips_n64)
 	for (i = 0; i < 8; i++)
-		printf("tf->tf_a%d == %x\n", i, tf->tf_a[i]);
+		printf("tf->tf_a%d == %zx\n", i, tf->tf_a[i]);
 	for (i = 0; i < 6; i++)
-		printf("tf->tf_t%d == %x\n", i, tf->tf_t[i]);
+		printf("tf->tf_t%d == %zx\n", i, tf->tf_t[i]);
 #else
 	for (i = 0; i < 4; i++)
-		printf("tf->tf_a%d == %x\n", i, tf->tf_a[i]);
+		printf("tf->tf_a%d == %zx\n", i, tf->tf_a[i]);
 	for (i = 0; i < 10; i++)
-		printf("tf->tf_t%d == %x\n", i, tf->tf_t[i]);
+		printf("tf->tf_t%d == %zx\n", i, tf->tf_t[i]);
 #endif
 
 	for (i = 0; i < 8; i++)
-		printf("tf->tf_s%d == %x\n", i, tf->tf_s[i]);
+		printf("tf->tf_s%d == %zx\n", i, tf->tf_s[i]);
 
-	printf("tf->tf_gp == %x\n", tf->tf_gp);
-	printf("tf->tf_sp == %x\n", tf->tf_sp);
-	printf("tf->tf_s8 == %x\n", tf->tf_s8);
-	printf("tf->tf_ra == %x\n", tf->tf_ra);
+	printf("tf->tf_gp == %zx\n", tf->tf_gp);
+	printf("tf->tf_sp == %zx\n", tf->tf_sp);
+	printf("tf->tf_s8 == %zx\n", tf->tf_s8);
+	printf("tf->tf_ra == %zx\n", tf->tf_ra);
 
-	printf("tf->tf_mullo == %x\n", tf->tf_mullo);
-	printf("tf->tf_mulhi == %x\n", tf->tf_mulhi);
+	printf("tf->tf_mullo == %zx\n", tf->tf_mullo);
+	printf("tf->tf_mulhi == %zx\n", tf->tf_mulhi);
 
-	printf("tf->tf_status == %x\n", tf->tf_status);
-	printf("tf->tf_badvaddr == %x\n", tf->tf_badvaddr);
-	printf("tf->tf_cause == %x\n", tf->tf_cause);
-	printf("tf->tf_pc == %x\n", tf->tf_pc);
+	printf("tf->tf_status == %zx\n", tf->tf_status);
+	printf("tf->tf_badvaddr == %zx\n", tf->tf_badvaddr);
+	printf("tf->tf_cause == %zx\n", tf->tf_cause);
+	printf("tf->tf_pc == %zx\n", tf->tf_pc);
 }
 
 
