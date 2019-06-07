@@ -42,3 +42,18 @@ VECTOR(MipsException)
 	eret
 	nop
 VECTOR_END(MipsException)
+
+VECTOR(MipsTLBMiss)
+	.set push
+	.set noat
+1:
+	j	1b
+	nop
+	.set pop
+VECTOR_END(MipsTLBMiss)
+
+VECTOR(MipsCache)
+1:
+	j	1b
+	nop
+VECTOR_END(MipsCache)
