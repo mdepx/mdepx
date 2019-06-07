@@ -71,7 +71,7 @@ sem_cb(void *arg)
 		sl_unlock(&sem->l);
 		return;
 	}
-	t->timeout = 1;
+	t->timeout = true;
 
 	KASSERT(td->td_state == TD_STATE_ACK,
 	    ("%s: wrong state %d\n", __func__, td->td_state));
@@ -112,7 +112,7 @@ sem_timedwait(sem_t *sem, int ticks)
 		if (ticks) {
 			t.td = td;
 			t.sem = sem;
-			t.timeout = 0;
+			t.timeout = false;
 			callout_init(&td->td_c);
 			callout_set(&td->td_c, ticks, sem_cb, &t);
 		}
