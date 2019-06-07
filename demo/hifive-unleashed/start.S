@@ -34,7 +34,7 @@ ASM_ENTRY(_start)
 	csrw	mtvec, t0
 
 	/*
-	 * CPU0 does not support lr/sc.
+	 * CPU0 (E51) does not support lr/sc.
 	 * Don't use it in SMP environment.
 	 */
 
@@ -52,6 +52,11 @@ ASM_ENTRY(_start)
 	j	1b
 2:
 
+	/* Release CPUs */
+	la	t0, mp_release
+	li	t1, 1
+	sb	t1, 0(t0)
+
 	/* Load our stack pointer. */
 	la	t0, secondary_stacks
 	li	t1, 4096
@@ -66,6 +71,13 @@ ASM_ENTRY(_start)
 	/* NOT REACHED */
 
 ASM_ENTRY(mpentry)
+	/* Spin until CPU1 clears BSS. */
+1:
+	la	t0, mp_release
+	lb	t1, 0(t0)
+	beqz	t1, 1b
+
+	/* Spin until CPU1 release the core. */
 	la	t0, __riscv_boot_ap
 	add	t0, t0, a0
 
