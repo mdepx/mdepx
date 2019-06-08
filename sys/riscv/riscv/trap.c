@@ -51,22 +51,22 @@ dump_frame(struct trapframe *tf)
 {
 	int i;
 
-	printf("tf->tf_ra %x\n", tf->tf_ra);
-	printf("tf->tf_sp %x\n", tf->tf_sp);
-	printf("tf->tf_gp %x\n", tf->tf_gp);
-	printf("tf->tf_tp %x\n", tf->tf_tp);
+	printf("tf->tf_ra %zx\n", tf->tf_ra);
+	printf("tf->tf_sp %zx\n", tf->tf_sp);
+	printf("tf->tf_gp %zx\n", tf->tf_gp);
+	printf("tf->tf_tp %zx\n", tf->tf_tp);
 
 	for (i = 0; i < 7; i++)
-		printf("tf->tf_t%d %x\n", i, tf->tf_t[i]);
+		printf("tf->tf_t%d %zx\n", i, tf->tf_t[i]);
 	for (i = 0; i < 12; i++)
-		printf("tf->tf_s%d %x\n", i, tf->tf_s[i]);
+		printf("tf->tf_s%d %zx\n", i, tf->tf_s[i]);
 	for (i = 0; i < 8; i++)
-		printf("tf->tf_a%d %x\n", i, tf->tf_a[i]);
+		printf("tf->tf_a%d %zx\n", i, tf->tf_a[i]);
 
-	printf("tf->tf_mepc %x\n", tf->tf_mepc);
-	printf("tf->tf_mstatus %x\n", tf->tf_mstatus);
-	printf("tf->tf_mtval %x\n", tf->tf_mtval);
-	printf("tf->tf_mcause %x\n", tf->tf_mcause);
+	printf("tf->tf_mepc %zx\n", tf->tf_mepc);
+	printf("tf->tf_mstatus %zx\n", tf->tf_mstatus);
+	printf("tf->tf_mtval %zx\n", tf->tf_mtval);
+	printf("tf->tf_mcause %zx\n", tf->tf_mcause);
 }
 
 static void
@@ -78,11 +78,11 @@ handle_exception(struct trapframe *tf)
 		tf->tf_mepc += 4;
 		break;
 	case EXCP_ILLEGAL_INSTRUCTION:
-		printf("%s: illegal instruction at %x\n",
+		printf("%s: illegal instruction at %zx\n",
 		    __func__, tf->tf_mepc);
 	default:
 		dump_frame(tf);
-		panic("%s: unhandled exception 0x%x\n",
+		panic("%s: unhandled exception 0x%zx\n",
 		    __func__, tf->tf_mcause);
 	}
 }
