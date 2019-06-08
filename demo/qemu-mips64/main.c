@@ -42,6 +42,8 @@
 #include <dev/uart/uart_16550.h>
 
 extern char MipsException[], MipsExceptionEnd[];
+extern char MipsTLBMiss[], MipsTLBMissEnd[];
+extern char MipsCache[], MipsCacheEnd[];
 
 static struct mips_timer_softc timer_sc;
 static struct uart_16550_softc uart_sc;
@@ -113,6 +115,30 @@ udelay(uint32_t usec)
 	mips_timer_udelay(&timer_sc, usec);
 }
 
+static void
+mips_install_vectors(void)
+{
+
+	if (MipsCacheEnd - MipsCache > 0x80)
+		panic("Cache error code is too big");
+	if (MipsTLBMissEnd - MipsTLBMiss > 0x80)
+		panic("TLB code is too big");
+
+	/* Install exception code. */
+	bcopy(MipsException, (void *)MIPS_EXC_VEC_GENERAL,
+	    MipsExceptionEnd - MipsException);
+
+	/* Install Cache Error code */
+	bcopy(MipsCache, (void *)MIPS_EXC_VEC_CACHE_ERR,
+	    MipsCacheEnd - MipsCache);
+
+	/* Install TLB exception code */
+	bcopy(MipsTLBMiss, (void *)MIPS_EXC_VEC_UTLB_MISS,
+	    MipsTLBMissEnd - MipsTLBMiss);
+	bcopy(MipsTLBMiss, (void *)MIPS_EXC_VEC_XTLB_MISS,
+	    MipsTLBMissEnd - MipsTLBMiss);
+}
+
 int
 app_init(void)
 {
@@ -124,10 +150,7 @@ app_init(void)
 	    UART_CLOCK_RATE, DEFAULT_BAUDRATE, 0);
 	console_register(uart_putchar, (void *)&uart_sc);
 
-	/* Install interrupt code */
-	bcopy(MipsException, (void *)MIPS_EXC_VEC_GENERAL,
-	    MipsExceptionEnd - MipsException);
-
+	mips_install_vectors();
 	mips_install_intr_map(mips_intr_map);
 
 	mips_timer_init(&timer_sc, MIPS_DEFAULT_FREQ,
@@ -143,6 +166,9 @@ app_init(void)
 	status |= MIPS_SR_IM_HARD(5);
 	status |= MIPS_SR_IE;
 	status &= ~MIPS_SR_BEV;
+	status |= MIPS_SR_UX;
+	status |= MIPS_SR_KX;
+	status |= MIPS_SR_SX;
 	mips_wr_status(status);
 
 	return (0);
