@@ -35,12 +35,14 @@
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
 
+#define	STACK_SIZE	4096
+
 static struct pcpu __pcpu[MAXCPU];
 static uint32_t ncpus;
-static size_t cpu_stacks[MAXCPU][4096]; /* Interrupt stack */
+static size_t cpu_stacks[MAXCPU][STACK_SIZE]; /* Interrupt stack */
 
 uint8_t __riscv_boot_ap[MAXCPU];
-uint8_t secondary_stacks[MAXCPU][4096]; /* Idle thread stacks */
+uint8_t secondary_stacks[MAXCPU][STACK_SIZE]; /* Idle thread stacks */
 
 void
 critical_enter(void)
@@ -116,7 +118,7 @@ md_init_secondary(int hart)
 
 	pcpup = &__pcpu[cpu];
 	pcpup->pc_cpuid = hart;
-	pcpup->pc_stack = (uintptr_t)&cpu_stacks[hart] + 4096 * 8;
+	pcpup->pc_stack = (uintptr_t)&cpu_stacks[hart] + STACK_SIZE;
 	__asm __volatile("mv gp, %0" :: "r"(pcpup));
 	csr_write(mscratch, pcpup->pc_stack);
 
@@ -144,7 +146,7 @@ md_init(int hart)
 
 	pcpup = &__pcpu[ncpus++];
 	pcpup->pc_cpuid = hart;
-	pcpup->pc_stack = (uintptr_t)&cpu_stacks[hart] + 4096 * 8;
+	pcpup->pc_stack = (uintptr_t)&cpu_stacks[hart] + STACK_SIZE;
 	__asm __volatile("mv gp, %0" :: "r"(pcpup));
 	csr_write(mscratch, pcpup->pc_stack);
 
@@ -156,8 +158,10 @@ md_init(int hart)
 
 	/* Allow the app to register malloc and timer. */
 	app_init();
+	printf("hart %d, stack %lx\n", hart, pcpup->pc_stack);
+	while (1);
 
-	td = thread_create("main", 1, 10000, 4096, main, NULL);
+	td = thread_create("main", 1, 10000, STACK_SIZE, main, NULL);
 	if (td == NULL)
 		panic("can't create the main thread\n");
 
