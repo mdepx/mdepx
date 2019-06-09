@@ -158,8 +158,6 @@ md_init(int hart)
 
 	/* Allow the app to register malloc and timer. */
 	app_init();
-	printf("hart %d, stack %lx\n", hart, pcpup->pc_stack);
-	while (1);
 
 	td = thread_create("main", 1, 10000, STACK_SIZE, main, NULL);
 	if (td == NULL)
