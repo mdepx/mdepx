@@ -10,21 +10,12 @@ Mdepx is an operating system for embedded applications.
 - Static/Dynamic memory allocation
 - Timed Mutexes, Semaphores
 - Symmetric Multiprocessing (SMP)
+- BSD libc included
 
 ## Supported platforms
 - ARM Cortex-M family (ARMv7, ARMv8)
 - MIPS32, MIPS64
 - RISC-V rv32ima, rv64ima
-
-## Included libraries
-- BSD libc library
-- libaeabi
-- libFLAC
-- libfont
-- md5
-- mbedtls
-- tinycrypt
-- xz
 
 ## Featured applications
   * CTSRD CHERI [device-model](https://github.com/CTSRD-CHERI/device-model)
