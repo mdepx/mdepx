@@ -17,7 +17,13 @@ Mdepx is an operating system for embedded applications.
 - MIPS32, MIPS64
 - RISC-V rv32ima, rv64ima
 
-## Featured applications
+## Generic demo applications
+  * QEMU/RISC-V rv64ima (SMP)
+  * QEMU/MIPS64
+  * HiFive Unleashed (SMP)
+  * HiFive Unleashed Monitor Core
+
+## Featured applications (external)
   * CTSRD CHERI [device-model](https://github.com/CTSRD-CHERI/device-model)
   * [Driving OLED display on HiFive1 board](https://github.com/osfive/hifive1-oled)
   * [Setting up LTE 4G Link with nRF9160](https://github.com/osfive/nrf9160)
@@ -25,19 +31,13 @@ Mdepx is an operating system for embedded applications.
   * [Driving MIPI DSI Display with STM32F469I-DISCO](https://github.com/osfive/stm32f469i-disco-dsi)
   * [Driving IPS Display with PIC32MZDA Starter Kit](https://github.com/osfive/pic32mzdask-ips)
 
-## Generic demo applications are provided:
-  * QEMU/RISC-V rv64ima (SMP)
-  * QEMU/MIPS64
-  * HiFive Unleashed (SMP)
-  * HiFive Unleashed Monitor Core
-
 # Getting started
 
 Mdepx has a Makefile-based build system. You have to construct a GNU makefile for your application. See [example applications](https://github.com/osfive/).
 
 # Contributing
 
-Please submit pull requests on github or send patches to br@bsdpad.com.
+Please submit pull requests on github or send patches to br@machdep.com.
 
 Note that Mdepx uses FreeBSD [style(9)](https://www.freebsd.org/cgi/man.cgi?query=style&sektion=9) guide.
 
