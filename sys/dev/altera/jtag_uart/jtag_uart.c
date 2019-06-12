@@ -57,10 +57,10 @@ aju_putc(struct aju_softc *sc, int c)
 }
 
 int
-aju_init(struct aju_softc *sc, uint32_t base)
+aju_init(struct aju_softc *sc, size_t base)
 {
 
-	sc->base = base | MIPS_XKPHYS_UNCACHED_BASE;
+	sc->base = base;
 
 	return (0);
 }
