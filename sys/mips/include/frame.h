@@ -52,8 +52,8 @@ struct trapframe {
 	register_t	tf_mullo;
 	register_t	tf_mulhi;
 	register_t	tf_status;
-	register_t	tf_badvaddr;
 	register_t	tf_cause;
+	register_t	tf_badvaddr;
 	register_t	tf_pc;
 };
 #endif
