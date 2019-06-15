@@ -1,4 +1,5 @@
 LIBC_OBJS =						\
+		lib/libc/net/inet_addr.o		\
 		lib/libc/stdio/fprintf.o		\
 		lib/libc/stdio/feof.o			\
 		lib/libc/stdio/fopen.o			\
