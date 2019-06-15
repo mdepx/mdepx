@@ -87,10 +87,10 @@
 	REG_S	v0, (REG_SIZE * 29)(sp)
 	REG_S	v1, (REG_SIZE * 30)(sp)
 
-	mfc0	a0, CP0_STATUS
-	mfc0	a1, CP0_CAUSE
-	mfc0	a2, CP0_BAD_VADDR
-	mfc0	a3, CP0_EXC_PC
+	MFC0	a0, CP0_STATUS
+	MFC0	a1, CP0_CAUSE
+	MFC0	a2, CP0_BAD_VADDR
+	MFC0	a3, CP0_EXC_PC
 
 	REG_S	a0, (REG_SIZE * 31)(sp)
 	REG_S	a1, (REG_SIZE * 32)(sp)
@@ -108,7 +108,7 @@
 	REG_L	k0, (REG_SIZE * 31)(sp)
 	REG_L	a3, (REG_SIZE * 34)(sp)
 
-	mtc0	a3, CP0_EXC_PC
+	MTC0	a3, CP0_EXC_PC
 
 .set noat
 	REG_L	AT, (REG_SIZE * 0)(sp)
