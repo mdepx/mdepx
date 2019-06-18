@@ -43,7 +43,14 @@
 	__value;						\
 })
 
+#define	mips_wr_index(val)	mtc0(0, 0, (val))
+#define	mips_rd_index()		mfc0(0, 0)
+#define	mips_wr_entrylo0(val)	mtc0(2, 0, (val))
+#define	mips_wr_entrylo1(val)	mtc0(3, 0, (val))
+#define	mips_wr_pagemask(val)	mtc0(5, 0, (val))
+#define	mips_rd_badvaddr()	mfc0(8, 0)
 #define	mips_rd_count()		mfc0(9, 0)
+#define	mips_wr_entryhi(val)	mtc0(10, 0, (val))
 #define	mips_rd_compare()	mfc0(11, 0)
 #define	mips_wr_compare(val)	mtc0(11, 0, (val))
 #define	mips_rd_status()	mfc0(12, 0)

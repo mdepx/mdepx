@@ -116,6 +116,7 @@
 #define	CP0_WIRED	$6
 #define	CP0_BAD_VADDR	$8
 #define	CP0_COUNT	$9
+#define	CP0_ENTRYHI	$10
 #define	CP0_COMPARE	$11
 #define	CP0_STATUS	$12,0
 #define	CP0_INTCTL	$12,1
