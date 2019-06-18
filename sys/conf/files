@@ -10,7 +10,6 @@ sys/kern/sched.o			sched
 sys/kern/sem.o				sched sem | sched mutex
 sys/kern/sleep.o			!sched
 sys/kern/smp.o				sched smp
-sys/kern/startup.o
 sys/kern/thread/thread.o		sched
 sys/kern/thread/thread_alloc.o		sched malloc
 sys/kern/thread/thread_sleep.o		sched
