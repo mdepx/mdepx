@@ -49,5 +49,29 @@ exception:
 	.thumb_func
 	.type __start, function
 __start:
+
+	/* Clear BSS */
+	ldr	r1, =_sbss
+	ldr	r2, =_ebss
+	mov	r3, 0
+1:
+	cmp	r1, r2
+	beq	2f
+	strb	r3, [r1], #1
+	b	1b
+2:
+
+	/* Relocate data */
+	ldr	r0, =_smem
+	ldr	r1, =_sdata
+	ldr	r2, =_edata
+1:
+	cmp	r1, r2
+	beq	2f
+	ldrb	r3, [r0], #1
+	strb	r3, [r1], #1
+	b	1b
+2:
+
 	mov	r0, 0
 	bl	md_init

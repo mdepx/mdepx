@@ -108,9 +108,6 @@ md_init(int arg)
 	struct pcpu *pcpup;
 	int cpuid;
 
-	zero_bss();
-	relocate_data();
-
 	cpuid = 0;
 
 	pcpup = &__pcpu;

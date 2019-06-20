@@ -48,7 +48,4 @@ void panic(const char *fmt, ...);
 
 #define	CTASSERT(x)	_Static_assert(x, "compile-time assertion failed")
 
-void zero_bss(void);
-void relocate_data(void);
-
 #endif /* !_SYS_SYSTM_H_ */
