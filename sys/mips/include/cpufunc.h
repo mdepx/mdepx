@@ -29,6 +29,21 @@
 
 #include <machine/cpuregs.h>
 
+#ifdef __mips_n64
+#define mtc0(reg, sel, value)						\
+	__asm __volatile(						\
+		"dmtc0   %z0, $%1, %2"					\
+		:: "r" ((uint64_t) (value)), "K" (reg), "K" (sel))
+
+#define mfc0(reg, sel)						\
+({								\
+	uint64_t __value;					\
+	__asm __volatile(					\
+		"dmfc0 %0, $%1, %2"				\
+		: "=r" (__value) : "K" (reg), "K" (sel));	\
+	__value;						\
+})
+#else
 #define mtc0(reg, sel, value)						\
 	__asm __volatile(						\
 		"mtc0   %z0, $%1, %2"					\
@@ -42,15 +57,18 @@
 		: "=r" (__value) : "K" (reg), "K" (sel));	\
 	__value;						\
 })
+#endif
 
 #define	mips_wr_index(val)	mtc0(0, 0, (val))
 #define	mips_rd_index()		mfc0(0, 0)
 #define	mips_wr_entrylo0(val)	mtc0(2, 0, (val))
 #define	mips_wr_entrylo1(val)	mtc0(3, 0, (val))
 #define	mips_wr_pagemask(val)	mtc0(5, 0, (val))
+#define	mips_rd_wired()		mfc0(6, 0)
 #define	mips_rd_badvaddr()	mfc0(8, 0)
 #define	mips_rd_count()		mfc0(9, 0)
 #define	mips_wr_entryhi(val)	mtc0(10, 0, (val))
+#define	mips_rd_entryhi()	mfc0(10, 0)
 #define	mips_rd_compare()	mfc0(11, 0)
 #define	mips_wr_compare(val)	mtc0(11, 0, (val))
 #define	mips_rd_status()	mfc0(12, 0)
