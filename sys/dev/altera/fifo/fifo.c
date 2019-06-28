@@ -141,7 +141,6 @@ fifo_process_tx(struct altera_fifo_softc *sc,
 
 	for (i = 0; i < iovcnt; i++) {
 		read_lo = (uint64_t)iov[i].iov_base;
-		read_lo |= MIPS_XKPHYS_UNCACHED_BASE;
 		len = iov[i].iov_len;
 
 		dprintf("%s: copy %lx -> 0, %d bytes\n",
@@ -254,7 +253,6 @@ fifo_process_rx(struct altera_fifo_softc *sc,
 	dprintf("%s(%d): fill_level %d\n", __func__, sc->unit, fill_level);
 
 	write_lo = (uint64_t)iov->iov_base;
-	write_lo |= MIPS_XKPHYS_UNCACHED_BASE;
 	error = 0;
 	sop_rcvd = 0;
 	eop_rcvd = 0;
@@ -283,8 +281,8 @@ fifo_process_rx(struct altera_fifo_softc *sc,
 		meta = RD4_FIFO_MEM(sc, A_ONCHIP_FIFO_MEM_CORE_METADATA);
 		meta = le32toh(meta);
 		if ((meta & A_ONCHIP_FIFO_MEM_CORE_ERROR_MASK) ||
-		    (meta & A_ONCHIP_FIFO_MEM_CORE_CHANNEL_MASK) != 0) {
-			printf("error\n");
+		    (meta & A_ONCHIP_FIFO_MEM_CORE_CHANNEL_MASK)) {
+			printf("%s: error: %x\n", __func__, meta);
 			error = -1;
 			break;
 		}
