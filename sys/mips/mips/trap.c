@@ -51,6 +51,8 @@
 static struct thread intr_thread[MAXCPU];
 #endif
 
+void MipsTLBMissException(void);
+
 static void
 dump_frame(struct trapframe *tf)
 {
@@ -164,6 +166,12 @@ mips_exception(struct trapframe *tf)
 	switch (exc_code) {
 	case MIPS_CR_EXC_CODE_INT:
 		intr = true;
+		break;
+	case MIPS_CR_EXC_CODE_TLBL:
+	case MIPS_CR_EXC_CODE_TLBS:
+#ifdef CONFIG_MIPS_TLBMISS
+		MipsTLBMissException();
+#endif
 		break;
 	case MIPS_CR_EXC_CODE_ADES:
 		dump_frame(tf);
