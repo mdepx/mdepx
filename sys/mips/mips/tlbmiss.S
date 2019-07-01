@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,16 +29,22 @@
 #include <machine/cpuregs.h>
 #include <mips/mips/saverestore.S>
 
-VECTOR(MipsException)
-	save_registers
-	nop
-	move	a0, sp
-	PTR_LA	k0, mips_exception
-	jalr	k0
-	nop
-	move	sp, v0
-	restore_registers
-	sync
+VECTOR(MipsTLBMiss)
+	.set push
+	.set noat
+	mfc0		k0, CP0_BAD_VADDR		# k0 = bad addr
+	/* TODO */
 	eret
 	nop
-VECTOR_END(MipsException)
+	.set pop
+VECTOR_END(MipsTLBMiss)
+
+VECTOR(MipsTLBMissException)
+	.set push
+	.set noat
+	mfc0		k0, CP0_BAD_VADDR		# k0 = bad addr
+	/* TODO */
+	jr	ra
+	nop
+	.set pop
+VECTOR_END(MipsTLBMissException)
