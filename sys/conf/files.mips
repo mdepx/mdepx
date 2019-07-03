@@ -1,7 +1,9 @@
 sys/mips/mips/cache_mipsNN.o		mips_cache
+sys/mips/mips/cache.o			mips_cache_exception
 sys/mips/mips/exception.o
 sys/mips/mips/machdep.o
 sys/mips/mips/saverestore.o
 sys/mips/mips/timer.o
+sys/mips/mips/tlbmiss.o			tlbmiss
 sys/mips/mips/trap.o
 include sys/conf/files
