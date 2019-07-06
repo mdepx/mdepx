@@ -104,21 +104,6 @@ app_init(void)
 	return (0);
 }
 
-static void __unused
-test(void *arg)
-{
-
-	printf("%d", PCPU_GET(cpuid));
-}
-
-static void __unused
-hello(void *arg)
-{
-
-	if (PCPU_GET(cpuid) == 0)
-		printf("\n\nhello\n\n");
-}
-
 int
 main(void)
 {
