@@ -57,6 +57,6 @@ raw_sleep(uint32_t ticks)
 
 	callout_set(&c, ticks, raw_sleep_cb, td);
 
-	while (c.state == 0)
+	while (c.state != CALLOUT_STATE_FIRED)
 		cpu_idle();
 }

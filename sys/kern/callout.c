@@ -84,7 +84,7 @@ void
 callout_init(struct callout *c)
 {
 
-	c->state = 0;
+	c->state = CALLOUT_STATE_READY;
 	c->flags = 0;
 }
 
@@ -168,7 +168,7 @@ callout_set_locked(struct callout *c, uint32_t ticks,
 		return (-1);
 
 	if (ticks == 0) {
-		c->state = 1;
+		c->state = CALLOUT_STATE_FIRED;
 		return (0);
 	}
 
@@ -271,7 +271,7 @@ callout_callback(struct mi_timer *mt)
 			ticks_elapsed -= c->ticks;
 			list_remove(&c->node);
 			c->ticks = 0;
-			c->state = 1;
+			c->state = CALLOUT_STATE_FIRED;
 			c->flags &= ~CALLOUT_FLAG_ACTIVE;
 			if (c->func)
 				c->func(c->arg);

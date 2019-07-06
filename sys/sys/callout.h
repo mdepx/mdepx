@@ -37,6 +37,8 @@
 
 struct callout {
 	int state;
+#define	CALLOUT_STATE_READY	0
+#define	CALLOUT_STATE_FIRED	1
 	uint32_t ticks;
 	uint32_t ticks_orig;
 	void (*func)(void *arg);
