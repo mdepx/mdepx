@@ -44,7 +44,6 @@ CFLAGS = -march=mips64 -mabi=64 -g -nostdinc -G0		\
 	-DBASE_ADDR=${BASE_ADDR}				\
 	-DCONFIG_QEMU						\
 	-DCONFIG_NPRIO=2					\
-	-DCONFIG_SCHED						\
 	-DCONFIG_CPU_IDLE_IE
 
 all:	${OBJDIR}/${APP}.bin

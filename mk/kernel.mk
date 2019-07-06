@@ -18,3 +18,8 @@ KOBJECTS = $(shell ${PYTHON} ${OSDIR}/tools/files.py		\
 $(foreach obj, ${KOBJECTS},					\
 	${eval OBJECTS += ${OSDIR}/${obj}}			\
 )
+
+$(foreach op, ${KERNEL},						\
+	${eval kopt = $(shell echo ${op} | tr '[:lower:]' '[:upper:]')}	\
+	${eval CFLAGS += -DCONFIG_${kopt}}				\
+)

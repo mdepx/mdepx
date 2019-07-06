@@ -26,8 +26,7 @@ CFLAGS += -nostdinc -fno-builtin-printf -ffreestanding -Wall		\
 	-Wredundant-decls -Wnested-externs -Wstrict-prototypes		\
 	-Wmissing-prototypes -Wpointer-arith -Winline -Wcast-qual	\
 	-Wundef -Wmissing-include-dirs -Werror				\
-	-DCONFIG_SCHED -DCONFIG_NPRIO=2
-CFLAGS += -DCONFIG_SMP -DMAXCPU=8
+	-DCONFIG_NPRIO=2 -DMAXCPU=8
 
 all:	${OBJDIR}/${APP}.bin
 
