@@ -41,7 +41,7 @@ raw_sleep_cb(void *arg)
 	td = arg;
 
 	KASSERT(td->td_state == TD_STATE_ACK,
-		("not sleeping, %d", td->td_state));
+	    ("%s: td is not sleeping (state %d).", __func__, td->td_state));
 
 	sched_add(td);
 }
