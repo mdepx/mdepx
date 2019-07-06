@@ -68,6 +68,7 @@ ASM_ENTRY(_start)
 	/* NOT REACHED */
 
 ASM_ENTRY(mpentry)
+#ifdef CONFIG_SMP
 	la	t0, __riscv_boot_ap
 	add	t0, t0, a0
 
@@ -84,6 +85,10 @@ ASM_ENTRY(mpentry)
 	fence
 
 	j	md_init_secondary
+#else
+1:
+	j	1b
+#endif
 END(mpentry)
 
 cpu_lottery:

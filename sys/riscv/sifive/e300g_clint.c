@@ -73,7 +73,9 @@ send_ipi(int cpumask, int ipi)
 			break;
 	}
 }
+#endif
 
+#ifdef CONFIG_SMP
 void
 clint_intr_software(void)
 {
