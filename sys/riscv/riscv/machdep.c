@@ -44,10 +44,6 @@ static size_t cpu_stacks[MAXCPU][STACK_SIZE]; /* Interrupt stack */
 uint8_t __riscv_boot_ap[MAXCPU];
 uint8_t secondary_stacks[MAXCPU][STACK_SIZE]; /* Idle thread stacks */
 
-#if !defined(CONFIG_SCHED) && defined(CONFIG_SMP)
-#error "Invalid configuration"
-#endif
-
 void
 critical_enter(void)
 {

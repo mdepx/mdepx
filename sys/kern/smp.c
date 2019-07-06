@@ -41,6 +41,10 @@ static int smp_tryst_ncpus;
 static uint32_t smp_tryst_room[2];
 static struct spinlock smp_lock;
 
+#if !defined(CONFIG_SCHED)
+#error "Invalid configuration"
+#endif
+
 void
 ipi_handler(void)
 {
