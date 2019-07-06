@@ -53,9 +53,11 @@ riscv_intr(int irq)
 	case IRQ_TIMER_MACHINE:
 		clint_intr();
 		break;
+#ifdef CONFIG_SMP
 	case IRQ_SOFTWARE_MACHINE:
 		clint_intr_software();
 		break;
+#endif
 	default:
 		printf("%s%d: %d\n", __func__, PCPU_GET(cpuid), irq);
 		break;

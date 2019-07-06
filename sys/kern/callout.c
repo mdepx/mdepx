@@ -45,7 +45,7 @@ static struct entry callouts_list[MAXCPU];
  * that belongs to another CPU, otherwise callout code is lock-free.
  */
 
-#ifdef SMP
+#ifdef CONFIG_SMP
 static struct spinlock l[MAXCPU];
 #define	callout_lock(cpuid)	sl_lock(&(l)[cpuid]);
 #define	callout_unlock(cpuid)	sl_unlock(&(l)[cpuid]);
@@ -315,7 +315,7 @@ callout_register(struct mi_timer *mt)
 	mi_tmr = mt;
 
 	for (i = 0; i < MAXCPU; i++) {
-#ifdef SMP
+#ifdef CONFIG_SMP
 		sl_init(&l[i]);
 #endif
 		list_init(&callouts_list[i]);
