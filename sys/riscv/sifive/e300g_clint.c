@@ -51,6 +51,8 @@
 #endif
 
 static struct clint_softc *clint_sc;
+
+#ifdef CONFIG_SCHED
 extern struct entry pcpu_all;
 
 void
@@ -86,6 +88,7 @@ clint_intr_software(void)
 
 	ipi_handler();
 }
+#endif
 
 void
 clint_set_sip(int hart_id)

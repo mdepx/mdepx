@@ -44,7 +44,9 @@
 #define	dprintf(fmt, ...)
 #endif
 
+#ifdef CONFIG_SCHED
 static struct thread intr_thread[MAXCPU];
+#endif
 
 static void
 dump_frame(struct trapframe *tf)
@@ -87,6 +89,7 @@ handle_exception(struct trapframe *tf)
 	}
 }
 
+#ifdef CONFIG_SCHED
 struct trapframe *
 riscv_exception(struct trapframe *tf)
 {
@@ -105,7 +108,7 @@ riscv_exception(struct trapframe *tf)
 	if (td->td_idle)
 		sched_cpu_avail(p, false);
 
-	/* Switch to the interrupt thread */
+	/* Switch to the interrupt thread. */
 	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
 	critical_enter();
 
@@ -141,3 +144,33 @@ riscv_exception(struct trapframe *tf)
 
 	return (td->td_tf);
 }
+
+#else
+
+struct trapframe *
+riscv_exception(struct trapframe *tf)
+{
+	struct thread *td;
+	bool intr;
+	int irq;
+
+	td = curthread;
+	intr = false;
+
+	curthread->td_critnest++;
+
+	if (tf->tf_mcause & EXCP_INTR) {
+		irq = (tf->tf_mcause & EXCP_MASK);
+		intr = true;
+	} else
+		handle_exception(tf);
+
+	td->td_tf = tf;
+	if (intr)
+		riscv_intr(irq);
+
+	curthread->td_critnest--;
+
+	return (td->td_tf);
+}
+#endif

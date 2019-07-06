@@ -44,6 +44,10 @@ static size_t cpu_stacks[MAXCPU][STACK_SIZE]; /* Interrupt stack */
 uint8_t __riscv_boot_ap[MAXCPU];
 uint8_t secondary_stacks[MAXCPU][STACK_SIZE]; /* Idle thread stacks */
 
+#if !defined(CONFIG_SCHED) && defined(CONFIG_SMP)
+#error "Invalid configuration"
+#endif
+
 void
 critical_enter(void)
 {
@@ -108,6 +112,7 @@ md_thread_terminate(struct thread *td)
 
 }
 
+#ifdef CONFIG_SMP
 void
 md_init_secondary(int hart)
 {
@@ -135,12 +140,12 @@ md_init_secondary(int hart)
 	intr_enable();
 	sched_enter();
 }
+#endif
 
 void
 md_init(int hart)
 {
 	struct pcpu *pcpup;
-	struct thread *td;
 
 	ncpus = 0;
 
@@ -151,14 +156,21 @@ md_init(int hart)
 	csr_write(mscratch, pcpup->pc_stack);
 
 	thread_init(hart);
+#ifdef CONFIG_SCHED
 	sched_init();
+#endif
+
+#ifdef CONFIG_SMP
 	smp_init();
+#endif
 
 	csr_set(mie, MIE_MSIE);
 
 	/* Allow the app to register malloc and timer. */
 	app_init();
 
+#ifdef CONFIG_SCHED
+	struct thread *td;
 	td = thread_create("main", 1, 10000, STACK_SIZE, main, NULL);
 	if (td == NULL)
 		panic("can't create the main thread\n");
@@ -168,4 +180,8 @@ md_init(int hart)
 
 	intr_enable();
 	sched_enter();
+#else
+	intr_enable();
+	main();
+#endif
 }
