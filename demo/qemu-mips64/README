@@ -1,4 +1,7 @@
-Demo for a big-endian 64-bit MIPS
+This is a demo application for the big-endian 64-bit MIPS (qemu Malta
+platform).
+
+The app uses multithreading and it is UP (uni-processor).
 
 1. Build QEMU
 
