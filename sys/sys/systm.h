@@ -37,7 +37,7 @@ void critical_exit(void);
 
 void panic(const char *fmt, ...);
 
-#ifdef CONFIG_PRODUCTION_BUILD
+#ifdef MDX_PRODUCTION
 #define	KASSERT(e, m) do {} while (0)
 #else
 #define	KASSERT(e, m) do {		\
