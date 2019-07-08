@@ -45,7 +45,7 @@
 #endif
 
 #ifdef MDX_SCHED
-static struct thread intr_thread[MAXCPU];
+static struct thread intr_thread[MDX_SMP_MAXCPU];
 #endif
 
 static void

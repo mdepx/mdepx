@@ -27,7 +27,7 @@ CFLAGS = -march=rv64imac -mabi=lp64 -mcmodel=medany			\
 	-Wredundant-decls -Wnested-externs -Wstrict-prototypes		\
 	-Wmissing-prototypes -Wpointer-arith -Winline -Wcast-qual	\
 	-Wundef -Wmissing-include-dirs -Werror				\
-	-DMAXCPU=8
+	-DMDX_SMP_MAXCPU=8
 
 all:	${OBJDIR}/${APP}.bin
 

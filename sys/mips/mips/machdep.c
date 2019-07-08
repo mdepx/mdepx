@@ -32,8 +32,8 @@
 #include <machine/frame.h>
 #include <machine/cpufunc.h>
 
-uint8_t secondary_stacks[MAXCPU][4096]; /* Idle thread stacks */
-struct pcpu __pcpu[MAXCPU];
+uint8_t secondary_stacks[MDX_SMP_MAXCPU][4096]; /* Idle thread stacks */
+struct pcpu __pcpu[MDX_SMP_MAXCPU];
 
 void
 critical_enter(void)

@@ -107,7 +107,7 @@ smp_tryst_cpus(uint32_t cpus, void (*fn), void *arg)
 	    ("%s: Not in critical section.", __func__));
 
 	ncpus = 0;
-	for (i = 0; i < MAXCPU; i++)
+	for (i = 0; i < MDX_SMP_MAXCPU; i++)
 		if (cpus & (1 << i))
 			ncpus += 1;
 
