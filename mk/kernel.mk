@@ -19,7 +19,8 @@ $(foreach obj, ${KOBJECTS},					\
 	${eval OBJECTS += ${OSDIR}/${obj}}			\
 )
 
-$(foreach op, ${KERNEL},						\
-	${eval kopt = $(shell echo ${op} | tr '[:lower:]' '[:upper:]')}	\
-	${eval CFLAGS += -DCONFIG_${kopt}}				\
+KFLAGS = $(shell ${PYTHON} ${OSDIR}/tools/flags.py "${KERNEL}")
+
+$(foreach kflag, ${KFLAGS},					\
+	${eval CFLAGS += -DCONFIG_${kflag}}			\
 )
