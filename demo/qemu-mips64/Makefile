@@ -19,7 +19,9 @@ OBJECTS =							\
 	${OSDIR}/sys/dev/uart/uart_16550.o			\
 	${OSDIR}/lib/libc/gen/assert.o
 
-KERNEL = malloc mips_cache mips_cache_exception tlbmiss sched (nprio=2) mutex
+KERNEL = malloc mips_cache mips_cache_exception	\
+	 tlbmiss sched (nprio=2) mutex
+
 LIBRARIES = libc
 
 WARNFLAGS =			\
