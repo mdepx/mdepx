@@ -1,4 +1,5 @@
 import sys
+import re
 import os
 
 args = sys.argv
@@ -7,7 +8,9 @@ if len(args) < 3:
 
 osdir = args[1]
 filename = args[2]
-options = args[3:]
+
+# Remove parenthesis and text between them
+options = re.sub("[\(].*?[\)]", "", args[3])
 
 def process(fullpath):
 	if not os.path.isfile(fullpath):

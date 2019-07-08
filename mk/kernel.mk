@@ -13,7 +13,7 @@ $(error "No ${PYTHON} found in PATH, consider setting PYTHON variable.")
 endif
 
 KOBJECTS = $(shell ${PYTHON} ${OSDIR}/tools/files.py		\
-	${OSDIR} sys/conf/files.${MACHINE} ${KERNEL})
+	${OSDIR} sys/conf/files.${MACHINE} "${KERNEL}")
 
 $(foreach obj, ${KOBJECTS},					\
 	${eval OBJECTS += ${OSDIR}/${obj}}			\
