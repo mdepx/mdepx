@@ -35,7 +35,7 @@
 #include <arm/arm/nvic.h>
 
 struct trapframe *arm_exception(struct trapframe *tf, int irq);
-#ifdef CONFIG_SCHED
+#ifdef MDX_SCHED
 static struct thread intr_thread[MAXCPU];
 #endif
 
@@ -78,7 +78,7 @@ handle_exception(struct trapframe *tf, int exc_code)
 	}
 }
 
-#ifdef CONFIG_SCHED
+#ifdef MDX_SCHED
 
 struct trapframe *
 arm_exception(struct trapframe *tf, int exc_code)

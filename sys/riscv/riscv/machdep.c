@@ -108,7 +108,7 @@ md_thread_terminate(struct thread *td)
 
 }
 
-#ifdef CONFIG_SMP
+#ifdef MDX_SMP
 void
 md_init_secondary(int hart)
 {
@@ -152,11 +152,11 @@ md_init(int hart)
 	csr_write(mscratch, pcpup->pc_stack);
 
 	thread_init(hart);
-#ifdef CONFIG_SCHED
+#ifdef MDX_SCHED
 	sched_init();
 #endif
 
-#ifdef CONFIG_SMP
+#ifdef MDX_SMP
 	smp_init();
 #endif
 
@@ -165,7 +165,7 @@ md_init(int hart)
 	/* Allow the app to register malloc and timer. */
 	app_init();
 
-#ifdef CONFIG_SCHED
+#ifdef MDX_SCHED
 	struct thread *td;
 	td = thread_create("main", 1, 10000, STACK_SIZE, main, NULL);
 	if (td == NULL)

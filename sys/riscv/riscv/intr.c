@@ -53,7 +53,7 @@ riscv_intr(int irq)
 	case IRQ_TIMER_MACHINE:
 		clint_intr();
 		break;
-#ifdef CONFIG_SMP
+#ifdef MDX_SMP
 	case IRQ_SOFTWARE_MACHINE:
 		clint_intr_software();
 		break;

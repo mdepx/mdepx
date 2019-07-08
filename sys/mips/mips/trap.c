@@ -47,7 +47,7 @@
 #define	dprintf(fmt, ...)
 #endif
 
-#ifdef CONFIG_SCHED
+#ifdef MDX_SCHED
 static struct thread intr_thread[MAXCPU];
 #endif
 
@@ -141,12 +141,12 @@ mips_exception(struct trapframe *tf)
 	struct thread *td;
 	uint32_t exc_code;
 	uint32_t cause;
-#ifdef CONFIG_SCHED
+#ifdef MDX_SCHED
 	bool released;
 #endif
 	bool intr;
 
-#ifdef CONFIG_SCHED
+#ifdef MDX_SCHED
 	released = false;
 #endif
 	intr = false;
@@ -154,7 +154,7 @@ mips_exception(struct trapframe *tf)
 	td = curthread;
 
 	/* Switch to the interrupt thread. */
-#ifdef CONFIG_SCHED
+#ifdef MDX_SCHED
 	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
 #endif
 	curthread->td_critnest++;
@@ -196,7 +196,7 @@ mips_exception(struct trapframe *tf)
 
 	dprintf("Exception cause: %x, code %d\n", cause, exc_code);
 
-#ifdef CONFIG_SCHED
+#ifdef MDX_SCHED
 	released = sched_ack(td, tf);
 #else
 	td->td_tf = tf;
@@ -204,7 +204,7 @@ mips_exception(struct trapframe *tf)
 	if (intr)
 		mips_handle_intr(cause);
 
-#ifdef CONFIG_SCHED
+#ifdef MDX_SCHED
 	if (!released) 
 		released = sched_park(td);
 
@@ -213,7 +213,7 @@ mips_exception(struct trapframe *tf)
 #endif
 
 	curthread->td_critnest--;
-#ifdef CONFIG_SCHED
+#ifdef MDX_SCHED
 	PCPU_SET(curthread, td);
 #endif
 

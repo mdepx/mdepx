@@ -68,7 +68,7 @@ ASM_ENTRY(_start)
 	/* NOT REACHED */
 
 ASM_ENTRY(mpentry)
-#ifdef CONFIG_SMP
+#ifdef MDX_SMP
 	la	t0, __riscv_boot_ap
 	add	t0, t0, a0
 

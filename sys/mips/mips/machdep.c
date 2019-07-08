@@ -121,14 +121,14 @@ md_init(int cpuid)
 
 	thread_init(cpuid);
 
-#ifdef CONFIG_SCHED
+#ifdef MDX_SCHED
 	sched_init();
 #endif
 
 	/* Allow the app to register malloc and timer. */
 	app_init();
 
-#ifdef CONFIG_SCHED
+#ifdef MDX_SCHED
 	struct thread *td;
 	td = thread_create("main", 1, 50000000, 4096, main, NULL);
 	if (td == NULL)

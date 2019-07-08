@@ -44,7 +44,7 @@
 #define	dprintf(fmt, ...)
 #endif
 
-#ifdef CONFIG_SCHED
+#ifdef MDX_SCHED
 static struct thread intr_thread[MAXCPU];
 #endif
 
@@ -89,7 +89,7 @@ handle_exception(struct trapframe *tf)
 	}
 }
 
-#ifdef CONFIG_SCHED
+#ifdef MDX_SCHED
 struct trapframe *
 riscv_exception(struct trapframe *tf)
 {
