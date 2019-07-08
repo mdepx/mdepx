@@ -22,7 +22,7 @@ INCS += -I${OSDIR}/include
 INCS += -I${OSDIR}/sys
 INCS += -I${OSDIR}/lib
 
-CFLAGS += ${INCS} ${CFLAGS_$@} -D__OSFIVE__
+CFLAGS += ${INCS} ${CFLAGS_$@} -D__MDX__
 
 #
 # Populate kernel and library objects first.
