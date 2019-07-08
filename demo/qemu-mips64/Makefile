@@ -19,9 +19,8 @@ OBJECTS =							\
 	${OSDIR}/sys/dev/uart/uart_16550.o			\
 	${OSDIR}/lib/libc/gen/assert.o
 
-KERNEL = malloc mips_cache mips_cache_exception	\
-	 tlbmiss sched (nprio=2) mutex		\
-	 mips (qemu cpu_idle_ie)
+KERNEL = malloc sched (nprio=2) mutex		\
+	 mips (cache tlb qemu cpu_idle_ie)
 
 LIBRARIES = libc
 

@@ -169,7 +169,7 @@ mips_exception(struct trapframe *tf)
 		break;
 	case MIPS_CR_EXC_CODE_TLBL:
 	case MIPS_CR_EXC_CODE_TLBS:
-#ifdef CONFIG_MIPS_TLBMISS
+#ifdef MDX_MIPS_TLB
 		MipsTLBMissException();
 #endif
 		break;
