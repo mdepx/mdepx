@@ -147,7 +147,7 @@ timer_start(void *arg, uint32_t ticks)
 	if (ticks < sc->minticks)
 		ticks = sc->minticks;
 
-#ifdef	CONFIG_QEMU
+#ifdef MDX_MIPS_QEMU
 	uint32_t new, old;
 	int wrapped;
 	int diff;

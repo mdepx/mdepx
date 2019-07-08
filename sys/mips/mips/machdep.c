@@ -67,7 +67,7 @@ critical_exit(void)
  * This should be based on WII bit in Config7 register, however some
  * implementations (e.g. BERI CPU) do not set WII bit correctly.
  */
-#ifdef CONFIG_CPU_IDLE_IE
+#ifdef MDX_MIPS_CPU_IDLE_IE
 void
 cpu_idle(void)
 {

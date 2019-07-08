@@ -20,7 +20,8 @@ OBJECTS =							\
 	${OSDIR}/lib/libc/gen/assert.o
 
 KERNEL = malloc mips_cache mips_cache_exception	\
-	 tlbmiss sched (nprio=2) mutex
+	 tlbmiss sched (nprio=2) mutex		\
+	 mips (qemu cpu_idle_ie)
 
 LIBRARIES = libc
 
@@ -43,9 +44,7 @@ CFLAGS = -march=mips64 -mabi=64 -g -nostdinc -G0		\
 	-nostdinc -fno-builtin-printf -ffreestanding		\
 	-mno-abicalls -msoft-float -fwrapv -fno-builtin-printf	\
 	-D__mips_n64 -nostdlib ${WARNFLAGS}			\
-	-DBASE_ADDR=${BASE_ADDR}				\
-	-DCONFIG_QEMU						\
-	-DCONFIG_CPU_IDLE_IE
+	-DBASE_ADDR=${BASE_ADDR}
 
 all:	${OBJDIR}/${APP}.bin
 
