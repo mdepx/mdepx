@@ -20,7 +20,7 @@ OBJECTS =							\
 	${OSDIR}/lib/libc/gen/assert.o
 
 KERNEL = malloc sched (nprio=2) mutex		\
-	 mips (cache tlb qemu cpu_idle_ie)
+	 mips (cache tlb qemu)
 
 LIBRARIES = libc
 

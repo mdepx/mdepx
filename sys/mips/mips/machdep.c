@@ -67,11 +67,15 @@ critical_exit(void)
  * This should be based on WII bit in Config7 register, however some
  * implementations (e.g. BERI CPU) do not set WII bit correctly.
  */
-#ifdef MDX_MIPS_CPU_IDLE_IE
+#ifdef MDX_MIPS_QEMU
 void
 cpu_idle(void)
 {
 
+	/*
+	 * Older mipses require interrupts turned on during sleep.
+	 * This is a case in qemu Malta platform.
+	 */
 	__asm __volatile("wait");
 }
 #else
