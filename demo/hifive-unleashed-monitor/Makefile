@@ -10,7 +10,6 @@ OSDIR = 	../../
 
 LDSCRIPT =	${OBJDIR}/ldscript
 LDSCRIPT_TPL =	${CURDIR}/ldscript.tpl
-HIFIVE1_FONT =	${CURDIR}/fonts/ter-124n.ld
 
 OBJECTS =	main.o						\
 		${OSDIR}/sys/riscv/sifive/e300g_clint.o		\
