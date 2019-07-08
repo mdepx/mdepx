@@ -1,52 +1,52 @@
 import sys
 import os
 
-args = sys.argv
-if len(args) < 1:
-	sys.exit(1)
+def normalize(options):
+	d = {}
 
-options = args[1]
+	tmp = ''
+	opt = ''
+	i = 0
+	while i < len(options):
+		c = options[i]
 
-def parse_opt(opt, str):
-	print("opt: %s, str: %s" % (opt, str))
+		if (c == ' ' or c == '('):
+			if tmp:
+				opt = tmp
+				d[opt] = ''
+				tmp = ''
+		else:
+			tmp += c
+			if (i == len(options) - 1):
+				d[tmp] = ''
 
-d = {}
+		if (c == "("):
+			# find the end
+			j = i
+			while j < len(options):
+				c1 = options[j]
+				if (c1 == ")"):
+					if opt:
+						d[opt] = options[i:j + 1]
+					i = j
+					break
+				j += 1
+		i += 1
 
-tmp = ''
-opt = ''
-i = 0
-while i < len(options):
-	c = options[i]
+	res = []
+	for key in d.keys():
+		res.append(key)
+		spl = d[key].strip('() ').split()
+		for o in spl:
+			res.append("%s_%s" % (key, o))
 
-	if (c == ' ' or c == '('):
-		if tmp:
-			opt = tmp
-			d[opt] = ''
-			tmp = ''
-	else:
-		tmp += c
-		if (i == len(options) - 1):
-			d[tmp] = ''
+	return ' '.join(res)
 
-	if (c == "("):
-		# find the end
-		j = i
-		while j < len(options):
-			c1 = options[j]
-			if (c1 == ")"):
-				if opt:
-					d[opt] = options[i:j + 1]
-				i = j
-				break
-			j += 1
-	i += 1
+if __name__ == '__main__':
+	args = sys.argv
+	if len(args) < 1:
+		sys.exit(1)
+	options = args[1]
 
-res = []
-for key in d.keys():
-	u = key.upper()
-	res.append(u)
-	spl = d[key].strip('() ').split()
-	for o in spl:
-		res.append("%s_%s" % (u, o.upper()))
-
-print(" ".join(res))
+	res = normalize(options)
+	print(res.upper())

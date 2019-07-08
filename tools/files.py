@@ -1,18 +1,10 @@
 import sys
-import re
 import os
+from flags import normalize
 
-args = sys.argv
-if len(args) < 3:
-	sys.exit(1)
-
-osdir = args[1]
-filename = args[2]
-
-# Remove parenthesis and text between them
-options = re.sub("[\(].*?[\)]", "", args[3])
-
-def process(fullpath):
+def process(osdir, filename):
+	result = []
+	fullpath = os.path.join(osdir, filename)
 	if not os.path.isfile(fullpath):
 		sys.exit(2)
 	f = open(fullpath, "r")
@@ -20,7 +12,7 @@ def process(fullpath):
 		if line.startswith("include"):
 			spl = line.split()
 			include = spl[1].strip()
-			process(os.path.join(osdir, include))
+			result += process(osdir, include)
 			continue
 		if line.startswith("#"):
 			continue
@@ -48,9 +40,16 @@ def process(fullpath):
 			if add:
 				result.append(obj)
 	f.close()
+	return result
 
-result = []
+if __name__ == '__main__':
+	args = sys.argv
+	if len(args) < 3:
+		sys.exit(1)
 
-process(os.path.join(osdir, filename))
+	osdir = args[1]
+	filename = args[2]
+	options = normalize(args[3])
 
-print(" ".join(set(result)))
+	result = process(osdir, filename)
+	print(" ".join(set(result)))
