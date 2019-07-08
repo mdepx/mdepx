@@ -50,9 +50,6 @@ all:	${OBJDIR}/${APP}.bin
 ${LDSCRIPT}:
 	@sed s#__BASE_ADDR__#${BASE_ADDR}#g ${LDSCRIPT_TPL} > ${LDSCRIPT}
 
-llvm-objdump:
-	llvm-objdump-cheri -d ${APP}.elf | less
-
 clean:
 	@rm -f ${LDSCRIPT} ${OBJECTS}
 
