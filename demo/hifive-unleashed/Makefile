@@ -17,7 +17,7 @@ OBJECTS =	main.o						\
 		${OSDIR}/sys/riscv/sifive/e300g_uart.o		\
 		start.o
 
-KERNEL = malloc sched mutex sem smp
+KERNEL = malloc sched (nprio=2) mutex sem smp
 LIBRARIES = libc
 
 CFLAGS = -march=rv64imac -mabi=lp64 -mcmodel=medany
@@ -25,7 +25,7 @@ CFLAGS += -nostdinc -fno-builtin-printf -ffreestanding -Wall		\
 	-Wredundant-decls -Wnested-externs -Wstrict-prototypes		\
 	-Wmissing-prototypes -Wpointer-arith -Winline -Wcast-qual	\
 	-Wundef -Wmissing-include-dirs -Werror				\
-	-DCONFIG_NPRIO=2 -DMAXCPU=8
+	-DMAXCPU=8
 
 all:	${OBJDIR}/${APP}.bin
 

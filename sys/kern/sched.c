@@ -50,13 +50,13 @@
 #define	dprintf(fmt, ...)
 #endif
 
-#ifndef	CONFIG_NPRIO
-#define	CONFIG_NPRIO	10
+#ifndef	MDX_SCHED_NPRIO
+#define	MDX_SCHED_NPRIO	10
 #endif
 
-CTASSERT(CONFIG_NPRIO > 1);
+CTASSERT(MDX_SCHED_NPRIO > 1);
 
-static struct entry runq[CONFIG_NPRIO];
+static struct entry runq[MDX_SCHED_NPRIO];
 static struct entry pcpu_list = LIST_INIT_STATIC(&pcpu_list);
 struct entry pcpu_all = LIST_INIT_STATIC(&pcpu_all);
 
@@ -75,7 +75,7 @@ sched_pick(void)
 	struct thread *td;
 	int i;
 
-	for (i = (CONFIG_NPRIO - 1); i >= 0; i--) {
+	for (i = (MDX_SCHED_NPRIO - 1); i >= 0; i--) {
 		if (list_empty(&runq[i]))
 			continue;
 		td = CONTAINER_OF(runq[i].next, struct thread, td_node);
@@ -133,8 +133,8 @@ sched_add(struct thread *td)
 	critical_enter();
 	sched_lock();
 
-	KASSERT(td->td_prio < CONFIG_NPRIO,
-	    ("td_prio(%d) >= CONFIG_NPRIO(%d)\n", td->td_prio, CONFIG_NPRIO));
+	KASSERT(td->td_prio < MDX_SCHED_NPRIO,
+	    ("td_prio(%d) >= nprio (%d)\n", td->td_prio, MDX_SCHED_NPRIO));
 
 	list_append(&runq[td->td_prio], &td->td_node);
 
@@ -265,7 +265,7 @@ sched_init(void)
 {
 	int i;
 
-	for (i = 0; i < CONFIG_NPRIO; i++)
+	for (i = 0; i < MDX_SCHED_NPRIO; i++)
 		list_init(&runq[i]);
 
 #ifdef MDX_SMP

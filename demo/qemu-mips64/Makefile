@@ -19,7 +19,7 @@ OBJECTS =							\
 	${OSDIR}/sys/dev/uart/uart_16550.o			\
 	${OSDIR}/lib/libc/gen/assert.o
 
-KERNEL = malloc mips_cache mips_cache_exception tlbmiss sched mutex
+KERNEL = malloc mips_cache mips_cache_exception tlbmiss sched (nprio=2) mutex
 LIBRARIES = libc
 
 WARNFLAGS =			\
@@ -43,7 +43,6 @@ CFLAGS = -march=mips64 -mabi=64 -g -nostdinc -G0		\
 	-D__mips_n64 -nostdlib ${WARNFLAGS}			\
 	-DBASE_ADDR=${BASE_ADDR}				\
 	-DCONFIG_QEMU						\
-	-DCONFIG_NPRIO=2					\
 	-DCONFIG_CPU_IDLE_IE
 
 all:	${OBJDIR}/${APP}.bin
