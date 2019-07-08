@@ -19,6 +19,9 @@ OBJECTS =	main.o						\
 
 KERNEL = malloc sched (nprio=2) mutex smp (maxcpu=8)
 
+# Uncomment for single-threaded demo
+# KERNEL = malloc
+
 LIBRARIES = libc
 
 CFLAGS = -march=rv64imac -mabi=lp64 -mcmodel=medany			\

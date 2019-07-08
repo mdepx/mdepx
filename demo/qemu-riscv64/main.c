@@ -56,11 +56,14 @@ extern uint8_t __riscv_boot_ap[2];
 extern uint32_t _sbss;
 extern uint32_t _ebss;
 
-static struct spinlock l1;
+#ifdef MDX_SCHED
 static struct mtx m __unused;
 static struct mtx m1 __unused;
-static struct callout c1[1000] __unused;
 static sem_t sem;
+#endif
+
+static struct spinlock l1;
+static struct callout c1[1000] __unused;
 
 static void
 uart_putchar(int c, void *arg)
@@ -78,6 +81,7 @@ uart_putchar(int c, void *arg)
 	uart_16550_putc(sc, c);
 }
 
+#ifdef MDX_SCHED
 static void __unused
 test_thr(void *arg)
 {
@@ -157,6 +161,7 @@ test_m2(void *arg)
 		mtx_unlock(&m1);
 	}
 }
+#endif
 
 static void __unused
 cb(void *arg)
@@ -183,8 +188,10 @@ app_init(void)
 	    UART_CLOCK_RATE, DEFAULT_BAUDRATE, 0);
 	console_register(uart_putchar, (void *)&uart_sc);
 
+#ifdef MDX_SCHED
 	sem_init(&sem, 1);
 	mtx_init(&m);
+#endif
 
 	e300g_clint_init(&clint_sc, CLINT_BASE);
 
@@ -216,9 +223,11 @@ main(void)
 	printf("cpu%d: pcpu size %d\n", PCPU_GET(cpuid), sizeof(struct pcpu));
 	sl_init(&l1);
 
+#ifdef MDX_SMP
 	printf("Releasing CPUs...\n");
 	for (j = 0; j < 8; j++)
 		__riscv_boot_ap[j] = 1;
+#endif
 
 	/* Some testing routines. */
 #if 0
@@ -233,7 +242,7 @@ main(void)
 	}
 #endif
 
-#if 1
+#ifdef MDX_SCHED
 	struct thread *td;
 	size_t i;
 	for (i = 1; i < 500; i++) {
@@ -273,7 +282,7 @@ main(void)
 		    (void *)&c1[j]);
 #endif
 
-#if 1
+#ifdef MDX_SMP
 	char a;
 	while (1) {
 		a = uart_16550_getc(&uart_sc);
