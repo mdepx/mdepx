@@ -135,38 +135,11 @@ mips_handle_intr(int cause)
 		}
 }
 
-struct trapframe *
-mips_exception(struct trapframe *tf)
+static void
+handle_exception(struct trapframe *tf, int exc_code)
 {
-	struct thread *td;
-	uint32_t exc_code;
-	uint32_t cause;
-#ifdef MDX_SCHED
-	bool released;
-#endif
-	bool intr;
 
-#ifdef MDX_SCHED
-	released = false;
-#endif
-	intr = false;
-
-	td = curthread;
-
-	/* Switch to the interrupt thread. */
-#ifdef MDX_SCHED
-	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
-#endif
-	curthread->td_critnest++;
-
-	cause = mips_rd_cause();
-	dprintf("%s: cause %x\n", __func__, cause);
-	exc_code = (cause & MIPS_CR_EXC_CODE_M) >> \
-	    MIPS_CR_EXC_CODE_S;
 	switch (exc_code) {
-	case MIPS_CR_EXC_CODE_INT:
-		intr = true;
-		break;
 	case MIPS_CR_EXC_CODE_TLBL:
 	case MIPS_CR_EXC_CODE_TLBS:
 #ifdef MDX_MIPS_TLB
@@ -193,29 +166,92 @@ mips_exception(struct trapframe *tf)
 		panic("%s: no handler: exc_code %d, pc %zx, badvaddr %zx\n",
 		    __func__, exc_code, tf->tf_pc, tf->tf_badvaddr);
 	}
-
-	dprintf("Exception cause: %x, code %d\n", cause, exc_code);
+}
 
 #ifdef MDX_SCHED
+
+struct trapframe *
+mips_exception(struct trapframe *tf)
+{
+	struct thread *td;
+	uint32_t exc_code;
+	uint32_t cause;
+	bool released;
+	bool intr;
+
+	released = false;
+	intr = false;
+
+	td = curthread;
+
+	/* Switch to the interrupt thread. */
+	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
+	curthread->td_critnest++;
+
+	cause = mips_rd_cause();
+	exc_code = (cause & MIPS_CR_EXC_CODE_M) >> \
+	    MIPS_CR_EXC_CODE_S;
+
+	dprintf("%s: cause %x, exc_code %d\n",
+	    __func__, cause, exc_code);
+
+	if (exc_code == MIPS_CR_EXC_CODE_INT)
+		intr = true;
+	else
+		handle_exception(tf, exc_code);
+
 	released = sched_ack(td, tf);
-#else
-	td->td_tf = tf;
-#endif
+
 	if (intr)
 		mips_handle_intr(cause);
 
-#ifdef MDX_SCHED
 	if (!released) 
 		released = sched_park(td);
 
 	if (released)
 		td = sched_next();
-#endif
 
 	curthread->td_critnest--;
-#ifdef MDX_SCHED
 	PCPU_SET(curthread, td);
-#endif
 
 	return (td->td_tf);
 }
+
+#else
+
+struct trapframe *
+mips_exception(struct trapframe *tf)
+{
+	struct thread *td;
+	uint32_t exc_code;
+	uint32_t cause;
+	bool intr;
+
+	intr = false;
+
+	td = curthread;
+
+	curthread->td_critnest++;
+
+	cause = mips_rd_cause();
+	exc_code = (cause & MIPS_CR_EXC_CODE_M) >> \
+	    MIPS_CR_EXC_CODE_S;
+
+	dprintf("%s: cause %x, exc_code %d\n",
+	    __func__, cause, exc_code);
+
+	if (exc_code == MIPS_CR_EXC_CODE_INT)
+		intr = true;
+	else
+		handle_exception(tf, exc_code);
+
+	td->td_tf = tf;
+	if (intr)
+		mips_handle_intr(cause);
+
+	curthread->td_critnest--;
+
+	return (td->td_tf);
+}
+
+#endif
