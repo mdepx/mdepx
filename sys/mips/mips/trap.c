@@ -175,7 +175,7 @@ mips_exception(struct trapframe *tf)
 		break;
 	case MIPS_CR_EXC_CODE_ADES:
 		dump_frame(tf);
-		panic("%s: Address error (store) pc %zx, badvaddr %zx\n",
+		panic("%s: Address error (store) at pc %zx, badvaddr %zx\n",
 		    __func__, tf->tf_pc, tf->tf_badvaddr);
 	case MIPS_CR_EXC_CODE_SYS:
 		tf->tf_pc += 4;
@@ -186,7 +186,7 @@ mips_exception(struct trapframe *tf)
 		    __func__, tf->tf_pc, tf->tf_badvaddr);
 	case MIPS_CR_EXC_CODE_ADEL:
 		dump_frame(tf);
-		panic("%s: load address error at pc %zx, badvaddr %zx\n",
+		panic("%s: Address error (load) at pc %zx, badvaddr %zx\n",
 		    __func__, tf->tf_pc, tf->tf_badvaddr);
 	default:
 		dump_frame(tf);
