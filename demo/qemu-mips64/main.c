@@ -47,7 +47,10 @@ extern char MipsCache[], MipsCacheEnd[];
 
 static struct mips_timer_softc timer_sc;
 static struct uart_16550_softc uart_sc;
+
+#ifdef MDX_SCHED
 static struct mtx m;
+#endif
 
 #define	USEC_TO_TICKS(n)	(100 * (n))	/* 100MHz clock. */
 #define	UART_BASE		0x180003f8
@@ -174,6 +177,7 @@ app_init(void)
 	return (0);
 }
 
+#ifdef MDX_SCHED
 static void __unused
 test_thr(void *arg)
 {
@@ -188,14 +192,14 @@ test_thr(void *arg)
 		raw_sleep(1000);
 	}
 }
+#endif
 
 int
 main(void)
 {
+#ifdef MDX_SCHED
 	struct thread *td;
 	size_t i;
-
-	printf("%s\n", __func__);
 
 	mtx_init(&m);
 
@@ -208,9 +212,12 @@ main(void)
 		if (td == NULL)
 			break;
 	}
+#endif
 
-	while (1)
-		raw_sleep(USEC_TO_TICKS(1000));
+	while (1) {
+		printf("Hello world\n");
+		raw_sleep(USEC_TO_TICKS(100000));
+	}
 
 	return (0);
 }
