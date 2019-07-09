@@ -30,6 +30,10 @@
 #include <sys/thread.h>
 #include <sys/pcpu.h>
 
+#ifndef MDX_SCHED
+#error "Invalid configuration"
+#endif
+
 static void
 raw_sleep_cb(void *arg)
 {
@@ -56,6 +60,8 @@ raw_sleep(uint32_t ticks)
 
 	KASSERT(td->td_idle == 0,
 	    ("%s: sleeping from idle thread.", __func__));
+	KASSERT(td->td_critnest == 0,
+	    ("%s: sleeping in critical section is not allowed", __func__));
 
 	callout_init(&c);
 
