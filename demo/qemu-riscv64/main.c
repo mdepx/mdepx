@@ -237,6 +237,7 @@ main(void)
 		if (td == NULL)
 			break;
 		printf("td %p created\n", td);
+		mdx_sched_add(td);
 	}
 #endif
 
@@ -249,16 +250,23 @@ main(void)
 		if (td == NULL)
 			break;
 		td->td_index = i;
+		mdx_sched_add(td);
 	}
 #endif
 
 #if 0
-	thread_create("test", 1, USEC_TO_TICKS(1000),
+	struct thread *td;
+	td = thread_create("test", 1, USEC_TO_TICKS(1000),
 	    4096, test_thr1, (void *)0);
-	thread_create("test", 1, USEC_TO_TICKS(2000),
+	mdx_sched_add(td);
+
+	td = thread_create("test", 1, USEC_TO_TICKS(2000),
 	    4096, test_thr2, (void *)1);
-	thread_create("test", 1, USEC_TO_TICKS(2000),
+	mdx_sched_add(td);
+
+	td = thread_create("test", 1, USEC_TO_TICKS(2000),
 	    4096, test_thr2, (void *)2);
+	mdx_sched_add(td);
 #endif
 
 #if 0
@@ -266,12 +274,17 @@ main(void)
 	td = thread_create("test1", 1, USEC_TO_TICKS(500),
 	    4096, test_m0, (void *)0);
 	td->td_index = 0;
+	mdx_sched_add(td);
+
 	td = thread_create("test2", 1, USEC_TO_TICKS(500),
 	    4096, test_m1, (void *)1);
 	td->td_index = 1;
+	mdx_sched_add(td);
+
 	td = thread_create("test3", 1, USEC_TO_TICKS(500),
 	    4096, test_m2, (void *)2);
 	td->td_index = 2;
+	mdx_sched_add(td);
 #endif
 
 #if 1

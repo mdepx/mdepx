@@ -137,6 +137,7 @@ md_init(int cpuid)
 	td = thread_create("main", 1, 50000000, 4096, main, NULL);
 	if (td == NULL)
 		panic("can't create the main thread\n");
+	mdx_sched_add(td);
 	mdx_sched_enter();
 #else
 	main();

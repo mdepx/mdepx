@@ -171,6 +171,7 @@ md_init(int hart)
 	if (td == NULL)
 		panic("can't create the main thread\n");
 
+	mdx_sched_add(td);
 	mdx_sched_cpu_add(pcpup);
 	mdx_sched_cpu_avail(pcpup, true);
 

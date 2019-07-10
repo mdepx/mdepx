@@ -209,8 +209,7 @@ main(void)
 		if (td == NULL)
 			break;
 		td->td_index = i;
-		if (td == NULL)
-			break;
+		mdx_sched_add(td);
 	}
 #endif
 
