@@ -198,9 +198,17 @@ sem_post(sem_t *sem)
 
 		error = callout_cancel(&td->td_c);
 		if (error) {
-			/* sem_cb is already called. */
-			if (td->td_state != TD_STATE_SEM_UNLOCK_ACK)
-				panic("%s: wrong state", __func__);
+			/*
+			 * We are here by one of the reasons:
+			 * 1. It could be that callout was not configured
+			 *    (timeout == 0), in that case the td state
+			 *    must not change (TD_STATE_SEM_UNLOCK).
+			 * 2. sem_cb is already called by another CPU.
+			 *    In that case td state must be changed to
+			 *    TD_STATE_SEM_UNLOCK_ACK by sem_cb().
+			 * 
+			 * There is nothing to do here in either case.
+			 */
 		}
 
 		KASSERT(td->td_state == TD_STATE_SEM_UNLOCK ||
