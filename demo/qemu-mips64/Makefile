@@ -21,8 +21,10 @@ OBJECTS =							\
 
 KERNEL = malloc sched (nprio=2) mutex mips (cache tlb qemu)
 
-# Uncomment for single-threaded demo
-# KERNEL = malloc mips (cache tlb qemu)
+ifdef MDX_ST
+# Single-threaded demo
+KERNEL = malloc mips (cache tlb qemu)
+endif
 
 LIBRARIES = libc
 
