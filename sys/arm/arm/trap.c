@@ -104,15 +104,15 @@ arm_exception(struct trapframe *tf, int exc_code)
 	} else
 		handle_exception(tf, exc_code);
 
-	released = sched_ack(td, tf);
+	released = mdx_sched_ack(td, tf);
 
 	if (intr)
 		arm_nvic_intr(irq, tf);
 
 	if (!released)
-		released = sched_park(td);
+		released = mdx_sched_park(td);
 	if (released)
-		td = sched_next();
+		td = mdx_sched_next();
 
 	/* Switch to the new thread. */
 	curthread->td_critnest--;

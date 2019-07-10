@@ -68,16 +68,16 @@ void cpu_idle(void);
 void thread_terminate(void);
 
 /* Scheduler */
-struct thread *sched_next(void);
-void sched_add_tail(struct thread *td);
-void sched_add_head(struct thread *td);
-void sched_add(struct thread *td0);
-void sched_enter(void);
-void sched_init(void);
-int sched_ack(struct thread *td, struct trapframe *tf);
-int sched_park(struct thread *td);
-void sched_cpu_add(struct pcpu *pcpup);
-void sched_cpu_avail(struct pcpu *pcpup, bool available);
+struct thread * mdx_sched_next(void);
+void mdx_sched_add_tail(struct thread *td);
+void mdx_sched_add_head(struct thread *td);
+void mdx_sched_add(struct thread *td0);
+void mdx_sched_enter(void);
+void mdx_sched_init(void);
+int mdx_sched_ack(struct thread *td, struct trapframe *tf);
+int mdx_sched_park(struct thread *td);
+void mdx_sched_cpu_add(struct pcpu *pcpup);
+void mdx_sched_cpu_avail(struct pcpu *pcpup, bool available);
 
 /* Thread MD part */
 void md_init(int cpuid);

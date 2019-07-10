@@ -200,16 +200,16 @@ mips_exception(struct trapframe *tf)
 	else
 		handle_exception(tf, exc_code);
 
-	released = sched_ack(td, tf);
+	released = mdx_sched_ack(td, tf);
 
 	if (intr)
 		mips_handle_intr(cause);
 
 	if (!released) 
-		released = sched_park(td);
+		released = mdx_sched_park(td);
 
 	if (released)
-		td = sched_next();
+		td = mdx_sched_next();
 
 	curthread->td_critnest--;
 	PCPU_SET(curthread, td);

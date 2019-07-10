@@ -130,11 +130,11 @@ md_init_secondary(int hart)
 
 	thread_init(hart);
 
-	sched_cpu_add(pcpup);
-	sched_cpu_avail(pcpup, true);
+	mdx_sched_cpu_add(pcpup);
+	mdx_sched_cpu_avail(pcpup, true);
 
 	intr_enable();
-	sched_enter();
+	mdx_sched_enter();
 }
 #endif
 
@@ -153,7 +153,7 @@ md_init(int hart)
 
 	thread_init(hart);
 #ifdef MDX_SCHED
-	sched_init();
+	mdx_sched_init();
 #endif
 
 #ifdef MDX_SMP
@@ -171,11 +171,11 @@ md_init(int hart)
 	if (td == NULL)
 		panic("can't create the main thread\n");
 
-	sched_cpu_add(pcpup);
-	sched_cpu_avail(pcpup, true);
+	mdx_sched_cpu_add(pcpup);
+	mdx_sched_cpu_avail(pcpup, true);
 
 	intr_enable();
-	sched_enter();
+	mdx_sched_enter();
 #else
 	intr_enable();
 	main();

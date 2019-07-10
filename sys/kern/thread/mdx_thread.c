@@ -92,7 +92,7 @@ thread_setup(struct thread *td, const char *name,
 	td->td_prio = prio;
 	md_setup_frame(td->td_tf, entry, arg, thread_terminate);
 
-	sched_add(td);
+	mdx_sched_add(td);
 
 	return (0);
 }

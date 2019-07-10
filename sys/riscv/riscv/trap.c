@@ -106,7 +106,7 @@ riscv_exception(struct trapframe *tf)
 
 	/* This CPU could not pick up new threads for a moment. */
 	if (td->td_idle)
-		sched_cpu_avail(p, false);
+		mdx_sched_cpu_avail(p, false);
 
 	/* Switch to the interrupt thread. */
 	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
@@ -125,18 +125,18 @@ riscv_exception(struct trapframe *tf)
 	 * could be added back to run queue by another CPU in mtx_unlock()
 	 * or by this cpu in riscv_intr().
 	 */
-	released = sched_ack(td, tf);
+	released = mdx_sched_ack(td, tf);
 
 	if (intr)
 		riscv_intr(irq);
 
 	/* Check if this thread has no more CPU time. */
 	if (!released)
-		released = sched_park(td);
+		released = mdx_sched_park(td);
 
 	/* Pickup new thread if we don't have one anymore. */
 	if (released)
-		td = sched_next();
+		td = mdx_sched_next();
 
 	/* Switch to the new thread. */
 	critical_exit();

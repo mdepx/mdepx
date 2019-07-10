@@ -80,7 +80,7 @@ sem_cb(void *arg)
 
 	td->td_state = TD_STATE_WAKEUP;
 
-	sched_add(td);
+	mdx_sched_add(td);
 
 	sl_unlock(&sem->l);
 }
@@ -218,7 +218,7 @@ sem_post(sem_t *sem)
 
 		td->td_state = TD_STATE_WAKEUP;
 
-		sched_add(td);
+		mdx_sched_add(td);
 	} else
 		sl_unlock(&sem->l);
 

@@ -41,10 +41,10 @@
 
 #include <machine/frame.h>
 
-#define	SCHED_DEBUG
-#undef	SCHED_DEBUG
+#define	MDX_SCHED_DEBUG
+#undef	MDX_SCHED_DEBUG
 
-#ifdef	SCHED_DEBUG
+#ifdef	MDX_SCHED_DEBUG
 #define	dprintf(fmt, ...)	printf(fmt, ##__VA_ARGS__)
 #else
 #define	dprintf(fmt, ...)
@@ -61,16 +61,16 @@ static struct entry pcpu_list = LIST_INIT_STATIC(&pcpu_list);
 struct entry pcpu_all = LIST_INIT_STATIC(&pcpu_all);
 
 #ifdef MDX_SMP
-static struct spinlock	l;
-#define	sched_lock()	sl_lock(&l)
-#define	sched_unlock()	sl_unlock(&l)
+static struct spinlock l;
+#define	mdx_sched_lock()	sl_lock(&l)
+#define	mdx_sched_unlock()	sl_unlock(&l)
 #else
-#define	sched_lock()
-#define	sched_unlock()
+#define	mdx_sched_lock()
+#define	mdx_sched_unlock()
 #endif
 
 static struct thread *
-sched_pick(void)
+mdx_sched_pick(void)
 {
 	struct thread *td;
 	int i;
@@ -90,7 +90,7 @@ sched_pick(void)
 }
 
 static void
-sched_cb(void *arg)
+mdx_sched_cb(void *arg)
 {
 	struct thread *td;
 
@@ -99,15 +99,15 @@ sched_cb(void *arg)
 
 	td = arg;
 
-	sched_lock();
+	mdx_sched_lock();
 	if (td->td_state == TD_STATE_RUNNING)
 		td->td_state = TD_STATE_READY;
-	sched_unlock();
+	mdx_sched_unlock();
 }
 
 #ifdef MDX_SMP
 static void
-sched_cpu_notify(void)
+mdx_sched_cpu_notify(void)
 {
 	struct pcpu *p;
 
@@ -127,11 +127,11 @@ sched_cpu_notify(void)
  * Add td to the run queue.
  */
 void
-sched_add(struct thread *td)
+mdx_sched_add(struct thread *td)
 {
 
 	critical_enter();
-	sched_lock();
+	mdx_sched_lock();
 
 	KASSERT(td->td_prio < MDX_SCHED_NPRIO,
 	    ("td_prio(%d) >= nprio (%d)\n", td->td_prio, MDX_SCHED_NPRIO));
@@ -139,15 +139,15 @@ sched_add(struct thread *td)
 	list_append(&runq[td->td_prio], &td->td_node);
 
 #ifdef MDX_SMP
-	sched_cpu_notify();
+	mdx_sched_cpu_notify();
 #endif
 
-	sched_unlock();
+	mdx_sched_unlock();
 	critical_exit();
 }
 
 int
-sched_ack(struct thread *td, struct trapframe *tf)
+mdx_sched_ack(struct thread *td, struct trapframe *tf)
 {
 
 	KASSERT(curthread->td_critnest > 0,
@@ -170,7 +170,7 @@ sched_ack(struct thread *td, struct trapframe *tf)
 }
 
 int
-sched_park(struct thread *td)
+mdx_sched_park(struct thread *td)
 {
 
 	KASSERT(curthread->td_critnest > 0,
@@ -186,14 +186,14 @@ sched_park(struct thread *td)
 		 */
 		return (0);
 	default:
-		sched_add(td);
+		mdx_sched_add(td);
 
 		return (1);
 	}
 }
 
 struct thread *
-sched_next(void)
+mdx_sched_next(void)
 {
 	struct thread *td;
 	struct pcpu *p;
@@ -203,16 +203,16 @@ sched_next(void)
 
 	p = curpcpu;
 
-	sched_lock();
-	td = sched_pick();
+	mdx_sched_lock();
+	td = mdx_sched_pick();
 	if (td->td_idle)
 		list_append(&pcpu_list, &p->pc_avail);
-	sched_unlock();
+	mdx_sched_unlock();
 
 	if (!td->td_idle) {
 		td->td_state = TD_STATE_RUNNING;
 		callout_init(&td->td_c);
-		callout_set(&td->td_c, td->td_quantum, sched_cb, td);
+		callout_set(&td->td_c, td->td_quantum, mdx_sched_cb, td);
 	}
 
 	dprintf("%s%d: curthread %p, tf %p, name %s, idx %x\n",
@@ -223,7 +223,7 @@ sched_next(void)
 }
 
 void
-sched_enter(void)
+mdx_sched_enter(void)
 {
 
 	KASSERT(curthread->td_idle == 1,
@@ -236,32 +236,32 @@ sched_enter(void)
 }
 
 void
-sched_cpu_avail(struct pcpu *pcpup, bool available)
+mdx_sched_cpu_avail(struct pcpu *pcpup, bool available)
 {
 
 	critical_enter();
-	sched_lock();
+	mdx_sched_lock();
 	if (available)
 		list_append(&pcpu_list, &pcpup->pc_avail);
 	else
 		list_remove(&pcpup->pc_avail);
-	sched_unlock();
+	mdx_sched_unlock();
 	critical_exit();
 }
 
 void
-sched_cpu_add(struct pcpu *pcpup)
+mdx_sched_cpu_add(struct pcpu *pcpup)
 {
 
 	critical_enter();
-	sched_lock();
+	mdx_sched_lock();
 	list_append(&pcpu_all, &pcpup->pc_all);
-	sched_unlock();
+	mdx_sched_unlock();
 	critical_exit();
 }
 
 void
-sched_init(void)
+mdx_sched_init(void)
 {
 	int i;
 

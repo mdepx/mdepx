@@ -126,7 +126,7 @@ md_init(int cpuid)
 	thread_init(cpuid);
 
 #ifdef MDX_SCHED
-	sched_init();
+	mdx_sched_init();
 #endif
 
 	/* Allow the app to register malloc and timer. */
@@ -137,7 +137,7 @@ md_init(int cpuid)
 	td = thread_create("main", 1, 50000000, 4096, main, NULL);
 	if (td == NULL)
 		panic("can't create the main thread\n");
-	sched_enter();
+	mdx_sched_enter();
 #else
 	main();
 #endif
