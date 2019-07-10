@@ -69,8 +69,6 @@ void thread_terminate(void);
 
 /* Scheduler */
 struct thread * mdx_sched_next(void);
-void mdx_sched_add_tail(struct thread *td);
-void mdx_sched_add_head(struct thread *td);
 void mdx_sched_add(struct thread *td0);
 void mdx_sched_enter(void);
 void mdx_sched_init(void);
