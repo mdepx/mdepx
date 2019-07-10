@@ -75,6 +75,7 @@
 #define	mips_wr_status(val)	mtc0(12, 0, (val))
 #define	mips_rd_cause()		mfc0(13, 0)
 #define	mips_wr_cause(val)	mtc0(13, 0, (val))
+#define	mips_rd_nepc()		mfc0(14, 2)
 #define	mips_wr_ebase(val)	mtc0(15, 1, (val))
 #define	mips_rd_cinfo()		mfc0(15, 6)
 #define	mips_rd_config0()	mfc0(16, 0)
