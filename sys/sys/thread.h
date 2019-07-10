@@ -65,7 +65,6 @@ struct thread * thread_alloc(uint32_t stack_size);
 int thread_setup(struct thread *td, const char *name,
     int prio, uint32_t quantum, void *entry, void *arg);
 void cpu_idle(void);
-void thread_terminate(void);
 
 /* Scheduler */
 struct thread * mdx_sched_next(void);

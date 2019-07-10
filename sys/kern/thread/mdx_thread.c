@@ -48,7 +48,7 @@
 /*
  * Used by thread to terminate itself.
  */
-void
+static void
 thread_terminate(void)
 {
 	struct thread *td;
