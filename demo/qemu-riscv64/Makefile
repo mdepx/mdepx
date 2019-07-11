@@ -19,8 +19,13 @@ OBJECTS =	main.o						\
 
 KERNEL = malloc sched (nprio=2) mutex smp (maxcpu=8)
 
-ifdef MDX_ST
+# Uni-processor demo
+ifdef MDX_UP
+KERNEL = malloc sched (nprio=2) mutex
+endif
+
 # Single-threaded demo
+ifdef MDX_ST
 KERNEL = malloc
 endif
 
