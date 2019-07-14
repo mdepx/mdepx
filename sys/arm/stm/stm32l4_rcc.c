@@ -33,6 +33,31 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
+void
+stm32l4_rcc_dsisel(struct stm32l4_rcc_softc *sc)
+{
+	uint32_t reg;
+
+	reg = RD4(sc, RCC_CCIPR2);
+	reg |= CCIPR2_DSISEL;
+	WR4(sc, RCC_CCIPR2, reg);
+}
+
+
+void
+stm32l4_rcc_hse_enable(struct stm32l4_rcc_softc *sc)
+{
+	uint32_t reg;
+
+	/* Use external ocsillator */
+	reg = RD4(sc, RCC_CR);
+	reg |= CR_HSEON;
+	WR4(sc, RCC_CR, reg);
+
+	while ((RD4(sc, RCC_CR) & CR_HSERDY) == 0)
+		;
+}
+
 /* MSI (multispeed internal) RC oscillator clock configuration */
 void
 stm32l4_rcc_msi_configure(struct stm32l4_rcc_softc *sc,

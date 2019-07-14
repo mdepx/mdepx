@@ -109,6 +109,7 @@
 #define	RCC_AHB3ENR		0x50
 #define	RCC_APB1ENR1		0x58
 #define	 APB1ENR1_PWREN		(1 << 28) /* Power interface clock enable */
+#define	 APB1ENR1_USART3EN	(1 << 18) /* USART3 clock enable */
 #define	 APB1ENR1_USART2EN	(1 << 17) /* USART2 clock enable */
 #define	 APB1ENR1_I2C3EN	(1 << 23) /* I2C3 clock enable */
 #define	 APB1ENR1_SPI3EN	(1 << 15) /* SPI3 clock enable */
@@ -117,6 +118,8 @@
 #define	 APB1ENR1_TIM2EN	(1 << 0)
 #define	RCC_APB1ENR2		0x5C
 #define	RCC_APB2ENR		0x60
+#define	 APB2ENR_DSIEN		(1 << 27) /* DSI clock enable */
+#define	 APB2ENR_LTDCEN		(1 << 26) /* LCD-TFT clock enable */
 #define	 APB2ENR_USART1EN	(1 << 14)
 #define	 APB2ENR_SPI1EN		(1 << 12) /* SPI1 clock enable */
 #define	 APB2ENR_SDMMC1EN	(1 << 10)
@@ -132,6 +135,8 @@
 #define	RCC_CSR			0x94	/* Control/status register */
 #define	 CSR_LSION		(1 << 0) /* LSI oscillator enable */
 #define	 CSR_LSIRDY		(1 << 1) /* LSI oscillator ready */
+#define	RCC_CCIPR2		0x9C
+#define	 CCIPR2_DSISEL		(1 << 12) /* PLLDSICLK is selected */
 
 struct rcc_config {
 	uint32_t ahb1enr;
@@ -154,5 +159,7 @@ void stm32l4_rcc_setup(struct stm32l4_rcc_softc *sc, struct rcc_config *cfg);
 void stm32l4_rcc_msi_configure(struct stm32l4_rcc_softc *sc, uint32_t freq);
 int stm32l4_rcc_lsi_enable(struct stm32l4_rcc_softc *sc);
 void stm32l4_rcc_bdcr_setup(struct stm32l4_rcc_softc *sc, uint32_t bdcr);
+void stm32l4_rcc_hse_enable(struct stm32l4_rcc_softc *sc);
+void stm32l4_rcc_dsisel(struct stm32l4_rcc_softc *sc);
 
 #endif /* !_ARM_STM_STM32L4_RCC_H_ */

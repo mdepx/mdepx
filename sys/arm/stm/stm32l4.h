@@ -37,6 +37,7 @@
 #include <arm/stm/stm32l4_syscfg.h>
 #include <arm/stm/stm32l4_rcc.h>
 #include <arm/stm/stm32l4_rtc.h>
+#include <arm/stm/stm32f4_dsi.h>
 
 #define	USART1_BASE	0x40013800
 #define	USART2_BASE	0x40004400
@@ -56,5 +57,6 @@
 #define	EXTI_BASE	0x40010400
 #define	SYSCFG_BASE	0x40010000
 #define	RTC_BASE	0x40002800
+#define	DSIHOST_BASE	0x40016C00
 
 #endif	/* !_ARM_STM_STM32F4_H_ */
