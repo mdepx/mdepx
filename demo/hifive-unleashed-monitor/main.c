@@ -59,7 +59,7 @@ static struct spinlock l1;
 static struct mtx m __unused;
 static struct mtx m1 __unused;
 static struct callout c1[1000] __unused;
-static sem_t sem;
+static mdx_sem_t sem;
 
 static void
 uart_putchar(int c, void *arg)

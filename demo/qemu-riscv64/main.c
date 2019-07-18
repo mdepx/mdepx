@@ -57,7 +57,7 @@ extern uint8_t __riscv_boot_ap[MDX_SMP_MAXCPU];
 #ifdef MDX_SCHED
 static struct mtx m __unused;
 static struct mtx m1 __unused;
-static sem_t sem;
+static mdx_sem_t sem;
 #endif
 
 static struct spinlock l1;

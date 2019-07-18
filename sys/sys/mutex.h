@@ -30,7 +30,7 @@
 #include <sys/sem.h>
 
 struct mtx {
-	sem_t sem;
+	mdx_sem_t sem;
 	struct thread *td;
 };
 

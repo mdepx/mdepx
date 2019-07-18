@@ -29,19 +29,19 @@
 
 #include <sys/spinlock.h>
 
-struct semaphore {
+struct mdx_semaphore {
 	int sem_count;
 	int sem_count_initial;
 	struct entry td_list;
 	struct spinlock l;
 };
 
-typedef struct semaphore sem_t;
+typedef struct mdx_semaphore mdx_sem_t;
 
-void mdx_sem_init(sem_t *sem, int count);
-void mdx_sem_wait(sem_t *sem);
-int mdx_sem_timedwait(sem_t *sem, int ticks);
-int mdx_sem_trywait(sem_t *sem);
-int mdx_sem_post(sem_t *sem);
+void mdx_sem_init(mdx_sem_t *sem, int count);
+void mdx_sem_wait(mdx_sem_t *sem);
+int mdx_sem_timedwait(mdx_sem_t *sem, int ticks);
+int mdx_sem_trywait(mdx_sem_t *sem);
+int mdx_sem_post(mdx_sem_t *sem);
 
 #endif /* _SYS_SEM_H_ */
