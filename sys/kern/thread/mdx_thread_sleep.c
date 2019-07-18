@@ -35,7 +35,7 @@
 #endif
 
 static void
-raw_sleep_cb(void *arg)
+mdx_tsleep_cb(void *arg)
 {
 	struct thread *td;
 
@@ -50,8 +50,11 @@ raw_sleep_cb(void *arg)
 	mdx_sched_add(td);
 }
 
+/*
+ * Sleep given amount of ticks in multi-threaded environment.
+ */
 void
-raw_sleep(uint32_t ticks)
+mdx_tsleep(uint32_t ticks)
 {
 	struct thread *td;
 	struct callout c;
@@ -68,7 +71,7 @@ raw_sleep(uint32_t ticks)
 	critical_enter();
 	td->td_state = TD_STATE_SLEEPING;
 	callout_cancel(&td->td_c);
-	callout_set(&c, ticks, raw_sleep_cb, td);
+	callout_set(&c, ticks, mdx_tsleep_cb, td);
 	critical_exit();
 
 	md_thread_yield();

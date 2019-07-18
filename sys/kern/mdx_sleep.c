@@ -35,7 +35,7 @@
 #endif
 
 static void
-raw_sleep_cb(void *arg)
+mdx_tsleep_cb(void *arg)
 {
 	struct thread *td;
 
@@ -46,8 +46,11 @@ raw_sleep_cb(void *arg)
 	td->td_state = TD_STATE_READY;
 }
 
+/*
+ * Sleep given amount of ticks in single-threaded environment.
+ */
 void
-raw_sleep(uint32_t ticks)
+mdx_tsleep(uint32_t ticks)
 {
 	struct thread *td;
 	struct callout c;
@@ -60,8 +63,7 @@ raw_sleep(uint32_t ticks)
 	    ("%s: sleeping in critical section is not allowed", __func__));
 
 	callout_init(&c);
-
-	callout_set(&c, ticks, raw_sleep_cb, td);
+	callout_set(&c, ticks, mdx_tsleep_cb, td);
 
 	while (c.state != CALLOUT_STATE_FIRED)
 		cpu_idle();

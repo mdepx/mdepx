@@ -92,7 +92,7 @@ test_thr(void *arg)
 		    csr_read(mstatus));
 		mdx_mutex_unlock(&m);
 
-		raw_sleep(1000);
+		mdx_tsleep(1000);
 	}
 }
 
@@ -103,7 +103,7 @@ test_thr1(void *arg)
 	while (1) {
 		printf("cpu%d: hello from thread%d\n",
 		    PCPU_GET(cpuid), (size_t)arg);
-		raw_sleep(10000000);
+		mdx_tsleep(10000000);
 	}
 }
 
@@ -114,7 +114,7 @@ test_thr2(void *arg)
 	while (1) {
 		printf("cpu%d: hello from thread%d\n",
 		    PCPU_GET(cpuid), (size_t)arg);
-		raw_sleep(5000000);
+		mdx_tsleep(5000000);
 	}
 }
 
@@ -307,7 +307,7 @@ main(void)
 
 	while (1) {
 		printf("Hello world\n");
-		raw_sleep(USEC_TO_TICKS(1000000));
+		mdx_tsleep(USEC_TO_TICKS(1000000));
 	}
 
 	return (0);

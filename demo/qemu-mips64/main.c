@@ -189,7 +189,7 @@ test_thr(void *arg)
 		    PCPU_GET(cpuid), (size_t)arg, curthread->td_critnest);
 		mdx_mutex_unlock(&m);
 
-		raw_sleep(1000);
+		mdx_tsleep(1000);
 	}
 }
 #endif
@@ -215,7 +215,7 @@ main(void)
 
 	while (1) {
 		printf("Hello world\n");
-		raw_sleep(USEC_TO_TICKS(100000));
+		mdx_tsleep(USEC_TO_TICKS(100000));
 	}
 
 	return (0);
