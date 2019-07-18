@@ -8,12 +8,12 @@ sys/kern/mdx_of.o			fdt
 sys/kern/mdx_panic.o
 sys/kern/mdx_sched.o			sched
 sys/kern/mdx_sem.o			sched sem | sched mutex
-sys/kern/mdx_sleep.o			!sched
+sys/kern/mdx_tsleep.o			!sched
 sys/kern/mdx_smp.o			sched smp
 sys/kern/thread/mdx_thread.o		sched
 sys/kern/thread/mdx_thread_alloc.o	sched malloc
-sys/kern/thread/mdx_thread_sleep.o	sched
 sys/kern/thread/mdx_thread0.o
+sys/kern/thread/mdx_tsleep.o		sched
 sys/net/if.o				net malloc
 sys/net/if_ether.o			net malloc
 sys/net/if_ethersubr.o			net
