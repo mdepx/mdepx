@@ -39,7 +39,7 @@ struct thread {
 	struct trapframe *	td_tf;		/* Trapframe on stack. */
 	uint8_t *		td_stack;	/* Pointer to stack. */
 	uint32_t		td_stack_size;	/* Size of the stack. */
-	struct entry		td_node;	/* Entry in runq or mtx q */
+	struct entry		td_node;	/* Entry in runq or mutex q */
 	struct callout		td_c;		/* Thread deadline callout. */
 	uint32_t		td_quantum;	/* Time slice. */
 	uint8_t			td_idle;	/* This is an idle thread. */

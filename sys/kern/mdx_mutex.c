@@ -31,7 +31,7 @@
 #include <sys/sem.h>
 
 void
-mtx_init(struct mtx *m)
+mdx_mutex_init(mdx_mutex_t *m)
 {
 
 	m->td = NULL;
@@ -39,7 +39,7 @@ mtx_init(struct mtx *m)
 }
 
 int
-mtx_timedlock(struct mtx *m, int ticks)
+mdx_mutex_timedlock(mdx_mutex_t *m, int ticks)
 {
 	int ret;
 
@@ -51,7 +51,7 @@ mtx_timedlock(struct mtx *m, int ticks)
 }
 
 void
-mtx_lock(struct mtx *m)
+mdx_mutex_lock(mdx_mutex_t *m)
 {
 
 	mdx_sem_wait(&m->sem);
@@ -59,7 +59,7 @@ mtx_lock(struct mtx *m)
 }
 
 int
-mtx_trylock(struct mtx *m)
+mdx_mutex_trylock(mdx_mutex_t *m)
 {
 	int ret;
 
@@ -71,7 +71,7 @@ mtx_trylock(struct mtx *m)
 }
 
 int
-mtx_unlock(struct mtx *m)
+mdx_mutex_unlock(mdx_mutex_t *m)
 {
 	int ret;
 

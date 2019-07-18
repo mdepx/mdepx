@@ -29,15 +29,17 @@
 
 #include <sys/sem.h>
 
-struct mtx {
+struct mdx_mutex {
 	mdx_sem_t sem;
 	struct thread *td;
 };
 
-void mtx_init(struct mtx *m);
-int mtx_timedlock(struct mtx *m, int ticks);
-void mtx_lock(struct mtx *m);
-int mtx_trylock(struct mtx *m);
-int mtx_unlock(struct mtx *m);
+typedef struct mdx_mutex mdx_mutex_t;
+
+void mdx_mutex_init(mdx_mutex_t *m);
+void mdx_mutex_lock(mdx_mutex_t *m);
+int mdx_mutex_timedlock(mdx_mutex_t *m, int ticks);
+int mdx_mutex_trylock(mdx_mutex_t *m);
+int mdx_mutex_unlock(mdx_mutex_t *m);
 
 #endif /* _SYS_MUTEX_H_ */

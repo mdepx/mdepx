@@ -56,8 +56,8 @@ extern uint32_t _sbss;
 extern uint32_t _ebss;
 
 static struct spinlock l1;
-static struct mtx m __unused;
-static struct mtx m1 __unused;
+static mdx_mutex_t m __unused;
+static mdx_mutex_t m1 __unused;
 static struct callout c1[1000] __unused;
 static mdx_sem_t sem;
 
@@ -84,12 +84,12 @@ test_thr(void *arg)
 {
 
 	while (1) {
-		if (!mtx_timedlock(&m, 1000))
+		if (!mdx_mutex_timedlock(&m, 1000))
 			continue;
 		printf("cpu%d: hello from thread%04d cn %d mstatus %x\n",
 		    PCPU_GET(cpuid), (size_t)arg, curthread->td_critnest,
 		    csr_read(mstatus));
-		mtx_unlock(&m);
+		mdx_mutex_unlock(&m);
 
 		raw_sleep(1000);
 	}
@@ -122,12 +122,12 @@ test_m0(void *arg)
 {
 
 	while (1) {
-		if (mtx_timedlock(&m1, 50000) == 0) {
+		if (mdx_mutex_timedlock(&m1, 50000) == 0) {
 			printf("again %ld\n", (uint64_t)arg);
 			continue;
 		}
 		printf("test_m0 acuired the mutex\n");
-		mtx_unlock(&m1);
+		mdx_mutex_unlock(&m1);
 	}
 }
 
@@ -136,12 +136,12 @@ test_m1(void *arg)
 {
 
 	while (1) {
-		if (mtx_timedlock(&m1, 50000) == 0) {
+		if (mdx_mutex_timedlock(&m1, 50000) == 0) {
 			printf("again %ld\n", (uint64_t)arg);
 			continue;
 		}
 		printf("test_m1 acuired the mutex\n");
-		mtx_unlock(&m1);
+		mdx_mutex_unlock(&m1);
 	}
 }
 
@@ -150,12 +150,12 @@ test_m2(void *arg)
 {
 
 	while (1) {
-		if (mtx_timedlock(&m1, 50000) == 0) {
+		if (mdx_mutex_timedlock(&m1, 50000) == 0) {
 			printf("again %ld\n", (uint64_t)arg);
 			continue;
 		}
 		printf("test_m2 acuired the mutex\n");
-		mtx_unlock(&m1);
+		mdx_mutex_unlock(&m1);
 	}
 }
 
@@ -185,7 +185,7 @@ app_init(void)
 	console_register(uart_putchar, (void *)&uart_sc);
 
 	mdx_sem_init(&sem, 1);
-	mtx_init(&m);
+	mdx_mutex_init(&m);
 
 	e300g_clint_init(&clint_sc, CLINT_BASE);
 

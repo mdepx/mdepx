@@ -49,7 +49,7 @@ static struct mips_timer_softc timer_sc;
 static struct uart_16550_softc uart_sc;
 
 #ifdef MDX_SCHED
-static struct mtx m;
+static mdx_mutex_t m;
 #endif
 
 #define	USEC_TO_TICKS(n)	(100 * (n))	/* 100MHz clock. */
@@ -183,11 +183,11 @@ test_thr(void *arg)
 {
 
 	while (1) {
-		if (!mtx_timedlock(&m, 1000))
+		if (!mdx_mutex_timedlock(&m, 1000))
 			continue;
 		printf("cpu%d: hello from thread%04d cn %d\n",
 		    PCPU_GET(cpuid), (size_t)arg, curthread->td_critnest);
-		mtx_unlock(&m);
+		mdx_mutex_unlock(&m);
 
 		raw_sleep(1000);
 	}
@@ -201,7 +201,7 @@ main(void)
 	struct thread *td;
 	size_t i;
 
-	mtx_init(&m);
+	mdx_mutex_init(&m);
 
 	for (i = 1; i < 5000; i++) {
 		td = thread_create("test", 1, (USEC_TO_TICKS(1000) * i),
