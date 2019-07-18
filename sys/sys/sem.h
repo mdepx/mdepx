@@ -38,10 +38,10 @@ struct semaphore {
 
 typedef struct semaphore sem_t;
 
-void sem_init(sem_t *sem, int count);
-void sem_wait(sem_t *sem);
-int sem_timedwait(sem_t *sem, int ticks);
-int sem_trywait(sem_t *sem);
-int sem_post(sem_t *sem);
+void mdx_sem_init(sem_t *sem, int count);
+void mdx_sem_wait(sem_t *sem);
+int mdx_sem_timedwait(sem_t *sem, int ticks);
+int mdx_sem_trywait(sem_t *sem);
+int mdx_sem_post(sem_t *sem);
 
 #endif /* _SYS_SEM_H_ */

@@ -35,7 +35,7 @@ mtx_init(struct mtx *m)
 {
 
 	m->td = NULL;
-	sem_init(&m->sem, 1);
+	mdx_sem_init(&m->sem, 1);
 }
 
 int
@@ -43,7 +43,7 @@ mtx_timedlock(struct mtx *m, int ticks)
 {
 	int ret;
 
-	ret = sem_timedwait(&m->sem, ticks);
+	ret = mdx_sem_timedwait(&m->sem, ticks);
 	if (ret)
 		m->td = curthread;
 
@@ -54,7 +54,7 @@ void
 mtx_lock(struct mtx *m)
 {
 
-	sem_wait(&m->sem);
+	mdx_sem_wait(&m->sem);
 	m->td = curthread;
 }
 
@@ -63,7 +63,7 @@ mtx_trylock(struct mtx *m)
 {
 	int ret;
 
-	ret = sem_trywait(&m->sem);
+	ret = mdx_sem_trywait(&m->sem);
 	if (ret)
 		m->td = curthread;
 
@@ -78,7 +78,7 @@ mtx_unlock(struct mtx *m)
 	if (m->td != curthread)
 		panic("can't unlock mutex");
 
-	ret = sem_post(&m->sem);
+	ret = mdx_sem_post(&m->sem);
 
 	return (ret);
 }

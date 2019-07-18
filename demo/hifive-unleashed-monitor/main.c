@@ -182,7 +182,7 @@ app_init(void)
 	    500000000, DEFAULT_BAUDRATE);
 	console_register(uart_putchar, (void *)&uart_sc);
 
-	sem_init(&sem, 1);
+	mdx_sem_init(&sem, 1);
 	mtx_init(&m);
 
 	e300g_clint_init(&clint_sc, CLINT_BASE);

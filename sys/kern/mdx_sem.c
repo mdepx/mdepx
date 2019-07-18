@@ -40,7 +40,7 @@ struct token {
 };
 
 void
-sem_init(sem_t *sem, int count)
+mdx_sem_init(sem_t *sem, int count)
 {
 
 	sem->sem_count = count;
@@ -50,7 +50,7 @@ sem_init(sem_t *sem, int count)
 }
 
 static void
-sem_cb(void *arg)
+mdx_sem_cb(void *arg)
 {
 	struct thread *td;
 	struct token *t;
@@ -86,7 +86,7 @@ sem_cb(void *arg)
 }
 
 int
-sem_timedwait(sem_t *sem, int ticks)
+mdx_sem_timedwait(sem_t *sem, int ticks)
 {
 	struct token t;
 	struct thread *td;
@@ -114,7 +114,7 @@ sem_timedwait(sem_t *sem, int ticks)
 			t.sem = sem;
 			t.timeout = false;
 			callout_init(&td->td_c);
-			callout_set(&td->td_c, ticks, sem_cb, &t);
+			callout_set(&td->td_c, ticks, mdx_sem_cb, &t);
 		}
 
 		td->td_state = TD_STATE_SEM_WAIT;
@@ -142,14 +142,14 @@ sem_timedwait(sem_t *sem, int ticks)
 }
 
 void
-sem_wait(sem_t *m)
+mdx_sem_wait(sem_t *m)
 {
 
-	sem_timedwait(m, 0);
+	mdx_sem_timedwait(m, 0);
 }
 
 int
-sem_trywait(sem_t *sem)
+mdx_sem_trywait(sem_t *sem)
 {
 	int ret;
 
@@ -169,7 +169,7 @@ sem_trywait(sem_t *sem)
 }
 
 int
-sem_post(sem_t *sem)
+mdx_sem_post(sem_t *sem)
 {
 	struct thread *td;
 	int error;
