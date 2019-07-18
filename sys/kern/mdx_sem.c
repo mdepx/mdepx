@@ -194,7 +194,7 @@ mdx_sem_post(mdx_sem_t *sem)
 		td->td_state = TD_STATE_SEM_UNLOCK;
 		sl_unlock(&sem->l);
 
-		/* sem_cb could be called here by another CPU. */
+		/* mdx_sem_cb could be called here by another CPU. */
 
 		error = callout_cancel(&td->td_c);
 		if (error) {
