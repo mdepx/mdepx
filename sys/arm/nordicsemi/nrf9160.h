@@ -103,7 +103,7 @@
 #define	BASE_NVMC	0x40039000 /* Non-volatile memory controller */
 #define	BASE_VMC	0x4003A000 /* Volatile memory controller */
 #define	BASE_CRYPTOCELL	0x50840000 /* CryptoCell sub-system control interface*/
-#define	BASE_P0		0x40842500 /* General purpose input and output */
+#define	BASE_GPIO	0x40842500 /* General purpose input and output */
 #define	PERIPH_SECURE_ACCESS	(1 << 28)
 
 #define	BASE_FICR	0x00FF0000 /* Factory information configuration */
