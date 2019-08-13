@@ -35,10 +35,10 @@
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
 
-static void (*smp_tryst_func)(void *arg);
-static void *smp_tryst_arg;
-static int smp_tryst_ncpus;
-static uint32_t smp_tryst_room[2];
+static void (*smp_rendezvous_func)(void *arg);
+static void *smp_rendezvous_arg;
+static int smp_rendezvous_ncpus;
+static uint32_t smp_rendezvous_room[2];
 static struct spinlock smp_lock;
 
 #if !defined(MDX_SCHED)
@@ -65,7 +65,7 @@ ipi_handler(void)
 		case IPI_IPI:
 			break;
 		case IPI_TRYST:
-			smp_tryst_action();
+			smp_rendezvous_action();
 			break;
 		default:
 			break;
@@ -74,7 +74,7 @@ ipi_handler(void)
 }
 
 void
-smp_tryst_action(void)
+smp_rendezvous_action(void)
 {
 	void (*local_func)(void *);
 	void *local_arg;
@@ -82,22 +82,22 @@ smp_tryst_action(void)
 	KASSERT(curthread->td_critnest > 0,
 	    ("%s: Not in critical section.", __func__));
 
-	atomic_add_acq_int(&smp_tryst_room[0], 1);
+	atomic_add_acq_int(&smp_rendezvous_room[0], 1);
 
 	/* Wait all the CPUs to enter the room. */
-	while (smp_tryst_room[0] < smp_tryst_ncpus)
+	while (smp_rendezvous_room[0] < smp_rendezvous_ncpus)
 		;
 
-	local_func = smp_tryst_func;
-	local_arg = smp_tryst_arg;
+	local_func = smp_rendezvous_func;
+	local_arg = smp_rendezvous_arg;
 	local_func(local_arg);
 
 	/* Leave the room. */
-	atomic_add_rel_int(&smp_tryst_room[1], 1);
+	atomic_add_rel_int(&smp_rendezvous_room[1], 1);
 }
 
 void
-smp_tryst_cpus(uint32_t cpus, void (*fn), void *arg)
+smp_rendezvous_cpus(uint32_t cpus, void (*fn), void *arg)
 {
 	int cpuid;
 	int ncpus;
@@ -112,24 +112,24 @@ smp_tryst_cpus(uint32_t cpus, void (*fn), void *arg)
 			ncpus += 1;
 
 	if (ncpus == 0)
-		panic("smp_tryst_cpus with cpu mask == 0");
+		panic("smp_rendezvous_cpus with cpu mask == 0");
 
 	while (!sl_trylock(&smp_lock))
 		ipi_handler();
 
-	smp_tryst_func = fn;
-	smp_tryst_arg = arg;
-	smp_tryst_ncpus = ncpus;
-	smp_tryst_room[1] = 0;
-	atomic_store_rel_int(&smp_tryst_room[0], 0);
+	smp_rendezvous_func = fn;
+	smp_rendezvous_arg = arg;
+	smp_rendezvous_ncpus = ncpus;
+	smp_rendezvous_room[1] = 0;
+	atomic_store_rel_int(&smp_rendezvous_room[0], 0);
 
 	cpuid = PCPU_GET(cpuid);
 	send_ipi(cpus & ~(1 << cpuid), IPI_TRYST);
 
 	if (cpus & (1 << cpuid))
-		smp_tryst_action();
+		smp_rendezvous_action();
 
-	while (atomic_load_acq_int(&smp_tryst_room[1]) < ncpus)
+	while (atomic_load_acq_int(&smp_rendezvous_room[1]) < ncpus)
 		;
 
 	sl_unlock(&smp_lock);

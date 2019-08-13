@@ -55,7 +55,7 @@ panic(const char *fmt, ...)
 	vpanic(fmt, ap);
 
 #ifdef MDX_SMP
-	smp_tryst_cpus(0xff, panic_stop, NULL);
+	smp_rendezvous_cpus(0xff, panic_stop, NULL);
 #else
 	panic_stop(NULL);
 #endif

@@ -30,8 +30,8 @@
 #define	IPI_IPI		(1 << 0)
 #define	IPI_TRYST	(1 << 1)
 
-void smp_tryst_action(void);
-void smp_tryst_cpus(uint32_t cpus, void (*fn), void *arg);
+void smp_rendezvous_action(void);
+void smp_rendezvous_cpus(uint32_t cpus, void (*fn), void *arg);
 void send_ipi(int mask, int ipi);
 void smp_init(void);
 void ipi_handler(void);

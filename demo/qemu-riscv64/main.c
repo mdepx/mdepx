@@ -299,7 +299,7 @@ main(void)
 		a = uart_16550_getc(&uart_sc);
 		if (a == 0x61) {
 			critical_enter();
-			smp_tryst_cpus(0xf, hello, NULL);
+			smp_rendezvous_cpus(0xf, hello, NULL);
 			critical_exit();
 		}
 	}
