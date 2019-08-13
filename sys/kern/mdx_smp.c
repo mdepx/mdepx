@@ -45,35 +45,7 @@ static struct spinlock smp_lock;
 #error "Invalid configuration"
 #endif
 
-void
-ipi_handler(void)
-{
-	uint32_t ipi_bitmap;
-	uint32_t ipi;
-	int bit;
-
-	ipi_bitmap = atomic_readandclear_int(PCPU_PTR(pending_ipis));
-	if (ipi_bitmap == 0)
-		return;
-
-	while ((bit = ffs(ipi_bitmap))) {
-		bit -= 1;
-		ipi = (1 << bit);
-		ipi_bitmap &= ~ipi;
-
-		switch (ipi) {
-		case IPI_IPI:
-			break;
-		case IPI_TRYST:
-			smp_rendezvous_action();
-			break;
-		default:
-			break;
-		}
-	}
-}
-
-void
+static void
 smp_rendezvous_action(void)
 {
 	void (*local_func)(void *);
@@ -133,6 +105,34 @@ smp_rendezvous_cpus(uint32_t cpus, void (*fn), void *arg)
 		;
 
 	sl_unlock(&smp_lock);
+}
+
+void
+ipi_handler(void)
+{
+	uint32_t ipi_bitmap;
+	uint32_t ipi;
+	int bit;
+
+	ipi_bitmap = atomic_readandclear_int(PCPU_PTR(pending_ipis));
+	if (ipi_bitmap == 0)
+		return;
+
+	while ((bit = ffs(ipi_bitmap))) {
+		bit -= 1;
+		ipi = (1 << bit);
+		ipi_bitmap &= ~ipi;
+
+		switch (ipi) {
+		case IPI_IPI:
+			break;
+		case IPI_TRYST:
+			smp_rendezvous_action();
+			break;
+		default:
+			break;
+		}
+	}
 }
 
 void
