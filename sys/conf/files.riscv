@@ -2,4 +2,3 @@ sys/riscv/riscv/exception.o
 sys/riscv/riscv/intr.o
 sys/riscv/riscv/machdep.o
 sys/riscv/riscv/trap.o
-include sys/conf/files

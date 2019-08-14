@@ -2,7 +2,7 @@ import sys
 import os
 from flags import normalize
 
-def process(osdir, filename):
+def process(osdir, filename, opts):
 	result = []
 	fullpath = os.path.join(osdir, filename)
 	if not os.path.isfile(fullpath):
@@ -31,10 +31,10 @@ def process(osdir, filename):
 			for dep in deps:
 				if dep.startswith("!"):
 					d = dep.lstrip("!")
-					if d in options:
+					if d in opts:
 						add = 0
 						break
-				elif dep not in options:
+				elif dep not in opts:
 					add = 0
 					break
 			if add:
@@ -44,12 +44,14 @@ def process(osdir, filename):
 
 if __name__ == '__main__':
 	args = sys.argv
-	if len(args) < 3:
+	if len(args) < 2:
 		sys.exit(1)
 
 	osdir = args[1]
-	filename = args[2]
-	options = normalize(args[3])
+	options = normalize(args[2])
+	result = []
+	for fname in options.keys():
+		filename = 'sys/conf/files.%s' % fname
+		result += process(osdir, filename, options[fname])
 
-	result = process(osdir, filename)
 	print(" ".join(set(result)))
