@@ -3,4 +3,3 @@ sys/arm/arm/machdep.o
 sys/arm/arm/nvic.o
 sys/arm/arm/scb.o
 sys/arm/arm/trap.o
-include sys/conf/files
