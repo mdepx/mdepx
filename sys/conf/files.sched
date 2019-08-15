@@ -1,0 +1,6 @@
+sys/kern/mdx_sem.o			sem | mutex
+sys/kern/mdx_mutex.o			mutex
+sys/kern/mdx_sched.o
+sys/kern/mdx_smp.o			smp
+sys/kern/thread/mdx_thread.o
+sys/kern/thread/mdx_thread_alloc.o	malloc

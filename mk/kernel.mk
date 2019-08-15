@@ -14,5 +14,5 @@ $(foreach obj, ${KOBJECTS},					\
 KFLAGS = $(shell ${PYTHON} -B ${OSDIR}/tools/flags.py "${KERNEL}")
 
 $(foreach kflag, ${KFLAGS},					\
-	${eval CFLAGS += -D${kflag}}				\
+	${eval CFLAGS += -DMDX_${kflag}}			\
 )

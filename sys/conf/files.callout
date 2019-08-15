@@ -1,0 +1,3 @@
+sys/kern/mdx_callout.o
+sys/kern/mdx_tsleep.o			!sched tsleep
+sys/kern/thread/mdx_tsleep.o		sched tsleep
