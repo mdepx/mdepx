@@ -36,7 +36,7 @@
 
 struct trapframe *arm_exception(struct trapframe *tf, int irq);
 #ifdef MDX_SCHED
-static struct thread intr_thread[MDX_SMP_MAXCPU];
+static struct thread intr_thread[MDX_SCHED_SMP_MAXCPU];
 #endif
 
 static void

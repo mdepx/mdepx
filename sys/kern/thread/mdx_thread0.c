@@ -28,7 +28,7 @@
 #include <sys/thread.h>
 #include <sys/pcpu.h>
 
-static struct thread idle_threads[MDX_SMP_MAXCPU];
+static struct thread idle_threads[MDX_SCHED_SMP_MAXCPU];
 
 void
 thread_init(int cpuid)

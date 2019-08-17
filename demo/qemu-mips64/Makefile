@@ -19,11 +19,20 @@ OBJECTS =							\
 	${OSDIR}/sys/dev/uart/uart_16550.o			\
 	${OSDIR}/lib/libc/gen/assert.o
 
-KERNEL = malloc sched (nprio=2) mutex mips (cache tlb qemu)
+KERNEL =				\
+	callout (tsleep sched)		\
+	malloc (fl fl_wrapper)		\
+	mips (cache tlb qemu)		\
+	sched (nprio=2 mutex malloc)	\
+	systm (console)
 
 ifdef MDX_ST
 # Single-threaded demo
-KERNEL = malloc mips (cache tlb qemu)
+KERNEL =				\
+	callout (tsleep)		\
+	malloc (fl fl_wrapper)		\
+	mips (cache tlb qemu)		\
+	systm (console)
 endif
 
 LIBRARIES = libc

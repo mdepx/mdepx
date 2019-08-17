@@ -37,12 +37,12 @@
 
 #define	STACK_SIZE	4096
 
-static struct pcpu __pcpu[MDX_SMP_MAXCPU];
+static struct pcpu __pcpu[MDX_SCHED_SMP_MAXCPU];
 static uint32_t ncpus;
-static size_t cpu_stacks[MDX_SMP_MAXCPU][STACK_SIZE]; /* Interrupt stack */
+static size_t cpu_stacks[MDX_SCHED_SMP_MAXCPU][STACK_SIZE]; /* Interrupt stack */
 
-uint8_t __riscv_boot_ap[MDX_SMP_MAXCPU];
-uint8_t secondary_stacks[MDX_SMP_MAXCPU][STACK_SIZE]; /* Idle thread stacks */
+uint8_t __riscv_boot_ap[MDX_SCHED_SMP_MAXCPU];
+uint8_t secondary_stacks[MDX_SCHED_SMP_MAXCPU][STACK_SIZE]; /* Idle thread stacks */
 
 void
 critical_enter(void)
@@ -108,7 +108,7 @@ md_thread_terminate(struct thread *td)
 
 }
 
-#ifdef MDX_SMP
+#ifdef MDX_SCHED_SMP
 void
 md_init_secondary(int hart)
 {
@@ -156,7 +156,7 @@ md_init(int hart)
 	mdx_sched_init();
 #endif
 
-#ifdef MDX_SMP
+#ifdef MDX_SCHED_SMP
 	smp_init();
 #endif
 

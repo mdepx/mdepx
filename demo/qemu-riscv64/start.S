@@ -68,7 +68,7 @@ ASM_ENTRY(_start)
 	/* NOT REACHED */
 
 ASM_ENTRY(mpentry)
-#ifdef MDX_SMP
+#ifdef MDX_SCHED_SMP
 	la	t0, __riscv_boot_ap
 	add	t0, t0, a0
 

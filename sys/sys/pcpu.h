@@ -30,8 +30,8 @@
 #include <sys/list.h>
 #include <machine/pcpu.h>
 
-#ifndef MDX_SMP_MAXCPU
-#define	MDX_SMP_MAXCPU	1
+#ifndef MDX_SCHED_SMP_MAXCPU
+#define	MDX_SCHED_SMP_MAXCPU	1
 #endif
 
 struct pcpu {

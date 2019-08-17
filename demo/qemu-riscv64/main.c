@@ -52,7 +52,7 @@
 static struct uart_16550_softc uart_sc;
 static struct clint_softc clint_sc;
 
-extern uint8_t __riscv_boot_ap[MDX_SMP_MAXCPU];
+extern uint8_t __riscv_boot_ap[MDX_SCHED_SMP_MAXCPU];
 
 #ifdef MDX_SCHED
 static mdx_mutex_t m __unused;
@@ -221,7 +221,7 @@ main(void)
 	printf("cpu%d: pcpu size %d\n", PCPU_GET(cpuid), sizeof(struct pcpu));
 	sl_init(&l1);
 
-#ifdef MDX_SMP
+#ifdef MDX_SCHED_SMP
 	printf("Releasing CPUs...\n");
 	for (j = 0; j < 8; j++)
 		__riscv_boot_ap[j] = 1;
@@ -293,7 +293,7 @@ main(void)
 		    (void *)&c1[j]);
 #endif
 
-#ifdef MDX_SMP
+#ifdef MDX_SCHED_SMP
 	char a;
 	while (1) {
 		a = uart_16550_getc(&uart_sc);

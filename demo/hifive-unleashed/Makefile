@@ -16,7 +16,13 @@ OBJECTS =	main.o						\
 		${OSDIR}/sys/riscv/sifive/e300g_uart.o		\
 		start.o
 
-KERNEL = malloc sched (nprio=2) mutex sem smp (maxcpu=8)
+KERNEL =							\
+	callout (tsleep sched)					\
+	malloc (fl fl_wrapper)					\
+	riscv							\
+	sched (nprio=2 mutex smp [maxcpu=8] malloc)		\
+	systm (console)
+
 LIBRARIES = libc
 
 CFLAGS = -march=rv64imac -mabi=lp64 -mcmodel=medany			\

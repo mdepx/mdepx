@@ -60,7 +60,7 @@ static struct entry runq[MDX_SCHED_NPRIO];
 static struct entry pcpu_list = LIST_INIT_STATIC(&pcpu_list);
 struct entry pcpu_all = LIST_INIT_STATIC(&pcpu_all);
 
-#ifdef MDX_SMP
+#ifdef MDX_SCHED_SMP
 static struct spinlock l;
 #define	mdx_sched_lock()	sl_lock(&l)
 #define	mdx_sched_unlock()	sl_unlock(&l)
@@ -105,7 +105,7 @@ mdx_sched_cb(void *arg)
 	mdx_sched_unlock();
 }
 
-#ifdef MDX_SMP
+#ifdef MDX_SCHED_SMP
 static void
 mdx_sched_cpu_notify(void)
 {
@@ -138,7 +138,7 @@ mdx_sched_add(struct thread *td)
 
 	list_append(&runq[td->td_prio], &td->td_node);
 
-#ifdef MDX_SMP
+#ifdef MDX_SCHED_SMP
 	mdx_sched_cpu_notify();
 #endif
 
@@ -268,7 +268,7 @@ mdx_sched_init(void)
 	for (i = 0; i < MDX_SCHED_NPRIO; i++)
 		list_init(&runq[i]);
 
-#ifdef MDX_SMP
+#ifdef MDX_SCHED_SMP
 	sl_init(&l);
 #endif
 }

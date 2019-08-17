@@ -60,7 +60,7 @@ send_ipi(int cpumask, int ipi)
 {
 	struct pcpu *p;
 
-	KASSERT(MDX_SMP_MAXCPU <= 32, ("cpumask is 32 bit"));
+	KASSERT(MDX_SCHED_SMP_MAXCPU <= 32, ("cpumask is 32 bit"));
 	KASSERT(!list_empty(&pcpu_all), ("no cpus"));
 
 	for (p = CONTAINER_OF(pcpu_all.next, struct pcpu, pc_all);;
@@ -75,7 +75,7 @@ send_ipi(int cpumask, int ipi)
 }
 #endif
 
-#ifdef MDX_SMP
+#ifdef MDX_SCHED_SMP
 void
 clint_intr_software(void)
 {
