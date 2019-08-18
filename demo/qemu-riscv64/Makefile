@@ -18,25 +18,29 @@ OBJECTS =	main.o						\
 		start.o
 
 KERNEL =						\
-	riscv						\
-	malloc (fl fl_wrapper)				\
-	sched (nprio=2 mutex smp [maxcpu=8] malloc)	\
 	callout (tsleep sched)				\
+	malloc (fl fl_wrapper)				\
+	riscv						\
+	sched (nprio=2 mutex smp [maxcpu=8] malloc)	\
 	systm (console)
 
 # Uni-processor demo
 ifdef MDX_UP
 KERNEL =				\
+	callout (tsleep sched)		\
 	riscv				\
 	malloc (fl fl_wrapper)		\
 	sched (nprio=2 mutex malloc)	\
-	callout (tsleep sched)		\
 	systm (console)
 endif
 
 # Single-threaded demo
 ifdef MDX_ST
-KERNEL = malloc
+KERNEL =				\
+	callout (tsleep)		\
+	riscv				\
+	malloc (fl fl_wrapper)		\
+	systm (console)
 endif
 
 LIBRARIES = libc
