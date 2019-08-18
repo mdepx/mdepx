@@ -65,6 +65,18 @@ mdx_tsleep(uint32_t ticks)
 	callout_init(&c);
 	callout_set(&c, ticks, mdx_tsleep_cb, td);
 
+#ifndef MDX_MIPS_QEMU
+	while (1) {
+		critical_enter();
+		if (c.state == CALLOUT_STATE_FIRED) {
+			critical_exit();
+			break;
+		}
+		cpu_idle();
+		critical_exit();
+	}
+#else
 	while (c.state != CALLOUT_STATE_FIRED)
 		cpu_idle();
+#endif
 }
