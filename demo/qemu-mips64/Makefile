@@ -16,7 +16,7 @@ BASE_ADDR =	0xffffffff80100000
 OBJECTS =							\
 	main.o							\
 	start.o							\
-	${OSDIR}/sys/dev/uart/uart_16550.o			\
+	${OSDIR}/kernel/dev/uart/uart_16550.o			\
 	${OSDIR}/lib/libc/gen/assert.o
 
 KERNEL =				\

@@ -12,9 +12,9 @@ LDSCRIPT =	${OBJDIR}/ldscript
 LDSCRIPT_TPL =	${CURDIR}/ldscript.tpl
 
 OBJECTS =	main.o						\
-		${OSDIR}/sys/dev/uart/uart_16550.o		\
-		${OSDIR}/sys/riscv/sifive/e300g_clint.o		\
-		${OSDIR}/sys/riscv/sifive/e300g_uart.o		\
+		${OSDIR}/kernel/dev/uart/uart_16550.o		\
+		${OSDIR}/kernel/riscv/sifive/e300g_clint.o	\
+		${OSDIR}/kernel/riscv/sifive/e300g_uart.o	\
 		start.o
 
 KERNEL =						\
