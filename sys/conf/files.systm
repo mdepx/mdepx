@@ -1,5 +1,0 @@
-sys/kern/mdx_console.o			console
-sys/kern/mdx_mbuf.o			net malloc
-sys/kern/mdx_of.o			fdt
-sys/kern/mdx_panic.o
-sys/kern/thread/mdx_thread0.o

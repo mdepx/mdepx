@@ -1,2 +1,0 @@
-sys/kern/malloc/mdx_malloc_fl.o		fl
-sys/kern/malloc/mdx_malloc.o		fl_wrapper

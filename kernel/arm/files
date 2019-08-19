@@ -1,0 +1,5 @@
+arm/exception.o
+arm/machdep.o
+arm/nvic.o
+arm/scb.o
+arm/trap.o

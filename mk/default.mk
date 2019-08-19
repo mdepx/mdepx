@@ -19,7 +19,7 @@ endif
 INCS += -I${OBJDIR}
 INCS += -I${CURDIR}
 INCS += -I${OSDIR}/include
-INCS += -I${OSDIR}/sys
+INCS += -I${OSDIR}/kernel
 INCS += -I${OSDIR}/lib
 
 CFLAGS += ${INCS} ${CFLAGS_$@} -D__MDX__

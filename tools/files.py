@@ -2,8 +2,9 @@ import sys
 import os
 from flags import normalize
 
-def process(osdir, filename, opts):
+def process(osdir, dir, opts):
 	result = []
+	filename = os.path.join(dir, "files")
 	fullpath = os.path.join(osdir, filename)
 	if not os.path.isfile(fullpath):
 		sys.exit(2)
@@ -19,7 +20,7 @@ def process(osdir, filename, opts):
 		spl = line.strip().split()
 		if not spl:
 			continue
-		obj = spl[0]
+		obj = os.path.join(dir, spl[0])
 		dep_str = " ".join(spl[1:])
 		if not dep_str:
 			result.append(obj)
@@ -50,8 +51,8 @@ if __name__ == '__main__':
 	osdir = args[1]
 	options = normalize(args[2])
 	result = []
-	for fname in options.keys():
-		filename = 'sys/conf/files.%s' % fname
-		result += process(osdir, filename, options[fname])
+	for dir in options.keys():
+		kdir = os.path.join("kernel", dir);
+		result += process(osdir, kdir, options[dir])
 
 	print(" ".join(set(result)))

@@ -80,6 +80,6 @@ int in_aifaddr(struct ifnet *ifp, struct in_addr in, u_long mask);
 int in_ifhasaddr(struct ifnet *ifp, struct in_addr in);
 
 #define	__KAME_NETINET_IN_H_INCLUDED_
-#include <netinet6/in6.h>
+#include <net/netinet6/in6.h>
 
 #endif /* !_NETINET_IN_H_ */

@@ -1,0 +1,6 @@
+mdx_sem.o		sem | mutex
+mdx_mutex.o		mutex
+mdx_sched.o
+mdx_smp.o		smp
+mdx_thread.o
+mdx_thread_alloc.o	malloc
