@@ -16,12 +16,39 @@ OBJECTS =	main.o						\
 		${OSDIR}/kernel/riscv/sifive/e300g_uart.o	\
 		start.o
 
-KERNEL =							\
-	callout (tsleep sched)					\
-	malloc (fl fl_wrapper)					\
-	riscv							\
-	sched (nprio=2 mutex smp [maxcpu=8] malloc)		\
-	systm (console)
+define KERNEL_CONFIG
+	module callout;
+	module malloc;
+	module riscv;
+	module sched;
+	module systm;
+
+	callout {
+		include tsleep;
+		include sched;
+	};
+
+	malloc {
+		include fl;
+		include fl_wrapper;
+	};
+
+	sched {
+		include mutex;
+		include malloc;
+		include smp;
+
+		nprio = 2;
+
+		smp {
+			maxcpu = 8;
+		};
+	};
+
+	systm {
+		include console;
+	};
+endef
 
 LIBRARIES = libc
 

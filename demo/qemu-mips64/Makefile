@@ -19,20 +19,48 @@ OBJECTS =							\
 	${OSDIR}/kernel/dev/uart/uart_16550.o			\
 	${OSDIR}/lib/libc/gen/assert.o
 
-KERNEL =				\
-	callout (tsleep sched)		\
-	malloc (fl fl_wrapper)		\
-	mips (cache tlb qemu)		\
-	sched (nprio=2 mutex malloc)	\
-	systm (console)
+define KERNEL_CONFIG
+	module callout;
+	module malloc;
+	module mips;
+	module systm;
 
-ifdef MDX_ST
-# Single-threaded demo
-KERNEL =				\
-	callout (tsleep)		\
-	malloc (fl fl_wrapper)		\
-	mips (cache tlb qemu)		\
-	systm (console)
+	callout {
+		include tsleep;
+	};
+
+	malloc {
+		include fl;
+		include fl_wrapper;
+	};
+
+	mips {
+		include cache;
+		include tlb;
+		include qemu;
+	};
+
+	sched {
+		include mutex;
+		include malloc;
+
+		nprio = 2;
+	};
+
+	systm {
+		include console;
+	};
+endef
+
+# Multi-threaded demo
+ifndef MDX_ST
+define KERNEL_CONFIG +=
+	module sched;
+
+	callout {
+		include sched;
+	};
+endef
 endif
 
 LIBRARIES = libc
@@ -62,6 +90,10 @@ all:	${OBJDIR}/${APP}.bin
 
 ${LDSCRIPT}:
 	@sed s#__BASE_ADDR__#${BASE_ADDR}#g ${LDSCRIPT_TPL} > ${LDSCRIPT}
+
+test:
+	echo $(shell python3 -B ${OSDIR}/tools/kernel.py \
+		${OSDIR} "${KERNEL_CONFIG}")
 
 clean:
 	@rm -f ${LDSCRIPT} ${OBJECTS}

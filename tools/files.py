@@ -1,6 +1,5 @@
 import sys
 import os
-from flags import normalize
 
 def process(osdir, dir, opts):
 	result = []
@@ -42,17 +41,3 @@ def process(osdir, dir, opts):
 				result.append(obj)
 	f.close()
 	return result
-
-if __name__ == '__main__':
-	args = sys.argv
-	if len(args) < 2:
-		sys.exit(1)
-
-	osdir = args[1]
-	options = normalize(args[2])
-	result = []
-	for dir in options.keys():
-		kdir = os.path.join("kernel", dir);
-		result += process(osdir, kdir, options[dir])
-
-	print(" ".join(set(result)))

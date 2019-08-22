@@ -17,30 +17,53 @@ OBJECTS =	main.o						\
 		${OSDIR}/kernel/riscv/sifive/e300g_uart.o	\
 		start.o
 
-KERNEL =						\
-	callout (tsleep sched)				\
-	malloc (fl fl_wrapper)				\
-	riscv						\
-	sched (nprio=2 mutex smp [maxcpu=8] malloc)	\
-	systm (console)
+define KERNEL_CONFIG
+	module callout;
+	module malloc;
+	module riscv;
+	module systm;
 
-# Uni-processor demo
-ifdef MDX_UP
-KERNEL =				\
-	callout (tsleep sched)		\
-	riscv				\
-	malloc (fl fl_wrapper)		\
-	sched (nprio=2 mutex malloc)	\
-	systm (console)
+	callout {
+		include tsleep;
+	};
+
+	malloc {
+		include fl;
+		include fl_wrapper;
+	};
+
+	sched {
+		include mutex;
+		include malloc;
+
+		nprio = 2;
+	};
+
+	systm {
+		include console;
+	};
+endef
+
+# Multi-threaded demo
+ifndef MDX_ST
+define KERNEL_CONFIG +=
+	module sched;
+	callout {
+		include sched;
+	};
+endef
 endif
 
-# Single-threaded demo
-ifdef MDX_ST
-KERNEL =				\
-	callout (tsleep)		\
-	riscv				\
-	malloc (fl fl_wrapper)		\
-	systm (console)
+# Multi-core demo
+ifndef MDX_UP
+define KERNEL_CONFIG +=
+	sched {
+		include smp;
+		smp {
+			maxcpu = 8;
+		};
+	};
+endef
 endif
 
 LIBRARIES = libc

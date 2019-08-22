@@ -1,93 +1,64 @@
 import sys
 import os
 
-def prs(str):
-	d = {}
+from kernel import proc0
 
-	tmp = ''
-	opt = ''
-	i = 0
-	while i < len(str):
-		c = str[i]
+result = []
 
-		if (c == ' ' or c == '['):
-			if tmp:
-				opt = tmp
-				d[opt] = ''
-				tmp = ''
-		else:
-			tmp += c
-			if (i == len(str) - 1):
-				d[tmp] = ''
+def wr(s):
+	sys.stdout.write(s.upper())
 
-		if (c == '['):
-			# find the end
-			j = i
-			while j < len(str):
-				c1 = str[j]
-				if (c1 == ']'):
-					if opt:
-						d[opt] = str[i + 1:j]
-					i = j
-					break
-				j += 1
-		i += 1
+def proc1(m, d):
+	inc = []
+	exc = []
 
-	return d
+	# Process directives
+	if 'include' in d:
+		inc = d['include']
 
-def normalize(options):
-	d = {}
+	if type(inc) == list:
+		for i in inc:
+			wr(m + '_' + i + ' ')
+	else:
+		wr(m + '_' + inc + ' ')
 
-	tmp = ''
-	opt = ''
-	i = 0
-	while i < len(options):
-		c = options[i]
+	# Process everything else
 
-		if (c == ' ' or c == '('):
-			if tmp:
-				opt = tmp
-				d[opt] = {}
-				tmp = ''
-		else:
-			tmp += c
-			if (i == len(options) - 1):
-				d[tmp] = {}
+	for k in d:
+		if k in ['include',]:
+			continue
 
-		if (c == "("):
-			# find the end
-			j = i
-			while j < len(options):
-				c1 = options[j]
-				if (c1 == ")"):
-					if opt:
-						op = options[i + 1:j]
-						d[opt] = prs(op.strip())
-					i = j
-					break
-				j += 1
-		i += 1
-
-	return d
+		d1 = d[k]
+		#print(d1)
+		if type(d1) == str:
+			val = m + '_' + k + '=' + d1
+			wr(val + ' ')
+		elif type(d1) == dict:
+			val = m + '_'
+			wr(val)
+			proc1(k, d1)
+		elif type(d1) == list:
+			# take last value
+			d2 = d1[-1]
+			if type(d2) == str:
+				val = m + '_' + k + '=' + d2
+				wr(val + ' ')
+			elif type(d2) == dict:
+				val = m + '_'
+				wr(val)
+				proc1(k, d2)
 
 if __name__ == '__main__':
 	args = sys.argv
 	if len(args) < 1:
 		sys.exit(1)
-	options = args[1]
+	data = args[1]
 
-	dres = normalize(options)
+	modules = {}
+	proc0(modules, data)
 
-	res = []
-	for key in dres.keys():
-		res.append(key)
-		d = dres[key]
-		#print(key, type(dres[key]), dres[key])
-		for o in d.keys():
-			res.append("%s_%s" % (key, o))
-			spl = d[o].split()
-			for s in spl:
-				res.append("%s_%s_%s" % (key, o, s))
-
-	res = ' '.join(res)
-	print(res.upper())
+	for m in modules['module']:
+		if m in modules:
+			d = modules[m]
+			wr(m + ' ')
+			proc1(m, d)
