@@ -4,14 +4,13 @@ from files import process
 
 def proc(d, key, val):
 	k = key.strip()
-	data = val.strip()
-	spl = data.split()
+	v = val.strip()
 
-	#print('proc: key "' + k + '" data "' + data + '"')
+	#print('proc: key "' + k + '" val "' + v + '"')
 
-	if data.startswith('{'):
+	if v.startswith('{'):
 		f = {}
-		proc0(f, data.lstrip("{").rstrip("}"))
+		proc0(f, v.strip("{}"))
 		if k in d:
 			# Merge dicts
 			for e in f:
@@ -27,9 +26,9 @@ def proc(d, key, val):
 		if k in d:
 			if type(d[k]) != list:
 				d[k] = [d[k]]
-			d[k].append(data)
+			d[k].append(v)
 		else:
-			d[k] = data
+			d[k] = v
 
 def proc0(d, data):
 	i = 0
@@ -49,8 +48,8 @@ def proc0(d, data):
 				tmp = ''
 			if (key and val):
 				proc(d, key, val)
-			key = ''
-			val = ''
+				key = ''
+				val = ''
 			i += 1
 			continue
 
@@ -90,28 +89,21 @@ if __name__ == '__main__':
 	data = args[2]
 
 	modules = {}
-
-	#print(data)
 	proc0(modules, data)
 
-	#print (modules)
-	#print()
-
 	result = []
-
-	#sys.exit(0)
 	for m in modules['module']:
 		l = []
 		if m in modules:
 			d = modules[m]
 			if type(d) != dict:
-				sys.exit(1)
-			#print(m, d)
+				sys.exit(4)
+
+			# Process directives only
 			if 'include' in d:
 				inc = d['include']
 				if type(inc) == list:
 					for file in inc:
-						#print(file)
 						l.append(file)
 				else:
 					l.append(inc)
