@@ -18,7 +18,7 @@ ${OBJDIR}/%.o: %.c GNUmakefile
 ${OBJDIR}/%.o: %.c Makefile
 	@echo "  CC      $(patsubst ${CURDIR}/%,%,$<)"
 	@mkdir -p $(dir $@)
-	${CC} ${CFLAGS} -c -o $@ $<
+	@${CC} ${CFLAGS} -c -o $@ $<
 
 ${OBJDIR}/%.o: %.S GNUmakefile
 	@echo "  CC      $(patsubst ${CURDIR}/%,%,$<)"
