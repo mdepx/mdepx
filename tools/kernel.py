@@ -2,6 +2,9 @@ import sys
 import os
 from files import process
 
+#
+# Process the value
+#
 def proc(d, key, val):
 	k = key.strip()
 	v = val.strip()
@@ -22,14 +25,27 @@ def proc(d, key, val):
 					d[k][e] = f[e]
 		else:
 			d[k] = f
-	else:
+	elif v.startswith("'"):
 		if k in d:
 			if type(d[k]) != list:
 				d[k] = [d[k]]
-			d[k].append(v)
+			d[k].append(v.strip("'"))
 		else:
-			d[k] = v
+			d[k] = v.strip("'")
+	else:
+		spl = v.split()
+		for s in spl:
+			if k in d:
+				if type(d[k]) != list:
+					d[k] = [d[k]]
+				d[k].append(s)
+			else:
+				d[k] = s
 
+#
+# Find the key value pair
+# First word is key, everything else until ';' is value
+#
 def proc0(d, data):
 	i = 0
 	tmp = ''
@@ -58,19 +74,9 @@ def proc0(d, data):
 			continue
 
 		elif (c == ' '):
-			if (tmp.strip() == '' or depth > 0):
-				tmp += c
-				i += 1
-				continue
-
-			if (key == ''):
+			if key == '':
 				key = tmp
 				tmp = ''
-			else:
-				val = tmp
-				tmp = ''
-			i += 1
-			continue
 
 		elif (c == '{'):
 			depth += 1
