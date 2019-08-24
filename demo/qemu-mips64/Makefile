@@ -19,7 +19,7 @@ OBJECTS =							\
 	${OSDIR}/kernel/dev/uart/uart_16550.o			\
 	${OSDIR}/lib/libc/gen/assert.o
 
-define KERNEL_CONFIG
+define MDX_CONFIG
 kernel = {
 	module callout;
 	module malloc;
@@ -56,7 +56,7 @@ endef
 
 # Multi-threaded demo
 ifndef MDX_ST
-define KERNEL_CONFIG +=
+define MDX_CONFIG +=
 kernel = {
 	module sched;
 
@@ -97,7 +97,7 @@ ${LDSCRIPT}:
 
 test:
 	echo $(shell python3 -B ${OSDIR}/tools/kernel.py \
-		${OSDIR} "${KERNEL_CONFIG}")
+		${OSDIR} "${MDX_CONFIG}")
 
 clean:
 	@rm -f ${LDSCRIPT} ${OBJECTS}

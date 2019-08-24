@@ -17,7 +17,7 @@ OBJECTS =	main.o						\
 		${OSDIR}/kernel/riscv/sifive/e300g_uart.o	\
 		start.o
 
-define KERNEL_CONFIG
+define MDX_CONFIG
 kernel {
 	module callout;
 	module malloc;
@@ -48,7 +48,7 @@ endef
 
 # Multi-threaded demo
 ifndef MDX_ST
-define KERNEL_CONFIG +=
+define MDX_CONFIG +=
 kernel {
 	module sched;
 	callout {
@@ -60,7 +60,7 @@ endif
 
 # Multi-core demo
 ifndef MDX_UP
-define KERNEL_CONFIG +=
+define MDX_CONFIG +=
 kernel {
 	sched {
 		include smp;

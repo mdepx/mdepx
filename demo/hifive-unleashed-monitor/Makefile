@@ -16,7 +16,7 @@ OBJECTS =	main.o						\
 		${OSDIR}/kernel/riscv/sifive/e300g_uart.o	\
 		start.o
 
-define KERNEL_CONFIG
+define MDX_CONFIG
 kernel = {
 	module callout;
 	module malloc;
