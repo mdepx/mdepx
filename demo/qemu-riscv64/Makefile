@@ -18,6 +18,7 @@ OBJECTS =	main.o						\
 		start.o
 
 define KERNEL_CONFIG
+kernel {
 	module callout;
 	module malloc;
 	module riscv;
@@ -42,27 +43,32 @@ define KERNEL_CONFIG
 	systm {
 		include console;
 	};
+};
 endef
 
 # Multi-threaded demo
 ifndef MDX_ST
 define KERNEL_CONFIG +=
+kernel {
 	module sched;
 	callout {
 		include sched;
 	};
+};
 endef
 endif
 
 # Multi-core demo
 ifndef MDX_UP
 define KERNEL_CONFIG +=
+kernel {
 	sched {
 		include smp;
 		smp {
 			maxcpu = 8;
 		};
 	};
+};
 endef
 endif
 

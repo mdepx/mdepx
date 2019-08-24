@@ -20,6 +20,7 @@ OBJECTS =							\
 	${OSDIR}/lib/libc/gen/assert.o
 
 define KERNEL_CONFIG
+kernel = {
 	module callout;
 	module malloc;
 	module mips;
@@ -50,16 +51,19 @@ define KERNEL_CONFIG
 	systm {
 		include console;
 	};
+};
 endef
 
 # Multi-threaded demo
 ifndef MDX_ST
 define KERNEL_CONFIG +=
+kernel = {
 	module sched;
 
 	callout {
 		include sched;
 	};
+};
 endef
 endif
 

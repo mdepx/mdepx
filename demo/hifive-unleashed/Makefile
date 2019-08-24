@@ -17,6 +17,7 @@ OBJECTS =	main.o						\
 		start.o
 
 define KERNEL_CONFIG
+kernel {
 	module callout;
 	module malloc;
 	module riscv;
@@ -48,6 +49,7 @@ define KERNEL_CONFIG
 	systm {
 		include console;
 	};
+};
 endef
 
 LIBRARIES = libc

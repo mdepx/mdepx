@@ -15,32 +15,21 @@ def proc(d, key, val):
 		f = {}
 		proc0(f, v.strip("{}"))
 		if k in d:
-			# Merge dicts
-			for e in f:
-				if e in d[k]:
-					if type(d[k][e]) != list:
-						d[k][e] = [d[k][e]]
-					d[k][e].append(f[e])
-				else:
-					d[k][e] = f[e]
+			d[k].append(f)
 		else:
-			d[k] = f
+			d[k] = [f]
 	elif v.startswith("'"):
 		if k in d:
-			if type(d[k]) != list:
-				d[k] = [d[k]]
 			d[k].append(v.strip("'"))
 		else:
-			d[k] = v.strip("'")
+			d[k] = [v.strip("'")]
 	else:
 		spl = v.split()
 		for s in spl:
 			if k in d:
-				if type(d[k]) != list:
-					d[k] = [d[k]]
 				d[k].append(s)
 			else:
-				d[k] = s
+				d[k] = [s]
 
 #
 # Find the key value pair
@@ -86,33 +75,47 @@ def proc0(d, data):
 		tmp += c
 		i += 1
 
+def proc_directive(l, d):
+	if type(d) != dict:
+		sys.exit(5)
+
+	# Process directives only
+	if 'include' in d:
+		includes = d['include']
+		for file in includes:
+			l.append(file)
+
 if __name__ == '__main__':
 	args = sys.argv
 	if len(args) < 2:
 		sys.exit(1)
 
 	osdir = args[1]
-	data = args[2]
+	config_str = args[2]
 
-	modules = {}
-	proc0(modules, data)
+	config = {}
+	proc0(config, config_str)
+
+	if not 'kernel' in config:
+		sys.exit(2)
 
 	result = []
-	for m in modules['module']:
-		l = []
-		if m in modules:
-			d = modules[m]
-			if type(d) != dict:
-				sys.exit(4)
 
-			# Process directives only
-			if 'include' in d:
-				inc = d['include']
-				if type(inc) == list:
-					for file in inc:
-						l.append(file)
-				else:
-					l.append(inc)
+	# Find all the 'module' directives
+	modules = []
+	kernel = config['kernel']
+	for k in kernel:
+		if 'module' in k:
+			modules += k['module']
+
+	# For each module look for directives
+	for m in modules:
+		l = []
+		for k in kernel:
+			if m in k:
+				d = k[m]
+				for itm in d:
+					proc_directive(l, itm)
 		result += process(osdir, "kernel/%s" % m, l)
 
 	print(" ".join(result))

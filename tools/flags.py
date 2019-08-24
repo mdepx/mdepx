@@ -5,47 +5,49 @@ from kernel import proc0
 def wr(s):
 	sys.stdout.write(s.upper())
 
-def proc1(m, d):
+def proc2(m, d):
 	for k in d:
 		# Process directives
 		if k == 'include':
 			options = d['include']
-			if type(options) == list:
-				for opt in options:
-					wr("%s_%s " % (m, opt))
-			else:
-				wr("%s_%s " % (m, options))
+			for opt in options:
+				wr("%s_%s " % (m, opt))
 			continue
 
 		# Process everything else
 		d1 = d[k]
-		if type(d1) == str:
-			wr("%s_%s=%s " % (m, k, d1))
-		elif type(d1) == dict:
-			wr("%s_" % m)
-			proc1(k, d1)
-		elif type(d1) == list:
-			# take last value
-			d2 = d1[-1]
-			if type(d2) == str:
-				wr("%s_%s=%s " % (m, k, d2))
-			elif type(d2) == dict:
-				wr("%s_" % m)
-				proc1(k, d2)
+		for itm in d1:
+			if type(itm) == str:
+				wr("%s_%s=%s " % (m, k, itm))
+			elif type(itm) == dict:
+				proc2("%s_%s" % (m, k), itm)
+			else:
+				sys.exit(5)
 
 if __name__ == '__main__':
 	args = sys.argv
 	if len(args) < 1:
 		sys.exit(1)
-	data = args[1]
+	config_str = args[1]
+	config = {}
+	proc0(config, config_str)
+	if not 'kernel' in config:
+		sys.exit(2)
+	kernel = config['kernel']
 
-	modules = {}
-	proc0(modules, data)
+	if type(kernel) != list:
+		sys.exit(3)
 
-	for m in modules['module']:
-		if not m in modules:
-			continue
+	modules = []
+	for k in kernel:
+		if 'module' in k:
+			modules += k['module']
 
-		d = modules[m]
+	for m in modules:
 		wr("%s " % m)
-		proc1(m, d)
+		for k in kernel:
+			if not m in k:
+				continue
+			d = k[m]
+			for el in d:
+				proc2(m, el)
