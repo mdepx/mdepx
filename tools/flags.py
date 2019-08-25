@@ -2,25 +2,24 @@ import sys
 import os
 from kernel import proc0
 
-def wr(s):
-	sys.stdout.write(s.upper())
-
-def proc2(m, d):
+def proc2(result, m, d):
 	for k in d:
 		# Process directives
 		if k == 'options':
 			options = d['options']
 			for opt in options:
-				wr("%s_%s " % (m, opt))
+				s = "%s_%s" % (m, opt)
+				result[s] = ''
 			continue
 
 		# Process everything else
 		d1 = d[k]
 		for itm in d1:
 			if type(itm) == str:
-				wr("%s_%s=%s " % (m, k, itm))
+				s = "%s_%s" % (m, k)
+				result[s] = itm
 			elif type(itm) == dict:
-				proc2("%s_%s" % (m, k), itm)
+				proc2(result, "%s_%s" % (m, k), itm)
 			else:
 				sys.exit(5)
 
@@ -43,11 +42,19 @@ if __name__ == '__main__':
 		if 'module' in k:
 			modules += k['module']
 
+	result = {}
 	for m in modules:
-		wr("%s " % m)
+		result[m] = ''
 		for k in kernel:
 			if not m in k:
 				continue
 			d = k[m]
 			for el in d:
-				proc2(m, el)
+				proc2(result, m, el)
+
+	for key in result:
+		val = result[key]
+		if val:
+			print("%s=%s" % (key.upper(), val.upper()))
+		else:
+			print("%s" % key.upper())
