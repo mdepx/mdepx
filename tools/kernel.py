@@ -80,10 +80,10 @@ def proc_directive(l, d):
 		sys.exit(5)
 
 	# Process directives only
-	if 'include' in d:
-		includes = d['include']
-		for file in includes:
-			l.append(file)
+	if 'options' in d:
+		options = d['options']
+		for opt in options:
+			l.append(opt)
 
 if __name__ == '__main__':
 	args = sys.argv

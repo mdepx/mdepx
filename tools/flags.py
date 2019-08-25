@@ -8,8 +8,8 @@ def wr(s):
 def proc2(m, d):
 	for k in d:
 		# Process directives
-		if k == 'include':
-			options = d['include']
+		if k == 'options':
+			options = d['options']
 			for opt in options:
 				wr("%s_%s " % (m, opt))
 			continue

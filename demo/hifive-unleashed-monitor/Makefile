@@ -25,24 +25,24 @@ kernel = {
 	module systm;
 
 	callout {
-		include tsleep;
-		include sched;
+		options tsleep;
+		options sched;
 	};
 
 	malloc {
-		include fl;
-		include fl_wrapper;
+		options fl;
+		options fl_wrapper;
 	};
 
 	sched {
-		include mutex;
-		include malloc;
+		options mutex;
+		options malloc;
 
 		nprio = 2;
 	};
 
 	systm {
-		include console;
+		options console;
 	};
 };
 endef

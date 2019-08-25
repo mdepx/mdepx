@@ -27,29 +27,29 @@ kernel = {
 	module systm;
 
 	callout {
-		include tsleep;
+		options tsleep;
 	};
 
 	malloc {
-		include fl;
-		include fl_wrapper;
+		options fl;
+		options fl_wrapper;
 	};
 
 	mips {
-		include cache;
-		include tlb;
-		include qemu;
+		options cache;
+		options tlb;
+		options qemu;
 	};
 
 	sched {
-		include mutex;
-		include malloc;
+		options mutex;
+		options malloc;
 
 		nprio = 2;
 	};
 
 	systm {
-		include console;
+		options console;
 	};
 };
 endef
@@ -61,7 +61,7 @@ kernel = {
 	module sched;
 
 	callout {
-		include sched;
+		options sched;
 	};
 };
 endef

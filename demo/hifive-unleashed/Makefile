@@ -25,19 +25,19 @@ kernel {
 	module systm;
 
 	callout {
-		include tsleep;
-		include sched;
+		options tsleep;
+		options sched;
 	};
 
 	malloc {
-		include fl;
-		include fl_wrapper;
+		options fl;
+		options fl_wrapper;
 	};
 
 	sched {
-		include mutex;
-		include malloc;
-		include smp;
+		options mutex;
+		options malloc;
+		options smp;
 
 		nprio = 2;
 
@@ -47,7 +47,7 @@ kernel {
 	};
 
 	systm {
-		include console;
+		options console;
 	};
 };
 endef

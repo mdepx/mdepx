@@ -25,23 +25,23 @@ kernel {
 	module systm;
 
 	callout {
-		include tsleep;
+		options tsleep;
 	};
 
 	malloc {
-		include fl;
-		include fl_wrapper;
+		options fl;
+		options fl_wrapper;
 	};
 
 	sched {
-		include mutex;
-		include malloc;
+		options mutex;
+		options malloc;
 
 		nprio = 2;
 	};
 
 	systm {
-		include console;
+		options console;
 	};
 };
 endef
@@ -52,7 +52,7 @@ define MDX_CONFIG +=
 kernel {
 	module sched;
 	callout {
-		include sched;
+		options sched;
 	};
 };
 endef
@@ -63,7 +63,7 @@ ifndef MDX_UP
 define MDX_CONFIG +=
 kernel {
 	sched {
-		include smp;
+		options smp;
 		smp {
 			maxcpu = 8;
 		};
