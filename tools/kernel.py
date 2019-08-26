@@ -62,8 +62,8 @@ def proc0(d, data):
 			i += 1
 			continue
 
-		elif (c == ' '):
-			if key == '':
+		elif (c == ' ' or c == '\t'):
+			if key == '' and tmp.strip():
 				key = tmp
 				tmp = ''
 
