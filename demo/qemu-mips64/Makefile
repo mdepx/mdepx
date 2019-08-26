@@ -19,56 +19,6 @@ OBJECTS =							\
 	${OSDIR}/kernel/dev/uart/uart_16550.o			\
 	${OSDIR}/lib/libc/gen/assert.o
 
-define MDX_CONFIG
-kernel = {
-	module callout;
-	module malloc;
-	module mips;
-	module systm;
-
-	callout {
-		options tsleep;
-	};
-
-	malloc {
-		options fl;
-		options fl_wrapper;
-	};
-
-	mips {
-		options cache;
-		options tlb;
-		options qemu;
-	};
-
-	sched {
-		options mutex;
-		options malloc;
-
-		nprio = 2;
-	};
-
-	systm {
-		options console;
-	};
-};
-endef
-
-# Multi-threaded demo
-ifndef MDX_ST
-define MDX_CONFIG +=
-kernel = {
-	module sched;
-
-	callout {
-		options sched;
-	};
-};
-endef
-endif
-
-LIBRARIES = libc
-
 WARNFLAGS =			\
 	-Werror			\
 	-Wall			\
@@ -95,12 +45,7 @@ all:	${OBJDIR}/${APP}.bin
 ${LDSCRIPT}:
 	@sed s#__BASE_ADDR__#${BASE_ADDR}#g ${LDSCRIPT_TPL} > ${LDSCRIPT}
 
-test:
-	echo $(shell python3 -B ${OSDIR}/tools/kernel.py \
-		${OSDIR} "${MDX_CONFIG}")
-
 clean:
 	@rm -f ${LDSCRIPT} ${OBJECTS}
 
-include ${OSDIR}/lib/libc/Makefile.inc
 include ${OSDIR}/mk/default.mk

@@ -16,44 +16,6 @@ OBJECTS =	main.o						\
 		${OSDIR}/kernel/riscv/sifive/e300g_uart.o	\
 		start.o
 
-define MDX_CONFIG
-kernel {
-	module callout;
-	module malloc;
-	module riscv;
-	module sched;
-	module systm;
-
-	callout {
-		options tsleep;
-		options sched;
-	};
-
-	malloc {
-		options fl;
-		options fl_wrapper;
-	};
-
-	sched {
-		options mutex;
-		options malloc;
-		options smp;
-
-		nprio = 2;
-
-		smp {
-			maxcpu = 8;
-		};
-	};
-
-	systm {
-		options console;
-	};
-};
-endef
-
-LIBRARIES = libc
-
 CFLAGS = -march=rv64imac -mabi=lp64 -mcmodel=medany			\
 	-nostdinc -fno-builtin-printf -ffreestanding -Wall		\
 	-Wredundant-decls -Wnested-externs -Wstrict-prototypes		\
@@ -68,5 +30,4 @@ ${LDSCRIPT}:
 clean:
 	@rm -f ${OBJECTS} ${LDSCRIPT} ${OBJDIR}/${APP}.*
 
-include ${OSDIR}/lib/libc/Makefile.inc
 include ${OSDIR}/mk/default.mk

@@ -27,7 +27,7 @@ CFLAGS += ${INCS} ${CFLAGS_$@} -D__MDX__
 #
 # Populate kernel and library objects first.
 #
-MDX_CONFIG := ${CURDIR}/mdx.config
+MDX_CONFIG := ${CURDIR}/mdx.cfg
 include ${OSDIR}/mk/kernel.mk
 include ${OSDIR}/mk/library.mk
 
