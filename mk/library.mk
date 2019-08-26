@@ -17,17 +17,14 @@ $(foreach itm, ${LIBRARIES},						\
 
 # New interface
 
-LCMD = ${PYTHON} -B ${OSDIR}/tools/library.py
-LIBS = $(shell ${LCMD} ${OSDIR} libs "${MDX_CONFIG}")
+LCMD = ${PYTHON} -B ${OSDIR}/tools/library.py ${MDX_CONFIG} ${OSDIR}
+LIBS = $(shell ${LCMD} libs)
 
 $(foreach lib, ${LIBS},							\
-	${eval OPTS = $(shell ${LCMD}					\
-		${OSDIR} options ${lib} "${MDX_CONFIG}")}		\
+	${eval OPTS = $(shell ${LCMD} options ${lib})}			\
 	$(foreach opt, ${OPTS},						\
-		${eval LOBJS=$(shell ${LCMD}				\
-			${OSDIR} objs ${lib} ${opt} "${MDX_CONFIG}")}	\
-		${eval LINCS=$(shell ${LCMD}				\
-			${OSDIR} incs ${lib} ${opt} "${MDX_CONFIG}")}	\
+		${eval LOBJS=$(shell ${LCMD} objs ${lib} ${opt})}	\
+		${eval LINCS=$(shell ${LCMD} incs ${lib} ${opt})}	\
 		$(foreach obj, ${LOBJS},				\
 			${eval OBJECTS += ${OSDIR}/${obj}}		\
 			$(foreach inc, ${LINCS},			\

@@ -90,8 +90,15 @@ if __name__ == '__main__':
 	if len(args) < 2:
 		sys.exit(1)
 
-	osdir = args[1]
-	config_str = args[2]
+	config_file = args[1]
+	osdir = args[2]
+
+	if not os.path.exists(config_file):
+		sys.exit(1)
+
+	f = open(config_file, "r")
+	config_str = f.read()
+	f.close()
 
 	config = {}
 	proc0(config, config_str)

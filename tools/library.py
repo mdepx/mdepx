@@ -7,20 +7,22 @@ if __name__ == '__main__':
 	if len(args) < 3:
 		sys.exit(1)
 
-	osdir = args[1]
-	cmd = args[2]
+	config_file = args[1]
+	osdir = args[2]
+	cmd = args[3]
 
-	if cmd == 'libs':
-		config_str = args[3]
-	elif cmd == 'options':
-		lib = args[3]
-		config_str = args[4]
-	elif cmd == 'objs' or cmd == 'incs':
-		lib = args[3]
-		module = args[4]
-		config_str = args[5]
-	else:
-		sys.exit(2)
+	if cmd in ['options', 'objs', 'incs']:
+		lib = args[4]
+
+	if cmd in ['objs', 'incs']:
+		module = args[5]
+
+	if not os.path.exists(config_file):
+		sys.exit(1)
+
+	f = open(config_file, "r")
+	config_str = f.read()
+	f.close()
 
 	config = {}
 	proc0(config, config_str)
