@@ -17,20 +17,9 @@ $(foreach itm, ${LIBRARIES},						\
 
 # New interface
 
-LCMD = ${PYTHON} -B ${OSDIR}/tools/library.py ${MDX_CONFIG} ${OSDIR}
-LIBS = $(shell ${LCMD} libs)
-
-$(foreach lib, ${LIBS},							\
-	${eval OPTS = $(shell ${LCMD} options ${lib})}			\
-	$(foreach opt, ${OPTS},						\
-		${eval LOBJS=$(shell ${LCMD} objs ${lib} ${opt})}	\
-		${eval LINCS=$(shell ${LCMD} incs ${lib} ${opt})}	\
-		$(foreach obj, ${LOBJS},				\
-			${eval OBJECTS += ${OSDIR}/${obj}}		\
-			$(foreach inc, ${LINCS},			\
-				${eval CFLAGS_${OSOBJDIR}/${obj} +=	\
-					-I${OSDIR}/${inc}}		\
-			)						\
-		)							\
-	)								\
-)
+LCMD = ${PYTHON} -B ${OSDIR}/tools/library.py ${MDX_CONFIG} ${OBJDIR}	\
+	${OSDIR}
+LIBS = $(shell ${LCMD} library)
+$(foreach lib, ${LIBS},			\
+	${eval ${lib}}			\
+);

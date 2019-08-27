@@ -8,17 +8,16 @@ if __name__ == '__main__':
 		sys.exit(1)
 
 	config_file = args[1]
-	osdir = args[2]
-	cmd = args[3]
+	objdir = args[2]
+	osdir = args[3]
+	cmd = args[4]
 
-	if cmd in ['options', 'objs', 'incs']:
-		lib = args[4]
-
-	if cmd in ['objs', 'incs']:
-		module = args[5]
+	osobjdir = "%s/%s" % (objdir, osdir)
+	if cmd != 'library':
+		sys.exit(2)
 
 	if not os.path.exists(config_file):
-		sys.exit(1)
+		sys.exit(3)
 
 	f = open(config_file, "r")
 	config_str = f.read()
@@ -28,54 +27,36 @@ if __name__ == '__main__':
 	proc0(config, config_str)
 
 	if not 'library' in config:
-		sys.exit(3)
+		sys.exit(4)
 
 	library = config['library']
 
 	result = []
+	modules = {}
 
-	if cmd == 'libs':
+	for l in library:
+		if not 'module' in l:
+			continue
+		for module in l['module']:
+			modules[module] = ['default']
+
+	for m in modules:
 		for l in library:
-			if not 'module' in l:
+			if not m in l:
 				continue
-			for module in l['module']:
-				result.append(module)
-
-
-	if cmd == 'options':
-		result.append('default')
-		for l in library:
-			if not lib in l:
-				continue
-			node = l[lib]
+			node = l[m]
 			for n in node:
 				if not 'options' in n:
 					continue
 				options = n['options']
 				for opt in options:
-					result.append(opt)
+					modules[m].append(opt)
 
-	if cmd == 'objs':
-		p = os.path.join(osdir, "lib", lib, "mdx.library")
-		f1 = open(p, "r")
-		data = f1.read()
-		f1.close()
-		cfg = {}
-		proc0(cfg, data)
-		library = cfg['library']
-		for l in library:
-			if not module in l:
-				continue
-			node = l[module]
-			for n in node:
-				if not 'objects' in n:
-					continue
-				objects = n['objects']
-				for obj in objects:
-					result.append(obj)
+	#print(modules)
 
-	if cmd == 'incs':
-		p = os.path.join(osdir, "lib", lib, "mdx.library")
+	resobj = {}
+	for m in modules:
+		p = os.path.join(osdir, "lib", m, "mdx.library")
 		f = open(p, "r")
 		data = f.read()
 		f.close()
@@ -83,14 +64,28 @@ if __name__ == '__main__':
 		proc0(cfg, data)
 		library = cfg['library']
 		for l in library:
-			if 'incs' in l:
-				result += l['incs']
-			if not module in l:
-				continue
-			m = l[module]
-			for node in m:
-				if 'incs' in node:
-					result += node['incs']
+			for opt in modules[m]:
+				result = []
+				if 'incs' in l:
+					result += l['incs']
+				if not opt in l:
+					continue
+				node = l[opt]
+				for n in node:
+					if 'incs' in n:
+						result += n['incs']
+					if not 'objects' in n:
+						continue
+					objects = n['objects']
+					for obj in objects:
+						resobj[obj] = []
+						for inc in result:
+							resobj[obj].append(inc)
 
-	s = " ".join(result)
-	print(s)
+	for obj in resobj:
+		print("OBJECTS+=%s/%s" % (osdir, obj))
+
+	for obj in resobj:
+		for inc in resobj[obj]:
+			print("CFLAGS_%s/%s+=-I${OSDIR}/%s" % \
+				(osobjdir, obj, inc))
