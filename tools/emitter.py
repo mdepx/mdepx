@@ -12,23 +12,21 @@ def proc1(config, context_str):
 	result = []
 	modules = {}
 
-	for l in context:
-		if not 'module' in l:
-			continue
-		for module in l['module']:
-			modules[module] = ['default']
+	if not 'module' in context:
+		return
+
+	for module in context['module']:
+		modules[module] = ['default']
 
 	for m in modules:
-		for l in context:
-			if not m in l:
-				continue
-			node = l[m]
-			for n in node:
-				if not 'options' in n:
-					continue
-				options = n['options']
-				for opt in options:
-					modules[m].append(opt)
+		if not m in context:
+			continue
+		node = context[m]
+		if not 'options' in node:
+			continue
+		options = node['options']
+		for opt in options:
+			modules[m].append(opt)
 
 	#print(modules)
 
@@ -44,32 +42,30 @@ def proc1(config, context_str):
 		cfg = {}
 		proc0(cfg, data)
 		context = cfg[context_str]
-		for l in context:
-			for opt in modules[m]:
-				incs = []
-				cflags = []
-				if 'incs' in l:
-					incs += l['incs']
-				if 'cflags' in l:
-					cflags += l['cflags']
-				if not opt in l:
-					continue
-				node = l[opt]
-				for n in node:
-					if 'incs' in n:
-						incs += n['incs']
-					if 'cflags' in n:
-						cflags += n['cflags']
-					if not 'objects' in n:
-						continue
-					objects = n['objects']
-					for obj in objects:
-						resobj[obj] = {'incs': [],
-								'cflags': []}
-						for inc in incs:
-							resobj[obj]['incs'].append(inc)
-						for cflag in cflags:
-							resobj[obj]['cflags'].append(cflag)
+		for opt in modules[m]:
+			incs = []
+			cflags = []
+			if 'incs' in context:
+				incs += context['incs']
+			if 'cflags' in context:
+				cflags += context['cflags']
+			if not opt in context:
+				continue
+			node = context[opt]
+			if 'incs' in node:
+				incs += node['incs']
+			if 'cflags' in node:
+				cflags += node['cflags']
+			if not 'objects' in node:
+				continue
+			objects = node['objects']
+			for obj in objects:
+				resobj[obj] = {'incs': [],
+						'cflags': []}
+				for inc in incs:
+					resobj[obj]['incs'].append(inc)
+				for cflag in cflags:
+					resobj[obj]['cflags'].append(cflag)
 
 	for obj in resobj:
 		print("OBJECTS+=%s/%s" % (osdir, obj))

@@ -1,7 +1,7 @@
 import sys
 import os
 
-def process_node(result, m, d):
+def proc(result, m, d):
 	for k in d:
 		# Process directives
 		if k == 'options':
@@ -13,39 +13,39 @@ def process_node(result, m, d):
 
 		# Process everything else
 		d1 = d[k]
-		for itm in d1:
-			if type(itm) == str:
-				s = "%s_%s" % (m, k)
-				result[s] = itm
-			elif type(itm) == dict:
-				process_node(result, "%s_%s" % (m, k), itm)
-			else:
-				sys.exit(5)
+		if type(d1) == list:
+			for itm in d1:
+				if type(itm) == str:
+					s = "%s_%s" % (m, k)
+					result[s] = itm
+				elif type(itm) == dict:
+					proc(result, "%s_%s" % (m, k), itm)
+				else:
+					sys.exit(5)
+		elif type(d1) == dict:
+			proc(result, "%s_%s" % (m, k), d1)
 
 def print_flags(config):
 	kernel = config['kernel']
-	if type(kernel) != list:
+	if type(kernel) != dict:
 		sys.exit(4)
 
 	modules = []
-	for k in kernel:
-		if 'module' in k:
-			modules += k['module']
+	if 'module' in kernel:
+		modules += kernel['module']
 
 	result = {}
 	for m in modules:
 		result[m] = ''
-		for k in kernel:
-			if not m in k:
-				continue
-			d = k[m]
-			for el in d:
-				process_node(result, m, el)
+		if not m in kernel:
+			continue
+		d = kernel[m]
+		proc(result, m, d)
 
 	for key in result:
 		val = result[key]
 		if val:
 			print("CFLAGS+=-DMDX_%s=%s" % \
-			    (key.upper(), val.upper()))
+				(key.upper(), val.upper()))
 		else:
 			print("CFLAGS+=-DMDX_%s" % key.upper())

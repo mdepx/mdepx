@@ -14,9 +14,10 @@ def proc(d, key, val):
 		f = {}
 		proc0(f, v.strip("{}"))
 		if k in d:
-			d[k].append(f)
+			for k1 in f:
+				d[k][k1] = f[k1]
 		else:
-			d[k] = [f]
+			d[k] = f
 	elif v.startswith("'"):
 		if k in d:
 			d[k].append(v.strip("'"))
