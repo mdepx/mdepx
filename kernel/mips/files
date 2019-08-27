@@ -1,8 +1,0 @@
-mips/cache_mipsNN.o		cache
-mips/cache.o			cache
-mips/exception.o
-mips/machdep.o
-mips/saverestore.o
-mips/timer.o
-mips/tlbmiss.o			tlb
-mips/trap.o

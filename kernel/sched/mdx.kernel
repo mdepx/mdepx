@@ -1,0 +1,24 @@
+kernel {
+	name = sched;
+
+	default {
+		objects kernel/sched/mdx_sched.o
+			kernel/sched/mdx_thread.o;
+	};
+
+	sem {
+		objects kernel/sched/mdx_sem.o;
+	};
+
+	mutex {
+		objects kernel/sched/mdx_mutex.o;
+	};
+
+	smp {
+		objects kernel/sched/mdx_smp.o;
+	};
+
+	malloc {
+		objects kernel/sched/mdx_thread_alloc.o;
+	};
+};

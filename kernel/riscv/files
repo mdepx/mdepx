@@ -1,4 +1,0 @@
-riscv/exception.o
-riscv/intr.o
-riscv/machdep.o
-riscv/trap.o

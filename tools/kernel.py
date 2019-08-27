@@ -1,6 +1,5 @@
 import sys
 import os
-from files import process
 
 #
 # Process the value
@@ -74,55 +73,3 @@ def proc0(d, data):
 
 		tmp += c
 		i += 1
-
-def proc_directive(l, d):
-	if type(d) != dict:
-		sys.exit(5)
-
-	# Process directives only
-	if 'options' in d:
-		options = d['options']
-		for opt in options:
-			l.append(opt)
-
-if __name__ == '__main__':
-	args = sys.argv
-	if len(args) < 2:
-		sys.exit(1)
-
-	config_file = args[1]
-	osdir = args[2]
-
-	if not os.path.exists(config_file):
-		sys.exit(1)
-
-	f = open(config_file, "r")
-	config_str = f.read()
-	f.close()
-
-	config = {}
-	proc0(config, config_str)
-
-	if not 'kernel' in config:
-		sys.exit(2)
-
-	result = []
-
-	# Find all the 'module' directives
-	modules = []
-	kernel = config['kernel']
-	for k in kernel:
-		if 'module' in k:
-			modules += k['module']
-
-	# For each module look for directives
-	for m in modules:
-		l = []
-		for k in kernel:
-			if m in k:
-				d = k[m]
-				for itm in d:
-					proc_directive(l, itm)
-		result += process(osdir, "kernel/%s" % m, l)
-
-	print(" ".join(result))

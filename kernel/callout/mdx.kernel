@@ -1,0 +1,15 @@
+kernel {
+	name = callout;
+
+	default {
+		objects kernel/callout/mdx_callout.o;
+	};
+
+	tsleep {
+		objects kernel/callout/mdx_tsleep.o;
+	};
+
+	tsleep_sched {
+		objects kernel/callout/mdx_tsleep_sched.o;
+	};
+};

@@ -16,10 +16,8 @@ $(foreach itm, ${LIBRARIES},						\
 )
 
 # New interface
-
-LCMD = ${PYTHON} -B ${OSDIR}/tools/library.py ${MDX_CONFIG} ${OBJDIR}	\
-	${OSDIR}
-LIBS = $(shell ${LCMD} library)
+LCMD = ${PYTHON} -B ${OSDIR}/tools/library.py
+LIBS = $(shell ${LCMD} ${MDX_CONFIG} ${OBJDIR} ${OSDIR})
 $(foreach lib, ${LIBS},			\
 	${eval ${lib}}			\
 );

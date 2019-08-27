@@ -1,0 +1,11 @@
+kernel {
+	name = malloc;
+
+	fl {
+		objects kernel/malloc/mdx_malloc_fl.o;
+	};
+
+	fl_wrapper {
+		objects kernel/malloc/mdx_malloc.o;
+	};
+};

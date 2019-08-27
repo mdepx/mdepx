@@ -1,47 +1,25 @@
 import sys
 import os
 from kernel import proc0
+from flags import proc3
 
-if __name__ == '__main__':
-	args = sys.argv
-	if len(args) < 3:
-		sys.exit(1)
-
-	config_file = args[1]
-	objdir = args[2]
-	osdir = args[3]
-	cmd = args[4]
-
-	osobjdir = "%s/%s" % (objdir, osdir)
-	if cmd != 'library':
-		sys.exit(2)
-
-	if not os.path.exists(config_file):
-		sys.exit(3)
-
-	f = open(config_file, "r")
-	config_str = f.read()
-	f.close()
-
-	config = {}
-	proc0(config, config_str)
-
-	if not 'library' in config:
+def proc1(config, context_str):
+	if not context_str in config:
 		sys.exit(4)
 
-	library = config['library']
+	context = config[context_str]
 
 	result = []
 	modules = {}
 
-	for l in library:
+	for l in context:
 		if not 'module' in l:
 			continue
 		for module in l['module']:
 			modules[module] = ['default']
 
 	for m in modules:
-		for l in library:
+		for l in context:
 			if not m in l:
 				continue
 			node = l[m]
@@ -56,14 +34,17 @@ if __name__ == '__main__':
 
 	resobj = {}
 	for m in modules:
-		p = os.path.join(osdir, "lib", m, "mdx.library")
+		if context_str == 'kernel':
+			p = os.path.join(osdir, "kernel", m, "mdx.kernel")
+		else:
+			p = os.path.join(osdir, "lib", m, "mdx.library")
 		f = open(p, "r")
 		data = f.read()
 		f.close()
 		cfg = {}
 		proc0(cfg, data)
-		library = cfg['library']
-		for l in library:
+		context = cfg[context_str]
+		for l in context:
 			for opt in modules[m]:
 				result = []
 				if 'incs' in l:
@@ -89,3 +70,27 @@ if __name__ == '__main__':
 		for inc in resobj[obj]:
 			print("CFLAGS_%s/%s+=-I${OSDIR}/%s" % \
 				(osobjdir, obj, inc))
+
+if __name__ == '__main__':
+	args = sys.argv
+	if len(args) < 3:
+		sys.exit(1)
+
+	config_file = args[1]
+	objdir = args[2]
+	osdir = args[3]
+
+	if not os.path.exists(config_file):
+		sys.exit(3)
+
+	osobjdir = "%s/%s" % (objdir, osdir)
+
+	f = open(config_file, "r")
+	config_str = f.read()
+	f.close()
+
+	config = {}
+	proc0(config, config_str)
+	proc1(config, 'library')
+	proc1(config, 'kernel')
+	proc3(config)

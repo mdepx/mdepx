@@ -1,0 +1,10 @@
+kernel {
+	name = riscv;
+
+	default {
+		objects kernel/riscv/riscv/exception.o
+			kernel/riscv/riscv/intr.o
+			kernel/riscv/riscv/machdep.o
+			kernel/riscv/riscv/trap.o;
+	};
+};

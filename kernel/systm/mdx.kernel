@@ -1,0 +1,20 @@
+kernel {
+	name = systm;
+
+	default {
+		objects kernel/systm/mdx_panic.o
+			kernel/systm/mdx_thread0.o;
+	};
+
+	console {
+		objects kernel/systm/mdx_console.o;
+	};
+
+	net {
+		objects kernel/systm/mdx_mbuf.o;
+	};
+
+	fdt {
+		objects kernel/systm/mdx_of.o;
+	};
+};

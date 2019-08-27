@@ -1,6 +1,5 @@
 import sys
 import os
-from kernel import proc0
 
 def proc2(result, m, d):
 	for k in d:
@@ -23,26 +22,8 @@ def proc2(result, m, d):
 			else:
 				sys.exit(5)
 
-if __name__ == '__main__':
-	args = sys.argv
-	if len(args) < 1:
-		sys.exit(1)
-
-	config_file = args[1]
-
-	if not os.path.exists(config_file):
-		sys.exit(2)
-
-	f = open(config_file, "r")
-	config_str = f.read();
-	f.close()
-
-	config = {}
-	proc0(config, config_str)
-	if not 'kernel' in config:
-		sys.exit(3)
+def proc3(config):
 	kernel = config['kernel']
-
 	if type(kernel) != list:
 		sys.exit(4)
 
@@ -64,6 +45,7 @@ if __name__ == '__main__':
 	for key in result:
 		val = result[key]
 		if val:
-			print("%s=%s" % (key.upper(), val.upper()))
+			print("CFLAGS+=-DMDX_%s=%s" % \
+			    (key.upper(), val.upper()))
 		else:
-			print("%s" % key.upper())
+			print("CFLAGS+=-DMDX_%s" % key.upper())

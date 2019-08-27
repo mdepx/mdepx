@@ -1,5 +1,0 @@
-mdx_console.o		console
-mdx_mbuf.o		net malloc
-mdx_of.o		fdt
-mdx_panic.o
-mdx_thread0.o
