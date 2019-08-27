@@ -1,7 +1,7 @@
 import sys
 import os
 
-def proc2(result, m, d):
+def process_node(result, m, d):
 	for k in d:
 		# Process directives
 		if k == 'options':
@@ -18,11 +18,11 @@ def proc2(result, m, d):
 				s = "%s_%s" % (m, k)
 				result[s] = itm
 			elif type(itm) == dict:
-				proc2(result, "%s_%s" % (m, k), itm)
+				process_node(result, "%s_%s" % (m, k), itm)
 			else:
 				sys.exit(5)
 
-def proc3(config):
+def print_flags(config):
 	kernel = config['kernel']
 	if type(kernel) != list:
 		sys.exit(4)
@@ -40,7 +40,7 @@ def proc3(config):
 				continue
 			d = k[m]
 			for el in d:
-				proc2(result, m, el)
+				process_node(result, m, el)
 
 	for key in result:
 		val = result[key]

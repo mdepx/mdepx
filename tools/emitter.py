@@ -1,7 +1,7 @@
 import sys
 import os
-from kernel import proc0
-from flags import proc3
+from parser import proc0
+from flags import print_flags
 
 def proc1(config, context_str):
 	if not context_str in config:
@@ -93,4 +93,4 @@ if __name__ == '__main__':
 	proc0(config, config_str)
 	proc1(config, 'library')
 	proc1(config, 'kernel')
-	proc3(config)
+	print_flags(config)
