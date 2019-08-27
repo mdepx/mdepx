@@ -46,30 +46,40 @@ def proc1(config, context_str):
 		context = cfg[context_str]
 		for l in context:
 			for opt in modules[m]:
-				result = []
+				incs = []
+				cflags = []
 				if 'incs' in l:
-					result += l['incs']
+					incs += l['incs']
+				if 'cflags' in l:
+					cflags += l['cflags']
 				if not opt in l:
 					continue
 				node = l[opt]
 				for n in node:
 					if 'incs' in n:
-						result += n['incs']
+						incs += n['incs']
+					if 'cflags' in n:
+						cflags += n['cflags']
 					if not 'objects' in n:
 						continue
 					objects = n['objects']
 					for obj in objects:
-						resobj[obj] = []
-						for inc in result:
-							resobj[obj].append(inc)
+						resobj[obj] = {'incs': [],
+								'cflags': []}
+						for inc in incs:
+							resobj[obj]['incs'].append(inc)
+						for cflag in cflags:
+							resobj[obj]['cflags'].append(cflag)
 
 	for obj in resobj:
 		print("OBJECTS+=%s/%s" % (osdir, obj))
 
 	for obj in resobj:
-		for inc in resobj[obj]:
+		for inc in resobj[obj]['incs']:
 			print("CFLAGS_%s/%s+=-I${OSDIR}/%s" % \
 				(osobjdir, obj, inc))
+		for cflag in resobj[obj]['cflags']:
+			print("CFLAGS_%s/%s+=%s" % (osobjdir, obj, cflag))
 
 if __name__ == '__main__':
 	args = sys.argv
