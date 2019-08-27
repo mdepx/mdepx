@@ -73,18 +73,16 @@ def proc1(config, context_str):
 
 if __name__ == '__main__':
 	args = sys.argv
-	if len(args) < 3:
+	if len(args) < 4:
 		sys.exit(1)
 
 	config_file = args[1]
 	objdir = args[2]
 	osdir = args[3]
-
-	if not os.path.exists(config_file):
-		sys.exit(3)
-
 	osobjdir = "%s/%s" % (objdir, osdir)
 
+	if not os.path.exists(config_file):
+		sys.exit(2)
 	f = open(config_file, "r")
 	config_str = f.read()
 	f.close()
