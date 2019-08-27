@@ -16,22 +16,17 @@ def proc1(config, context_str):
 		return
 
 	for module in context['module']:
-		modules[module] = ['default']
-
-	for m in modules:
-		if not m in context:
-			continue
-		node = context[m]
-		if not 'options' in node:
-			continue
-		options = node['options']
-		for opt in options:
-			modules[m].append(opt)
-
-	#print(modules)
+		modules[module] = []
 
 	resobj = {}
+
 	for m in modules:
+		options = ['default']
+		if m in context:
+			node = context[m]
+			if 'options' in node:
+				options += node['options']
+
 		if context_str == 'kernel':
 			p = os.path.join(osdir, "kernel", m, "mdx.kernel")
 		else:
@@ -41,17 +36,18 @@ def proc1(config, context_str):
 		f.close()
 		cfg = {}
 		proc0(cfg, data)
-		context = cfg[context_str]
-		for opt in modules[m]:
+
+		context1 = cfg[context_str]
+		for opt in options:
 			incs = []
 			cflags = []
-			if 'incs' in context:
-				incs += context['incs']
-			if 'cflags' in context:
-				cflags += context['cflags']
-			if not opt in context:
+			if 'incs' in context1:
+				incs += context1['incs']
+			if 'cflags' in context1:
+				cflags += context1['cflags']
+			if not opt in context1:
 				continue
-			node = context[opt]
+			node = context1[opt]
 			if 'incs' in node:
 				incs += node['incs']
 			if 'cflags' in node:

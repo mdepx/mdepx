@@ -2,6 +2,9 @@ import sys
 import os
 
 def proc(result, m, d):
+	if type(d) != dict:
+		sys.exit(6)
+
 	for k in d:
 		# Process directives
 		if k == 'options':
