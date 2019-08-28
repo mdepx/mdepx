@@ -1,6 +1,8 @@
 kernel {
 	name = sched;
 
+	nprio = 10;
+
 	default {
 		objects kernel/sched/mdx_sched.o
 			kernel/sched/mdx_thread.o;
@@ -16,6 +18,7 @@ kernel {
 
 	smp {
 		objects kernel/sched/mdx_smp.o;
+		maxcpu = 1;
 	};
 
 	malloc {

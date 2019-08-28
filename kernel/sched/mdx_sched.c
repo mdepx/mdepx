@@ -50,10 +50,6 @@
 #define	dprintf(fmt, ...)
 #endif
 
-#ifndef	MDX_SCHED_NPRIO
-#define	MDX_SCHED_NPRIO	10
-#endif
-
 CTASSERT(MDX_SCHED_NPRIO > 1);
 
 static struct entry runq[MDX_SCHED_NPRIO];
