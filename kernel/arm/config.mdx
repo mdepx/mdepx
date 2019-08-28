@@ -4,4 +4,12 @@ arm {
 		kernel/arm/arm/nvic.o
 		kernel/arm/arm/scb.o
 		kernel/arm/arm/trap.o;
+
+	nrf9160 {
+		objects kernel/arm/nordicsemi/nrf_uarte.o
+			kernel/arm/nordicsemi/nrf9160_power.o
+			kernel/arm/nordicsemi/nrf9160_spu.o
+			kernel/arm/nordicsemi/nrf9160_timer.o
+			kernel/arm/nordicsemi/nrf9160_uicr.o;
+	};
 };
