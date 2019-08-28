@@ -1,13 +1,11 @@
 net {
-	default {
-		objects kernel/net/if_ethersubr.o
-			kernel/net/netinet/in_cksum.o
-			kernel/net/netinet/if_ethersubr.o
-			kernel/net/netinet/ip_icmp.o
-			kernel/net/netinet/ip_input.o
-			kernel/net/netinet/ip_output.o
-			kernel/net/netinet6/ip6_input.o;
-	};
+	objects kernel/net/if_ethersubr.o
+		kernel/net/netinet/in_cksum.o
+		kernel/net/netinet/if_ethersubr.o
+		kernel/net/netinet/ip_icmp.o
+		kernel/net/netinet/ip_input.o
+		kernel/net/netinet/ip_output.o
+		kernel/net/netinet6/ip6_input.o;
 
 	malloc {
 		objects kernel/net/if.o

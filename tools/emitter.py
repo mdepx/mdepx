@@ -11,7 +11,7 @@ def proc1(resobj, flags, config, context_str):
 	if not 'module' in context:
 		return
 	for m in context['module']:
-		options = ['default']
+		options = []
 		if m in context:
 			node = context[m]
 			if 'options' in node:
@@ -29,14 +29,25 @@ def proc1(resobj, flags, config, context_str):
 
 		context1 = cfg[m]
 		collect_flags(flags, m, context1, False)
-		for opt in options:
-			incs = []
-			cflags = []
 
-			if 'incs' in context1:
-				incs += context1['incs']
-			if 'cflags' in context1:
-				cflags += context1['cflags']
+		incs = []
+		cflags = []
+
+		if 'incs' in context1:
+			incs += context1['incs']
+		if 'cflags' in context1:
+			cflags += context1['cflags']
+
+		if 'objects' in context1:
+			objects = context1['objects']
+			for obj in objects:
+				resobj[obj] = {'incs': [], 'cflags': []}
+				for inc in incs:
+					resobj[obj]['incs'].append(inc)
+				for cflag in cflags:
+					resobj[obj]['cflags'].append(cflag)
+
+		for opt in options:
 
 			if not opt in context1:
 				continue

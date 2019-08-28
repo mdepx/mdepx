@@ -1,11 +1,9 @@
 mips {
-	default {
-		objects kernel/mips/mips/exception.o
-			kernel/mips/mips/machdep.o
-			kernel/mips/mips/saverestore.o
-			kernel/mips/mips/timer.o
-			kernel/mips/mips/trap.o;
-	};
+	objects kernel/mips/mips/exception.o
+		kernel/mips/mips/machdep.o
+		kernel/mips/mips/saverestore.o
+		kernel/mips/mips/timer.o
+		kernel/mips/mips/trap.o;
 
 	cache {
 		objects kernel/mips/mips/cache_mipsNN.o

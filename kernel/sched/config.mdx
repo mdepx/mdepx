@@ -1,10 +1,8 @@
 sched {
 	nprio = 10;
 
-	default {
-		objects kernel/sched/mdx_sched.o
-			kernel/sched/mdx_thread.o;
-	};
+	objects kernel/sched/mdx_sched.o
+		kernel/sched/mdx_thread.o;
 
 	sem {
 		objects kernel/sched/mdx_sem.o;
