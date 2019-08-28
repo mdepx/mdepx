@@ -26,6 +26,9 @@ def proc1(resobj, flags, config, context_str):
 		cfg = {}
 		proc0(cfg, data)
 
+		if not m in cfg:
+			continue
+
 		context1 = cfg[m]
 		collect_flags(flags, m, context1, False)
 
