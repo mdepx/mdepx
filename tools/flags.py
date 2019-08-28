@@ -1,7 +1,7 @@
 import sys
 import os
 
-def proc(result, m, d):
+def collect_flags(result, m, d, deep):
 	if type(d) != dict:
 		sys.exit(6)
 
@@ -14,6 +14,9 @@ def proc(result, m, d):
 				result[s] = ''
 			continue
 
+		if k in ['name', 'objects', 'incs', 'cflags']:
+			continue
+
 		# Process everything else
 		d1 = d[k]
 		if type(d1) == list:
@@ -21,30 +24,21 @@ def proc(result, m, d):
 				if type(itm) == str:
 					s = "%s_%s" % (m, k)
 					result[s] = itm
-				elif type(itm) == dict:
-					proc(result, "%s_%s" % (m, k), itm)
 				else:
 					sys.exit(5)
-		elif type(d1) == dict:
-			proc(result, "%s_%s" % (m, k), d1)
+		elif type(d1) == dict and deep == True:
+			collect_flags(result, "%s_%s" % (m, k), d1, True)
 
-def print_flags(config):
-	kernel = config['kernel']
-	if type(kernel) != dict:
-		sys.exit(4)
+def collect_all_user_flags(flags, context):
+	if 'module' in context:
+		for m in context['module']:
+			flags[m] = ''
+			if not m in context:
+				continue
+			d = context[m]
+			collect_flags(flags, m, d, True)
 
-	modules = []
-	if 'module' in kernel:
-		modules += kernel['module']
-
-	result = {}
-	for m in modules:
-		result[m] = ''
-		if not m in kernel:
-			continue
-		d = kernel[m]
-		proc(result, m, d)
-
+def print_flags(result):
 	for key in result:
 		val = result[key]
 		if val:
