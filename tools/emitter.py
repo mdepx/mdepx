@@ -27,7 +27,7 @@ def proc1(resobj, flags, config, context_str):
 		cfg = {}
 		proc0(cfg, data)
 
-		context1 = cfg[context_str]
+		context1 = cfg[m]
 		collect_flags(flags, m, context1, False)
 		for opt in options:
 			incs = []
