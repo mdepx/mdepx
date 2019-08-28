@@ -6,21 +6,13 @@ from flags import print_flags
 def proc1(config, context_str):
 	if not context_str in config:
 		sys.exit(4)
-
 	context = config[context_str]
-
-	result = []
-	modules = {}
-
-	if not 'module' in context:
-		return
-
-	for module in context['module']:
-		modules[module] = []
 
 	resobj = {}
 
-	for m in modules:
+	if not 'module' in context:
+		return
+	for m in context['module']:
 		options = ['default']
 		if m in context:
 			node = context[m]
