@@ -4,6 +4,8 @@ from parser import proc0
 from flags import collect_all_user_flags
 from flags import collect_flags, print_flags
 
+c_dirs = {'library': 'lib', 'kernel': 'kernel'}
+
 def proc1(resobj, flags, config, context_str):
 	if not context_str in config:
 		sys.exit(4)
@@ -17,10 +19,7 @@ def proc1(resobj, flags, config, context_str):
 			if 'options' in node:
 				options += node['options']
 
-		if context_str == 'kernel':
-			p = os.path.join(osdir, "kernel", m, "config.mdx")
-		else:
-			p = os.path.join(osdir, "lib", m, "config.mdx")
+		p = os.path.join(osdir, c_dirs[context_str], m, "config.mdx")
 		f = open(p, "r")
 		data = f.read()
 		f.close()
@@ -48,6 +47,8 @@ def proc1(resobj, flags, config, context_str):
 					resobj[obj]['cflags'].append(cflag)
 
 		for opt in options:
+			incs1 = []
+			cflags1 = []
 
 			if not opt in context1:
 				continue
@@ -55,18 +56,18 @@ def proc1(resobj, flags, config, context_str):
 			collect_flags(flags, "%s_%s" % (m, opt), node, False)
 
 			if 'incs' in node:
-				incs += node['incs']
+				incs1 += node['incs']
 			if 'cflags' in node:
-				cflags += node['cflags']
+				cflags1 += node['cflags']
 
 			if not 'objects' in node:
 				continue
 			objects = node['objects']
 			for obj in objects:
 				resobj[obj] = {'incs': [], 'cflags': []}
-				for inc in incs:
+				for inc in incs + incs1:
 					resobj[obj]['incs'].append(inc)
-				for cflag in cflags:
+				for cflag in cflags + cflags1:
 					resobj[obj]['cflags'].append(cflag)
 	return resobj
 
