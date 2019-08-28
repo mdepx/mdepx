@@ -18,9 +18,9 @@ def proc1(resobj, flags, config, context_str):
 				options += node['options']
 
 		if context_str == 'kernel':
-			p = os.path.join(osdir, "kernel", m, "mdx.kernel")
+			p = os.path.join(osdir, "kernel", m, "config.mdx")
 		else:
-			p = os.path.join(osdir, "lib", m, "mdx.library")
+			p = os.path.join(osdir, "lib", m, "config.mdx")
 		f = open(p, "r")
 		data = f.read()
 		f.close()
