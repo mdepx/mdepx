@@ -19,7 +19,7 @@ def obj_set_flags(resobj, context, key, l):
 
 def proc1(resobj, flags, config, context_str):
 	if not context_str in config:
-		sys.exit(4)
+		return resobj
 	context = config[context_str]
 	if not 'module' in context:
 		return
