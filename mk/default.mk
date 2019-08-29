@@ -28,8 +28,7 @@ CFLAGS += ${INCS} ${CFLAGS_$@} -D__MDX__
 # Populate kernel and library objects first.
 #
 MDX_CONFIG := ${CURDIR}/mdx.cfg
-include ${OSDIR}/mk/kernel.mk
-include ${OSDIR}/mk/library.mk
+include ${OSDIR}/mk/emitter.mk
 
 #
 # Add ${OBJDIR} prefix to each member of OBJECTS.
