@@ -100,7 +100,7 @@ default_handler(void *arg, struct trapframe *frame, int i)
 	printf("Interrupt handler is missing for int %d\n", i);
 }
 
-static const struct mips_intr_entry mips_intr_map[MIPS_N_INTR] = {
+static const struct mips_intr_entry default_intr_map[MIPS_N_INTR] = {
 	[0] = { default_handler, NULL },
 	[1] = { default_handler, NULL },
 	[2] = { default_handler, NULL },
@@ -111,13 +111,13 @@ static const struct mips_intr_entry mips_intr_map[MIPS_N_INTR] = {
 	[7] = { default_handler, NULL },
 };
 
-static const struct mips_intr_entry *map = mips_intr_map;
+static const struct mips_intr_entry *mips_intr_map = default_intr_map;
 
 void
 mips_install_intr_map(const struct mips_intr_entry *m)
 {
 
-	map = m;
+	mips_intr_map = m;
 }
 
 static void
@@ -127,8 +127,9 @@ mips_handle_intr(int cause)
 
 	for (i = 0; i < MIPS_N_INTR; i++)
 		if (cause & MIPS_CR_IP(i)) {
-			if (map[i].handler != NULL)
-				map[i].handler(map[i].arg, NULL, i);
+			if (mips_intr_map[i].handler != NULL)
+				mips_intr_map[i].handler(mips_intr_map[i].arg,
+				    NULL, i);
 			else
 				printf("%s: spurious intr %d\n",
 				    __func__, i);
