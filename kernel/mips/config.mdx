@@ -13,4 +13,9 @@ mips {
 	tlb {
 		objects kernel/mips/mips/tlbmiss.o;
 	};
+
+	beri {
+		objects kernel/mips/beri/beripic.o
+			kernel/mips/beri/beri_epw.o;
+	};
 };
