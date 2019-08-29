@@ -6,6 +6,17 @@ from flags import collect_flags, print_flags
 
 c_dirs = {'library': 'lib', 'kernel': 'kernel'}
 
+def obj_set_flags(resobj, context, key, l):
+	if not 'objects' in context:
+		return
+	for obj in context['objects']:
+		if not obj in resobj:
+			resobj[obj] = {}
+		if not key in resobj[obj]:
+			resobj[obj][key] = []
+		for el in l:
+			resobj[obj][key].append(el)
+
 def proc1(resobj, flags, config, context_str):
 	if not context_str in config:
 		sys.exit(4)
@@ -40,14 +51,8 @@ def proc1(resobj, flags, config, context_str):
 		if 'cflags' in context1:
 			cflags += context1['cflags']
 
-		if 'objects' in context1:
-			objects = context1['objects']
-			for obj in objects:
-				resobj[obj] = {'incs': [], 'cflags': []}
-				for inc in incs:
-					resobj[obj]['incs'].append(inc)
-				for cflag in cflags:
-					resobj[obj]['cflags'].append(cflag)
+		obj_set_flags(resobj, context1, 'incs', incs)
+		obj_set_flags(resobj, context1, 'cflags', cflags)
 
 		for opt in options:
 			incs1 = []
@@ -63,15 +68,9 @@ def proc1(resobj, flags, config, context_str):
 			if 'cflags' in node:
 				cflags1 += node['cflags']
 
-			if not 'objects' in node:
-				continue
-			objects = node['objects']
-			for obj in objects:
-				resobj[obj] = {'incs': [], 'cflags': []}
-				for inc in incs + incs1:
-					resobj[obj]['incs'].append(inc)
-				for cflag in cflags + cflags1:
-					resobj[obj]['cflags'].append(cflag)
+			obj_set_flags(resobj, node, 'incs', incs1 + incs)
+			obj_set_flags(resobj, node, 'cflags', cflags1 + cflags)
+
 	return resobj
 
 def emit_objects_flags(resobj):
@@ -79,11 +78,15 @@ def emit_objects_flags(resobj):
 		print("OBJECTS+=%s/%s" % (osdir, obj))
 
 	for obj in resobj:
-		for inc in resobj[obj]['incs']:
-			print("CFLAGS_%s/%s+=-I${OSDIR}/%s" % \
-				(osobjdir, obj, inc))
-		for cflag in resobj[obj]['cflags']:
-			print("CFLAGS_%s/%s+=%s" % (osobjdir, obj, cflag))
+		if 'incs' in resobj[obj]:
+			for inc in resobj[obj]['incs']:
+				print("CFLAGS_%s/%s+=-I${OSDIR}/%s" % \
+					(osobjdir, obj, inc))
+
+		if 'cflags' in resobj[obj]:
+			for cflag in resobj[obj]['cflags']:
+				print("CFLAGS_%s/%s+=%s" % \
+					(osobjdir, obj, cflag))
 
 if __name__ == '__main__':
 	args = sys.argv
