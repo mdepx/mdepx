@@ -32,7 +32,8 @@
 #include <machine/frame.h>
 #include <machine/cpufunc.h>
 
-uint8_t secondary_stacks[MDX_SCHED_SMP_MAXCPU][4096]; /* Idle thread stacks */
+/* Idle-thread stacks */
+uint8_t cpu_stacks[MDX_SCHED_SMP_MAXCPU][MDX_CPU_STACK_SIZE];
 struct pcpu __pcpu[MDX_SCHED_SMP_MAXCPU];
 
 void

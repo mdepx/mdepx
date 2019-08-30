@@ -58,8 +58,8 @@ ASM_ENTRY(_start)
 	sb	t1, 0(t0)
 
 	/* Load our stack pointer. */
-	la	t0, secondary_stacks
-	li	t1, 4096
+	la	t0, cpu_stacks
+	li	t1, MDX_CPU_STACK_SIZE
 	mulw	t2, t1, a0
 	add	t2, t2, t1
 	add	sp, t2, t0
@@ -85,8 +85,8 @@ ASM_ENTRY(mpentry)
 	lb	t1, 0(t0)
 	beqz	t1, 1b
 
-	la	t0, secondary_stacks
-	li	t1, 4096
+	la	t0, cpu_stacks
+	li	t1, MDX_CPU_STACK_SIZE
 	mulw	t2, t1, a0
 	add	t2, t2, t1
 	add	sp, t2, t0

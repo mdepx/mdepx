@@ -4,6 +4,11 @@ kernel {
 	module riscv;
 	module sched;
 	module systm;
+	module cpu;
+
+	cpu {
+		stack_size 8192;
+	};
 
 	callout {
 		options tsleep_sched;

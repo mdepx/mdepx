@@ -3,6 +3,11 @@ kernel {
 	module malloc;
 	module mips;
 	module systm;
+	module cpu;
+
+	cpu {
+		stack_size 4096;
+	};
 
 	callout {
 		options tsleep;
