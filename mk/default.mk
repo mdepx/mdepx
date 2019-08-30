@@ -27,7 +27,7 @@ CFLAGS += ${INCS} ${CFLAGS_$@} -D__MDX__
 #
 # Populate kernel and library objects first.
 #
-MDX_CONFIG := ${CURDIR}/config.mdx
+MDX_CONFIG := ${CURDIR}/mdepx.conf
 include ${OSDIR}/mk/emitter.mk
 
 #

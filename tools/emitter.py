@@ -30,7 +30,7 @@ def proc1(resobj, flags, config, context_str):
 			if 'options' in node:
 				options += node['options']
 
-		p = os.path.join(osdir, c_dirs[context_str], m, "config.mdx")
+		p = os.path.join(osdir, c_dirs[context_str], m, "mdepx.conf")
 		f = open(p, "r")
 		data = f.read()
 		f.close()
