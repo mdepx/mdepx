@@ -35,14 +35,11 @@
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
 
-static struct pcpu __pcpu[MDX_CPU_MAX];
-static uint32_t ncpus;
+extern struct pcpu __pcpu[MDX_CPU_MAX];
 
 /* Interrupt stack */
 static size_t intr_stacks[MDX_CPU_MAX][MDX_CPU_STACK_SIZE];
-
-/* Idle thread stacks */
-uint8_t cpu_stacks[MDX_CPU_MAX][MDX_CPU_STACK_SIZE];
+static uint32_t ncpus;
 uint8_t __riscv_boot_ap[MDX_CPU_MAX];
 
 void

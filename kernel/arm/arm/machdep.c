@@ -33,7 +33,7 @@
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
 
-struct pcpu __pcpu;
+extern struct pcpu __pcpu[MDX_CPU_MAX];
 
 void
 critical_enter(void)
@@ -110,7 +110,7 @@ md_init(int arg)
 
 	cpuid = 0;
 
-	pcpup = &__pcpu;
+	pcpup = &__pcpu[cpuid];
 	pcpup->pc_cpuid = cpuid;
 
 	thread_init(cpuid);

@@ -32,9 +32,7 @@
 #include <machine/frame.h>
 #include <machine/cpufunc.h>
 
-/* Idle-thread stacks */
-uint8_t cpu_stacks[MDX_CPU_MAX][MDX_CPU_STACK_SIZE];
-struct pcpu __pcpu[MDX_CPU_MAX];
+extern struct pcpu __pcpu[MDX_CPU_MAX];
 
 void
 critical_enter(void)
