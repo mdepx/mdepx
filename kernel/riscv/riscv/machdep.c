@@ -152,10 +152,10 @@ md_init(int hart)
 	thread_init(hart);
 #ifdef MDX_SCHED
 	mdx_sched_init();
-#endif
 
 #ifdef MDX_SCHED_SMP
 	smp_init();
+#endif
 #endif
 
 	csr_set(mie, MIE_MSIE);
