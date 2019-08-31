@@ -35,15 +35,15 @@
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
 
-static struct pcpu __pcpu[MDX_SCHED_SMP_MAXCPU];
+static struct pcpu __pcpu[MDX_CPU_MAX];
 static uint32_t ncpus;
 
 /* Interrupt stack */
-static size_t intr_stacks[MDX_SCHED_SMP_MAXCPU][MDX_CPU_STACK_SIZE];
+static size_t intr_stacks[MDX_CPU_MAX][MDX_CPU_STACK_SIZE];
 
 /* Idle thread stacks */
-uint8_t cpu_stacks[MDX_SCHED_SMP_MAXCPU][MDX_CPU_STACK_SIZE];
-uint8_t __riscv_boot_ap[MDX_SCHED_SMP_MAXCPU];
+uint8_t cpu_stacks[MDX_CPU_MAX][MDX_CPU_STACK_SIZE];
+uint8_t __riscv_boot_ap[MDX_CPU_MAX];
 
 void
 critical_enter(void)

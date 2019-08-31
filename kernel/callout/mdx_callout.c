@@ -38,7 +38,7 @@
 #include <sys/pcpu.h>
 
 static struct mi_timer *mi_tmr;
-static struct entry callouts_list[MDX_SCHED_SMP_MAXCPU];
+static struct entry callouts_list[MDX_CPU_MAX];
 
 /*
  * Lock is only required in the SMP case when we need to cancel a callout
@@ -46,7 +46,7 @@ static struct entry callouts_list[MDX_SCHED_SMP_MAXCPU];
  */
 
 #ifdef MDX_SCHED_SMP
-static struct spinlock l[MDX_SCHED_SMP_MAXCPU];
+static struct spinlock l[MDX_CPU_MAX];
 #define	callout_lock(cpuid)	sl_lock(&(l)[cpuid]);
 #define	callout_unlock(cpuid)	sl_unlock(&(l)[cpuid]);
 #else
@@ -314,7 +314,7 @@ callout_register(struct mi_timer *mt)
 
 	mi_tmr = mt;
 
-	for (i = 0; i < MDX_SCHED_SMP_MAXCPU; i++) {
+	for (i = 0; i < MDX_CPU_MAX; i++) {
 #ifdef MDX_SCHED_SMP
 		sl_init(&l[i]);
 #endif

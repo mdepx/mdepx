@@ -48,7 +48,7 @@
 #endif
 
 #ifdef MDX_SCHED
-static struct thread intr_thread[MDX_SCHED_SMP_MAXCPU];
+static struct thread intr_thread[MDX_CPU_MAX];
 #endif
 
 void MipsTLBMissException(void);

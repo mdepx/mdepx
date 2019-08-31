@@ -30,10 +30,6 @@
 #include <sys/list.h>
 #include <machine/pcpu.h>
 
-#ifndef MDX_SCHED_SMP_MAXCPU
-#define	MDX_SCHED_SMP_MAXCPU	1
-#endif
-
 struct pcpu {
 	struct thread	*pc_curthread;
 	size_t		pc_stack;

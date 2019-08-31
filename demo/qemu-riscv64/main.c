@@ -52,7 +52,7 @@
 static struct uart_16550_softc uart_sc;
 static struct clint_softc clint_sc;
 
-extern uint8_t __riscv_boot_ap[MDX_SCHED_SMP_MAXCPU];
+extern uint8_t __riscv_boot_ap[MDX_CPU_MAX];
 
 #ifdef MDX_SCHED
 static mdx_mutex_t m __unused;
