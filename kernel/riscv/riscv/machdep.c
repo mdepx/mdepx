@@ -136,6 +136,10 @@ md_init_secondary(int hart)
 }
 #endif
 
+extern struct thread main_thread[MDX_CPU_MAX];
+extern uint8_t cpu_stacks[MDX_CPU_MAX][MDX_CPU_STACK_SIZE];
+extern uint8_t main_thread_stack[MDX_CPU_STACK_SIZE];
+
 void
 md_init(int hart)
 {
@@ -165,9 +169,17 @@ md_init(int hart)
 
 #ifdef MDX_SCHED
 	struct thread *td;
+
+#ifndef MDX_THREAD_DYNAMIC_ALLOC
+	td = &main_thread[0];
+	td->td_stack = (uint8_t *)main_thread_stack + MDX_CPU_STACK_SIZE;
+	td->td_stack_size = MDX_CPU_STACK_SIZE;
+	thread_setup(td, "main", 1, 10000, main, NULL);
+#else
 	td = thread_create("main", 1, 10000, MDX_CPU_STACK_SIZE, main, NULL);
 	if (td == NULL)
 		panic("can't create the main thread\n");
+#endif
 
 	mdx_sched_add(td);
 	mdx_sched_cpu_add(pcpup);

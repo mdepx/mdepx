@@ -35,5 +35,10 @@
  */
 uint8_t cpu_stacks[MDX_CPU_MAX][MDX_CPU_STACK_SIZE];
 
+#ifndef MDX_THREAD_DYNAMIC_ALLOC
+struct thread main_thread;
+uint8_t main_thread_stack[MDX_CPU_STACK_SIZE];
+#endif
+
 /* Per cpu struct */
 struct pcpu __pcpu[MDX_CPU_MAX];
