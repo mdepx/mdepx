@@ -29,15 +29,14 @@
 #include <sys/thread.h>
 #include <sys/pcpu.h>
 
-/*
- * This is an idle-thread stacks in SMP mode.
- * Or main thread stack in UP mode.
- */
+#ifdef MDX_THREAD
+struct thread idle_threads[MDX_CPU_MAX];
 uint8_t cpu_stacks[MDX_CPU_MAX][MDX_CPU_STACK_SIZE];
 
 #ifndef MDX_THREAD_DYNAMIC_ALLOC
 struct thread main_thread;
 uint8_t main_thread_stack[MDX_CPU_STACK_SIZE];
+#endif
 #endif
 
 /* Per cpu struct */

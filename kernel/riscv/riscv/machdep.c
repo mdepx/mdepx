@@ -37,6 +37,11 @@
 
 extern struct pcpu __pcpu[MDX_CPU_MAX];
 
+#ifndef MDX_THREAD_DYNAMIC_ALLOC
+extern struct thread main_thread[MDX_CPU_MAX];
+extern uint8_t main_thread_stack[MDX_CPU_STACK_SIZE];
+#endif
+
 /* Interrupt stack */
 static size_t intr_stacks[MDX_CPU_MAX][MDX_CPU_STACK_SIZE];
 static uint32_t ncpus;
@@ -135,10 +140,6 @@ md_init_secondary(int hart)
 	mdx_sched_enter();
 }
 #endif
-
-extern struct thread main_thread[MDX_CPU_MAX];
-extern uint8_t cpu_stacks[MDX_CPU_MAX][MDX_CPU_STACK_SIZE];
-extern uint8_t main_thread_stack[MDX_CPU_STACK_SIZE];
 
 void
 md_init(int hart)
