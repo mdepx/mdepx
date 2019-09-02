@@ -113,7 +113,7 @@ md_init(int arg)
 	pcpup = &__pcpu[cpuid];
 	pcpup->pc_cpuid = cpuid;
 
-	thread_init(cpuid);
+	thread_idle_init(cpuid);
 
 #ifdef MDX_SCHED
 	mdx_sched_init();

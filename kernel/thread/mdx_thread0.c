@@ -31,7 +31,7 @@
 extern struct thread idle_threads[MDX_CPU_MAX];
 
 void
-thread_init(int cpuid)
+thread_idle_init(int cpuid)
 {
 	struct thread *t;
 

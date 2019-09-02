@@ -122,7 +122,7 @@ md_init(int cpuid)
 	pcpup->pc_cpuid = cpuid;
 	__asm __volatile("move $28, %0" :: "r"(pcpup));
 
-	thread_init(cpuid);
+	thread_idle_init(cpuid);
 
 #ifdef MDX_SCHED
 	mdx_sched_init();
