@@ -28,7 +28,8 @@
 #include <sys/thread.h>
 #include <sys/pcpu.h>
 
-extern struct thread idle_threads[MDX_CPU_MAX];
+static struct thread idle_threads[MDX_CPU_MAX];
+uint8_t cpu_stacks[MDX_CPU_MAX][MDX_CPU_STACK_SIZE];
 
 void
 thread_idle_init(int cpuid)

@@ -29,14 +29,9 @@
 #include <sys/thread.h>
 #include <sys/pcpu.h>
 
-#ifdef MDX_THREAD
-struct thread idle_threads[MDX_CPU_MAX];
-uint8_t cpu_stacks[MDX_CPU_MAX][MDX_CPU_STACK_SIZE];
-
-#ifndef MDX_THREAD_DYNAMIC_ALLOC
+#if defined(MDX_THREAD) && !defined(MDX_THREAD_DYNAMIC_ALLOC)
 struct thread main_thread;
 uint8_t main_thread_stack[MDX_CPU_STACK_SIZE];
-#endif
 #endif
 
 /* Per cpu struct */
