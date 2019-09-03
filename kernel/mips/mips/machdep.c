@@ -27,12 +27,10 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 #include <sys/thread.h>
-#include <sys/pcpu.h>
 
+#include <machine/pcpu.h>
 #include <machine/frame.h>
 #include <machine/cpufunc.h>
-
-extern struct pcpu __pcpu[MDX_CPU_MAX];
 
 void
 critical_enter(void)

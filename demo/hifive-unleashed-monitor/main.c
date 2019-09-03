@@ -33,9 +33,9 @@
 #include <sys/mutex.h>
 #include <sys/sem.h>
 #include <sys/list.h>
-#include <sys/pcpu.h>
 #include <sys/smp.h>
 
+#include <machine/pcpu.h>
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
 

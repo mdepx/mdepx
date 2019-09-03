@@ -28,9 +28,9 @@
 
 #include <sys/cdefs.h>
 #include <sys/systm.h>
-#include <sys/pcpu.h>
 #include <sys/smp.h>
 
+#include <machine/pcpu.h>
 #include <machine/atomic.h>
 #include <machine/cpuregs.h>
 

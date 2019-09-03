@@ -26,7 +26,8 @@
 
 #include <sys/cdefs.h>
 #include <sys/thread.h>
-#include <sys/pcpu.h>
+
+#include <machine/pcpu.h>
 
 static struct thread idle_threads[MDX_CPU_MAX];
 uint8_t cpu_stacks[MDX_CPU_MAX][MDX_CPU_STACK_SIZE];

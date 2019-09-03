@@ -36,9 +36,9 @@
 #include <sys/thread.h>
 #include <sys/mutex.h>
 #include <sys/spinlock.h>
-#include <sys/pcpu.h>
 #include <sys/smp.h>
 
+#include <machine/pcpu.h>
 #include <machine/frame.h>
 
 #define	MDX_SCHED_DEBUG

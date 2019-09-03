@@ -27,14 +27,14 @@
 #ifndef	_MACHINE_PCPU_H_
 #define	_MACHINE_PCPU_H_
 
-extern struct pcpu __pcpu;
+#include <sys/pcpu.h>
 
 static inline struct pcpu *
 get_pcpu(void)
 {
 	struct pcpu *p;
 
-	p = &__pcpu;
+	p = __pcpu;
 
 	return (p);
 }
@@ -45,7 +45,7 @@ get_curthread(void)
 	struct thread *td;
 
 	/* pc_curthread is the first member of struct pcpu. */
-	td = (struct thread *)*(uintptr_t *)&__pcpu;
+	td = (struct thread *)*(uintptr_t *)__pcpu;
 
 	return (td);
 }

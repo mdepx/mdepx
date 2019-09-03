@@ -27,7 +27,8 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 #include <sys/thread.h>
-#include <sys/pcpu.h>
+
+#include <machine/pcpu.h>
 
 #if defined(MDX_THREAD) && !defined(MDX_THREAD_DYNAMIC_ALLOC)
 struct thread main_thread;

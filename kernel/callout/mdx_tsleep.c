@@ -28,7 +28,8 @@
 #include <sys/callout.h>
 #include <sys/systm.h>
 #include <sys/thread.h>
-#include <sys/pcpu.h>
+
+#include <machine/pcpu.h>
 
 #ifdef MDX_SCHED
 #error "Invalid configuration"

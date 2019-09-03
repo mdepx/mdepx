@@ -28,7 +28,6 @@
 #define _SYS_PCPU_H_
 
 #include <sys/list.h>
-#include <machine/pcpu.h>
 
 struct pcpu {
 	struct thread	*pc_curthread;
@@ -38,5 +37,7 @@ struct pcpu {
 	struct entry	pc_all;		/* List of all available CPUs. */
 	uint32_t	pc_pending_ipis;
 };
+
+extern struct pcpu __pcpu[MDX_CPU_MAX];
 
 #endif /* !_SYS_PCPU_H_ */
