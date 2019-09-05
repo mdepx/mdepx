@@ -16,7 +16,7 @@ def obj_set_flags(resobj, context, root, key, l):
 		for el in l:
 			resobj[o][key].append(el)
 
-def proc1(resobj, flags, root, context, context_str):
+def proc1(resobj, flags, root, context):
 	obj_set_flags(resobj, context, root, 'incs', [])
 
 	if not 'module' in context:
@@ -25,11 +25,12 @@ def proc1(resobj, flags, root, context, context_str):
 		options = []
 		if m in context:
 			node = context[m]
-			proc1(resobj, flags, context_str, node, m)
+			p = os.path.join(root, m)
+			proc1(resobj, flags, p, node)
 			if 'options' in node:
 				options += node['options']
 
-		p = os.path.join(root, context_str, m, "mdepx.conf")
+		p = os.path.join(root, m, "mdepx.conf")
 		if not os.path.exists(p):
 			continue
 		f = open(p, "r")
@@ -52,8 +53,9 @@ def proc1(resobj, flags, root, context, context_str):
 		if 'cflags' in context1:
 			cflags += context1['cflags']
 
-		obj_set_flags(resobj, context1, root, 'incs', incs)
-		obj_set_flags(resobj, context1, root, 'cflags', cflags)
+		p = os.path.join(root, m)
+		obj_set_flags(resobj, context1, p, 'incs', incs)
+		obj_set_flags(resobj, context1, p, 'cflags', cflags)
 
 		for opt in options:
 			incs1 = []
@@ -69,8 +71,9 @@ def proc1(resobj, flags, root, context, context_str):
 			if 'cflags' in node:
 				cflags1 += node['cflags']
 
-			obj_set_flags(resobj, node, root, 'incs', incs1 + incs)
-			obj_set_flags(resobj, node, root, 'cflags', cflags1 + cflags)
+			p = os.path.join(root, m)
+			obj_set_flags(resobj, node, p, 'incs', incs1 + incs)
+			obj_set_flags(resobj, node, p, 'cflags', cflags1 + cflags)
 
 	return resobj
 
@@ -108,7 +111,7 @@ if __name__ == '__main__':
 
 	flags = {}
 	resobj = {}
-	proc1(resobj, flags, '', config, '')
+	proc1(resobj, flags, '', config)
 	emit_objects_flags(resobj)
 
 	if 'mdepx' in config:
