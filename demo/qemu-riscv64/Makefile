@@ -6,16 +6,10 @@ LD =		${CROSS_COMPILE}ld
 OBJCOPY =	${CROSS_COMPILE}objcopy
 
 OBJDIR =	obj
-OSDIR = 	../../
+OSDIR = 	mdepx
 
 LDSCRIPT =	${OBJDIR}/ldscript
 LDSCRIPT_TPL =	${CURDIR}/ldscript.tpl
-
-OBJECTS =	main.o						\
-		${OSDIR}/kernel/dev/uart/uart_16550.o		\
-		${OSDIR}/kernel/riscv/sifive/e300g_clint.o	\
-		${OSDIR}/kernel/riscv/sifive/e300g_uart.o	\
-		start.o
 
 CFLAGS = -march=rv64imac -mabi=lp64 -mcmodel=medany			\
 	-nostdinc -fno-builtin-printf -ffreestanding -Wall		\
