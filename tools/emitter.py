@@ -4,7 +4,7 @@ from parser import proc0
 import sys
 import os
 
-def obj_set_flags(resobj, context, root, key, l):
+def obj_set_flags(resobj, root, context, key, l):
 	if not 'objects' in context:
 		return
 	for obj in context['objects']:
@@ -17,7 +17,15 @@ def obj_set_flags(resobj, context, root, key, l):
 			resobj[o][key].append(el)
 
 def proc1(resobj, flags, root, context):
-	obj_set_flags(resobj, context, root, 'incs', [])
+	root_incs = []
+	root_cflags = []
+
+	if 'incs' in context:
+		root_incs += context['incs']
+	if 'cflags' in context:
+		root_cflags += context['cflags']
+	obj_set_flags(resobj, root, context, 'incs', root_incs)
+	obj_set_flags(resobj, root, context, 'cflags', root_cflags)
 
 	if not 'module' in context:
 		return
@@ -33,9 +41,8 @@ def proc1(resobj, flags, root, context):
 		p = os.path.join(root, m, "mdepx.conf")
 		if not os.path.exists(p):
 			continue
-		f = open(p, "r")
-		data = f.read()
-		f.close()
+		with open(p) as f:
+			data = f.read()
 		cfg = {}
 		proc0(cfg, data)
 
@@ -54,8 +61,8 @@ def proc1(resobj, flags, root, context):
 			cflags += context1['cflags']
 
 		p = os.path.join(root, m)
-		obj_set_flags(resobj, context1, p, 'incs', incs)
-		obj_set_flags(resobj, context1, p, 'cflags', cflags)
+		obj_set_flags(resobj, p, context1, 'incs', incs)
+		obj_set_flags(resobj, p, context1, 'cflags', cflags)
 
 		for opt in options:
 			incs1 = []
@@ -72,8 +79,8 @@ def proc1(resobj, flags, root, context):
 				cflags1 += node['cflags']
 
 			p = os.path.join(root, m)
-			obj_set_flags(resobj, node, p, 'incs', incs1 + incs)
-			obj_set_flags(resobj, node, p, 'cflags', cflags1 + cflags)
+			obj_set_flags(resobj, p, node, 'incs', incs1 + incs)
+			obj_set_flags(resobj, p, node, 'cflags', cflags1 + cflags)
 
 	return resobj
 
@@ -102,12 +109,11 @@ if __name__ == '__main__':
 
 	if not os.path.exists(config_file):
 		sys.exit(2)
-	f = open(config_file, "r")
-	config_str = f.read()
-	f.close()
+	with open(config_file) as f:
+		data = f.read()
 
 	config = {}
-	proc0(config, config_str)
+	proc0(config, data)
 
 	flags = {}
 	resobj = {}
