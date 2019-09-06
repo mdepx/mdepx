@@ -52,8 +52,9 @@ def proc1(resobj, flags, root, context, data):
 			collect_flags(flags, "%s_%s" % (m, opt), node, False)
 
 			p = os.path.join(root, m)
-			collect_directives(node, data2)
-			obj_set_flags(resobj, p, node, data2)
+			data3 = copy.deepcopy(data2)
+			collect_directives(node, data3)
+			obj_set_flags(resobj, p, node, data3)
 
 	return resobj
 
@@ -72,7 +73,7 @@ def emit_objects_flags(resobj):
 				print("CFLAGS_%s/%s+=%s" % \
 					(objdir, obj, cflag))
 
-def proc2(root, context, result):
+def proc2(root, context):
 	ky = context.copy()
 	for k in ky:
 		v = context[k]
@@ -87,13 +88,13 @@ def proc2(root, context, result):
 					if not el in context:
 						context[el] = {}
 					proc0(context, data)
-					proc2(p, context[el], result)
+					proc2(p, context[el])
 		elif type(v) == dict:
 			p = os.path.join(root)
 			if 'module' in context:
 				if k in context['module']:
 					p = os.path.join(root, k)
-			proc2(p, v, result)
+			proc2(p, v)
 
 if __name__ == '__main__':
 	args = sys.argv
@@ -103,6 +104,7 @@ if __name__ == '__main__':
 	config_file = args[1]
 	objdir = args[2]
 
+	# Open main configuration file provided by app
 	if not os.path.exists(config_file):
 		sys.exit(2)
 	with open(config_file) as f:
@@ -111,12 +113,12 @@ if __name__ == '__main__':
 	config = {}
 	proc0(config, data)
 
+	# Merge-in module's configuration files to the main config
+	proc2('', config)
+
 	flags = {}
 	resobj = {}
 	data = {}
-	result = {}
-	proc2('', config, result)
-
 	proc1(resobj, flags, '', config, data)
 
 	#print(config)
