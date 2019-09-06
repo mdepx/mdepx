@@ -1,31 +1,33 @@
 from flags import collect_all_user_flags
 from flags import collect_flags, print_flags
 from parser import proc0
+import copy
 import sys
 import os
 
-def obj_set_flags(resobj, root, context, key, l):
+def obj_set_flags(resobj, root, context, data):
 	if not 'objects' in context:
 		return
 	for obj in context['objects']:
 		o = os.path.join(root, obj)
 		if not o in resobj:
 			resobj[o] = {}
-		if not key in resobj[o]:
+		for key in data:
+			#if not key in resobj[o]:
 			resobj[o][key] = []
-		for el in l:
-			resobj[o][key].append(el)
+			#print(data[key])
+			for el in data[key]:
+				resobj[o][key].append(el)
 
-def proc1(resobj, flags, root, context):
-	root_incs = []
-	root_cflags = []
+def collect_directives(context, data):
+	for x in ['incs', 'cflags']:
+		if x in context:
+			data[x] = context[x]
 
-	if 'incs' in context:
-		root_incs += context['incs']
-	if 'cflags' in context:
-		root_cflags += context['cflags']
-	obj_set_flags(resobj, root, context, 'incs', root_incs)
-	obj_set_flags(resobj, root, context, 'cflags', root_cflags)
+def proc1(resobj, flags, root, context, data):
+	data1 = copy.deepcopy(data)
+	collect_directives(context, data1)
+	obj_set_flags(resobj, root, context, data1)
 
 	if not 'module' in context:
 		return
@@ -33,54 +35,25 @@ def proc1(resobj, flags, root, context):
 		options = []
 		if m in context:
 			node = context[m]
-			p = os.path.join(root, m)
-			proc1(resobj, flags, p, node)
 			if 'options' in node:
 				options += node['options']
+			p = os.path.join(root, m)
+			proc1(resobj, flags, p, node, data1)
 
-		p = os.path.join(root, m, "mdepx.conf")
-		if not os.path.exists(p):
-			continue
-		with open(p) as f:
-			data = f.read()
-		cfg = {}
-		proc0(cfg, data)
-
-		if not m in cfg:
-			continue
-
-		context1 = cfg[m]
-		collect_flags(flags, m, context1, False)
-
-		incs = []
-		cflags = []
-
-		if 'incs' in context1:
-			incs += context1['incs']
-		if 'cflags' in context1:
-			cflags += context1['cflags']
-
-		p = os.path.join(root, m)
-		obj_set_flags(resobj, p, context1, 'incs', incs)
-		obj_set_flags(resobj, p, context1, 'cflags', cflags)
+		data2 = copy.deepcopy(data1)
+		if m in context:
+			collect_directives(context[m], data2)
+			obj_set_flags(resobj, p, context[m], data2)
 
 		for opt in options:
-			incs1 = []
-			cflags1 = []
-
-			if not opt in context1:
+			if not opt in context[m]:
 				continue
-			node = context1[opt]
+			node = context[m][opt]
 			collect_flags(flags, "%s_%s" % (m, opt), node, False)
 
-			if 'incs' in node:
-				incs1 += node['incs']
-			if 'cflags' in node:
-				cflags1 += node['cflags']
-
 			p = os.path.join(root, m)
-			obj_set_flags(resobj, p, node, 'incs', incs1 + incs)
-			obj_set_flags(resobj, p, node, 'cflags', cflags1 + cflags)
+			collect_directives(node, data2)
+			obj_set_flags(resobj, p, node, data2)
 
 	return resobj
 
@@ -98,6 +71,29 @@ def emit_objects_flags(resobj):
 			for cflag in resobj[obj]['cflags']:
 				print("CFLAGS_%s/%s+=%s" % \
 					(objdir, obj, cflag))
+
+def proc2(root, context, result):
+	ky = context.copy()
+	for k in ky:
+		v = context[k]
+		if k == 'module':
+			for el in v:
+				p = os.path.join(root, el)
+				p1 = os.path.join(p, 'mdepx.conf')
+				if not os.path.exists(p1):
+					continue
+				with open(p1) as f:
+					data = f.read()
+					if not el in context:
+						context[el] = {}
+					proc0(context, data)
+					proc2(p, context[el], result)
+		elif type(v) == dict:
+			p = os.path.join(root)
+			if 'module' in context:
+				if k in context['module']:
+					p = os.path.join(root, k)
+			proc2(p, v, result)
 
 if __name__ == '__main__':
 	args = sys.argv
@@ -117,7 +113,13 @@ if __name__ == '__main__':
 
 	flags = {}
 	resobj = {}
-	proc1(resobj, flags, '', config)
+	data = {}
+	result = {}
+	proc2('', config, result)
+
+	proc1(resobj, flags, '', config, data)
+
+	#print(config)
 	emit_objects_flags(resobj)
 
 	if 'mdepx' in config:
