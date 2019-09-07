@@ -73,7 +73,7 @@ def emit_objects_flags(resobj):
 				print("CFLAGS_%s/%s+=%s" % \
 					(objdir, obj, cflag))
 
-def proc2(root, context):
+def open_modules(root, context):
 	ky = context.copy()
 	for k in ky:
 		v = context[k]
@@ -88,13 +88,10 @@ def proc2(root, context):
 					if not el in context:
 						context[el] = {}
 					proc0(context, data)
-					proc2(p, context[el])
+					open_modules(p, context[el])
 		elif type(v) == dict:
-			p = os.path.join(root)
-			if 'module' in context:
-				if k in context['module']:
-					p = os.path.join(root, k)
-			proc2(p, v)
+			p = os.path.join(root, k)
+			open_modules(p, v)
 
 if __name__ == '__main__':
 	args = sys.argv
@@ -113,11 +110,11 @@ if __name__ == '__main__':
 	config = {}
 	proc0(config, data)
 
-	# Merge-in module's configuration files to the main config
-	proc2('', config)
+	# Merge-in module's configuration files into the main config
+	open_modules('', config)
 
-	flags = {}
 	resobj = {}
+	flags = {}
 	data = {}
 	proc1(resobj, flags, '', config, data)
 
