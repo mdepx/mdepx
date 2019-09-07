@@ -30,6 +30,18 @@ def collect_directives(root, context, data):
 	if 'prefix' in context:
 		data['prefix'] = [root, context['prefix']]
 
+def process_directives(resobj, root, m, context, data):
+	p = os.path.join(root, m)
+	obj_set_flags(resobj, p, context, data)
+	if 'prefix' in data:
+		l = root.replace(data['prefix'][0], data['prefix'][1][0])
+		if l:
+			z = "%s_%s" % (l, m)
+		else:
+			z = m
+		flags[z] = ''
+		collect_flags(flags, z, context, False)
+
 def proc1(resobj, flags, root, context, data):
 	data1 = copy.deepcopy(data)
 	collect_directives(root, context, data1)
@@ -49,16 +61,7 @@ def proc1(resobj, flags, root, context, data):
 		data2 = copy.deepcopy(data1)
 		if m in context:
 			collect_directives(p, context[m], data2)
-			obj_set_flags(resobj, p, context[m], data2)
-			if 'prefix' in data2:
-				l = root.replace(data2['prefix'][0],
-						data2['prefix'][1][0])
-				if l:
-					z = "%s_%s" % (l, m)
-				else:
-					z = m
-				flags[z] = ''
-				collect_flags(flags, z, context[m], False)
+			process_directives(resobj, root, m, context[m], data2)
 
 		for opt in options:
 			if not opt in context[m]:
@@ -68,16 +71,7 @@ def proc1(resobj, flags, root, context, data):
 			p = os.path.join(root, m)
 			data3 = copy.deepcopy(data2)
 			collect_directives(p, node, data3)
-			obj_set_flags(resobj, p, node, data3)
-			if 'prefix' in data3:
-				l = root.replace(data3['prefix'][0],
-						data3['prefix'][1][0])
-				if l:
-					z = "%s_%s" % (l, m)
-				else:
-					z = m
-				flags[z] = ''
-				collect_flags(flags, z, context[m][opt], False)
+			process_directives(resobj, root, m, node, data3)
 
 	return resobj
 
