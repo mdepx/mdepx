@@ -1,4 +1,3 @@
-from flags import collect_all_user_flags
 from flags import collect_flags, print_flags
 from parser import proc0
 import copy
@@ -17,7 +16,7 @@ def obj_set_flags(resobj, root, context, data):
 			for el in data[key]:
 				resobj[o][key].append(el)
 
-def collect_directives(context, data):
+def collect_directives(root, context, data):
 	for x in ['incs', 'incs+', 'cflags', 'cflags+']:
 		if x in context:
 			if x.endswith("+"):
@@ -28,9 +27,12 @@ def collect_directives(context, data):
 			else:
 				data[x] = context[x]
 
+	if 'prefix' in context:
+		data['prefix'] = [root, context['prefix']]
+
 def proc1(resobj, flags, root, context, data):
 	data1 = copy.deepcopy(data)
-	collect_directives(context, data1)
+	collect_directives(root, context, data1)
 	obj_set_flags(resobj, root, context, data1)
 
 	if not 'module' in context:
@@ -46,19 +48,36 @@ def proc1(resobj, flags, root, context, data):
 
 		data2 = copy.deepcopy(data1)
 		if m in context:
-			collect_directives(context[m], data2)
+			collect_directives(p, context[m], data2)
 			obj_set_flags(resobj, p, context[m], data2)
+			if 'prefix' in data2:
+				l = root.replace(data2['prefix'][0],
+						data2['prefix'][1][0])
+				if l:
+					z = "%s_%s" % (l, m)
+				else:
+					z = m
+				flags[z] = ''
+				collect_flags(flags, z, context[m], False)
 
 		for opt in options:
 			if not opt in context[m]:
 				continue
 			node = context[m][opt]
-			collect_flags(flags, "%s_%s" % (m, opt), node, False)
 
 			p = os.path.join(root, m)
 			data3 = copy.deepcopy(data2)
-			collect_directives(node, data3)
+			collect_directives(p, node, data3)
 			obj_set_flags(resobj, p, node, data3)
+			if 'prefix' in data3:
+				l = root.replace(data3['prefix'][0],
+						data3['prefix'][1][0])
+				if l:
+					z = "%s_%s" % (l, m)
+				else:
+					z = m
+				flags[z] = ''
+				collect_flags(flags, z, context[m][opt], False)
 
 	return resobj
 
@@ -124,10 +143,5 @@ if __name__ == '__main__':
 
 	#print(config)
 	emit_objects_flags(resobj)
-
-	if 'mdepx' in config:
-		if 'kernel' in config['mdepx']:
-			kernel = config['mdepx']['kernel']
-			collect_all_user_flags(flags, kernel)
 
 	print_flags(flags)

@@ -14,7 +14,8 @@ def collect_flags(result, m, d, deep):
 				result[s] = ''
 			continue
 
-		if k in ['objects', 'incs', 'incs+', 'cflags', 'cflags+']:
+		if k in ['objects', 'incs', 'incs+',
+			'cflags', 'cflags+', 'prefix', 'module']:
 			continue
 
 		# Process everything else
@@ -29,20 +30,10 @@ def collect_flags(result, m, d, deep):
 		elif type(d1) == dict and deep == True:
 			collect_flags(result, "%s_%s" % (m, k), d1, True)
 
-def collect_all_user_flags(flags, context):
-	if 'module' in context:
-		for m in context['module']:
-			flags[m] = ''
-			if not m in context:
-				continue
-			d = context[m]
-			collect_flags(flags, m, d, True)
-
 def print_flags(result):
 	for key in result:
 		val = result[key]
 		if val:
-			print("CFLAGS+=-DMDX_%s=%s" % \
-				(key.upper(), val.upper()))
+			print("CFLAGS+=-D%s=%s" % (key.upper(), val.upper()))
 		else:
-			print("CFLAGS+=-DMDX_%s" % key.upper())
+			print("CFLAGS+=-D%s" % key.upper())
