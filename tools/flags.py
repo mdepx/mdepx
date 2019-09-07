@@ -14,7 +14,7 @@ def collect_flags(result, m, d, deep):
 				result[s] = ''
 			continue
 
-		if k in ['objects', 'incs', 'cflags']:
+		if k in ['objects', 'incs', 'incs+', 'cflags', 'cflags+']:
 			continue
 
 		# Process everything else

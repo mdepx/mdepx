@@ -11,7 +11,11 @@ def merge(a, b, path = None):
 			elif a[key] == b[key]:
 				pass # same leaf value
 			else:
-				pass # conflict, keep original value
+				if key.endswith("+"):
+					a[key] += b[key]
+				else:
+					# conflict, keep original value
+					pass
 		else:
 			a[key] = b[key]
 	return a

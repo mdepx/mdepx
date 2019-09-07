@@ -13,16 +13,20 @@ def obj_set_flags(resobj, root, context, data):
 		if not o in resobj:
 			resobj[o] = {}
 		for key in data:
-			#if not key in resobj[o]:
 			resobj[o][key] = []
-			#print(data[key])
 			for el in data[key]:
 				resobj[o][key].append(el)
 
 def collect_directives(context, data):
-	for x in ['incs', 'cflags']:
+	for x in ['incs', 'incs+', 'cflags', 'cflags+']:
 		if x in context:
-			data[x] = context[x]
+			if x.endswith("+"):
+				k = x.rstrip("+")
+				if not k in data:
+					data[k] = []
+				data[k] += context[x]
+			else:
+				data[x] = context[x]
 
 def proc1(resobj, flags, root, context, data):
 	data1 = copy.deepcopy(data)
