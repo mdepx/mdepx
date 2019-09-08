@@ -115,10 +115,8 @@ if __name__ == '__main__':
 
 	resobj = {}
 	flags = {}
-	data = {}
-	proc1('', config, data)
 
-	#print(config)
+	proc1('', config, {})
+
 	emit_objects_flags(resobj)
-
 	print_flags(flags)
