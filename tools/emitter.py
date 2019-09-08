@@ -17,20 +17,18 @@ def collect_directives(root, context, data):
 			else:
 				data[x] = context[x]
 
+	for x in ['objects', 'module', 'options']:
+		if x in context:
+			data[x] = context[x]
+
 	if 'prefix' in context:
 		data['prefix'] = [root, context['prefix']]
 
-	if 'module' in context:
-		data['module'] = context['module']
-
-	if 'options' in context:
-		data['options'] = context['options']
-
 def process_directives(resobj, root, m, context, data):
 
-	if 'objects' in context:
+	if 'objects' in data:
 		p = os.path.join(root, m)
-		for obj in context['objects']:
+		for obj in data['objects']:
 			o = os.path.join(p, obj)
 			if not o in resobj:
 				resobj[o] = {}
@@ -47,15 +45,15 @@ def process_directives(resobj, root, m, context, data):
 		flags[l] = ''
 		collect_flags(flags, l, context, False)
 
-	if 'module' in context:
-		for m in context['module']:
+	if 'module' in data:
+		for m in data['module']:
 			if m in context:
 				node = context[m]
 				p = os.path.join(root, m)
 				proc1(resobj, flags, p, node, data)
 
-	if 'options' in context:
-		for opt in context['options']:
+	if 'options' in data:
+		for opt in data['options']:
 			if opt in context:
 				node = context[opt]
 				p = os.path.join(root)
