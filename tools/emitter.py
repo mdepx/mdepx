@@ -24,12 +24,11 @@ def collect_directives(root, context, data):
 	if 'prefix' in context:
 		data['prefix'] = [root, context['prefix']]
 
-def process_directives(resobj, root, m, context, data):
+def process_directives(resobj, root, context, data):
 
 	if 'objects' in data:
-		p = os.path.join(root, m)
 		for obj in data['objects']:
-			o = os.path.join(p, obj)
+			o = os.path.join(root, obj)
 			if not o in resobj:
 				resobj[o] = {}
 			for key in data:
@@ -40,8 +39,6 @@ def process_directives(resobj, root, m, context, data):
 	if 'prefix' in data:
 		l = root.replace(data['prefix'][0], data['prefix'][1][0])
 		l = l.replace("/", "_")
-		if m:
-			l += "_%s" % m
 		flags[l] = ''
 		collect_flags(flags, l, context, False)
 
@@ -62,7 +59,7 @@ def process_directives(resobj, root, m, context, data):
 def proc1(resobj, flags, root, context, data):
 	data1 = copy.deepcopy(data)
 	collect_directives(root, context, data1)
-	process_directives(resobj, root, '', context, data1)
+	process_directives(resobj, root, context, data1)
 
 	return resobj
 
