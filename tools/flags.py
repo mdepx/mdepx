@@ -15,7 +15,7 @@ def collect_flags(result, m, d, deep):
 			continue
 
 		if k in ['objects', 'incs', 'incs+', 'cflags', 'cflags+',
-			'ldscript', 'prefix', 'module']:
+			'ldadd', 'ldscript', 'prefix', 'module']:
 			continue
 
 		# Process everything else

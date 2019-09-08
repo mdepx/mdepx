@@ -1,5 +1,6 @@
 from flags import collect_flags
 from flags import print_flags
+from utils import build
 from parser import proc0
 import copy
 import sys
@@ -21,8 +22,14 @@ def collect_nested_directives(root, context, data):
 		data['prefix'] = [root, context['prefix']]
 
 def process_directives(root, context, data):
-	if 'ldscript' in context:
-		vars['ldscript'] = context['ldscript'][0]
+	for x in ['app', 'cross_compile', 'ldscript', 'machine']:
+		if x in context:
+			vars[x] = context[x][0]
+
+	if 'ldadd' in context:
+		if not 'ldadd' in vars:
+			vars['ldadd'] = []
+		vars['ldadd'] += context['ldadd']
 
 	if 'objects' in context:
 		for obj in context['objects']:
@@ -123,5 +130,5 @@ if __name__ == '__main__':
 
 	emit_objects_flags(resobj)
 	print_flags(flags)
-	for v in vars:
-		print("%s=%s" % (v.upper(), vars[v]))
+
+	#build(objdir, resobj, flags, vars)
