@@ -5,7 +5,7 @@ import copy
 import sys
 import os
 
-def collect_directives(root, context, data):
+def collect_nested_directives(root, context, data):
 
 	for x in ['incs', 'incs+', 'cflags', 'cflags+']:
 		if x in context:
@@ -17,17 +17,13 @@ def collect_directives(root, context, data):
 			else:
 				data[x] = context[x]
 
-	for x in ['objects', 'module', 'options']:
-		if x in context:
-			data[x] = context[x]
-
 	if 'prefix' in context:
 		data['prefix'] = [root, context['prefix']]
 
-def process_directives(resobj, root, context, data):
+def process_directives(root, context, data):
 
-	if 'objects' in data:
-		for obj in data['objects']:
+	if 'objects' in context:
+		for obj in context['objects']:
 			o = os.path.join(root, obj)
 			if not o in resobj:
 				resobj[o] = {}
@@ -42,24 +38,23 @@ def process_directives(resobj, root, context, data):
 		flags[l] = ''
 		collect_flags(flags, l, context, False)
 
-	if 'module' in data:
-		for m in data['module']:
+	if 'module' in context:
+		for m in context['module']:
 			if m in context:
 				node = context[m]
 				p = os.path.join(root, m)
-				proc1(resobj, flags, p, node, data)
+				proc1(p, node, data)
 
-	if 'options' in data:
-		for opt in data['options']:
+	if 'options' in context:
+		for opt in context['options']:
 			if opt in context:
 				node = context[opt]
-				p = os.path.join(root)
-				proc1(resobj, flags, p, node, data)
+				proc1(root, node, data)
 
-def proc1(resobj, flags, root, context, data):
+def proc1(root, context, data):
 	data1 = copy.deepcopy(data)
-	collect_directives(root, context, data1)
-	process_directives(resobj, root, context, data1)
+	collect_nested_directives(root, context, data1)
+	process_directives(root, context, data1)
 
 	return resobj
 
@@ -121,7 +116,7 @@ if __name__ == '__main__':
 	resobj = {}
 	flags = {}
 	data = {}
-	proc1(resobj, flags, '', config, data)
+	proc1('', config, data)
 
 	#print(config)
 	emit_objects_flags(resobj)
