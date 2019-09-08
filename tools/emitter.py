@@ -1,22 +1,12 @@
-from flags import collect_flags, print_flags
+from flags import collect_flags
+from flags import print_flags
 from parser import proc0
 import copy
 import sys
 import os
 
-def obj_set_flags(resobj, root, context, data):
-	if not 'objects' in context:
-		return
-	for obj in context['objects']:
-		o = os.path.join(root, obj)
-		if not o in resobj:
-			resobj[o] = {}
-		for key in data:
-			resobj[o][key] = []
-			for el in data[key]:
-				resobj[o][key].append(el)
-
 def collect_directives(root, context, data):
+
 	for x in ['incs', 'incs+', 'cflags', 'cflags+']:
 		if x in context:
 			if x.endswith("+"):
@@ -30,22 +20,34 @@ def collect_directives(root, context, data):
 	if 'prefix' in context:
 		data['prefix'] = [root, context['prefix']]
 
+	if 'module' in context:
+		pass
+
 def process_directives(resobj, root, m, context, data):
-	p = os.path.join(root, m)
-	obj_set_flags(resobj, p, context, data)
+
+	if 'objects' in context:
+		p = os.path.join(root, m)
+		for obj in context['objects']:
+			o = os.path.join(p, obj)
+			if not o in resobj:
+				resobj[o] = {}
+			for key in data:
+				resobj[o][key] = []
+				for el in data[key]:
+					resobj[o][key].append(el)
+
 	if 'prefix' in data:
 		l = root.replace(data['prefix'][0], data['prefix'][1][0])
-		if l:
-			z = "%s_%s" % (l, m)
-		else:
-			z = m
-		flags[z] = ''
-		collect_flags(flags, z, context, False)
+		l = l.replace("/", "_")
+		if m:
+			l += "_%s" % m
+		flags[l] = ''
+		collect_flags(flags, l, context, False)
 
 def proc1(resobj, flags, root, context, data):
 	data1 = copy.deepcopy(data)
 	collect_directives(root, context, data1)
-	obj_set_flags(resobj, root, context, data1)
+	process_directives(resobj, root, '', context, data1)
 
 	if not 'module' in context:
 		return
