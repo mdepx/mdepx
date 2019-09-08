@@ -47,24 +47,24 @@ def process_directives(resobj, root, m, context, data):
 		flags[l] = ''
 		collect_flags(flags, l, context, False)
 
-def proc1(resobj, flags, root, context, data):
-	data1 = copy.deepcopy(data)
-	collect_directives(root, context, data1)
-	process_directives(resobj, root, '', context, data1)
-
 	if 'module' in context:
 		for m in context['module']:
 			if m in context:
 				node = context[m]
 				p = os.path.join(root, m)
-				proc1(resobj, flags, p, node, data1)
+				proc1(resobj, flags, p, node, data)
 
 	if 'options' in context:
 		for opt in context['options']:
 			if opt in context:
 				node = context[opt]
 				p = os.path.join(root)
-				proc1(resobj, flags, p, node, data1)
+				proc1(resobj, flags, p, node, data)
+
+def proc1(resobj, flags, root, context, data):
+	data1 = copy.deepcopy(data)
+	collect_directives(root, context, data1)
+	process_directives(resobj, root, '', context, data1)
 
 	return resobj
 
