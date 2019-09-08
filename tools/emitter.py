@@ -21,7 +21,10 @@ def collect_directives(root, context, data):
 		data['prefix'] = [root, context['prefix']]
 
 	if 'module' in context:
-		pass
+		data['module'] = context['module']
+
+	if 'options' in context:
+		data['options'] = context['options']
 
 def process_directives(resobj, root, m, context, data):
 
@@ -49,31 +52,19 @@ def proc1(resobj, flags, root, context, data):
 	collect_directives(root, context, data1)
 	process_directives(resobj, root, '', context, data1)
 
-	if not 'module' in context:
-		return
-	for m in context['module']:
-		options = []
-		if m in context:
-			node = context[m]
-			if 'options' in node:
-				options += node['options']
-			p = os.path.join(root, m)
-			proc1(resobj, flags, p, node, data1)
+	if 'module' in context:
+		for m in context['module']:
+			if m in context:
+				node = context[m]
+				p = os.path.join(root, m)
+				proc1(resobj, flags, p, node, data1)
 
-		data2 = copy.deepcopy(data1)
-		if m in context:
-			collect_directives(p, context[m], data2)
-			process_directives(resobj, root, m, context[m], data2)
-
-		for opt in options:
-			if not opt in context[m]:
-				continue
-			node = context[m][opt]
-
-			p = os.path.join(root, m)
-			data3 = copy.deepcopy(data2)
-			collect_directives(p, node, data3)
-			process_directives(resobj, root, m, node, data3)
+	if 'options' in context:
+		for opt in context['options']:
+			if opt in context:
+				node = context[opt]
+				p = os.path.join(root)
+				proc1(resobj, flags, p, node, data1)
 
 	return resobj
 
