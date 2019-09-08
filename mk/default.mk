@@ -12,10 +12,6 @@ ifndef APP
 $(error Error: APP must be defined)
 endif
 
-ifndef LDSCRIPT
-$(error Error: LDSCRIPT must be defined)
-endif
-
 INCS += -I${OBJDIR}
 INCS += -I${CURDIR}
 INCS += -I${OSDIR}/include
@@ -29,6 +25,10 @@ CFLAGS += ${INCS} ${CFLAGS_$@} -D__MDX__
 #
 MDX_CONFIG := ${CURDIR}/mdepx.conf
 include ${OSDIR}/mk/emitter.mk
+
+ifndef LDSCRIPT
+$(error Error: LDSCRIPT must be defined)
+endif
 
 #
 # Add ${OBJDIR} prefix to each member of OBJECTS.

@@ -21,6 +21,8 @@ def collect_nested_directives(root, context, data):
 		data['prefix'] = [root, context['prefix']]
 
 def process_directives(root, context, data):
+	if 'ldscript' in context:
+		vars['ldscript'] = context['ldscript'][0]
 
 	if 'objects' in context:
 		for obj in context['objects']:
@@ -115,8 +117,11 @@ if __name__ == '__main__':
 
 	resobj = {}
 	flags = {}
+	vars = {}
 
 	proc1('', config, {})
 
 	emit_objects_flags(resobj)
 	print_flags(flags)
+	for v in vars:
+		print("%s=%s" % (v.upper(), vars[v]))
