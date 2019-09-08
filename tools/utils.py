@@ -45,7 +45,9 @@ def build(objdir, resobj, flags, vars):
 		os.makedirs(os.path.dirname(objfile), exist_ok=True)
 		cmd = '%s %s %s %s -c -o %s' % \
 			(compiler, fl, incs, o, objfile)
-		print(cmd)
+
+		pcmd = "  CC      %s" % o
+		print(pcmd)
 		status, output = getstatusoutput(cmd)
 		if status != 0:
 			print(output)
@@ -60,7 +62,8 @@ def build(objdir, resobj, flags, vars):
 			objs += "%s " % o
 	elf = os.path.join(objdir, "%s.elf" % vars.get('app'))
 	cmd = "%s -T %s %s -o %s" % (linker, vars['ldscript'], objs, elf)
-	print(cmd)
+	pcmd = "  LD      %s" % elf
+	print(pcmd)
 	status, output = getstatusoutput(cmd)
 	if status != 0:
 		print(output)
