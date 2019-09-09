@@ -8,7 +8,7 @@ import os
 
 def collect_nested_directives(root, context, data):
 
-	for x in ['incs', 'incs+', 'cflags', 'cflags+']:
+	for x in ['cflags', 'cflags+']:
 		if x in context:
 			if x.endswith("+"):
 				k = x.rstrip("+")
@@ -18,13 +18,29 @@ def collect_nested_directives(root, context, data):
 			else:
 				data[x] = context[x]
 
+	for x in ['incs', 'incs+']:
+		if x in context:
+			k = x
+			if x.endswith("+"):
+				k = x.rstrip("+")
+			if not k in data:
+				data[k] = []
+			for el in context[x]:
+				data[k].append(os.path.join(root, el))
+
 	if 'prefix' in context:
 		data['prefix'] = [root, context['prefix']]
 
+	if 'cross_compile' in context:
+		data['cross_compile'] = context['cross_compile']
+
 def process_directives(root, context, data):
-	for x in ['app', 'cross_compile', 'ldscript', 'machine']:
+	for x in ['app', 'ldscript']:
 		if x in context:
 			vars[x] = context[x][0]
+
+	if 'machine' in context:
+		vars['machine'] = os.path.join(root, context['machine'][0])
 
 	if 'ldadd' in context:
 		if not 'ldadd' in vars:
@@ -74,7 +90,7 @@ def emit_objects_flags(resobj):
 	for obj in resobj:
 		if 'incs' in resobj[obj]:
 			for inc in resobj[obj]['incs']:
-				print("CFLAGS_%s/%s+=-I${OSDIR}/%s" % \
+				print("CFLAGS_%s/%s+=-I%s" % \
 					(objdir, obj, inc))
 
 		if 'cflags' in resobj[obj]:
