@@ -35,46 +35,43 @@ def collect_nested_directives(root, context, data):
 		data['cross_compile'] = context['cross_compile']
 
 def process_directives(root, context, data):
-	for x in ['app', 'ldscript']:
-		if x in context:
+	for x in data:
+		if x in ['prefix']:
+			l = root.replace(data[x][0], data[x][1][0])
+			l = l.replace("/", "_")
+			#print(l)
+			flags[l] = ''
+			collect_flags(flags, l, context, False)
+
+	for x in context:
+		if x in ['app', 'ldscript']:
 			vars[x] = context[x][0]
-
-	if 'machine' in context:
-		vars['machine'] = os.path.join(root, context['machine'][0])
-
-	if 'ldadd' in context:
-		if not 'ldadd' in vars:
-			vars['ldadd'] = []
-		vars['ldadd'] += context['ldadd']
-
-	if 'objects' in context:
-		for obj in context['objects']:
-			o = os.path.join(root, obj)
-			if not o in resobj:
-				resobj[o] = {}
-			for key in data:
-				resobj[o][key] = []
-				for el in data[key]:
-					resobj[o][key].append(el)
-
-	if 'prefix' in data:
-		l = root.replace(data['prefix'][0], data['prefix'][1][0])
-		l = l.replace("/", "_")
-		flags[l] = ''
-		collect_flags(flags, l, context, False)
-
-	if 'module' in context:
-		for m in context['module']:
-			if m in context:
-				node = context[m]
-				p = os.path.join(root, m)
-				proc1(p, node, data)
-
-	if 'options' in context:
-		for opt in context['options']:
-			if opt in context:
-				node = context[opt]
-				proc1(root, node, data)
+		elif x in ['machine']:
+			vars[x] = os.path.join(root, context[x][0])
+		elif x in ['ldadd']:
+			if not x in vars:
+				vars[x] = []
+			vars[x] += context[x]
+		elif x in ['objects']:
+			for obj in context[x]:
+				o = os.path.join(root, obj)
+				if not o in resobj:
+					resobj[o] = {}
+				for key in data:
+					resobj[o][key] = []
+					for el in data[key]:
+						resobj[o][key].append(el)
+		elif x in ['options']:
+			for opt in context[x]:
+				if opt in context:
+					node = context[opt]
+					proc1(root, node, data)
+		elif x in ['module']:
+			for m in context[x]:
+				if m in context:
+					node = context[m]
+					p = os.path.join(root, m)
+					proc1(p, node, data)
 
 def proc1(root, context, data):
 	data1 = copy.deepcopy(data)
@@ -106,6 +103,7 @@ def open_modules(root, context):
 			for el in v:
 				p = os.path.join(root, el)
 				p1 = os.path.join(p, 'mdepx.conf')
+				#print("opening", p1)
 				if not os.path.exists(p1):
 					continue
 				with open(p1) as f:

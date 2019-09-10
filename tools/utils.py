@@ -24,6 +24,8 @@ def build(objdir, resobj, flags, vars):
 
 	machine(vars, objdir)
 
+	link_objs = []
+
 	for obj in resobj:
 		fl = ' '.join(resobj[obj].get('cflags'))
 		for key in flags:
@@ -42,7 +44,9 @@ def build(objdir, resobj, flags, vars):
 
 		cc = resobj[obj].get('cross_compile') or ['']
 		compiler = '%sgcc' % cc[0]
-		objfile = os.path.join(objdir, obj)
+		ob = os.path.abspath(obj)
+		objfile = "%s/%s" % (objdir, ob)
+		link_objs.append(objfile)
 		os.makedirs(os.path.dirname(objfile), exist_ok=True)
 		cmd = '%s %s %s %s -c -o %s' % \
 			(compiler, fl, incs, o, objfile)
@@ -56,14 +60,11 @@ def build(objdir, resobj, flags, vars):
 
 	linker = resobj[obj].get('cross_compile') or ['']
 	linker = '%sld' % linker[0]
-	objs = ''
-	for o in resobj:
-		objs += "%s " % os.path.join(objdir, o)
 	if 'ldadd' in vars:
 		for o in vars['ldadd']:
-			objs += "%s " % o
+			link_objs.append(o)
 	elf = os.path.join(objdir, "%s.elf" % vars.get('app'))
-	cmd = "%s -T %s %s -o %s" % (linker, vars['ldscript'], objs, elf)
+	cmd = "%s -T %s %s -o %s" % (linker, vars['ldscript'], " ".join(link_objs), elf)
 	pcmd = "  LD      %s" % elf
 	print(pcmd)
 	status, output = getstatusoutput(cmd)
