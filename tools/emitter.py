@@ -31,8 +31,9 @@ def collect_nested_directives(root, context, data):
 	if 'prefix' in context:
 		data['prefix'] = [root, context['prefix']]
 
-	if 'cross_compile' in context:
-		data['cross_compile'] = context['cross_compile']
+	for x in ['cross_compile', 'objdir']:
+		if x in context:
+			data[x] = context[x]
 
 def process_directives(root, context, data):
 	for x in data:
@@ -44,7 +45,7 @@ def process_directives(root, context, data):
 			collect_flags(flags, l, context, False)
 
 	for x in context:
-		if x in ['app', 'ldscript']:
+		if x in ['app', 'ldscript', 'cross_compile']:
 			vars[x] = context[x][0]
 		elif x in ['machine']:
 			vars[x] = os.path.join(root, context[x][0])
@@ -145,4 +146,4 @@ if __name__ == '__main__':
 	emit_objects_flags(resobj)
 	print_flags(flags)
 
-	#build(objdir, resobj, flags, vars)
+	#build(resobj, flags, vars)

@@ -1,4 +1,5 @@
 from subprocess import getstatusoutput
+from distutils import spawn
 import sys
 import os
 
@@ -20,18 +21,22 @@ def machine(vars, objdir):
 		os.unlink(dst)
 	os.symlink(m, dst)
 
-def build(objdir, resobj, flags, vars):
-
-	machine(vars, objdir)
+def build(resobj, flags, vars):
 
 	link_objs = []
 
 	for obj in resobj:
-		fl = ' '.join(resobj[obj].get('cflags'))
+		fl = ' '.join(resobj[obj].get('cflags', []))
 		for key in flags:
 			fl += ' -D%s' % (key.upper())
 			if flags[key]:
 				fl += '=%s' % flags[key].upper()
+
+		objdir = resobj[obj].get('objdir')
+		if not objdir:
+			sys.exit(8)
+		objdir = objdir[0]
+		machine(vars, objdir)
 
 		incs = '-I%s' % objdir
 		if 'incs' in resobj[obj]:
@@ -42,8 +47,17 @@ def build(objdir, resobj, flags, vars):
 		if not os.path.exists(o):
 			o = obj.replace(".o", ".S")
 
-		cc = resobj[obj].get('cross_compile') or ['']
-		compiler = '%sgcc' % cc[0]
+		found = False
+		cross_compile = resobj[obj].get('cross_compile', [''])
+		for cc in cross_compile:
+			compiler = '%sgcc' % cc
+			if spawn.find_executable(compiler):
+				found = True
+				break
+		if not found:
+			print("Compiler not found")
+			return
+
 		ob = os.path.abspath(obj)
 		objfile = "%s/%s" % (objdir, ob)
 		link_objs.append(objfile)
@@ -58,13 +72,22 @@ def build(objdir, resobj, flags, vars):
 			print(output)
 			sys.exit(7)
 
-	linker = resobj[obj].get('cross_compile') or ['']
-	linker = '%sld' % linker[0]
+	cross_compile = vars.get('cross_compile')
+	if not cross_compile:
+		print("Linker not found: cross_compile is not set")
+		return
+
+	linker = '%sld' % cc
+	if not spawn.find_executable(linker):
+		print("Linker not found")
+		return
+
 	if 'ldadd' in vars:
 		for o in vars['ldadd']:
 			link_objs.append(o)
-	elf = os.path.join(objdir, "%s.elf" % vars.get('app'))
-	cmd = "%s -T %s %s -o %s" % (linker, vars['ldscript'], " ".join(link_objs), elf)
+	elf = os.path.join(objdir, "%s.elf" % vars.get('app','app'))
+	cmd = "%s -T %s %s -o %s" % \
+		(linker, vars['ldscript'], " ".join(link_objs), elf)
 	pcmd = "  LD      %s" % elf
 	print(pcmd)
 	status, output = getstatusoutput(cmd)
