@@ -42,11 +42,6 @@ def collect_nested_directives(root, context, data):
 
 def process_directives(root, context, data):
 
-	# Replace root if provided in the context
-	for x in context:
-		if x in ['root']:
-			root = context[x][0]
-
 	for x in data:
 		if x in ['prefix']:
 			l = root.replace(data[x][0], data[x][1][0])
@@ -82,7 +77,11 @@ def process_directives(root, context, data):
 			for m in context[x]:
 				if m in context:
 					node = context[m]
-					p = os.path.join(root, m)
+					if 'root' in node:
+						p = os.path.join(root,
+							node['root'][0])
+					else:
+						p = os.path.join(root, m)
 					proc1(p, node, data)
 
 def proc1(root, context, data):
