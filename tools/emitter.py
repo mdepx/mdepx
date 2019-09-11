@@ -8,6 +8,11 @@ import os
 
 def collect_nested_directives(root, context, data):
 
+	# Replace root if provided in the context
+	for x in context:
+		if x in ['root']:
+			root = context[x][0]
+
 	for x in ['cflags', 'cflags+']:
 		if x in context:
 			if x.endswith("+"):
@@ -28,14 +33,20 @@ def collect_nested_directives(root, context, data):
 			for el in context[x]:
 				data[k].append(os.path.join(root, el))
 
-	if 'prefix' in context:
-		data['prefix'] = [root, context['prefix']]
-
 	for x in ['cross_compile', 'objdir']:
 		if x in context:
 			data[x] = context[x]
 
+	if 'prefix' in context:
+		data['prefix'] = [root, context['prefix']]
+
 def process_directives(root, context, data):
+
+	# Replace root if provided in the context
+	for x in context:
+		if x in ['root']:
+			root = context[x][0]
+
 	for x in data:
 		if x in ['prefix']:
 			l = root.replace(data[x][0], data[x][1][0])
@@ -97,14 +108,18 @@ def emit_objects_flags(resobj):
 					(objdir, obj, cflag))
 
 def open_modules(root, context):
+
 	ky = context.copy()
+
 	for k in ky:
 		v = context[k]
 		if k == 'module':
 			for el in v:
-				p = os.path.join(root, el)
+				if el in context and 'root' in context[el]:
+					p = context[el]['root'][0]
+				else:
+					p = os.path.join(root, el)
 				p1 = os.path.join(p, 'mdepx.conf')
-				#print("opening", p1)
 				if not os.path.exists(p1):
 					continue
 				with open(p1) as f:
@@ -114,7 +129,10 @@ def open_modules(root, context):
 					proc0(context, data)
 					open_modules(p, context[el])
 		elif type(v) == dict:
-			p = os.path.join(root, k)
+			if 'root' in v:
+				p = v['root'][0]
+			else:
+				p = os.path.join(root, k)
 			open_modules(p, v)
 
 if __name__ == '__main__':
