@@ -1,28 +1,25 @@
-APP =		qemu-riscv64
-MACHINE =	riscv
+APP = qemu-riscv64
 
-CC =		${CROSS_COMPILE}gcc
-LD =		${CROSS_COMPILE}ld
-OBJCOPY =	${CROSS_COMPILE}objcopy
+OSDIR = ../../
 
-OBJDIR =	obj
-OSDIR = 	mdepx
-
-LDSCRIPT =	${OBJDIR}/ldscript
-LDSCRIPT_TPL =	${CURDIR}/ldscript.tpl
-
-CFLAGS = -march=rv64imac -mabi=lp64 -mcmodel=medany			\
+export CFLAGS = -march=rv64imac -mabi=lp64 -mcmodel=medany		\
 	-nostdinc -fno-builtin-printf -ffreestanding -Wall		\
 	-Wredundant-decls -Wnested-externs -Wstrict-prototypes		\
 	-Wmissing-prototypes -Wpointer-arith -Winline -Wcast-qual	\
 	-Wundef -Wmissing-include-dirs -Werror
 
-all:	${OBJDIR}/${APP}.bin
+CMD = python3 -B ${OSDIR}/tools/emitter.py
 
-${LDSCRIPT}:
-	@cat ${LDSCRIPT_TPL} > ${LDSCRIPT}
+all:
+	${CMD} mdepx.conf
+
+st:
+	${CMD} mdepx-st.conf
+
+up:
+	${CMD} mdepx-up.conf
 
 clean:
-	@rm -f ${OBJECTS} ${LDSCRIPT} ${OBJDIR}/${APP}.*
+	@rm -rf obj/*
 
-include ${OSDIR}/mk/default.mk
+include ${OSDIR}/mk/user.mk

@@ -29,11 +29,3 @@ def collect_flags(result, m, d, deep):
 					sys.exit(5)
 		elif type(d1) == dict and deep == True:
 			collect_flags(result, "%s_%s" % (m, k), d1, True)
-
-def print_flags(result):
-	for key in result:
-		val = result[key]
-		if val:
-			print("CFLAGS+=-D%s=%s" % (key.upper(), val.upper()))
-		else:
-			print("CFLAGS+=-D%s" % key.upper())

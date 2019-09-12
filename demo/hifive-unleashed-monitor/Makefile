@@ -1,5 +1,4 @@
-APP =		hifive-unleashed-monitor
-MACHINE =	riscv
+APP =		hifive-unleashed
 
 CC =		${CROSS_COMPILE}gcc
 LD =		${CROSS_COMPILE}ld
@@ -11,23 +10,21 @@ OSDIR = 	../../
 LDSCRIPT =	${OBJDIR}/ldscript
 LDSCRIPT_TPL =	${CURDIR}/ldscript.tpl
 
-OBJECTS =	main.o						\
-		${OSDIR}/kernel/riscv/sifive/e300g_clint.o	\
-		${OSDIR}/kernel/riscv/sifive/e300g_uart.o	\
-		start.o
-
-CFLAGS = -march=rv64imac -mabi=lp64 -mcmodel=medany			\
+export CFLAGS = -march=rv64imac -mabi=lp64 -mcmodel=medany		\
 	-nostdinc -fno-builtin-printf -ffreestanding -Wall		\
 	-Wredundant-decls -Wnested-externs -Wstrict-prototypes		\
 	-Wmissing-prototypes -Wpointer-arith -Winline -Wcast-qual	\
 	-Wundef -Wmissing-include-dirs -Werror
 
-all:	${OBJDIR}/${APP}.bin
+CMD = python3 -B ${OSDIR}/tools/emitter.py
+
+all:	${LDSCRIPT}
+	${CMD} mdepx.conf
 
 ${LDSCRIPT}:
 	@cat ${LDSCRIPT_TPL} > ${LDSCRIPT}
 
 clean:
-	@rm -f ${OBJECTS} ${LDSCRIPT} ${OBJDIR}/${APP}.*
+	@rm -rf obj/*
 
-include ${OSDIR}/mk/default.mk
+include ${OSDIR}/mk/user.mk

@@ -3,7 +3,7 @@ from distutils import spawn
 import sys
 import os
 
-""" This code is not in use """
+DEFAULT_OBJDIR = 'obj'
 
 def machine(vars, objdir):
 	machine = vars.get('machine')
@@ -25,17 +25,17 @@ def build(resobj, flags, vars):
 
 	link_objs = []
 
+	cross_compile = os.environ.get('CROSS_COMPILE', '')
+	cflags = os.environ.get('CFLAGS', '')
+
 	for obj in resobj:
-		fl = ' '.join(resobj[obj].get('cflags', []))
+		fl = cflags + ' ' + ' '.join(resobj[obj].get('cflags', []))
 		for key in flags:
 			fl += ' -D%s' % (key.upper())
 			if flags[key]:
 				fl += '=%s' % flags[key].upper()
 
-		objdir = resobj[obj].get('objdir')
-		if not objdir:
-			sys.exit(8)
-		objdir = objdir[0]
+		objdir = resobj[obj].get('objdir', [DEFAULT_OBJDIR])[0]
 		machine(vars, objdir)
 
 		incs = '-I%s' % objdir
@@ -47,17 +47,7 @@ def build(resobj, flags, vars):
 		if not os.path.exists(o):
 			o = obj.replace(".o", ".S")
 
-		found = False
-		cross_compile = resobj[obj].get('cross_compile', [''])
-		for cc in cross_compile:
-			compiler = '%sgcc' % cc
-			if spawn.find_executable(compiler):
-				found = True
-				break
-		if not found:
-			print("Compiler not found")
-			return
-
+		compiler = '%sgcc' % cross_compile
 		ob = os.path.abspath(obj)
 		objfile = "%s/%s" % (objdir, ob)
 		link_objs.append(objfile)
@@ -71,14 +61,9 @@ def build(resobj, flags, vars):
 			print(output)
 			sys.exit(7)
 
-	cross_compile = vars.get('cross_compile')
-	if not cross_compile:
-		print("Linker not found: cross_compile is not set")
-		return
-
-	linker = '%sld' % cc
+	linker = '%sld' % cross_compile
 	if not spawn.find_executable(linker):
-		print("Linker not found")
+		print("Linker not found: %s" % linker)
 		return
 
 	if 'ldadd' in vars:

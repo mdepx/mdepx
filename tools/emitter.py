@@ -1,5 +1,4 @@
 from flags import collect_flags
-from flags import print_flags
 from utils import build
 from parser import proc0
 import copy
@@ -33,7 +32,7 @@ def collect_nested_directives(root, context, data):
 			for el in context[x]:
 				data[k].append(os.path.join(root, el))
 
-	for x in ['cross_compile', 'objdir']:
+	for x in ['objdir']:
 		if x in context:
 			data[x] = context[x]
 
@@ -51,14 +50,15 @@ def process_directives(root, context, data):
 			collect_flags(flags, l, context, False)
 
 	for x in context:
-		if x in ['app', 'ldscript', 'cross_compile']:
+		if x in ['app', 'ldscript']:
 			vars[x] = context[x][0]
 		elif x in ['machine']:
 			vars[x] = os.path.join(root, context[x][0])
 		elif x in ['ldadd']:
 			if not x in vars:
 				vars[x] = []
-			vars[x] += context[x]
+			for l in context[x]:
+				vars[x].append(os.path.join(root, l))
 		elif x in ['objects']:
 			for obj in context[x]:
 				o = os.path.join(root, obj)
@@ -91,21 +91,6 @@ def proc1(root, context, data):
 
 	return resobj
 
-def emit_objects_flags(resobj):
-	for obj in resobj:
-		print("OBJECTS+=%s" % obj)
-
-	for obj in resobj:
-		if 'incs' in resobj[obj]:
-			for inc in resobj[obj]['incs']:
-				print("CFLAGS_%s/%s+=-I%s" % \
-					(objdir, obj, inc))
-
-		if 'cflags' in resobj[obj]:
-			for cflag in resobj[obj]['cflags']:
-				print("CFLAGS_%s/%s+=%s" % \
-					(objdir, obj, cflag))
-
 def open_modules(root, context):
 
 	ky = context.copy()
@@ -118,6 +103,7 @@ def open_modules(root, context):
 					p = context[el]['root'][0]
 				else:
 					p = os.path.join(root, el)
+				p = os.path.expanduser(p)
 				p1 = os.path.join(p, 'mdepx.conf')
 				if not os.path.exists(p1):
 					continue
@@ -136,11 +122,11 @@ def open_modules(root, context):
 
 if __name__ == '__main__':
 	args = sys.argv
-	if len(args) < 3:
+	if len(args) < 2:
+		print("Error: config file is not privded")
 		sys.exit(1)
 
 	config_file = args[1]
-	objdir = args[2]
 
 	# Open main configuration file provided by app
 	if not os.path.exists(config_file):
@@ -160,7 +146,4 @@ if __name__ == '__main__':
 
 	proc1('', config, {})
 
-	emit_objects_flags(resobj)
-	print_flags(flags)
-
-	#build(resobj, flags, vars)
+	build(resobj, flags, vars)
