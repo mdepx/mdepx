@@ -38,7 +38,11 @@ ASM_ENTRY(_start)
 	 * Don't use it in SMP environment.
 	 */
 
+#ifdef MDX_SCHED_SMP
 	li	t0, 1
+#else
+	li	t0, 0
+#endif
 	bne	a0, t0, mpentry
 
 	/* Clear BSS. */
@@ -52,10 +56,12 @@ ASM_ENTRY(_start)
 	j	1b
 2:
 
+#ifdef MDX_SCHED_SMP
 	/* Release CPUs */
 	la	t0, mp_release
 	li	t1, 1
 	sb	t1, 0(t0)
+#endif
 
 	/* Load our stack pointer. */
 	la	t0, cpu_stacks
@@ -71,6 +77,7 @@ ASM_ENTRY(_start)
 	/* NOT REACHED */
 
 ASM_ENTRY(mpentry)
+#ifdef MDX_SCHED_SMP
 	/* Spin until CPU1 clears BSS. */
 1:
 	la	t0, mp_release
@@ -94,4 +101,8 @@ ASM_ENTRY(mpentry)
 	fence
 
 	j	md_init_secondary
+#else
+1:
+	j	1b
+#endif
 END(mpentry)

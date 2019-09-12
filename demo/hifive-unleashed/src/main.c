@@ -61,7 +61,9 @@ static mdx_mutex_t m1 __unused;
 static struct callout c1[1000] __unused;
 static mdx_sem_t sem;
 
+#ifdef MDX_SCHED_SMP
 uint8_t mp_release __section(".data") = 0;
+#endif
 
 static void
 uart_putchar(int c, void *arg)
@@ -216,9 +218,11 @@ main(void)
 
 	sl_init(&l1);
 
+#ifdef MDX_SCHED_SMP
 	printf("Releasing CPUs...\n");
 	for (j = 2; j < 5; j++)
 		__riscv_boot_ap[j] = 1;
+#endif
 
 	/* Some testing routines. */
 #if 0

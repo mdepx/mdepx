@@ -20,7 +20,11 @@ CMD = python3 -B ${OSDIR}/tools/emitter.py
 
 all:	${LDSCRIPT}
 	${CMD} mdepx.conf
-	${OBJCOPY} -O binary ${OBJDIR}/${APP}.elf ${OBJDIR}/${APP}.bin
+	@${OBJCOPY} -O binary ${OBJDIR}/${APP}.elf ${OBJDIR}/${APP}.bin
+
+monitor: ${LDSCRIPT}
+	${CMD} mdepx-monitor.conf
+	@${OBJCOPY} -O binary ${OBJDIR}/${APP}-monitor.elf ${OBJDIR}/${APP}-monitor.bin
 
 ${LDSCRIPT}:
 	@cat ${LDSCRIPT_TPL} > ${LDSCRIPT}

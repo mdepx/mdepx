@@ -1,4 +1,6 @@
-An SMP demo for 4 x U54 cores of HiFive Unleashed.
+These are two demo apps for SiFive HiFive Unleashed board
+
+First app is an SMP-enabled demo utilizing 4 x U54 cores:
 
 1. Build mdepx
 
@@ -10,4 +12,18 @@ An SMP demo for 4 x U54 cores of HiFive Unleashed.
     $ setenv ipaddr 10.10.0.10
     $ setenv serverip 10.10.0.1
     $ tftp /tftpboot/hifive-unleashed.bin
+    $ go 0x80000000
+
+Second app is a demo for E51 (monitor) core of HiFive Unleashed:
+
+1. Build mdepx
+
+    $ export CROSS_COMPILE=riscv64-unknown-elf-
+    $ make clean monitor
+
+2. Run on HiFive Unleashed, from U-Boot:
+
+    $ setenv ipaddr 10.10.0.10
+    $ setenv serverip 10.10.0.1
+    $ tftp /tftpboot/hifive-unleashed-monitor.bin
     $ go 0x80000000
