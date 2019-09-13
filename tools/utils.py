@@ -1,5 +1,3 @@
-from subprocess import getstatusoutput
-from distutils import spawn
 import sys
 import os
 
@@ -21,14 +19,28 @@ def machine(vars, objdir):
 		os.unlink(dst)
 	os.symlink(m, dst)
 
+def find_elf(name):
+	for path in os.environ["PATH"].split(os.pathsep):
+		elf = os.path.join(path, name)
+		if os.path.exists(elf):
+			return elf
+	return None
+
+def run(cmd, args):
+	pid = os.fork()
+	if pid == 0:
+		os.execve(cmd, args, os.environ)
+		return
+
+	t = os.waitpid(pid, 0)
+	return t[1]
+
 def build(resobj, flags, vars):
 
 	link_objs = []
 
-	cc = os.environ.get('CC', '')
-	ld = os.environ.get('LD', '')
 	cross_compile = os.environ.get('CROSS_COMPILE', '')
-
+	cc = os.environ.get('CC', '')
 	if cc:
 		compiler = cc
 	else:
@@ -63,27 +75,38 @@ def build(resobj, flags, vars):
 			(compiler, fl, incs, o, objfile)
 		pcmd = "  CC      %s" % o
 		print(pcmd)
-		status, output = getstatusoutput(cmd)
-		if status != 0:
-			print(output)
-			sys.exit(7)
 
-	if ld:
-		linker = ld
-	else:
-		linker = '%sld' % cross_compile
-	if not spawn.find_executable(linker):
-		print("Linker not found: %s" % linker)
-		return
+		p = find_elf(compiler)
+		if not p:
+			return
+		if run(p, cmd.split()) != 0:
+			return
 
 	if 'ldadd' in vars:
 		for o in vars['ldadd']:
 			link_objs.append(o)
+
+	ldscript = vars.get('ldscript', '')
+	if not ldscript:
+		print("Error: ldscript is not provided")
+		return
+
+	ld = os.environ.get('LD', '')
+	if ld:
+		linker = ld
+	else:
+		linker = '%sld' % cross_compile
+
+	fp = find_elf(linker)
+	if not fp:
+		print("Linker not found: %s" % linker)
+		return
+
 	elf = os.path.join(objdir, "%s.elf" % vars.get('app', 'app'))
 	cmd = "%s -T %s %s -o %s" % \
 		(linker, vars['ldscript'], " ".join(link_objs), elf)
 	pcmd = "  LD      %s" % elf
 	print(pcmd)
-	status, output = getstatusoutput(cmd)
-	if status != 0:
-		print(output)
+
+	if run(fp, cmd.split()) != 0:
+		return
