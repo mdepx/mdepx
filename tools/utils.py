@@ -25,7 +25,15 @@ def build(resobj, flags, vars):
 
 	link_objs = []
 
+	cc = os.environ.get('CC', '')
+	ld = os.environ.get('LD', '')
 	cross_compile = os.environ.get('CROSS_COMPILE', '')
+
+	if cc:
+		compiler = cc
+	else:
+		compiler = '%sgcc' % cross_compile
+
 	cflags = os.environ.get('CFLAGS', '')
 
 	for obj in resobj:
@@ -47,7 +55,6 @@ def build(resobj, flags, vars):
 		if not os.path.exists(o):
 			o = obj.replace(".o", ".S")
 
-		compiler = '%sgcc' % cross_compile
 		ob = os.path.abspath(obj)
 		objfile = "%s/%s" % (objdir, ob)
 		link_objs.append(objfile)
@@ -61,7 +68,10 @@ def build(resobj, flags, vars):
 			print(output)
 			sys.exit(7)
 
-	linker = '%sld' % cross_compile
+	if ld:
+		linker = ld
+	else:
+		linker = '%sld' % cross_compile
 	if not spawn.find_executable(linker):
 		print("Linker not found: %s" % linker)
 		return
