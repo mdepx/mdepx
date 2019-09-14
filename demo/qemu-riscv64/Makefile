@@ -10,12 +10,15 @@ export CFLAGS = -march=rv64imac -mabi=lp64 -mcmodel=medany		\
 
 CMD = python3 -B ${OSDIR}/tools/emitter.py
 
+# Multi-threaded, multi-processor
 all:
 	${CMD} mdepx.conf
 
+# Single-threaded, uni-processor
 st:
 	${CMD} mdepx-st.conf
 
+# Multi-threaded, uni-processor
 up:
 	${CMD} mdepx-up.conf
 
