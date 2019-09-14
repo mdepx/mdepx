@@ -40,11 +40,16 @@ def build(resobj, flags, vars):
 	link_objs = []
 
 	cross_compile = os.environ.get('CROSS_COMPILE', '')
+
 	cc = os.environ.get('CC', '')
 	if cc:
 		compiler = cc
 	else:
 		compiler = '%sgcc' % cross_compile
+	compiler_fp = find_elf(compiler)
+	if not compiler_fp:
+		print("compiler not found in PATH: %s" % compiler)
+		return
 
 	cflags = os.environ.get('CFLAGS', '').split()
 	for key in flags:
@@ -74,15 +79,10 @@ def build(resobj, flags, vars):
 		os.makedirs(os.path.dirname(objfile), exist_ok=True)
 
 		cmd = [compiler] + fl + incs + [o, '-c', '-o', objfile]
-
 		pcmd = "  CC      %s" % o
 		print(pcmd)
 
-		p = find_elf(compiler)
-		if not p:
-			print("compiler not found in PATH: %s" % compiler)
-			return
-		if run(p, cmd) != 0:
+		if run(compiler_fp, cmd) != 0:
 			return
 
 	if 'ldadd' in vars:
@@ -91,7 +91,7 @@ def build(resobj, flags, vars):
 
 	ldscript = vars.get('ldscript', None)
 	if not ldscript:
-		print("Error: ldscript is not provided")
+		print("Error: ldscript is not provided. Can't link")
 		return
 
 	ld = os.environ.get('LD', '')
@@ -99,9 +99,8 @@ def build(resobj, flags, vars):
 		linker = ld
 	else:
 		linker = '%sld' % cross_compile
-
-	fp = find_elf(linker)
-	if not fp:
+	linker_fp = find_elf(linker)
+	if not linker_fp:
 		print("Linker not found: %s" % linker)
 		return
 
@@ -111,5 +110,5 @@ def build(resobj, flags, vars):
 	pcmd = "  LD      %s" % elf
 	print(pcmd)
 
-	if run(fp, cmd) != 0:
+	if run(linker_fp, cmd) != 0:
 		return
