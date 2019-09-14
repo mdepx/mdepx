@@ -46,22 +46,23 @@ def build(resobj, flags, vars):
 	else:
 		compiler = '%sgcc' % cross_compile
 
-	cflags = os.environ.get('CFLAGS', '')
+	cflags = os.environ.get('CFLAGS', '').split()
+	for key in flags:
+		t = '-D%s' % key.upper()
+		if flags[key]:
+			t += '=%s' % flags[key].upper()
+		cflags.append(t)
 
 	for obj in resobj:
-		fl = cflags + ' ' + ' '.join(resobj[obj].get('cflags', []))
-		for key in flags:
-			fl += ' -D%s' % (key.upper())
-			if flags[key]:
-				fl += '=%s' % flags[key].upper()
+		fl = cflags + resobj[obj].get('cflags', [])
 
 		objdir = resobj[obj].get('objdir', [DEFAULT_OBJDIR])[0]
 		machine(vars, objdir)
 
-		incs = '-I%s' % objdir
+		incs = ['-I%s' % objdir]
 		if 'incs' in resobj[obj]:
 			for inc in resobj[obj]['incs']:
-				incs += ' -I%s ' % inc
+				incs.append('-I%s' % inc)
 
 		o = obj.replace(".o", ".c")
 		if not os.path.exists(o):
@@ -71,22 +72,24 @@ def build(resobj, flags, vars):
 		objfile = "%s/%s" % (objdir, ob)
 		link_objs.append(objfile)
 		os.makedirs(os.path.dirname(objfile), exist_ok=True)
-		cmd = '%s %s %s %s -c -o %s' % \
-			(compiler, fl, incs, o, objfile)
+
+		cmd = [compiler] + fl + incs + [o, '-c', '-o', objfile]
+
 		pcmd = "  CC      %s" % o
 		print(pcmd)
 
 		p = find_elf(compiler)
 		if not p:
+			print("compiler not found in PATH: %s" % compiler)
 			return
-		if run(p, cmd.split()) != 0:
+		if run(p, cmd) != 0:
 			return
 
 	if 'ldadd' in vars:
 		for o in vars['ldadd']:
 			link_objs.append(o)
 
-	ldscript = vars.get('ldscript', '')
+	ldscript = vars.get('ldscript', None)
 	if not ldscript:
 		print("Error: ldscript is not provided")
 		return
@@ -103,10 +106,10 @@ def build(resobj, flags, vars):
 		return
 
 	elf = os.path.join(objdir, "%s.elf" % vars.get('app', 'app'))
-	cmd = "%s -T %s %s -o %s" % \
-		(linker, vars['ldscript'], " ".join(link_objs), elf)
+
+	cmd = [linker, "-T", ldscript] + link_objs + ["-o", elf]
 	pcmd = "  LD      %s" % elf
 	print(pcmd)
 
-	if run(fp, cmd.split()) != 0:
+	if run(fp, cmd) != 0:
 		return
