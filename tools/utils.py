@@ -38,6 +38,7 @@ def run(cmd, args):
 def build(resobj, flags, vars):
 
 	link_objs = []
+	ldadd = []
 
 	cross_compile = os.environ.get('CROSS_COMPILE', '')
 
@@ -69,9 +70,18 @@ def build(resobj, flags, vars):
 			for inc in resobj[obj]['incs']:
 				incs.append('-I%s' % inc)
 
-		o = obj.replace(".o", ".c")
-		if not os.path.exists(o):
-			o = obj.replace(".o", ".S")
+		if obj.endswith('.a'):
+			ldadd.append(obj)
+			continue
+
+		o = None
+		for x in ['c', 'S']:
+			p = "%s.%s" % (obj[:-2], x)
+			if os.path.exists(p):
+				o = p
+				break
+		if not o:
+			print("Source file not found for object: %s" % o)
 
 		ob = os.path.abspath(obj)
 		objfile = "%s/%s" % (objdir, ob)
@@ -85,9 +95,9 @@ def build(resobj, flags, vars):
 		if run(compiler_fp, cmd) != 0:
 			return
 
+	link_objs += ldadd
 	if 'ldadd' in vars:
-		for o in vars['ldadd']:
-			link_objs.append(o)
+		link_objs += vars['ldadd']
 
 	ldscript = vars.get('ldscript', None)
 	if not ldscript:
