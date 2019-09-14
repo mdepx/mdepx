@@ -81,7 +81,7 @@ def build(resobj, flags, vars):
 				o = p
 				break
 		if not o:
-			print("Source file not found for object: %s" % o)
+			print("Source file not found for object: %s" % obj)
 
 		ob = os.path.abspath(obj)
 		objfile = "%s/%s" % (objdir, ob)
