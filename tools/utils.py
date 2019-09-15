@@ -15,7 +15,7 @@ def machine(vars, objdir):
 		sys.exit(7)
 
 	dst = os.path.join(objdir, 'machine')
-	if os.path.exists(dst):
+	if os.path.lexists(dst):
 		os.unlink(dst)
 	os.symlink(m, dst)
 
