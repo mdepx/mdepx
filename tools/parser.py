@@ -67,7 +67,14 @@ def proc0(d, data):
 	while i < len(data):
 		c = data[i]
 
-		if ((c == ';' or i == len(data) - 1) and depth == 0):
+		if (c == '#' and depth == 0):
+			# Single line comment
+			while c != '\n':
+				c = data[i]
+				i += 1
+			continue
+
+		elif ((c == ';' or i == len(data) - 1) and depth == 0):
 			if val == '':
 				val = tmp
 				tmp = ''
