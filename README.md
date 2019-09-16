@@ -33,7 +33,7 @@ Mdepx is an operating system for embedded applications.
 
 # Getting started
 
-Mdepx has a Makefile-based build system. You have to construct a GNU makefile for your application. See [example applications](https://github.com/osfive/).
+Mdepx has a python3-based build system. You have to construct a configuration file for your application. See [demo applications](https://github.com/machdep/mdepx/tree/master/demo).
 
 # Contributing
 
