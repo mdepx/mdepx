@@ -1,4 +1,3 @@
-import sys
 import os
 
 DEFAULT_OBJDIR = 'obj'
@@ -6,18 +5,20 @@ DEFAULT_OBJDIR = 'obj'
 def machine(vars, objdir):
 	machine = vars.get('machine')
 	if not machine:
-		print('machine is not set')
-		sys.exit(6)
+		print("Error: machine directive is not set")
+		return False
 
 	m = os.path.abspath(machine)
 	if not os.path.exists(m):
-		print("machine headers not found at path: %s" % m)
-		sys.exit(7)
+		print("Error: machine headers not found at path: %s" % m)
+		return False
 
 	dst = os.path.join(objdir, 'machine')
 	if os.path.lexists(dst):
 		os.unlink(dst)
 	os.symlink(m, dst)
+
+	return True
 
 def find_elf(name):
 	for path in os.environ["PATH"].split(os.pathsep):
@@ -30,7 +31,6 @@ def run(cmd, args):
 	pid = os.fork()
 	if pid == 0:
 		os.execve(cmd, args, os.environ)
-		return
 
 	t = os.waitpid(pid, 0)
 	return t[1]
@@ -50,7 +50,7 @@ def build(resobj, flags, vars):
 	compiler_fp = find_elf(compiler)
 	if not compiler_fp:
 		print("compiler not found in PATH: %s" % compiler)
-		return
+		return False
 
 	cflags = os.environ.get('CFLAGS', '').split()
 	for key in flags:
@@ -63,7 +63,8 @@ def build(resobj, flags, vars):
 		fl = cflags + resobj[obj].get('cflags', [])
 
 		objdir = resobj[obj].get('objdir', [DEFAULT_OBJDIR])[0]
-		machine(vars, objdir)
+		if not machine(vars, objdir):
+			return False
 
 		incs = ['-I%s' % objdir]
 		if 'incs' in resobj[obj]:
@@ -93,7 +94,7 @@ def build(resobj, flags, vars):
 		print(pcmd)
 
 		if run(compiler_fp, cmd) != 0:
-			return
+			return False
 
 	link_objs += ldadd
 	if 'ldadd' in vars:
@@ -102,7 +103,7 @@ def build(resobj, flags, vars):
 	ldscript = vars.get('ldscript', None)
 	if not ldscript:
 		print("Error: ldscript is not provided. Can't link")
-		return
+		return False
 
 	ld = os.environ.get('LD', '')
 	if ld:
@@ -112,7 +113,7 @@ def build(resobj, flags, vars):
 	linker_fp = find_elf(linker)
 	if not linker_fp:
 		print("Linker not found: %s" % linker)
-		return
+		return False
 
 	elf = os.path.join(objdir, "%s.elf" % vars.get('app', 'app'))
 
@@ -121,4 +122,6 @@ def build(resobj, flags, vars):
 	print(pcmd)
 
 	if run(linker_fp, cmd) != 0:
-		return
+		return False
+
+	return True

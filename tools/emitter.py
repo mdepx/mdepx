@@ -123,14 +123,16 @@ def open_modules(root, context):
 if __name__ == '__main__':
 	args = sys.argv
 	if len(args) < 2:
-		print("Error: config file is not privded")
+		print("Error: config file is not provided")
 		sys.exit(1)
 
 	config_file = args[1]
 
 	# Open main configuration file provided by app
 	if not os.path.exists(config_file):
+		print("Error: config file not found: %s" % config_file)
 		sys.exit(2)
+
 	with open(config_file) as f:
 		data = f.read()
 
@@ -146,4 +148,6 @@ if __name__ == '__main__':
 
 	proc1('', config, {})
 
-	build(resobj, flags, vars)
+	# Compile and link the app
+	if not build(resobj, flags, vars):
+		sys.exit(3)
