@@ -204,6 +204,7 @@ main(void)
 	mdx_mutex_init(&m);
 
 	for (i = 1; i < 5000; i++) {
+		printf("Creating thread %d\n", i);
 		td = thread_create("test", 1, (USEC_TO_TICKS(1000) * i),
 		    4096, test_thr, (void *)i);
 		if (td == NULL)
