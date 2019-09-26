@@ -27,13 +27,18 @@
 #ifndef	_DEV_DISPLAY_DSI_H_
 #define	_DEV_DISPLAY_DSI_H_
 
-#define	DSI_DCS_SHORT_PKT_WRITE_P0	0x05 /* DCS short write, no parameters */
-#define	DSI_DCS_SHORT_PKT_WRITE_P1	0x15 /* DCS short write, one parameter */
-#define	DSI_GEN_SHORT_PKT_WRITE_P0	0x03 /* Generic short write, no parameters */
-#define	DSI_GEN_SHORT_PKT_WRITE_P1	0x13 /* Generic short write, one parameter */
-#define	DSI_GEN_SHORT_PKT_WRITE_P2	0x23 /* Generic short write, two parameters */
-#define	DSI_DCS_LONG_PKT_WRITE		0x39 /* DCS long write */
-#define	DSI_GEN_LONG_PKT_WRITE		0x29 /* Generic long write */
+#define	DSI_GEN_SHORT_WRITE_P0	0x03 /* Generic short write, no parameters */
+#define	DSI_GEN_SHORT_WRITE_P1	0x13 /* Generic short write, one parameter */
+#define	DSI_DCS_SHORT_WRITE_P0	0x05 /* DCS short write, no parameters */
+#define	DSI_DCS_SHORT_WRITE_P1	0x15 /* DCS short write, one parameter */
+#define	DSI_GEN_SHORT_WRITE_P2	0x23 /* Generic short write, two parameters */
+#define	DSI_GEN_LONG_WRITE	0x29 /* Generic long write */
+#define	DSI_DCS_LONG_WRITE	0x39 /* DCS long write */
+#define	DSI_GEN_READ_P0		0x04 /* Generic read, no parameters */
+#define	DSI_GEN_READ_P1		0x14 /* Generic read, one parameter */
+#define	DSI_GEN_READ_P2		0x24 /* Generic read, two parameters */
+#define	DSI_DCS_READ_P0		0x06 /* DCS read, no parameters */
+#define	DSI_MAX_RET_PKT_SIZE	0x37 /* Set maximum return packet size */
 
 struct dsi_device {
 	void (*dsi_short)(struct dsi_device *, uint8_t vchid, uint8_t data_type,
