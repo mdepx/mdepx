@@ -682,7 +682,9 @@ static uint8 readSOSMarker(void)
 {
    uint8 i;
    uint16 left = getBits1(16);
+#if 0
    uint8 spectral_start, spectral_end, successive_high, successive_low;
+#endif
 
    gCompsInScan = (uint8)getBits1(8);
 
@@ -711,10 +713,12 @@ static uint8 readSOSMarker(void)
       gCompACTab[ci] = (c & 15);
    }
 
+#if 0
    spectral_start  = (uint8)getBits1(8);
    spectral_end    = (uint8)getBits1(8);
    successive_high = (uint8)getBits1(4);
    successive_low  = (uint8)getBits1(4);
+#endif
 
    left -= 3;
 
@@ -1022,6 +1026,7 @@ static uint8 processRestart(void)
    
    return 0;
 }
+#if 0
 //------------------------------------------------------------------------------
 // FIXME: findEOI() is not actually called at the end of the image 
 // (it's optional, and probably not needed on embedded devices)
@@ -1048,6 +1053,7 @@ static uint8 findEOI(void)
    
    return 0;
 }
+#endif
 //------------------------------------------------------------------------------
 static uint8 checkHuffTables(void)
 {
@@ -1725,10 +1731,12 @@ static void convertCb(uint8 dstOfs)
       int16 cbG, cbB;
 
       cbG = ((cb * 88U) >> 8U) - 44U;
-      *pDstG++ = subAndClamp(pDstG[0], cbG);
+      *pDstG = subAndClamp(pDstG[0], cbG);
+      pDstG++;
 
       cbB = (cb + ((cb * 198U) >> 8U)) - 227U;
-      *pDstB++ = addAndClamp(pDstB[0], cbB);
+      *pDstB = addAndClamp(pDstB[0], cbB);
+      pDstB++;
    }
 }
 /*----------------------------------------------------------------------------*/
@@ -1746,10 +1754,12 @@ static void convertCr(uint8 dstOfs)
       int16 crR, crG;
 
       crR = (cr + ((cr * 103U) >> 8U)) - 179;
-      *pDstR++ = addAndClamp(pDstR[0], crR);
+      *pDstR = addAndClamp(pDstR[0], crR);
+      pDstR++;
 
       crG = ((cr * 183U) >> 8U) - 91;
-      *pDstG++ = subAndClamp(pDstG[0], crG);
+      *pDstG = subAndClamp(pDstG[0], crG);
+      pDstG++;
    }
 }
 /*----------------------------------------------------------------------------*/
