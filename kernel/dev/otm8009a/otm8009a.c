@@ -57,10 +57,10 @@ dsi_cmd(dsi_device_t *dev, const uint8_t *params, uint32_t nparams)
 {
 
 	if (nparams < 2)
-		dev->dsi_short(dev, dev->vchid, DSI_DCS_SHORT_PKT_WRITE_P1,
+		dev->dsi_short(dev, dev->vchid, DSI_DCS_SHORT_WRITE_P1,
 		    params[0], params[1]); 
 	else
-		dev->dsi_long(dev, dev->vchid, DSI_DCS_LONG_PKT_WRITE,
+		dev->dsi_long(dev, dev->vchid, DSI_DCS_LONG_WRITE,
 		    params, nparams); 
 }
 
