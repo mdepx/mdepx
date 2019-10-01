@@ -53,14 +53,20 @@ def build(resobj, flags, vars):
 		return False
 
 	cflags = os.environ.get('CFLAGS', '').split()
+	asflags = os.environ.get('ASFLAGS', '').split()
+	if not asflags:
+		asflags = cflags
+
+	defs = []
 	for key in flags:
 		t = '-D%s' % key.upper()
 		if flags[key]:
 			t += '=%s' % flags[key].upper()
-		cflags.append(t)
+		defs.append(t)
 
 	for obj in resobj:
-		fl = cflags + resobj[obj].get('cflags', [])
+		cflags += resobj[obj].get('cflags', [])
+		asflags += resobj[obj].get('asflags', [])
 
 		objdir = resobj[obj].get('objdir', [DEFAULT_OBJDIR])[0]
 		if not machine(vars, objdir):
@@ -76,10 +82,12 @@ def build(resobj, flags, vars):
 			continue
 
 		o = None
-		for x in ['c', 'S']:
+		d = {'c': cflags, 'S': asflags}
+		for x in d:
 			p = "%s.%s" % (obj[:-2], x)
 			if os.path.exists(p):
 				o = p
+				fl = d[x]
 				break
 		if not o:
 			print("Source file not found for object: %s" % obj)
@@ -89,9 +97,10 @@ def build(resobj, flags, vars):
 		link_objs.append(objfile)
 		os.makedirs(os.path.dirname(objfile), exist_ok=True)
 
-		cmd = [compiler] + fl + incs + [o, '-c', '-o', objfile]
+		cmd = [compiler] + defs + fl + incs + [o, '-c', '-o', objfile]
 		pcmd = "  CC      %s" % o
 		print(pcmd)
+		#print(" ".join(cmd))
 
 		if run(compiler_fp, cmd) != 0:
 			return False
@@ -120,6 +129,7 @@ def build(resobj, flags, vars):
 	cmd = [linker, "-T", ldscript] + link_objs + ["-o", elf]
 	pcmd = "  LD      %s" % elf
 	print(pcmd)
+	#print(" ".join(cmd))
 
 	if run(linker_fp, cmd) != 0:
 		return False
