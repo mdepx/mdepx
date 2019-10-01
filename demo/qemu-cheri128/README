@@ -1,0 +1,20 @@
+The CHERI pure-capability world demo.
+
+1. Build LLVM and QEMU from here:
+
+	https://github.com/CTSRD-CHERI/llvm-project
+
+	https://github.com/CTSRD-CHERI/qemu
+
+2. Build mdepx
+
+    $ cd mdepx/demo/qemu-cheri128
+    $ export CC=clang-cheri
+    $ export LD=ld.lld-cheri
+    $ make clean all
+
+3. Run
+
+    $ qemu-system-cheri128 -m 1024 -M malta -kernel obj/qemu-cheri128.elf -nographic
+
+4. To quit from QEMU press ctrl-a x
