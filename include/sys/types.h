@@ -93,4 +93,15 @@ typedef	_Bool		bool;
 #define	true		1
 #define	false		0
 
+/* Capabilities */
+#ifndef __has_feature
+#define	__has_feature(x)	0
+#endif
+
+#if __has_feature(capabilities)
+typedef	void * __capability capability;
+#else
+typedef	__size_t capability;
+#endif
+
 #endif /* !_SYS_TYPES_H_ */
