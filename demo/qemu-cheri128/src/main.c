@@ -77,6 +77,10 @@ main(void)
 	capability cap;
 
 	cap = cheri_getdefault();
+
+	/* Remove default capability */
+	__asm __volatile("csetdefault $cnull");
+
 	cap = cheri_setoffset(cap, MIPS_XKPHYS_UNCACHED_BASE + UART_BASE);
 	cap = cheri_setbounds(cap, 6);
 
