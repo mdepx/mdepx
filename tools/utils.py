@@ -72,10 +72,10 @@ def build(resobj, flags, vars):
 		if not machine(vars, objdir):
 			return False
 
-		incs = ['-I%s' % objdir]
-		if 'incs' in resobj[obj]:
-			for inc in resobj[obj]['incs']:
-				incs.append('-I%s' % inc)
+		searchp = ['-I%s' % objdir]
+		if 'search-path' in resobj[obj]:
+			for p in resobj[obj]['search-path']:
+				searchp.append('-I%s' % p)
 
 		if obj.endswith('.a'):
 			ldadd.append(obj)
@@ -97,7 +97,8 @@ def build(resobj, flags, vars):
 		link_objs.append(objfile)
 		os.makedirs(os.path.dirname(objfile), exist_ok=True)
 
-		cmd = [compiler] + defs + fl + incs + [o, '-c', '-o', objfile]
+		cmd = [compiler] + defs + fl + searchp
+		cmd += [o, '-c', '-o', objfile]
 		pcmd = "  CC      %s" % o
 		print(pcmd)
 		#print(" ".join(cmd))

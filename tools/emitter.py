@@ -22,15 +22,12 @@ def collect_nested_directives(root, context, data):
 			else:
 				data[x] = context[x]
 
-	for x in ['incs', 'incs+']:
+	for x in ['search-path']:
 		if x in context:
-			k = x
-			if x.endswith("+"):
-				k = x.rstrip("+")
-			if not k in data:
-				data[k] = []
+			if not x in data:
+				data[x] = []
 			for el in context[x]:
-				data[k].append(os.path.join(root, el))
+				data[x].append(os.path.join(root, el))
 
 	for x in ['objdir']:
 		if x in context:
