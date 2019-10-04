@@ -71,6 +71,20 @@ udelay(uint32_t usec)
 
 }
 
+static inline void __unused
+trace_enable(void)
+{
+
+	__asm __volatile("li $zero, 0xbeef");
+}
+
+static inline void __unused
+trace_disable(void)
+{
+
+	__asm __volatile("li $zero, 0xdead");
+}
+
 int
 main(void)
 {
