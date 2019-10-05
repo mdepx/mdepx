@@ -47,8 +47,13 @@ def process_directives(root, context, data):
 			collect_flags(flags, l, context, False)
 
 	for x in context:
-		if x in ['app', 'ldscript']:
-			vars[x] = context[x][0]
+		args = context[x]
+		if x in ['link']:
+			if (len(args) % 2) != 0:
+				print("Error: link directive accepts "
+					"even number of arguments")
+				sys.exit(5)
+			vars[x] = args
 		elif x in ['machine']:
 			vars[x] = os.path.join(root, context[x][0])
 		elif x in ['ldadd']:

@@ -40,13 +40,13 @@ def build(resobj, flags, vars):
 	link_objs = []
 	ldadd = []
 
-	cross_compile = os.environ.get('CROSS_COMPILE', '')
-
 	cc = os.environ.get('CC', '')
 	if cc:
 		compiler = cc
 	else:
+		cross_compile = os.environ.get('CROSS_COMPILE', '')
 		compiler = '%sgcc' % cross_compile
+
 	compiler_fp = find_elf(compiler)
 	if not compiler_fp:
 		print("compiler not found in PATH: %s" % compiler)
@@ -105,34 +105,42 @@ def build(resobj, flags, vars):
 
 		if run(compiler_fp, cmd) != 0:
 			return False
-
 	link_objs += ldadd
 	if 'ldadd' in vars:
 		link_objs += vars['ldadd']
 
-	ldscript = vars.get('ldscript', None)
-	if not ldscript:
-		print("Error: ldscript is not provided. Can't link")
+	link(vars, link_objs)
+
+	return True
+
+def link(vars, link_objs):
+
+	args = vars.get('link', None)
+	if not args:
 		return False
+
+	if (len(args) % 2) != 0:
+		print("Error: link command must have even number of arguments")
 
 	ld = os.environ.get('LD', '')
 	if ld:
 		linker = ld
 	else:
+		cross_compile = os.environ.get('CROSS_COMPILE', '')
 		linker = '%sld' % cross_compile
+
 	linker_fp = find_elf(linker)
 	if not linker_fp:
 		print("Linker not found: %s" % linker)
 		return False
 
-	elf = os.path.join(objdir, "%s.elf" % vars.get('app', 'app'))
+	for ldscript, elf in zip(args[0::2], args[1::2]):
+		cmd = [linker, "-T", ldscript] + link_objs + ["-o", elf]
+		pcmd = "  LD      %s" % elf
+		print(pcmd)
+		#print(" ".join(cmd))
 
-	cmd = [linker, "-T", ldscript] + link_objs + ["-o", elf]
-	pcmd = "  LD      %s" % elf
-	print(pcmd)
-	#print(" ".join(cmd))
-
-	if run(linker_fp, cmd) != 0:
-		return False
+		if run(linker_fp, cmd) != 0:
+			return False
 
 	return True
