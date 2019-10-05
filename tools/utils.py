@@ -135,6 +135,7 @@ def link(vars, link_objs):
 		return False
 
 	for ldscript, elf in zip(args[0::2], args[1::2]):
+		os.makedirs(os.path.dirname(elf), exist_ok=True)
 		cmd = [linker, "-T", ldscript] + link_objs + ["-o", elf]
 		pcmd = "  LD      %s" % elf
 		print(pcmd)
