@@ -223,7 +223,7 @@ main(void)
 
 #ifdef MDX_SCHED_SMP
 	printf("Releasing CPUs...\n");
-	for (j = 0; j < 8; j++)
+	for (j = 0; j < MDX_CPU_MAX; j++)
 		__riscv_boot_ap[j] = 1;
 #endif
 
