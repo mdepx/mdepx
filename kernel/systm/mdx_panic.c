@@ -49,7 +49,9 @@ panic(const char *fmt, ...)
 {
 	va_list ap;
 
+#ifdef MDX_THREAD
 	critical_enter();
+#endif
 
 	va_start(ap, fmt);
 	vpanic(fmt, ap);
