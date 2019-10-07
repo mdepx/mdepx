@@ -112,7 +112,9 @@ def link(vars, link_objs):
 		return False
 
 	if (len(args) % 2) != 0:
-		print("Error: link command must have even number of arguments")
+		print("Error: link directive must have even number of "
+			"arguments: pairs of ldscript and output filename.")
+		return False
 
 	if 'ldadd' in vars:
 		link_objs += vars['ldadd']
