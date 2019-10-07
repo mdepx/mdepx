@@ -35,10 +35,7 @@ def run(cmd, args):
 	t = os.waitpid(pid, 0)
 	return t[1]
 
-def build(resobj, flags, vars):
-
-	link_objs = []
-	ldadd = []
+def compile(resobj, flags, vars, link_objs):
 
 	cc = os.environ.get('CC', '')
 	if cc:
@@ -78,8 +75,8 @@ def build(resobj, flags, vars):
 				searchp.append('-I%s' % p)
 
 		if obj.endswith('.a'):
-			ldadd.append(obj)
-			continue
+			link_objs.append(obj)
+			continuE
 
 		o = None
 		d = {'c': cflags, 'S': asflags}
@@ -105,11 +102,6 @@ def build(resobj, flags, vars):
 
 		if run(compiler_fp, cmd) != 0:
 			return False
-	link_objs += ldadd
-	if 'ldadd' in vars:
-		link_objs += vars['ldadd']
-
-	link(vars, link_objs)
 
 	return True
 
@@ -121,6 +113,9 @@ def link(vars, link_objs):
 
 	if (len(args) % 2) != 0:
 		print("Error: link command must have even number of arguments")
+
+	if 'ldadd' in vars:
+		link_objs += vars['ldadd']
 
 	ld = os.environ.get('LD', '')
 	if ld:
@@ -143,5 +138,16 @@ def link(vars, link_objs):
 
 		if run(linker_fp, cmd) != 0:
 			return False
+
+	return True
+
+def build(resobj, flags, vars):
+	link_objs = []
+
+	if not compile(resobj, flags, vars, link_objs):
+		return False
+
+	if not link(vars, link_objs):
+		return False
 
 	return True
