@@ -32,10 +32,10 @@ export CFLAGS = -march=mips64 -mabi=64 -g -nostdinc -G0		\
 CMD = python3 -B ${OSDIR}/tools/emitter.py
 
 all:	${LDSCRIPT}
-	${CMD} mdepx.conf
+	@${CMD} mdepx.conf
 
 st:	${LDSCRIPT}
-	${CMD} mdepx-st.conf
+	@${CMD} mdepx-st.conf
 
 ${LDSCRIPT}:
 	@sed s#__BASE_ADDR__#${BASE_ADDR}#g ${LDSCRIPT_TPL} > ${LDSCRIPT}

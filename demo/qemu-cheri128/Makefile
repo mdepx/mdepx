@@ -36,7 +36,7 @@ export ASFLAGS = ${COMMON_FLAGS} -fno-pic
 CMD = python3 -B ${OSDIR}/tools/emitter.py
 
 all:	${LDSCRIPT}
-	${CMD} mdepx.conf
+	@${CMD} mdepx.conf
 
 ${LDSCRIPT}:
 	@sed s#__BASE_ADDR__#${BASE_ADDR}#g ${LDSCRIPT_TPL} > ${LDSCRIPT}
