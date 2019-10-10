@@ -36,7 +36,7 @@ def run(cmd, args):
 	t = os.waitpid(pid, 0)
 	return t[1]
 
-def compile(resobj, flags, vars, link_objs):
+def compile(resobj, flags, vars, link_objs, debug):
 
 	cc = os.environ.get('CC', '')
 	if cc:
@@ -99,14 +99,15 @@ def compile(resobj, flags, vars, link_objs):
 		cmd += [o, '-c', '-o', objfile]
 		pcmd = "  CC      %s" % o
 		print(pcmd)
-		#print(" ".join(cmd))
+		if debug:
+			print(" ".join(cmd))
 
 		if run(compiler_fp, cmd) != 0:
 			return False
 
 	return True
 
-def link(vars, link_objs):
+def link(vars, link_objs, debug):
 
 	args = vars.get('link', None)
 	if not args:
@@ -137,20 +138,21 @@ def link(vars, link_objs):
 		cmd = [linker, "-T", ldscript] + link_objs + ["-o", elf]
 		pcmd = "  LD      %s" % elf
 		print(pcmd)
-		#print(" ".join(cmd))
+		if debug:
+			print(" ".join(cmd))
 
 		if run(linker_fp, cmd) != 0:
 			return False
 
 	return True
 
-def build(resobj, flags, vars):
+def build(resobj, flags, vars, debug=False):
 	link_objs = []
 
-	if not compile(resobj, flags, vars, link_objs):
+	if not compile(resobj, flags, vars, link_objs, debug):
 		return False
 
-	if not link(vars, link_objs):
+	if not link(vars, link_objs, debug):
 		return False
 
 	return True

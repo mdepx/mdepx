@@ -1,6 +1,7 @@
 from flags import collect_flags
 from utils import build
 from parser import proc0
+import argparse
 import copy
 import sys
 import os
@@ -123,12 +124,13 @@ def open_modules(root, context):
 			open_modules(p, v)
 
 if __name__ == '__main__':
-	args = sys.argv
-	if len(args) < 2:
-		print("Error: config file is not provided")
-		sys.exit(1)
 
-	config_file = args[1]
+	parser = argparse.ArgumentParser()
+	parser.add_argument("-d", help="enable debugging", action="store_true")
+	parser.add_argument("conf", help="A working config file")
+	args = parser.parse_args()
+
+	config_file = args.conf
 
 	# Open main configuration file provided by app
 	if not os.path.exists(config_file):
@@ -151,5 +153,5 @@ if __name__ == '__main__':
 	proc1('', config, {})
 
 	# Compile and link the app
-	if not build(resobj, flags, vars):
+	if not build(resobj, flags, vars, debug=args.d):
 		sys.exit(3)
