@@ -21,6 +21,7 @@ def machine(vars, objdir):
 	return True
 
 def find_elf(name):
+	name = os.path.expanduser(name)
 	for path in os.environ["PATH"].split(os.pathsep):
 		elf = os.path.join(path, name)
 		if os.path.exists(elf):
