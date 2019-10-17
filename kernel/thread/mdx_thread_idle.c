@@ -29,15 +29,20 @@
 
 #include <machine/pcpu.h>
 
-static struct thread idle_threads[MDX_CPU_MAX];
-uint8_t cpu_stacks[MDX_CPU_MAX][MDX_CPU_STACK_SIZE];
+static struct thread idle_thread[MDX_CPU_MAX];
+uint8_t idle_thread_stack[MDX_CPU_MAX][MDX_THREAD_STACK_SIZE];
+
+#if !defined(MDX_THREAD_DYNAMIC_ALLOC)
+struct thread main_thread;
+uint8_t main_thread_stack[MDX_THREAD_STACK_SIZE];
+#endif
 
 void
 thread_idle_init(int cpuid)
 {
 	struct thread *t;
 
-	t = &idle_threads[cpuid];
+	t = &idle_thread[cpuid];
 	bzero(t, sizeof(struct thread));
 	t->td_name = "idle";
 	t->td_quantum = 0;

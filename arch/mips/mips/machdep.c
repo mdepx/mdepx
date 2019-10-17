@@ -131,7 +131,7 @@ md_init(int cpuid)
 
 #ifdef MDX_SCHED
 	struct thread *td;
-	td = thread_create("main", 1, 50000000, MDX_CPU_STACK_SIZE,
+	td = thread_create("main", 1, 50000000, MDX_THREAD_STACK_SIZE,
 	    main, NULL);
 	if (td == NULL)
 		panic("can't create the main thread\n");

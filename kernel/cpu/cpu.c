@@ -30,10 +30,5 @@
 
 #include <machine/pcpu.h>
 
-#if defined(MDX_THREAD) && !defined(MDX_THREAD_DYNAMIC_ALLOC)
-struct thread main_thread;
-uint8_t main_thread_stack[MDX_CPU_STACK_SIZE];
-#endif
-
 /* Per cpu struct */
 struct pcpu __pcpu[MDX_CPU_MAX];

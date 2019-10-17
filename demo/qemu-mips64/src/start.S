@@ -79,8 +79,8 @@ ASM_ENTRY(_start)
 2:
 
 	/* Load stack pointer */
-	dla	t0, cpu_stacks
-	add	t0, t0, MDX_CPU_STACK_SIZE
+	dla	t0, idle_thread_stack
+	add	t0, t0, MDX_THREAD_STACK_SIZE
 	move	sp, t0
 	nop
 	li	a0, 0

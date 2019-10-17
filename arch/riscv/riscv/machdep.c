@@ -37,11 +37,11 @@
 
 #ifndef MDX_THREAD_DYNAMIC_ALLOC
 extern struct thread main_thread[MDX_CPU_MAX];
-extern uint8_t main_thread_stack[MDX_CPU_STACK_SIZE];
+extern uint8_t main_thread_stack[MDX_THREAD_STACK_SIZE];
 #endif
 
 /* Interrupt stack */
-static size_t intr_stacks[MDX_CPU_MAX][MDX_CPU_STACK_SIZE];
+static size_t intr_stacks[MDX_CPU_MAX][MDX_THREAD_STACK_SIZE];
 static uint32_t ncpus;
 uint8_t __riscv_boot_ap[MDX_CPU_MAX];
 
@@ -120,7 +120,7 @@ md_init_secondary(int hart)
 
 	pcpup = &__pcpu[cpu];
 	pcpup->pc_cpuid = hart;
-	pcpup->pc_stack = (uintptr_t)&intr_stacks[hart] + MDX_CPU_STACK_SIZE;
+	pcpup->pc_stack = (uintptr_t)&intr_stacks[hart] + MDX_THREAD_STACK_SIZE;
 	__asm __volatile("mv gp, %0" :: "r"(pcpup));
 	csr_write(mscratch, pcpup->pc_stack);
 
@@ -148,7 +148,7 @@ md_init(int hart)
 
 	pcpup = &__pcpu[ncpus++];
 	pcpup->pc_cpuid = hart;
-	pcpup->pc_stack = (uintptr_t)&intr_stacks[hart] + MDX_CPU_STACK_SIZE;
+	pcpup->pc_stack = (uintptr_t)&intr_stacks[hart] + MDX_THREAD_STACK_SIZE;
 	__asm __volatile("mv gp, %0" :: "r"(pcpup));
 	csr_write(mscratch, pcpup->pc_stack);
 
@@ -169,15 +169,15 @@ md_init(int hart)
 #ifdef MDX_SCHED
 	struct thread *td;
 
-#ifndef MDX_THREAD_DYNAMIC_ALLOC
-	td = &main_thread[0];
-	td->td_stack = (uint8_t *)main_thread_stack + MDX_CPU_STACK_SIZE;
-	td->td_stack_size = MDX_CPU_STACK_SIZE;
-	thread_setup(td, "main", 1, 10000, main, NULL);
-#else
-	td = thread_create("main", 1, 10000, MDX_CPU_STACK_SIZE, main, NULL);
+#ifdef MDX_THREAD_DYNAMIC_ALLOC
+	td = thread_create("main", 1, 10000, MDX_THREAD_STACK_SIZE, main, NULL);
 	if (td == NULL)
 		panic("can't create the main thread\n");
+#else
+	td = &main_thread[0];
+	td->td_stack = (uint8_t *)main_thread_stack + MDX_THREAD_STACK_SIZE;
+	td->td_stack_size = MDX_THREAD_STACK_SIZE;
+	thread_setup(td, "main", 1, 10000, main, NULL);
 #endif
 
 	mdx_sched_add(td);
