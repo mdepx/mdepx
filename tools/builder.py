@@ -111,7 +111,8 @@ def link(vars, link_objs, debug):
 
 	args = vars.get('link', None)
 	if not args:
-		return False
+		# Nothing to link
+		return True
 
 	if (len(args) % 2) != 0:
 		print("Error: link directive must have even number of "
