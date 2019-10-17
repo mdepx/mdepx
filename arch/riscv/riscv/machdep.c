@@ -41,7 +41,7 @@ extern uint8_t main_thread_stack[MDX_THREAD_STACK_SIZE];
 #endif
 
 /* Interrupt stack */
-static size_t intr_stacks[MDX_CPU_MAX][MDX_THREAD_STACK_SIZE];
+static size_t intr_stack[MDX_CPU_MAX][MDX_RISCV_INTR_STACK_SIZE];
 static uint32_t ncpus;
 uint8_t __riscv_boot_ap[MDX_CPU_MAX];
 
@@ -120,7 +120,8 @@ md_init_secondary(int hart)
 
 	pcpup = &__pcpu[cpu];
 	pcpup->pc_cpuid = hart;
-	pcpup->pc_stack = (uintptr_t)&intr_stacks[hart] + MDX_THREAD_STACK_SIZE;
+	pcpup->pc_stack = (uintptr_t)&intr_stack[hart] +
+	    MDX_RISCV_INTR_STACK_SIZE;
 	__asm __volatile("mv gp, %0" :: "r"(pcpup));
 	csr_write(mscratch, pcpup->pc_stack);
 
@@ -148,7 +149,8 @@ md_init(int hart)
 
 	pcpup = &__pcpu[ncpus++];
 	pcpup->pc_cpuid = hart;
-	pcpup->pc_stack = (uintptr_t)&intr_stacks[hart] + MDX_THREAD_STACK_SIZE;
+	pcpup->pc_stack = (uintptr_t)&intr_stack[hart] +
+	    MDX_RISCV_INTR_STACK_SIZE;
 	__asm __volatile("mv gp, %0" :: "r"(pcpup));
 	csr_write(mscratch, pcpup->pc_stack);
 
