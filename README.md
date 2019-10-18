@@ -25,8 +25,8 @@ Mdepx is an operating system for embedded applications.
 
 ## Featured applications (external)
   * CTSRD CHERI [device-model](https://github.com/CTSRD-CHERI/device-model)
-  * [Driving OLED display on HiFive1 board](https://github.com/osfive/hifive1-oled)
   * [Setting up LTE 4G Link with nRF9160](https://github.com/machdep/nrf9160)
+  * [Driving OLED display on HiFive1 board](https://github.com/machdep/hifive1-oled)
   * GFE (Government Furnished Equipment) [Bluespec Piccolo demo](https://github.com/CTSRD-CHERI/piccolo-demo)
   * [Driving MIPI DSI Display with STM32F469I-DISCO](https://github.com/osfive/stm32f469i-disco-dsi)
   * [Driving IPS Display with PIC32MZDA Starter Kit](https://github.com/osfive/pic32mzdask-ips)
