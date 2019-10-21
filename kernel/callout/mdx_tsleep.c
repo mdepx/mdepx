@@ -66,7 +66,14 @@ mdx_tsleep(uint32_t ticks)
 	callout_init(&c);
 	callout_set(&c, ticks, mdx_tsleep_cb, td);
 
-#ifndef MDX_MIPS_QEMU
+#ifdef MDX_MIPS_QEMU
+	/*
+	 * Interrupts has to be enabled before entering wait
+	 * in qemu/mips, otherwise it never wakesup.
+	 */
+	while (c.state != CALLOUT_STATE_FIRED)
+		cpu_idle();
+#else
 	while (1) {
 		critical_enter();
 		if (c.state == CALLOUT_STATE_FIRED) {
@@ -76,8 +83,5 @@ mdx_tsleep(uint32_t ticks)
 		cpu_idle();
 		critical_exit();
 	}
-#else
-	while (c.state != CALLOUT_STATE_FIRED)
-		cpu_idle();
 #endif
 }
