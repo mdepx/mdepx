@@ -13,15 +13,14 @@ def collect_nested_directives(root, context, data):
 		if x in ['root']:
 			root = context[x][0]
 
-	for x in ['cflags', 'cflags+']:
+	if 'append-cflags' in context:
+		if not 'cflags' in data:
+			data['cflags'] = []
+		data['cflags'] += context['append-cflags']
+
+	for x in ['cflags']:
 		if x in context:
-			if x.endswith("+"):
-				k = x.rstrip("+")
-				if not k in data:
-					data[k] = []
-				data[k] += context[x]
-			else:
-				data[x] = context[x]
+			data[x] = context[x]
 
 	for x in ['search-path']:
 		if x in context:

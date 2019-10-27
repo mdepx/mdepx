@@ -10,13 +10,11 @@ def merge(a, b, path = None):
 			if type(a[key]) == dict and type(b[key]) == dict:
 				merge(a[key], b[key], path + [str(key)])
 			elif a[key] == b[key]:
-				pass # same leaf value
+				# same leaf value
+				pass
 			else:
-				if key.endswith("+"):
-					a[key] += b[key]
-				else:
-					# conflict, keep original value
-					pass
+				# conflict, keep original value
+				pass
 		else:
 			a[key] = b[key]
 	return a
