@@ -1,9 +1,10 @@
 import sys
 import os
 
+# merge dict b into dict a
 def merge(a, b, path = None):
-	"merges b into a"
-	if path is None: path = []
+	if path is None:
+		path = []
 	for key in b:
 		if key in a:
 			if type(a[key]) == dict and type(b[key]) == dict:
