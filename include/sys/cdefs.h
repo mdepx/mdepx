@@ -58,4 +58,12 @@
 #define	CONTAINER_OF(ptr, type, field)	\
 	((type *)((char *)ptr - offsetof(type, field)))
 
+#if defined(__GNUC__)
+#define	__always_inline		__attribute__((__always_inline__))
+#define	__result_use_check	__attribute__((__warn_unused_result__))
+#else
+#define	__always_inline
+#define	__result_use_check
+#endif
+
 #endif	/* !_SYS_CDEFS_H_ */
