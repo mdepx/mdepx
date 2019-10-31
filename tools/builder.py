@@ -63,8 +63,8 @@ def compile(resobj, flags, vars, link_objs, debug):
 		defs.append(t)
 
 	for obj in resobj:
-		cflags += resobj[obj].get('cflags', [])
-		asflags += resobj[obj].get('asflags', [])
+		obj_cflags = cflags + resobj[obj].get('cflags', [])
+		obj_asflags = asflags + resobj[obj].get('asflags', [])
 
 		objdir = resobj[obj].get('objdir', [DEFAULT_OBJDIR])[0]
 		if not machine(vars, objdir):
@@ -80,7 +80,7 @@ def compile(resobj, flags, vars, link_objs, debug):
 			continuE
 
 		o = None
-		d = {'c': cflags, 'S': asflags}
+		d = {'c': obj_cflags, 'S': obj_asflags}
 		for x in d:
 			p = "%s.%s" % (obj[:-2], x)
 			if os.path.exists(p):
