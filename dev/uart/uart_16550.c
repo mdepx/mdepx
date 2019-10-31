@@ -30,7 +30,7 @@
 
 #if __has_feature(capabilities)
 static inline uint8_t
-mips_cap_ioread_uint8(void * cap, size_t offset)
+mips_cap_ioread_uint8(capability cap, size_t offset)
 {
 	uint8_t v;
 	__asm__ __volatile__ ("clb %[v], %[offset],  0(%[cap])"
@@ -40,7 +40,7 @@ mips_cap_ioread_uint8(void * cap, size_t offset)
 }
 
 static inline void
-mips_cap_iowrite_uint8(void * cap, size_t offset, uint8_t v)
+mips_cap_iowrite_uint8(capability cap, size_t offset, uint8_t v)
 {
 	__asm__ __volatile__ ("csb %[v], %[offset],  0(%[cap])"
 		:: [cap] "C" (cap), [offset] "r" (offset), [v] "r" (v));
