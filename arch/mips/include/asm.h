@@ -52,21 +52,27 @@
 #if REG_SIZE == 4
 #define	REG_S		sw
 #define	REG_L		lw
+#define	REG_LI		li
 #define	PTR_L		lw
 #define	PTR_LA		la
 #define	PTR_SRL		srl
 #define	PTR_SLL		sll
 #define	PTR_ADDU	addu
+#define	PTR_ADDIU	addiu
+#define	PTR_SUBU	subu
 #define	MTC0		mtc0
 #define	MFC0		mfc0
 #elif REG_SIZE == 8
 #define	REG_S		sd
 #define	REG_L		ld
+#define	REG_LI		dli
 #define	PTR_L		ld
 #define	PTR_LA		dla
 #define	PTR_SRL		dsrl
 #define	PTR_SLL		dsll
 #define	PTR_ADDU	daddu
+#define	PTR_ADDIU	daddiu
+#define	PTR_SUBU	dsubu
 #define	MTC0		dmtc0
 #define	MFC0		dmfc0
 #endif
