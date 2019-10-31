@@ -76,5 +76,6 @@
  * MIPS32® / microMIPS32™ Privileged Resource Architecture.
  */
 #define	HAZARD_CLEAR	nop;nop;nop;nop;ehb
+#define	_C_LABEL(x)     x
 
 #endif	/* !_MACHINE_ASM_H_ */
