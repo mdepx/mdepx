@@ -50,10 +50,8 @@ def compile(resobj, flags, vars, link_objs, debug):
 		print("compiler not found in PATH: %s" % compiler)
 		return False
 
-	cflags = os.environ.get('CFLAGS', '').split()
-	asflags = os.environ.get('ASFLAGS', '').split()
-	if not asflags:
-		asflags = cflags
+	env_cflags = os.environ.get('CFLAGS', '').split()
+	env_asflags = os.environ.get('ASFLAGS', '').split()
 
 	defs = []
 	for key in flags:
@@ -63,8 +61,13 @@ def compile(resobj, flags, vars, link_objs, debug):
 		defs.append(t)
 
 	for obj in resobj:
-		obj_cflags = cflags + resobj[obj].get('cflags', [])
-		obj_asflags = asflags + resobj[obj].get('asflags', [])
+		obj_cflags = list(env_cflags)
+		obj_cflags += resobj[obj].get('build-flags', [])
+		obj_cflags += resobj[obj].get('cflags', [])
+
+		obj_asflags = list(env_asflags)
+		obj_asflags += resobj[obj].get('build-flags', [])
+		obj_asflags += resobj[obj].get('asflags', [])
 
 		objdir = resobj[obj].get('objdir', [DEFAULT_OBJDIR])[0]
 		if not machine(vars, objdir):

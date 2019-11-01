@@ -8,6 +8,8 @@ export CFLAGS = -march=rv64imac -mabi=lp64 -mcmodel=medany		\
 	-Wmissing-prototypes -Wpointer-arith -Winline -Wcast-qual	\
 	-Wundef -Wmissing-include-dirs -Werror
 
+export ASFLAGS = ${CFLAGS}
+
 CMD = python3 -B ${OSDIR}/tools/emitter.py
 
 # Multi-threaded, multi-processor

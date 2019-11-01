@@ -13,10 +13,25 @@ def collect_nested_directives(root, context, data):
 		if x in ['root']:
 			root = context[x][0]
 
+	if 'set-build-flags' in context:
+		if not 'build-flags' in data:
+			data['build-flags'] = []
+		data['build-flags'] += context['set-build-flags']
+
 	if 'append-cflags' in context:
 		if not 'cflags' in data:
 			data['cflags'] = []
 		data['cflags'] += context['append-cflags']
+
+	if 'append-asflags' in context:
+		if not 'asflags' in data:
+			data['asflags'] = []
+		data['asflags'] += context['append-asflags']
+
+	if 'set-cflags' in context:
+		data['cflags'] = context['set-cflags']
+	if 'set-asflags' in context:
+		data['asflags'] = context['set-asflags']
 
 	for x in ['cflags']:
 		if x in context:
