@@ -106,8 +106,13 @@ main(void)
 
 	console_register(uart_putchar, (void *)&uart_sc);
 
-	while (1)
-		printf("Hello World\n");
+	while (1) {
+#ifdef __CHERI_PURE_CAPABILITY__
+		printf("Hello Pure Capability World\n");
+#else
+		printf("Hello Hybrid Capability World\n");
+#endif
+	}
 
 	return (0);
 }

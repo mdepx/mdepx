@@ -1,4 +1,4 @@
-The CHERI pure-capability world demo.
+The CHERI hybrid and pure capability system demos.
 
 1. Build LLVM and QEMU from here:
 
@@ -6,12 +6,19 @@ The CHERI pure-capability world demo.
 
 	https://github.com/CTSRD-CHERI/qemu
 
-2. Build mdepx
+2. Setup environment variables
 
     $ cd mdepx/demo/qemu-cheri128
     $ export CC=clang-cheri
     $ export LD=ld.lld-cheri
+
+2a. Hybrid capability system demo
+
     $ make clean all
+
+2b. Pure capability system demo
+
+    $ make clean pure all
 
 3. Run
 
