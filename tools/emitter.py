@@ -67,14 +67,14 @@ def process_directives(root, context, data):
 				sys.exit(5)
 			vars[x] = args
 		elif x in ['machine']:
-			vars[x] = os.path.join(root, context[x][0])
+			vars[x] = os.path.join(root, args[0])
 		elif x in ['ldadd']:
 			if not x in vars:
 				vars[x] = []
-			for l in context[x]:
+			for l in args:
 				vars[x].append(os.path.join(root, l))
 		elif x in ['objects']:
-			for obj in context[x]:
+			for obj in args:
 				o = os.path.join(root, obj)
 				if not o in resobj:
 					resobj[o] = {}
@@ -83,12 +83,12 @@ def process_directives(root, context, data):
 					for el in data[key]:
 						resobj[o][key].append(el)
 		elif x in ['options']:
-			for opt in context[x]:
+			for opt in args:
 				if opt in context:
 					node = context[opt]
 					proc1(root, node, data)
 		elif x in ['module']:
-			for m in context[x]:
+			for m in args:
 				if m in context:
 					node = context[m]
 					if 'root' in node:
