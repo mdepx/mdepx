@@ -9,44 +9,37 @@ import os
 def collect_nested_directives(root, context, data):
 
 	# Replace root if provided in the context
+	if 'root' in context:
+		root = context['root'][0]
+
 	for x in context:
-		if x in ['root']:
-			root = context[x][0]
 
-	if 'set-build-flags' in context:
-		if not 'build-flags' in data:
-			data['build-flags'] = []
-		data['build-flags'] += context['set-build-flags']
+		spl = x.split("-")
+		if len(spl) < 2:
+			continue
 
-	if 'append-cflags' in context:
-		if not 'cflags' in data:
-			data['cflags'] = []
-		data['cflags'] += context['append-cflags']
+		cmd = spl[0]
+		if not cmd in ['set', 'append', 'prepend']:
+			continue
 
-	if 'append-asflags' in context:
-		if not 'asflags' in data:
-			data['asflags'] = []
-		data['asflags'] += context['append-asflags']
+		k = "-".join(spl[1:])
+		if not k in ['cflags', 'asflags',
+				'build-flags', 'search-path']:
+			continue
 
-	if 'set-cflags' in context:
-		data['cflags'] = context['set-cflags']
-	if 'set-asflags' in context:
-		data['asflags'] = context['set-asflags']
+		if not k in data or cmd == 'set':
+			data[k] = []
 
-	for x in ['append-search-path']:
-		if x in context:
-			if not 'search-path' in data:
-				data['search-path'] = []
-			for el in context[x]:
-				data['search-path'].append(os.path.join(root,
-									el))
+		for el in context[x]:
+			if k in ['search-path']:
+				v = os.path.join(root, el)
+			else:
+				v = el
 
-	for x in ['set-search-path']:
-		if x in context:
-			data['search-path'] = []
-			for el in context[x]:
-				data['search-path'].append(os.path.join(root,
-									el))
+			if cmd == 'prepend':
+				data[k].insert(0, v)
+			else:
+				data[k].append(v)
 
 	for x in ['objdir']:
 		if x in context:
