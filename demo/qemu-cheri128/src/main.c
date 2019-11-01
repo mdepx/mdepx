@@ -46,6 +46,8 @@
 
 static struct uart_16550_softc uart_sc;
 
+void * __capability kernel_sealcap;
+
 void cpu_reset(void);
 int main(void);
 
@@ -92,11 +94,13 @@ main(void)
 
 	cap = cheri_getdefault();
 
+#ifdef __CHERI_PURE_CAPABILITY__
 	/* Remove default capability */
 	__asm __volatile("csetdefault $cnull");
+#endif
 
 	cap = cheri_setoffset(cap, MIPS_XKPHYS_UNCACHED_BASE + UART_BASE);
-	cap = cheri_setbounds(cap, 6);
+	cap = cheri_csetbounds(cap, 6);
 
 	uart_16550_init(&uart_sc, cap, UART_CLOCK_RATE, DEFAULT_BAUDRATE, 0);
 

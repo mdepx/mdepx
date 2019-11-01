@@ -11,7 +11,10 @@ LDSCRIPT =	${OBJDIR}/ldscript
 CMD = python3 -B ${OSDIR}/tools/emitter.py -d
 
 all:	${LDSCRIPT}
-	@${CMD} mdepx.conf
+	@${CMD} mdepx-hybrid.conf
+
+pure:	${LDSCRIPT}
+	@${CMD} mdepx-pure.conf
 
 ${LDSCRIPT}:
 	@sed s#__BASE_ADDR__#${BASE_ADDR}#g ${LDSCRIPT_TPL} > ${LDSCRIPT}
