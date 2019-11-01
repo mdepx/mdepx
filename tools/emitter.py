@@ -33,16 +33,20 @@ def collect_nested_directives(root, context, data):
 	if 'set-asflags' in context:
 		data['asflags'] = context['set-asflags']
 
-	for x in ['cflags']:
+	for x in ['append-search-path']:
 		if x in context:
-			data[x] = context[x]
-
-	for x in ['search-path']:
-		if x in context:
-			if not x in data:
-				data[x] = []
+			if not 'search-path' in data:
+				data['search-path'] = []
 			for el in context[x]:
-				data[x].append(os.path.join(root, el))
+				data['search-path'].append(os.path.join(root,
+									el))
+
+	for x in ['set-search-path']:
+		if x in context:
+			data['search-path'] = []
+			for el in context[x]:
+				data['search-path'].append(os.path.join(root,
+									el))
 
 	for x in ['objdir']:
 		if x in context:
