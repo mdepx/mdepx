@@ -30,6 +30,10 @@
 #include <sys/systm.h>
 #include <sys/malloc.h>
 
+#ifndef __CHERI_PURE_CAPABILITY__
+#include <sys/thread.h>
+#endif
+
 #include <machine/frame.h>
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
@@ -86,6 +90,15 @@ trace_disable(void)
 
 	__asm __volatile("li $zero, 0xdead");
 }
+
+#ifndef __CHERI_PURE_CAPABILITY__
+int
+app_init(void)
+{
+
+	return (0);
+}
+#endif
 
 int
 main(void)

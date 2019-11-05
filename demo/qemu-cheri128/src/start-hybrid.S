@@ -74,7 +74,8 @@ ASM_ENTRY(_start)
 	PTR_LA		t0, _C_LABEL(kernel_sealcap)
 	csc		CHERI_REG_C27, t0, 0($ddc)
 
-	dla	t0, main
+	li	a0, 0
+	dla	t0, md_init
 	jr	t0
 	nop
 
