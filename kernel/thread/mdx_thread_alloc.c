@@ -44,16 +44,19 @@ struct thread *
 thread_alloc(uint32_t stack_size)
 {
 	struct thread *td;
+	void *addr;
 
 	td = zalloc(sizeof(struct thread));
 	if (td == NULL)
 		return (NULL);
 	td->td_stack_size = stack_size;
-	td->td_stack = zalloc(td->td_stack_size);
-	if (td->td_stack == NULL) {
+	addr = zalloc(td->td_stack_size);
+	if (addr == NULL) {
 		free(td);
 		return (NULL);
 	}
+
+	td->td_stack = (uint8_t *)addr + stack_size;
 
 	return (td);
 }
