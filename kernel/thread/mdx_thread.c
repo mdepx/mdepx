@@ -88,7 +88,7 @@ thread_setup(struct thread *td, const char *name,
 	td->td_quantum = quantum;
 	td->td_state = TD_STATE_READY;
 	td->td_tf = (struct trapframe *)((uint8_t *)td->td_stack
-	    + td->td_stack_size - sizeof(struct trapframe));
+	    - sizeof(struct trapframe));
 	td->td_prio = prio;
 	md_setup_frame(td->td_tf, entry, arg, thread_terminate);
 
