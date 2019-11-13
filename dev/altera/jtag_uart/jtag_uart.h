@@ -34,10 +34,10 @@
 #define	 AJU_CONTROL_WSPACE_M	(0xffff << AJU_CONTROL_WSPACE_S)
 
 struct aju_softc {
-	size_t base;
+	capability base;
 };
 
-int aju_init(struct aju_softc *sc, size_t base);
+int aju_init(struct aju_softc *sc, capability base);
 void aju_putc(struct aju_softc *sc, int c);
 
 #endif /* !_DEV_ALTERA_JTAG_UART_ */
