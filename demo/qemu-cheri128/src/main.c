@@ -39,8 +39,10 @@
 #include <machine/cpufunc.h>
 #include <machine/cheric.h>
 
+#ifndef __CHERI_PURE_CAPABILITY__
 #include <mips/mips/timer.h>
 #include <mips/mips/trap.h>
+#endif
 
 #include <dev/uart/uart_16550.h>
 
@@ -54,7 +56,9 @@ extern char MipsCache[], MipsCacheEnd[];
 #define	DEFAULT_BAUDRATE	115200
 #define	MIPS_DEFAULT_FREQ	1000000
 
+#ifndef __CHERI_PURE_CAPABILITY__
 static struct mips_timer_softc timer_sc;
+#endif
 static struct uart_16550_softc uart_sc;
 
 void * __capability kernel_sealcap;
@@ -62,6 +66,7 @@ void * __capability kernel_sealcap;
 void cpu_reset(void);
 int main(void);
 
+#ifndef __CHERI_PURE_CAPABILITY__
 static void
 softintr(void *arg, struct trapframe *frame, int i)
 {
@@ -96,6 +101,7 @@ static const struct mips_intr_entry mips_intr_map[MIPS_N_INTR] = {
 	[6] = { hardintr_unknown, NULL },
 	[7] = { mips_timer_intr, (void *)&timer_sc },
 };
+#endif
 
 static void
 uart_putchar(int c, void *arg)
@@ -133,8 +139,26 @@ trace_disable(void)
 	__asm __volatile("li $zero, 0xdead");
 }
 
-#ifndef __CHERI_PURE_CAPABILITY__
+static void
+setup_uart(void)
+{
+	capability cap;
 
+	cap = cheri_getdefault();
+
+#ifdef __CHERI_PURE_CAPABILITY__
+	/* Remove default capability */
+	__asm __volatile("csetdefault $cnull");
+#endif
+
+	cap = cheri_setoffset(cap, MIPS_XKPHYS_UNCACHED_BASE + UART_BASE);
+	cap = cheri_csetbounds(cap, 6);
+
+	uart_16550_init(&uart_sc, cap, UART_CLOCK_RATE, DEFAULT_BAUDRATE, 0);
+	console_register(uart_putchar, (void *)&uart_sc);
+}
+
+#ifndef __CHERI_PURE_CAPABILITY__
 static void
 mips_install_vectors(void)
 {
@@ -192,22 +216,7 @@ app_init(void)
 	mips_wr_status(status);
 
 	/* Setup capability-enabled JTAG UART. */
-
-	capability cap;
-
-	cap = cheri_getdefault();
-
-#ifdef __CHERI_PURE_CAPABILITY__
-	/* Remove default capability */
-	__asm __volatile("csetdefault $cnull");
-#endif
-
-	cap = cheri_setoffset(cap, MIPS_XKPHYS_UNCACHED_BASE + UART_BASE);
-	cap = cheri_csetbounds(cap, 6);
-
-	uart_16550_init(&uart_sc, cap, UART_CLOCK_RATE, DEFAULT_BAUDRATE, 0);
-
-	console_register(uart_putchar, (void *)&uart_sc);
+	setup_uart();
 
 	mips_timer_init(&timer_sc, MIPS_DEFAULT_FREQ,
 	    USEC_TO_TICKS(1));
@@ -224,6 +233,11 @@ app_init(void)
 int
 main(void)
 {
+
+#ifdef __CHERI_PURE_CAPABILITY__
+	/* Setup capability-enabled JTAG UART. */
+	setup_uart();
+#endif
 
 	while (1) {
 #ifdef __CHERI_PURE_CAPABILITY__
