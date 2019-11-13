@@ -37,6 +37,12 @@ VECTOR(MipsException)
 	jalr	k0
 	nop
 	move	sp, v0
+#if __has_feature(capabilities)
+	/* TODO: bug workaround. */
+	j	1f
+	nop
+1:
+#endif
 	restore_registers
 	sync
 	eret
