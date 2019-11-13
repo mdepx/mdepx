@@ -32,6 +32,13 @@
 #include <machine/frame.h>
 #include <machine/cpufunc.h>
 
+#include <machine/cheric.h>
+
+#ifndef MDX_THREAD_DYNAMIC_ALLOC
+extern struct thread main_thread;
+extern uint8_t main_thread_stack[MDX_THREAD_STACK_SIZE];
+#endif
+
 void
 critical_enter(void)
 {
@@ -90,6 +97,14 @@ void
 md_setup_frame(struct trapframe *tf, void *entry,
     void *arg, void *terminate)
 {
+#if __has_feature(capabilities)
+	capability cap;
+
+	cap = cheri_getkcc();
+	cap = cheri_setoffset(cap, (uintptr_t)entry);
+	/* TODO: set bounds. */
+	tf->tf_pcc = cap;
+#endif
 
 	tf->tf_ra = (uintptr_t)terminate;
 	tf->tf_pc = (uintptr_t)entry;
@@ -131,10 +146,19 @@ md_init(int cpuid)
 
 #ifdef MDX_SCHED
 	struct thread *td;
+
+#ifdef MDX_THREAD_DYNAMIC_ALLOC
 	td = thread_create("main", 1, 50000000, MDX_THREAD_STACK_SIZE,
 	    main, NULL);
 	if (td == NULL)
 		panic("can't create the main thread\n");
+#else
+	td = &main_thread;
+	td->td_stack = (uint8_t *)main_thread_stack + MDX_THREAD_STACK_SIZE;
+	td->td_stack_size = MDX_THREAD_STACK_SIZE;
+	thread_setup(td, "main", 1, 50000000, main, NULL);
+#endif
+
 	mdx_sched_add(td);
 	mdx_sched_enter();
 #else
