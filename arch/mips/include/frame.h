@@ -55,14 +55,14 @@ struct trapframe {
 	register_t	tf_cause;
 	register_t	tf_badvaddr;
 	register_t	tf_pc;
-#if __has_feature(capabilities)
+#ifdef CPU_CHERI
 	register_t	reserved[1]; /* alignment for capabilities */
 	capability	tf_pcc;	/* PCC */
 #endif
 };
 #endif
 
-#if __has_feature(capabilities)
+#ifdef CPU_CHERI
 #define	TF_SIZE		(38 * REG_SIZE)
 #else
 #define	TF_SIZE		(35 * REG_SIZE)

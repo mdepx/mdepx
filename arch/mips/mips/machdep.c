@@ -32,7 +32,9 @@
 #include <machine/frame.h>
 #include <machine/cpufunc.h>
 
+#ifdef CPU_CHERI
 #include <machine/cheric.h>
+#endif
 
 #ifndef MDX_THREAD_DYNAMIC_ALLOC
 extern struct thread main_thread;
@@ -97,7 +99,7 @@ void
 md_setup_frame(struct trapframe *tf, void *entry,
     void *arg, void *terminate)
 {
-#if __has_feature(capabilities)
+#ifdef CPU_CHERI
 	capability cap;
 
 	cap = cheri_getkcc();

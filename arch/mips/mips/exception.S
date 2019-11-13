@@ -37,7 +37,7 @@ VECTOR(MipsException)
 	jalr	k0
 	nop
 	move	sp, v0
-#if __has_feature(capabilities)
+#ifdef CPU_CHERI
 	/* TODO: bug workaround. */
 	j	1f
 	nop

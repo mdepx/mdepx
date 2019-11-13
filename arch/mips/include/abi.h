@@ -39,4 +39,11 @@
 #error Define __mips_n32, __mips_o32 or __mips_n64.
 #endif
 
+/* Capabilities */
+#ifdef __has_feature
+#if __has_feature(capabilities) 
+#define	CPU_CHERI
+#endif
+#endif
+
 #endif	/* !_MACHINE_ABI_H_ */
