@@ -27,8 +27,8 @@
 #include <machine/regdef.h>
 #include <machine/cpuregs.h>
 #include <machine/asm.h>
-#include "cherireg.h"
-#include "cheriasm.h"
+#include <machine/cherireg.h>
+#include <machine/cheriasm.h>
 
 #define	MIPS_CP0_REG_REVOKE		$30
 #define	MIPS_CP0_REG_REVOKE_BASE	2
@@ -73,6 +73,11 @@ ASM_ENTRY(_start)
 	candperm	CHERI_REG_C27, CHERI_REG_C27, t0
 	PTR_LA		t0, _C_LABEL(kernel_sealcap)
 	csc		CHERI_REG_C27, t0, 0($ddc)
+
+	/* Set the stack pointer. */
+	dla	t0, idle_thread_stack
+	dli	t1, MDX_THREAD_STACK_SIZE
+	add	sp, t0, t1
 
 	li	a0, 0
 	dla	t0, md_init
