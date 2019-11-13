@@ -31,6 +31,11 @@
 #include <machine/abi.h>
 #include <machine/frame.h>
 
+#ifdef CPU_CHERI
+#include <machine/cheriasm.h>
+.set cheri_sysregs_accessible
+#endif
+
 .macro save_registers
 	addi	sp, sp, -(TF_SIZE)
 
@@ -96,6 +101,12 @@
 	REG_S	a1, (REG_SIZE * 32)(sp)
 	REG_S	a2, (REG_SIZE * 33)(sp)
 	REG_S	a3, (REG_SIZE * 34)(sp)
+
+#ifdef CPU_CHERI
+	CGetEPCC	CHERI_REG_KSCRATCH
+	csc		CHERI_REG_KSCRATCH, sp, (REG_SIZE * 36)($ddc)
+#endif
+
 .endm
 
 .macro restore_registers
@@ -108,7 +119,12 @@
 	REG_L	k0, (REG_SIZE * 31)(sp)
 	REG_L	a3, (REG_SIZE * 34)(sp)
 
+#ifdef CPU_CHERI
+	clc		CHERI_REG_KSCRATCH, sp, (REG_SIZE * 36)($ddc)
+	CSetEPCC	CHERI_REG_KSCRATCH
+#else
 	MTC0	a3, CP0_EXC_PC
+#endif
 
 .set noat
 	REG_L	AT, (REG_SIZE * 0)(sp)
