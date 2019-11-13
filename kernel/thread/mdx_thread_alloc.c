@@ -44,6 +44,7 @@ struct thread *
 thread_alloc(uint32_t stack_size)
 {
 	struct thread *td;
+	uintptr_t new_stack;
 	void *addr;
 
 	td = zalloc(sizeof(struct thread));
@@ -56,7 +57,13 @@ thread_alloc(uint32_t stack_size)
 		return (NULL);
 	}
 
-	td->td_stack = (uint8_t *)addr + stack_size;
+	new_stack = (uintptr_t)addr + stack_size;
+
+	/* Align the stack as CHERI CPU required. */
+	while (new_stack & 0xf)
+		new_stack--;
+
+	td->td_stack = (void *)new_stack;
 
 	return (td);
 }
