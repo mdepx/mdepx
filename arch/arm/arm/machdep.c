@@ -34,7 +34,7 @@
 #include <machine/cpufunc.h>
 
 #ifndef MDX_THREAD_DYNAMIC_ALLOC
-extern struct thread main_thread[MDX_CPU_MAX];
+extern struct thread main_thread;
 extern uint8_t main_thread_stack[MDX_THREAD_STACK_SIZE];
 #endif
 
@@ -129,7 +129,7 @@ md_init(int arg)
 	struct thread *td;
 
 #ifndef MDX_THREAD_DYNAMIC_ALLOC
-	td = &main_thread[0];
+	td = &main_thread;
 	td->td_stack = (uint8_t *)main_thread_stack + MDX_THREAD_STACK_SIZE;
 	td->td_stack_size = MDX_THREAD_STACK_SIZE;
 	thread_setup(td, "main", 1, 10000, main, NULL);
