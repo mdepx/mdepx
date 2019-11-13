@@ -193,18 +193,18 @@ mips_install_vectors(void)
 int
 app_init(void)
 {
+	uint64_t malloc_base;
+	uint32_t status;
+	int malloc_size;
 
 	mips_install_vectors();
 	mips_install_intr_map(mips_intr_map);
 
-#if 0
 	malloc_init();
 	malloc_base = BASE_ADDR + 0x01000000;
 	malloc_size = 0x01000000;
 	malloc_add_region(malloc_base, malloc_size);
-#endif
 
-	int status;
 	status = mips_rd_status();
 	status &= ~(MIPS_SR_IM_M);
 	status |= MIPS_SR_IM_HARD(5);
@@ -230,14 +230,29 @@ app_init(void)
 }
 #endif
 
+static void
+test_thr(void)
+{
+
+	while (1)
+		printf("hi\n");
+}
+
+
 int
 main(void)
 {
+	struct thread *td;
 
 #ifdef __CHERI_PURE_CAPABILITY__
 	/* Setup capability-enabled JTAG UART. */
 	setup_uart();
 #endif
+
+	td = thread_create("test", 1, (USEC_TO_TICKS(1000) * 100),
+	    4096, test_thr, (void *)0);
+	td->td_index = 0;
+	mdx_sched_add(td);
 
 	while (1) {
 #ifdef __CHERI_PURE_CAPABILITY__
