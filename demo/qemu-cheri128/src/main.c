@@ -230,6 +230,7 @@ app_init(void)
 }
 #endif
 
+#ifndef __CHERI_PURE_CAPABILITY__
 static void
 test_thr(void)
 {
@@ -237,22 +238,22 @@ test_thr(void)
 	while (1)
 		printf("hi\n");
 }
-
+#endif
 
 int
 main(void)
 {
-	struct thread *td;
 
 #ifdef __CHERI_PURE_CAPABILITY__
 	/* Setup capability-enabled JTAG UART. */
 	setup_uart();
-#endif
-
+#else
+	struct thread *td;
 	td = thread_create("test", 1, (USEC_TO_TICKS(1000) * 100),
 	    4096, test_thr, (void *)0);
 	td->td_index = 0;
 	mdx_sched_add(td);
+#endif
 
 	while (1) {
 #ifdef __CHERI_PURE_CAPABILITY__

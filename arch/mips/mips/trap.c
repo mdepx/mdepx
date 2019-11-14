@@ -35,6 +35,9 @@
 #include <machine/frame.h>
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
+#ifdef CPU_CHERI
+#include <machine/cheric.h>
+#endif
 
 #include <mips/mips/trap.h>
 
@@ -140,11 +143,18 @@ static void
 handle_exception(struct trapframe *tf, int exc_code)
 {
 
+#ifdef CPU_CHERI
+	printf("exc_code %d\n", exc_code);
+#endif
+
 	switch (exc_code) {
 	case MIPS_CR_EXC_CODE_TLBL:
 	case MIPS_CR_EXC_CODE_TLBS:
 #ifdef MDX_MIPS_TLB
 		MipsTLBMissException();
+#else
+		panic("%s: TLB error at pc %zx, badvaddr %zx\n",
+		    __func__, tf->tf_pc, tf->tf_badvaddr);
 #endif
 		break;
 	case MIPS_CR_EXC_CODE_ADES:
@@ -185,7 +195,25 @@ mips_exception(struct trapframe *tf)
 
 	td = curthread;
 
-	/* Switch to the interrupt thread. */
+#ifdef CPU_CHERI
+	printf("%s: tf %p, name %s\n", __func__, tf, curthread->td_name);
+
+	printf("%s: EPCC: ", __func__);
+	CHERI_PRINT_PTR(cheri_getepcc());
+	printf("%s: PCC: ", __func__);
+	CHERI_PRINT_PTR(cheri_getpcc());
+
+
+	CHERI_PRINT_PTR(cheri_getidc());
+	CHERI_PRINT_PTR(cheri_getkr1c());
+	CHERI_PRINT_PTR(cheri_getkr2c());
+	CHERI_PRINT_PTR(cheri_getkcc());
+	CHERI_PRINT_PTR(cheri_getkdc());
+	CHERI_PRINT_PTR(cheri_getepcc());
+
+#endif
+
+	/* Switch to the interrupt thread. Stack is the same. */
 	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
 	curthread->td_critnest++;
 
@@ -214,6 +242,15 @@ mips_exception(struct trapframe *tf)
 
 	curthread->td_critnest--;
 	PCPU_SET(curthread, td);
+
+#ifdef CPU_CHERI
+	printf("%s: new tf %p\n", __func__, td->td_tf);
+	printf("DDC: ");
+	CHERI_PRINT_PTR(cheri_getdefault());
+
+	printf("PCC: ");
+	CHERI_PRINT_PTR(cheri_getpcc());
+#endif
 
 	return (td->td_tf);
 }
