@@ -105,4 +105,41 @@
 #define	ta3	$15
 #endif /* __mips_n32 || __mips_n64 */
 
+#ifdef CPU_CHERI
+#define	DDC		(CHERIBASE + CREG_SIZE * 0)
+#define	C1		(CHERIBASE + CREG_SIZE * 1)
+#define	C2		(CHERIBASE + CREG_SIZE * 2)
+#define	C3		(CHERIBASE + CREG_SIZE * 3)
+#define	C4		(CHERIBASE + CREG_SIZE * 4)
+#define	C5		(CHERIBASE + CREG_SIZE * 5)
+#define	C6		(CHERIBASE + CREG_SIZE * 6)
+#define	C7		(CHERIBASE + CREG_SIZE * 7)
+#define	C8		(CHERIBASE + CREG_SIZE * 8)
+#define	C9		(CHERIBASE + CREG_SIZE * 9)
+#define	C10		(CHERIBASE + CREG_SIZE * 10)
+#define	STC		(CHERIBASE + CREG_SIZE * 11)
+#define	C12		(CHERIBASE + CREG_SIZE * 12)
+#define	C13		(CHERIBASE + CREG_SIZE * 13)
+#define	C14		(CHERIBASE + CREG_SIZE * 14)
+#define	C15		(CHERIBASE + CREG_SIZE * 15)
+#define	C16		(CHERIBASE + CREG_SIZE * 16)
+#define	C17		(CHERIBASE + CREG_SIZE * 17)
+#define	C18		(CHERIBASE + CREG_SIZE * 18)
+#define	C19		(CHERIBASE + CREG_SIZE * 19)
+#define	C20		(CHERIBASE + CREG_SIZE * 20)
+#define	C21		(CHERIBASE + CREG_SIZE * 21)
+#define	C22		(CHERIBASE + CREG_SIZE * 22)
+#define	C23		(CHERIBASE + CREG_SIZE * 23)
+#define	C24		(CHERIBASE + CREG_SIZE * 24)
+#define	C25		(CHERIBASE + CREG_SIZE * 25)
+#define	IDC		(CHERIBASE + CREG_SIZE * 26)
+#define	C27		(CHERIBASE + CREG_SIZE * 27)
+#define	C28		(CHERIBASE + CREG_SIZE * 28)
+#define	C29		(CHERIBASE + CREG_SIZE * 29)
+#define	C30		(CHERIBASE + CREG_SIZE * 30)
+#define	C31		(CHERIBASE + CREG_SIZE * 31)
+#define	PCC		(CHERIBASE + CREG_SIZE * 32)
+#define	CAPCAUSE	(CHERIBASE + CREG_SIZE * 33)
+#endif
+
 #endif /* _MIPS_REGDEF_H */

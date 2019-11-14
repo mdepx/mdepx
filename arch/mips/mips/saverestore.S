@@ -103,8 +103,44 @@
 	REG_S	a3, (REG_SIZE * 34)(sp)
 
 #ifdef CPU_CHERI
+	csc		CHERI_REG_C1, sp, (C1)($ddc)
+	csc		CHERI_REG_C2, sp, (C2)($ddc)
+	csc		CHERI_REG_C3, sp, (C3)($ddc)
+	csc		CHERI_REG_C4, sp, (C4)($ddc)
+	csc		CHERI_REG_C5, sp, (C5)($ddc)
+	csc		CHERI_REG_C6, sp, (C6)($ddc)
+	csc		CHERI_REG_C7, sp, (C7)($ddc)
+	csc		CHERI_REG_C8, sp, (C8)($ddc)
+	csc		CHERI_REG_C9, sp, (C9)($ddc)
+	csc		CHERI_REG_C10, sp, (C10)($ddc)
+	csc		CHERI_REG_STC, sp, (STC)($ddc)
+	csc		CHERI_REG_C12, sp, (C12)($ddc)
+	csc		CHERI_REG_C13, sp, (C13)($ddc)
+	csc		CHERI_REG_C14, sp, (C14)($ddc)
+	csc		CHERI_REG_C15, sp, (C15)($ddc)
+	csc		CHERI_REG_C16, sp, (C16)($ddc)
+	csc		CHERI_REG_C17, sp, (C17)($ddc)
+	csc		CHERI_REG_C18, sp, (C18)($ddc)
+	csc		CHERI_REG_C19, sp, (C19)($ddc)
+	csc		CHERI_REG_C20, sp, (C20)($ddc)
+	csc		CHERI_REG_C21, sp, (C21)($ddc)
+	csc		CHERI_REG_C22, sp, (C22)($ddc)
+	csc		CHERI_REG_C23, sp, (C23)($ddc)
+	csc		CHERI_REG_C24, sp, (C24)($ddc)
+	csc		CHERI_REG_C25, sp, (C25)($ddc)
+	csc		CHERI_REG_C26, sp, (IDC)($ddc)
+	csc		CHERI_REG_C27, sp, (C27)($ddc)
+	csc		CHERI_REG_C28, sp, (C28)($ddc)
+	csc		CHERI_REG_C29, sp, (C29)($ddc)
+	csc		CHERI_REG_C30, sp, (C30)($ddc)
+	csc		CHERI_REG_C31, sp, (C31)($ddc)
 	CGetEPCC	CHERI_REG_KSCRATCH
-	csc		CHERI_REG_KSCRATCH, sp, (REG_SIZE * 36)($ddc)
+	csc		CHERI_REG_KSCRATCH, sp, (PCC)($ddc)
+	CGetDefault	CHERI_REG_KSCRATCH
+	csc		CHERI_REG_KSCRATCH, sp, (DDC)($ddc)
+	cgetcause	t0
+	daddiu		t1, sp, CAPCAUSE
+	csd		t0, t1, 0($ddc)
 #endif
 
 .endm
@@ -120,8 +156,43 @@
 	REG_L	a3, (REG_SIZE * 34)(sp)
 
 #ifdef CPU_CHERI
-	clc		CHERI_REG_KSCRATCH, sp, (REG_SIZE * 36)($ddc)
+	clc		CHERI_REG_KSCRATCH, sp, (DDC)($ddc)
+	CSetDefault	CHERI_REG_KSCRATCH
+	clc		CHERI_REG_C1, sp, (C1)($ddc)
+	clc		CHERI_REG_C2, sp, (C2)($ddc)
+	clc		CHERI_REG_C3, sp, (C3)($ddc)
+	clc		CHERI_REG_C4, sp, (C4)($ddc)
+	clc		CHERI_REG_C5, sp, (C5)($ddc)
+	clc		CHERI_REG_C6, sp, (C6)($ddc)
+	clc		CHERI_REG_C7, sp, (C7)($ddc)
+	clc		CHERI_REG_C8, sp, (C8)($ddc)
+	clc		CHERI_REG_C9, sp, (C9)($ddc)
+	clc		CHERI_REG_C10, sp, (C10)($ddc)
+	clc		CHERI_REG_STC, sp, (STC)($ddc)
+	clc		CHERI_REG_C12, sp, (C12)($ddc)
+	clc		CHERI_REG_C13, sp, (C13)($ddc)
+	clc		CHERI_REG_C14, sp, (C14)($ddc)
+	clc		CHERI_REG_C15, sp, (C15)($ddc)
+	clc		CHERI_REG_C16, sp, (C16)($ddc)
+	clc		CHERI_REG_C17, sp, (C17)($ddc)
+	clc		CHERI_REG_C18, sp, (C18)($ddc)
+	clc		CHERI_REG_C19, sp, (C19)($ddc)
+	clc		CHERI_REG_C20, sp, (C20)($ddc)
+	clc		CHERI_REG_C21, sp, (C21)($ddc)
+	clc		CHERI_REG_C22, sp, (C22)($ddc)
+	clc		CHERI_REG_C23, sp, (C23)($ddc)
+	clc		CHERI_REG_C24, sp, (C24)($ddc)
+	clc		CHERI_REG_C25, sp, (C25)($ddc)
+	clc		CHERI_REG_C26, sp, (IDC)($ddc)
+	/* C27 (KSTRATCH) restored after EPCC. */
+	clc		CHERI_REG_C28, sp, (C28)($ddc)
+	clc		CHERI_REG_C29, sp, (C29)($ddc)
+	clc		CHERI_REG_C30, sp, (C30)($ddc)
+	clc		CHERI_REG_C31, sp, (C31)($ddc)
+
+	clc		CHERI_REG_KSCRATCH, sp, (PCC)($ddc)
 	CSetEPCC	CHERI_REG_KSCRATCH
+	clc		CHERI_REG_C27, sp, (C27)($ddc)
 #else
 	MTC0	a3, CP0_EXC_PC
 #endif

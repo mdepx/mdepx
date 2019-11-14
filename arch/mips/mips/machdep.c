@@ -106,6 +106,10 @@ md_setup_frame(struct trapframe *tf, void *entry,
 	cap = cheri_setoffset(cap, (uintptr_t)entry);
 	/* TODO: set bounds. */
 	tf->tf_pcc = cap;
+
+	/* Set some default data capability for this thread. */
+	cap = cheri_getdefault();
+	tf->tf_c[0] = cap;
 #endif
 
 	tf->tf_ra = (uintptr_t)terminate;

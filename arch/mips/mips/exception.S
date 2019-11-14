@@ -24,8 +24,8 @@
  * SUCH DAMAGE.
  */
 
-#include <machine/regdef.h>
 #include <machine/asm.h>
+#include <machine/regdef.h>
 #include <machine/cpuregs.h>
 #include <mips/mips/saverestore.S>
 

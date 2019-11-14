@@ -57,13 +57,16 @@ struct trapframe {
 	register_t	tf_pc;
 #ifdef CPU_CHERI
 	register_t	reserved[1]; /* alignment for capabilities */
-	capability	tf_pcc;	/* PCC */
+	capability	tf_c[32];
+	capability	tf_pcc;
+	capability	tf_capcause;
 #endif
 };
 #endif
 
 #ifdef CPU_CHERI
-#define	TF_SIZE		(38 * REG_SIZE)
+#define	CHERIBASE	(36 * REG_SIZE)
+#define	TF_SIZE		(CHERIBASE + 34 * CREG_SIZE)
 #else
 #define	TF_SIZE		(35 * REG_SIZE)
 #endif
