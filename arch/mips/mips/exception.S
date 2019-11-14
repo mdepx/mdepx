@@ -29,7 +29,7 @@
 #include <machine/cpuregs.h>
 #include <mips/mips/saverestore.S>
 
-VECTOR(MipsException)
+VECTOR(MipsExceptionHandler)
 	save_registers
 	nop
 	move	a0, sp
@@ -37,14 +37,18 @@ VECTOR(MipsException)
 	jalr	k0
 	nop
 	move	sp, v0
-#ifdef CPU_CHERI
-	/* TODO: bug workaround. */
-	j	1f
-	nop
-1:
-#endif
 	restore_registers
 	sync
 	eret
+	nop
+VECTOR_END(MipsExceptionHandler)
+
+/*
+ * MIPS exception vector is limited to 0x100 bytes.
+ * So jump from here to the kernel handler.
+ * Note: mips jump is not PC-relative.
+ */
+VECTOR(MipsException)
+	j	MipsExceptionHandler
 	nop
 VECTOR_END(MipsException)
