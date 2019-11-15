@@ -134,9 +134,9 @@
 	csc		CHERI_REG_C29, sp, (C29)($ddc)
 	csc		CHERI_REG_C30, sp, (C30)($ddc)
 	csc		CHERI_REG_C31, sp, (C31)($ddc)
-	CGetEPCC	CHERI_REG_KSCRATCH
+	cgetepcc	CHERI_REG_KSCRATCH
 	csc		CHERI_REG_KSCRATCH, sp, (PCC)($ddc)
-	CGetDefault	CHERI_REG_KSCRATCH
+	cgetdefault	CHERI_REG_KSCRATCH
 	csc		CHERI_REG_KSCRATCH, sp, (DDC)($ddc)
 	cgetcause	t0
 	daddiu		t1, sp, CAPCAUSE
@@ -157,7 +157,7 @@
 
 #ifdef CPU_CHERI
 	clc		CHERI_REG_KSCRATCH, sp, (DDC)($ddc)
-	CSetDefault	CHERI_REG_KSCRATCH
+	csetdefault	CHERI_REG_KSCRATCH
 	clc		CHERI_REG_C1, sp, (C1)($ddc)
 	clc		CHERI_REG_C2, sp, (C2)($ddc)
 	clc		CHERI_REG_C3, sp, (C3)($ddc)
@@ -191,7 +191,7 @@
 	clc		CHERI_REG_C31, sp, (C31)($ddc)
 
 	clc		CHERI_REG_KSCRATCH, sp, (PCC)($ddc)
-	CSetEPCC	CHERI_REG_KSCRATCH
+	csetepcc	CHERI_REG_KSCRATCH
 	clc		CHERI_REG_C27, sp, (C27)($ddc)
 #else
 	MTC0	a3, CP0_EXC_PC
