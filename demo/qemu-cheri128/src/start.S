@@ -27,18 +27,22 @@
 #include <machine/regdef.h>
 #include <machine/cpuregs.h>
 #include <machine/asm.h>
+#include <machine/cherireg.h>
+#include <machine/cheriasm.h>
 
 #define	MIPS_CP0_REG_REVOKE		$30
 #define	MIPS_CP0_REG_REVOKE_BASE	2
 #define	MIPS_CP0_REG_REVOKE_BOUND	3
 #define	MIPS_CP0_REG_REVOKE_PERMS	4
 
+.set cheri_sysregs_accessible
+
 	.set noreorder
 	.text
 ASM_ENTRY(_start)
 	mtc0    zero, CP0_CAUSE
 
-	mfc0	t0, $12
+	mfc0	t0, CP0_STATUS
 	li	t1, 0x40000000		/* no float */
 	or	t0, t0, t1
 	li	t1, 0x4			/* Clear ELR */
@@ -52,62 +56,33 @@ ASM_ENTRY(_start)
 	li	t1, 0x7 << 5
 	or	t0, t0, t1		/* Set UX, SX, and KSX */
 	or	t0, t0, (3 << 8)	/* Set user interrupt bits */
-	mtc0	t0, $12
+	mtc0	t0, CP0_STATUS
 
 	nop; nop; nop; nop; nop; nop; nop; nop;
 
-	CClearLo	0xfffe
-	CClearHi	0xffff
+	CHERI_LOCORE_ROOT_CAPS
+	/*
+	 * Create the parent kernel sealing capablity.
+	 */
+	cmove		CHERI_REG_C27, CHERI_REG_C28
+	REG_LI		t0, CHERI_SEALCAP_KERNEL_BASE
+	csetoffset	CHERI_REG_C27, CHERI_REG_C27, t0
+	REG_LI		t0, CHERI_SEALCAP_KERNEL_LENGTH
+	csetbounds	CHERI_REG_C27, CHERI_REG_C27, t0
+	REG_LI		t0, CHERI_SEALCAP_KERNEL_PERMS
+	candperm	CHERI_REG_C27, CHERI_REG_C27, t0
+	PTR_LA		t0, _C_LABEL(kernel_sealcap)
+	csc		CHERI_REG_C27, t0, 0($ddc)
 
-	/* W^X for pointers: ensure $c0 is never executable. */
-	cgetdefault	$c3
-	dli		t0, ~(1 << 1)
-	candperm	$c3, $c3, t0
-	csetdefault	$c3
+	/* Set the stack pointer. */
+	dla	t0, idle_thread_stack
+	dli	t1, MDX_THREAD_STACK_SIZE
+	add	sp, t0, t1
 
-	# Implement W^X for pointers: trim store permissions from $pcc to
-	# prevent it from becoming writable in the future.
-	cgetpcc		$c12
-	dli		t0, ~((1 << 3) | (1 << 5))
-	candperm	$c12, $c12, t0
-
-	# Jump to write-free $pcc.
-	dla		t0, jump_target
-	csetoffset	$c12, $c12, t0
-	cjr		$c12
+	li	a0, 0
+	dla	t0, md_init
+	jr	t0
 	nop
-
-jump_target:
-
-	dmtc0  zero, MIPS_CP0_REG_REVOKE, MIPS_CP0_REG_REVOKE_PERMS
-	dmtc0  zero, MIPS_CP0_REG_REVOKE, MIPS_CP0_REG_REVOKE_BASE
-	dmtc0  zero, MIPS_CP0_REG_REVOKE, MIPS_CP0_REG_REVOKE_BOUND
-
-	dla	t0, __start_boot_stack
-	dla	t1, __size_boot_stack
-
-	cgetdefault	$c11
-	cincoffset	$c11, $c11, t0
-	csetboundsexact	$c11, $c11, t1
-	cincoffset	$c11, $c11, t1
-
-	/* Relocate capabilities */
-	cgetpcc		$c12
-	dla		t0, crt_init_globals
-	csetoffset	$c12, $c12, t0
-	csetbounds	$idc, $c11, zero # need non null
-	cjalr		$c12, $c17
-	cmove		$c18, $idc
-	cmove		$idc, $c3
-
-	/* Call into main */
-	cgetpcc		$c12
-	dla		t0, main
-	csetoffset	$c12, $c12, t0
-	csetbounds	$idc, $c11, zero # need non null
-	cjalr		$c12, $c17
-	cmove		$c18, $idc
-	cmove		$idc, $c3
 
 ENTRY(cpu_reset)
 
