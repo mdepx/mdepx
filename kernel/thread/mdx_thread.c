@@ -49,7 +49,7 @@
  * Used by thread to terminate itself.
  */
 static void
-thread_terminate(void)
+mdx_thread_terminate(void)
 {
 	struct thread *td;
 
@@ -71,7 +71,7 @@ thread_terminate(void)
 }
 
 int
-thread_setup(struct thread *td, const char *name,
+mdx_thread_setup(struct thread *td, const char *name,
     int prio, uint32_t quantum, void *entry, void *arg)
 {
 
@@ -90,7 +90,7 @@ thread_setup(struct thread *td, const char *name,
 	td->td_tf = (struct trapframe *)((uint8_t *)td->td_stack
 	    - sizeof(struct trapframe));
 	td->td_prio = prio;
-	md_setup_frame(td->td_tf, entry, arg, thread_terminate);
+	md_setup_frame(td->td_tf, entry, arg, mdx_thread_terminate);
 
 	return (0);
 }

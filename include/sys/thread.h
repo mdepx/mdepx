@@ -61,9 +61,10 @@ void thread_idle_init(int cpuid);
 struct thread *mdx_thread_create(const char *name, int prio,
     uint32_t quantum, uint32_t stack_size,
     void *entry, void *arg);
-struct thread * thread_alloc(uint32_t stack_size);
-int thread_setup(struct thread *td, const char *name,
+struct thread * mdx_thread_alloc(uint32_t stack_size);
+int mdx_thread_setup(struct thread *td, const char *name,
     int prio, uint32_t quantum, void *entry, void *arg);
+
 void cpu_idle(void);
 
 /* Scheduler */

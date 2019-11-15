@@ -180,7 +180,7 @@ md_init(int hart)
 	td = &main_thread;
 	td->td_stack = (uint8_t *)main_thread_stack + MDX_THREAD_STACK_SIZE;
 	td->td_stack_size = MDX_THREAD_STACK_SIZE;
-	thread_setup(td, "main", 1, 10000, main, NULL);
+	mdx_thread_setup(td, "main", 1, 10000, main, NULL);
 #endif
 
 	mdx_sched_add(td);
