@@ -205,10 +205,7 @@ app_init(void)
 	mips_timer_init(&timer_sc, MIPS_DEFAULT_FREQ,
 	    USEC_TO_TICKS(1));
 
-	printf("%s: PCC: ", __func__);
 	CHERI_PRINT_PTR(cheri_getpcc());
-
-	printf("%s: completed %d\n", __func__, sizeof(void *));
 
 	return (0);
 }
