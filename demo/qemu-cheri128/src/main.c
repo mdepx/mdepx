@@ -249,7 +249,7 @@ main(void)
 	setup_uart();
 #else
 	struct thread *td;
-	td = thread_create("test", 1, (USEC_TO_TICKS(1000) * 100),
+	td = mdx_thread_create("test", 1, (USEC_TO_TICKS(1000) * 100),
 	    4096, test_thr, (void *)0);
 	td->td_index = 0;
 	mdx_sched_add(td);

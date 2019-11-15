@@ -134,7 +134,8 @@ md_init(int arg)
 	td->td_stack_size = MDX_THREAD_STACK_SIZE;
 	thread_setup(td, "main", 1, 10000, main, NULL);
 #else
-	td = thread_create("main", 1, 10000, MDX_THREAD_STACK_SIZE, main, NULL);
+	td = mdx_thread_create("main", 1, 10000,
+	    MDX_THREAD_STACK_SIZE, main, NULL);
 	if (td == NULL)
 		panic("can't create the main thread\n");
 #endif

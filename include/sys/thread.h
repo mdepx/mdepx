@@ -58,7 +58,7 @@ struct thread {
 };
 
 void thread_idle_init(int cpuid);
-struct thread *thread_create(const char *name, int prio,
+struct thread *mdx_thread_create(const char *name, int prio,
     uint32_t quantum, uint32_t stack_size,
     void *entry, void *arg);
 struct thread * thread_alloc(uint32_t stack_size);

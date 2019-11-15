@@ -229,7 +229,7 @@ main(void)
 	struct thread *td;
 	size_t i;
 	for (i = 0; i < 20; i++) {
-		td = thread_create("test", 1, USEC_TO_TICKS(1000),
+		td = mdx_thread_create("test", 1, USEC_TO_TICKS(1000),
 		    4096, test_thr, (void *)i);
 		if (td == NULL)
 			break;
@@ -241,7 +241,7 @@ main(void)
 	struct thread *td;
 	size_t i;
 	for (i = 1; i < 500; i++) {
-		td = thread_create("test", 1, (USEC_TO_TICKS(1000) * i),
+		td = mdx_thread_create("test", 1, (USEC_TO_TICKS(1000) * i),
 		    4096, test_thr, (void *)i);
 		if (td == NULL)
 			break;
@@ -250,23 +250,23 @@ main(void)
 #endif
 
 #if 0
-	thread_create("test", 1, USEC_TO_TICKS(1000),
+	mdx_thread_create("test", 1, USEC_TO_TICKS(1000),
 	    4096, test_thr1, (void *)0);
-	thread_create("test", 1, USEC_TO_TICKS(2000),
+	mdx_thread_create("test", 1, USEC_TO_TICKS(2000),
 	    4096, test_thr2, (void *)1);
-	thread_create("test", 1, USEC_TO_TICKS(2000),
+	mdx_thread_create("test", 1, USEC_TO_TICKS(2000),
 	    4096, test_thr2, (void *)2);
 #endif
 
 #if 0
 	struct thread *td;
-	td = thread_create("test1", 1, USEC_TO_TICKS(500),
+	td = mdx_thread_create("test1", 1, USEC_TO_TICKS(500),
 	    4096, test_m0, (void *)0);
 	td->td_index = 0;
-	td = thread_create("test2", 1, USEC_TO_TICKS(500),
+	td = mdx_thread_create("test2", 1, USEC_TO_TICKS(500),
 	    4096, test_m1, (void *)1);
 	td->td_index = 1;
-	td = thread_create("test3", 1, USEC_TO_TICKS(500),
+	td = mdx_thread_create("test3", 1, USEC_TO_TICKS(500),
 	    4096, test_m2, (void *)2);
 	td->td_index = 2;
 #endif

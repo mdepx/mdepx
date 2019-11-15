@@ -154,8 +154,8 @@ md_init(int cpuid)
 	struct thread *td;
 
 #ifdef MDX_THREAD_DYNAMIC_ALLOC
-	td = thread_create("main", 1, 50000000, MDX_THREAD_STACK_SIZE,
-	    main, NULL);
+	td = mdx_thread_create("main", 1, 50000000,
+	    MDX_THREAD_STACK_SIZE, main, NULL);
 	if (td == NULL)
 		panic("can't create the main thread\n");
 #else
