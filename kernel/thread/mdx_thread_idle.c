@@ -40,7 +40,7 @@ uint8_t main_thread_stack[MDX_THREAD_STACK_SIZE] __aligned(16);
 #endif
 
 void
-thread_idle_init(int cpuid)
+mdx_thread_init(int cpuid)
 {
 	struct thread *t;
 

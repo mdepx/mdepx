@@ -106,17 +106,19 @@ md_thread_terminate(struct thread *td)
 }
 
 void
-md_init(int arg)
+md_init(int cpuid)
 {
+#ifdef MDX_CPU
 	struct pcpu *pcpup;
 	int cpuid;
 
-	cpuid = 0;
-
 	pcpup = &__pcpu[cpuid];
 	pcpup->pc_cpuid = cpuid;
+#endif
 
-	thread_idle_init(cpuid);
+#ifdef MDX_THREAD
+	mdx_thread_init(cpuid);
+#endif
 
 #ifdef MDX_SCHED
 	mdx_sched_init();
@@ -132,9 +134,10 @@ md_init(int arg)
 	td = &main_thread;
 	td->td_stack = (uint8_t *)main_thread_stack + MDX_THREAD_STACK_SIZE;
 	td->td_stack_size = MDX_THREAD_STACK_SIZE;
-	thread_setup(td, "main", 1, 10000, main, NULL);
+	mdx_thread_setup(td, "main", 1, 10000, main, NULL);
 #else
-	td = thread_create("main", 1, 10000, MDX_THREAD_STACK_SIZE, main, NULL);
+	td = mdx_thread_create("main", 1, 10000,
+	    MDX_THREAD_STACK_SIZE, main, NULL);
 	if (td == NULL)
 		panic("can't create the main thread\n");
 #endif
@@ -147,4 +150,6 @@ md_init(int arg)
 #else
 	main();
 #endif
+
+	panic("md_init returned");
 }

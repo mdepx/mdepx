@@ -42,8 +42,11 @@ extern uint8_t main_thread_stack[MDX_THREAD_STACK_SIZE];
 
 /* Interrupt stack */
 static size_t intr_stack[MDX_CPU_MAX][MDX_RISCV_INTR_STACK_SIZE];
-static uint32_t ncpus;
 uint8_t __riscv_boot_ap[MDX_CPU_MAX];
+
+#ifdef MDX_CPU
+static uint32_t ncpus;
+#endif
 
 void
 critical_enter(void)
@@ -130,7 +133,7 @@ md_init_secondary(int hart)
 	csr_clear(mie, MIE_MTIE);
 	csr_clear(mip, MIP_MTIP);
 
-	thread_idle_init(hart);
+	mdx_thread_init(hart);
 
 	mdx_sched_cpu_add(pcpup);
 	mdx_sched_cpu_avail(pcpup, true);
@@ -143,6 +146,7 @@ md_init_secondary(int hart)
 void
 md_init(int hart)
 {
+#ifdef MDX_CPU
 	struct pcpu *pcpup;
 
 	ncpus = 0;
@@ -153,33 +157,38 @@ md_init(int hart)
 	    MDX_RISCV_INTR_STACK_SIZE;
 	__asm __volatile("mv gp, %0" :: "r"(pcpup));
 	csr_write(mscratch, pcpup->pc_stack);
+#endif
 
-	thread_idle_init(hart);
+#ifdef MDX_THREAD
+	mdx_thread_init(hart);
+#endif
+
 #ifdef MDX_SCHED
 	mdx_sched_init();
-
 #ifdef MDX_SCHED_SMP
 	smp_init();
 #endif
 #endif
 
+	/* Enable supervisor interrupts. */
 	csr_set(mie, MIE_MSIE);
 
-	/* Allow the app to register malloc and timer. */
+	/* Allow the app to register a timer and (optionally) malloc. */
 	app_init();
 
 #ifdef MDX_SCHED
 	struct thread *td;
 
 #ifdef MDX_THREAD_DYNAMIC_ALLOC
-	td = thread_create("main", 1, 10000, MDX_THREAD_STACK_SIZE, main, NULL);
+	td = mdx_thread_create("main", 1, 10000,
+	    MDX_THREAD_STACK_SIZE, main, NULL);
 	if (td == NULL)
 		panic("can't create the main thread\n");
 #else
 	td = &main_thread;
 	td->td_stack = (uint8_t *)main_thread_stack + MDX_THREAD_STACK_SIZE;
 	td->td_stack_size = MDX_THREAD_STACK_SIZE;
-	thread_setup(td, "main", 1, 10000, main, NULL);
+	mdx_thread_setup(td, "main", 1, 10000, main, NULL);
 #endif
 
 	mdx_sched_add(td);
@@ -192,4 +201,6 @@ md_init(int hart)
 	intr_enable();
 	main();
 #endif
+
+	panic("md_init returned");
 }

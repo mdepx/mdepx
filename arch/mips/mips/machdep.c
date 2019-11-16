@@ -133,36 +133,38 @@ md_thread_terminate(struct thread *td)
 void
 md_init(int cpuid)
 {
+#ifdef MDX_CPU
 	struct pcpu *pcpup;
-
-	cpuid = 0;
 
 	pcpup = &__pcpu[cpuid];
 	pcpup->pc_cpuid = cpuid;
 	__asm __volatile("move $28, %0" :: "r"(pcpup));
+#endif
 
-	thread_idle_init(cpuid);
+#ifdef MDX_THREAD
+	mdx_thread_init(cpuid);
+#endif
 
 #ifdef MDX_SCHED
 	mdx_sched_init();
 #endif
 
-	/* Allow the app to register malloc and timer. */
+	/* Allow the app to register a timer and (optionally) malloc. */
 	app_init();
 
 #ifdef MDX_SCHED
 	struct thread *td;
 
 #ifdef MDX_THREAD_DYNAMIC_ALLOC
-	td = thread_create("main", 1, 50000000, MDX_THREAD_STACK_SIZE,
-	    main, NULL);
+	td = mdx_thread_create("main", 1, 50000000,
+	    MDX_THREAD_STACK_SIZE, main, NULL);
 	if (td == NULL)
 		panic("can't create the main thread\n");
 #else
 	td = &main_thread;
 	td->td_stack = (uint8_t *)main_thread_stack + MDX_THREAD_STACK_SIZE;
 	td->td_stack_size = MDX_THREAD_STACK_SIZE;
-	thread_setup(td, "main", 1, 50000000, main, NULL);
+	mdx_thread_setup(td, "main", 1, 50000000, main, NULL);
 #endif
 
 	mdx_sched_add(td);
