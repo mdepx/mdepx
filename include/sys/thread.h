@@ -57,7 +57,7 @@ struct thread {
 #define	TD_STATE_SEM_UNLOCK_ACK	8
 };
 
-void thread_idle_init(int cpuid);
+void mdx_thread_init(int cpuid);
 struct thread *mdx_thread_create(const char *name, int prio,
     uint32_t quantum, uint32_t stack_size,
     void *entry, void *arg);

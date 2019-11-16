@@ -130,7 +130,7 @@ md_init_secondary(int hart)
 	csr_clear(mie, MIE_MTIE);
 	csr_clear(mip, MIP_MTIP);
 
-	thread_idle_init(hart);
+	mdx_thread_init(hart);
 
 	mdx_sched_cpu_add(pcpup);
 	mdx_sched_cpu_avail(pcpup, true);
@@ -154,7 +154,7 @@ md_init(int hart)
 	__asm __volatile("mv gp, %0" :: "r"(pcpup));
 	csr_write(mscratch, pcpup->pc_stack);
 
-	thread_idle_init(hart);
+	mdx_thread_init(hart);
 #ifdef MDX_SCHED
 	mdx_sched_init();
 
