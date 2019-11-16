@@ -42,8 +42,11 @@ extern uint8_t main_thread_stack[MDX_THREAD_STACK_SIZE];
 
 /* Interrupt stack */
 static size_t intr_stack[MDX_CPU_MAX][MDX_RISCV_INTR_STACK_SIZE];
-static uint32_t ncpus;
 uint8_t __riscv_boot_ap[MDX_CPU_MAX];
+
+#ifdef MDX_CPU
+static uint32_t ncpus;
+#endif
 
 void
 critical_enter(void)
@@ -143,6 +146,7 @@ md_init_secondary(int hart)
 void
 md_init(int hart)
 {
+#ifdef MDX_CPU
 	struct pcpu *pcpup;
 
 	ncpus = 0;
@@ -153,19 +157,23 @@ md_init(int hart)
 	    MDX_RISCV_INTR_STACK_SIZE;
 	__asm __volatile("mv gp, %0" :: "r"(pcpup));
 	csr_write(mscratch, pcpup->pc_stack);
+#endif
 
+#ifdef MDX_THREAD
 	mdx_thread_init(hart);
+#endif
+
 #ifdef MDX_SCHED
 	mdx_sched_init();
-
 #ifdef MDX_SCHED_SMP
 	smp_init();
 #endif
 #endif
 
+	/* Enable supervisor interrupts. */
 	csr_set(mie, MIE_MSIE);
 
-	/* Allow the app to register malloc and timer. */
+	/* Allow the app to register a timer and (optionally) malloc. */
 	app_init();
 
 #ifdef MDX_SCHED
@@ -193,4 +201,6 @@ md_init(int hart)
 	intr_enable();
 	main();
 #endif
+
+	panic("md_init returned");
 }

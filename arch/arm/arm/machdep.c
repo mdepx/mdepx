@@ -106,17 +106,19 @@ md_thread_terminate(struct thread *td)
 }
 
 void
-md_init(int arg)
+md_init(int cpuid)
 {
+#ifdef MDX_CPU
 	struct pcpu *pcpup;
 	int cpuid;
 
-	cpuid = 0;
-
 	pcpup = &__pcpu[cpuid];
 	pcpup->pc_cpuid = cpuid;
+#endif
 
+#ifdef MDX_THREAD
 	mdx_thread_init(cpuid);
+#endif
 
 #ifdef MDX_SCHED
 	mdx_sched_init();
@@ -148,4 +150,6 @@ md_init(int arg)
 #else
 	main();
 #endif
+
+	panic("md_init returned");
 }

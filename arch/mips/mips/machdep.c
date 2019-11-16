@@ -133,21 +133,23 @@ md_thread_terminate(struct thread *td)
 void
 md_init(int cpuid)
 {
+#ifdef MDX_CPU
 	struct pcpu *pcpup;
-
-	cpuid = 0;
 
 	pcpup = &__pcpu[cpuid];
 	pcpup->pc_cpuid = cpuid;
 	__asm __volatile("move $28, %0" :: "r"(pcpup));
+#endif
 
+#ifdef MDX_THREAD
 	mdx_thread_init(cpuid);
+#endif
 
 #ifdef MDX_SCHED
 	mdx_sched_init();
 #endif
 
-	/* Allow the app to register malloc and timer. */
+	/* Allow the app to register a timer and (optionally) malloc. */
 	app_init();
 
 #ifdef MDX_SCHED
