@@ -35,7 +35,7 @@ uint8_t idle_thread_stack[MDX_CPU_MAX][MDX_THREAD_STACK_SIZE];
 /* TODO: remove main_thread from this file ? */
 #if !defined(MDX_THREAD_DYNAMIC_ALLOC)
 struct thread main_thread;
-/* CHERI requires 16/32 byte alignment. */
+/* CHERI requires __CHERI_CAPABILITY_WIDTH__/8 byte alignment. */
 uint8_t main_thread_stack[MDX_THREAD_STACK_SIZE] __aligned(16);
 #endif
 
