@@ -31,7 +31,7 @@
 #include <machine/abi.h>
 #include <machine/frame.h>
 
-#ifdef CPU_CHERI
+#if __has_feature(capabilities)
 #include <machine/cheriasm.h>
 .set cheri_sysregs_accessible
 #endif
@@ -102,7 +102,7 @@
 	REG_S	a2, (REG_SIZE * 33)(sp)
 	REG_S	a3, (REG_SIZE * 34)(sp)
 
-#ifdef CPU_CHERI
+#if __has_feature(capabilities)
 	csc		CHERI_REG_C1, sp, (C1)($ddc)
 	csc		CHERI_REG_C2, sp, (C2)($ddc)
 	csc		CHERI_REG_C3, sp, (C3)($ddc)
@@ -155,7 +155,7 @@
 	REG_L	k0, (REG_SIZE * 31)(sp)
 	REG_L	a3, (REG_SIZE * 34)(sp)
 
-#ifdef CPU_CHERI
+#if __has_feature(capabilities)
 	clc		CHERI_REG_KSCRATCH, sp, (DDC)($ddc)
 	csetdefault	CHERI_REG_KSCRATCH
 	clc		CHERI_REG_C1, sp, (C1)($ddc)

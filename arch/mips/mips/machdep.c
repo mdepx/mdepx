@@ -32,7 +32,7 @@
 #include <machine/frame.h>
 #include <machine/cpufunc.h>
 
-#ifdef CPU_CHERI
+#if __has_feature(capabilities)
 #include <machine/cheric.h>
 #endif
 
@@ -99,7 +99,7 @@ void
 md_setup_frame(struct trapframe *tf, void *entry,
     void *arg, void *terminate)
 {
-#ifdef CPU_CHERI
+#if __has_feature(capabilities)
 	capability cap;
 
 	cap = cheri_getkcc();

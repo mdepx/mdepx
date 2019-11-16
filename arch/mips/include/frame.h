@@ -55,7 +55,7 @@ struct trapframe {
 	register_t	tf_cause;
 	register_t	tf_badvaddr;
 	register_t	tf_pc;
-#ifdef CPU_CHERI
+#if __has_feature(capabilities)
 	register_t	reserved[1]; /* alignment for capabilities */
 	capability	tf_c[32];
 	capability	tf_pcc;
@@ -64,7 +64,7 @@ struct trapframe {
 };
 #endif
 
-#ifdef CPU_CHERI
+#if __has_feature(capabilities)
 #define	CHERIBASE	(36 * REG_SIZE)
 #define	TF_SIZE		(CHERIBASE + 34 * CREG_SIZE)
 #else

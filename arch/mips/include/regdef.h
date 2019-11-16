@@ -38,6 +38,8 @@
  * $FreeBSD$
  */
 
+#include <machine/abi.h>
+
 #ifndef _MIPS_REGDEF_H
 #define _MIPS_REGDEF_H
 
@@ -105,7 +107,7 @@
 #define	ta3	$15
 #endif /* __mips_n32 || __mips_n64 */
 
-#ifdef CPU_CHERI
+#if __has_feature(capabilities)
 #define	DDC		(CHERIBASE + CREG_SIZE * 0)
 #define	C1		(CHERIBASE + CREG_SIZE * 1)
 #define	C2		(CHERIBASE + CREG_SIZE * 2)

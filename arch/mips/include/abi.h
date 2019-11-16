@@ -42,9 +42,10 @@
 /* Capabilities */
 #ifdef __has_feature
 #if __has_feature(capabilities) 
-#define	CPU_CHERI
 #define	CREG_SIZE	__SIZEOF_CHERI_CAPABILITY__
 #endif
+#else
+#define	__has_feature(x)	0
 #endif
 
 #endif	/* !_MACHINE_ABI_H_ */
