@@ -133,5 +133,5 @@ ether_ifattach(struct ifnet *ifp, uint8_t *hwaddr)
 	bcopy(hwaddr, ifp->if_hw_addr, ifp->if_addrlen);
 	ifp->if_broadcastaddr = etherbroadcastaddr;
 
-	return (0);
+	return (MDX_OK);
 }

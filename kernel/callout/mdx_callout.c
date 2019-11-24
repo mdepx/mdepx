@@ -166,11 +166,11 @@ callout_set_locked(struct callout *c, uint32_t ticks,
 	    ("%s: Not in critical section.", __func__));
 
 	if (c->flags & CALLOUT_FLAG_ACTIVE)
-		return (-1);
+		return (MDX_ERROR);
 
 	if (ticks == 0) {
 		c->state = CALLOUT_STATE_FIRED;
-		return (0);
+		return (MDX_OK);
 	}
 
 	c->ticks_orig = ticks;
@@ -182,7 +182,7 @@ callout_set_locked(struct callout *c, uint32_t ticks,
 	callout_set_one(c);
 	c->flags |= CALLOUT_FLAG_ACTIVE;
 
-	return (0);
+	return (MDX_OK);
 }
 
 int
@@ -223,7 +223,7 @@ callout_cancel_locked(struct callout *c)
 
 	c->flags &= ~CALLOUT_FLAG_ACTIVE;
 
-	return (0);
+	return (MDX_OK);
 }
 
 int
@@ -259,7 +259,7 @@ callout_callback(struct mi_timer *mt)
 	    ("%s: callback for the wrong device", __func__));
 
 	if (list_empty(&callouts_list[cpuid]))
-		return (0);
+		return (MDX_OK);
 
 	ticks_elapsed = get_elapsed(&mi_tmr->count_saved[cpuid]);
 
@@ -294,7 +294,7 @@ callout_callback(struct mi_timer *mt)
 	}
 	callout_unlock(cpuid);
 
-	return (0);
+	return (MDX_OK);
 }
 
 int
@@ -324,5 +324,5 @@ callout_register(struct mi_timer *mt)
 		mi_tmr->count_saved[i] = 0;
 	}
 
-	return (0);
+	return (MDX_OK);
 }

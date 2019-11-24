@@ -45,7 +45,7 @@ in_ifhasaddr(struct ifnet *ifp, struct in_addr in)
 			return (1);
 	}
 
-	return (0);
+	return (MDX_OK);
 }
 
 /* Add interface address */
@@ -56,7 +56,7 @@ in_aifaddr(struct ifnet *ifp, struct in_addr in, u_long mask)
 	struct in_ifaddr *ia;
 
 	if (in_ifhasaddr(ifp, in))
-		return (-1);
+		return (MDX_ERROR);
 
 	ifa = malloc(sizeof(struct in_ifaddr));
 	ifa->ifa_addr = malloc(sizeof(struct sockaddr));
@@ -68,5 +68,5 @@ in_aifaddr(struct ifnet *ifp, struct in_addr in, u_long mask)
 	ia->ia_sockmask.sin_addr.s_addr = mask;
 	STAILQ_INSERT_TAIL(&ifp->if_addrhead, ifa, ifa_link);
 
-	return (0);
+	return (MDX_OK);
 }

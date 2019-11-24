@@ -64,14 +64,14 @@ arpresolve(struct ifnet *ifp, int is_gw, struct mbuf *m,
 		if (gw->sin_addr.s_addr == lle->addr4.s_addr) {
 			/* Found */
 			memcpy(phdr, lle->r_linkdata, lle->r_hdrlen);
-			return (0);
+			return (MDX_OK);
 		}
 	}
 
 	/* Not found */
 	arprequest(ifp, NULL, &SIN(dst)->sin_addr, NULL);
 
-	return (-1);
+	return (MDX_ERROR);
 }
 
 static void

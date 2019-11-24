@@ -98,5 +98,5 @@ ether_requestencap(struct ifnet *ifp, struct if_encap_req *req)
 	memcpy(eh->ether_shost, IF_LLADDR(ifp), ETHER_ADDR_LEN);
 	req->bufsize = sizeof(struct ether_header);
 
-	return (0);
+	return (MDX_OK);
 }
