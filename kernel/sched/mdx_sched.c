@@ -162,7 +162,7 @@ mdx_sched_ack(struct thread *td, struct trapframe *tf)
 		break;
 	}
 
-	return (0);
+	return (MDX_OK);
 }
 
 int
@@ -180,7 +180,7 @@ mdx_sched_park(struct thread *td)
 		 * Current thread is still running and has quantum.
 		 * Do not switch.
 		 */
-		return (0);
+		return (MDX_OK);
 	default:
 		mdx_sched_add(td);
 

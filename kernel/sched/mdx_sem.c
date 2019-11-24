@@ -135,10 +135,10 @@ mdx_sem_timedwait(mdx_sem_t *sem, int ticks)
 		 */
 
 		if (ticks && t.timeout)
-			return (0);
+			return (MDX_OK);
 	}
 
-	return (1);
+	return (MDX_ERROR);
 }
 
 void

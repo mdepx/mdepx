@@ -82,5 +82,5 @@ fdt_find_first_compatible(void *dtb, const char *compat)
 			return (offset);
 	} while (offset > 0);
 
-	return (0);
+	return (MDX_OK);
 }

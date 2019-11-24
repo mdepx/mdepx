@@ -28,6 +28,7 @@
 #define	_SYS_CDEFS_H_
 
 #include <sys/types.h>
+#include <sys/errno.h>
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>

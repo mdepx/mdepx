@@ -76,13 +76,13 @@ mdx_thread_setup(struct thread *td, const char *name,
 {
 
 	if (td == NULL || td->td_stack == NULL)
-		return (-1);
+		return (MDX_ERROR);
 
 	if (quantum == 0)
-		return (-1);
+		return (MDX_ERROR);
 
 	if (entry == NULL)
-		return (-1);
+		return (MDX_ERROR);
 
 	td->td_name = name;
 	td->td_quantum = quantum;
@@ -92,5 +92,5 @@ mdx_thread_setup(struct thread *td, const char *name,
 	td->td_prio = prio;
 	md_setup_frame(td->td_tf, entry, arg, mdx_thread_terminate);
 
-	return (0);
+	return (MDX_OK);
 }

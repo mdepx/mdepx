@@ -303,14 +303,14 @@ callout_register(struct mi_timer *mt)
 	int i;
 
 	if (mi_tmr != NULL)
-		return (EEXIST);
+		return (MDX_EXIST);
 
 	if (mt->width == 0 ||
 	    mt->start == NULL ||
 	    mt->stop == NULL ||
 	    mt->count == NULL) {
 		printf("%s: can't register timer\n", __func__);
-		return (ENXIO);
+		return (MDX_ERROR);
 	}
 
 	mi_tmr = mt;
