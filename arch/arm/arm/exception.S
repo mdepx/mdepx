@@ -73,5 +73,5 @@ __start:
 	b	1b
 2:
 
-	mov	r0, 0
+	mov	r0, 0	/* cpuid */
 	bl	md_init

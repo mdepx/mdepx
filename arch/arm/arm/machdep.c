@@ -110,7 +110,6 @@ md_init(int cpuid)
 {
 #ifdef MDX_CPU
 	struct pcpu *pcpup;
-	int cpuid;
 
 	pcpup = &__pcpu[cpuid];
 	pcpup->pc_cpuid = cpuid;
