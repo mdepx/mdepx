@@ -155,18 +155,14 @@ struct qm_trace {
 #endif	/* QUEUE_MACRO_DEBUG_TRACE */
 
 #ifdef QUEUE_MACRO_DEBUG_TRASH
+#define	QMD_SAVELINK(name, link)	void **name = (void *)&(link)
 #define	TRASHIT(x)		do {(x) = (void *)-1;} while (0)
 #define	QMD_IS_TRASHED(x)	((x) == (void *)(intptr_t)-1)
 #else	/* !QUEUE_MACRO_DEBUG_TRASH */
+#define	QMD_SAVELINK(name, link)
 #define	TRASHIT(x)
 #define	QMD_IS_TRASHED(x)	0
 #endif	/* QUEUE_MACRO_DEBUG_TRASH */
-
-#if defined(QUEUE_MACRO_DEBUG_TRACE) || defined(QUEUE_MACRO_DEBUG_TRASH)
-#define	QMD_SAVELINK(name, link)	void **name = (void *)&(link)
-#else	/* !QUEUE_MACRO_DEBUG_TRACE && !QUEUE_MACRO_DEBUG_TRASH */
-#define	QMD_SAVELINK(name, link)
-#endif	/* QUEUE_MACRO_DEBUG_TRACE || QUEUE_MACRO_DEBUG_TRASH */
 
 #ifdef __cplusplus
 /*
@@ -832,6 +828,10 @@ struct {								\
 
 #define	TAILQ_PREV(elm, headname, field)				\
 	(*(((struct headname *)((elm)->field.tqe_prev))->tqh_last))
+
+#define	TAILQ_PREV_FAST(elm, head, type, field)				\
+    ((elm)->field.tqe_prev == &(head)->tqh_first ? NULL :		\
+     __containerof((elm)->field.tqe_prev, QUEUE_TYPEOF(type), field.tqe_next))
 
 #define	TAILQ_REMOVE(head, elm, field) do {				\
 	QMD_SAVELINK(oldnext, (elm)->field.tqe_next);			\

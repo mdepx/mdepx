@@ -25,15 +25,36 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: head/sys/sys/endian.h 326256 2017-11-27 15:01:59Z pfg $
+ * $FreeBSD$
  */
 
 #ifndef _SYS_ENDIAN_H_
 #define _SYS_ENDIAN_H_
 
+#include <sys/cdefs.h>
 #include <sys/types.h>
 #include <machine/endian.h>
 
+#ifndef _UINT8_T_DECLARED
+typedef	__uint8_t	uint8_t;
+#define	_UINT8_T_DECLARED
+#endif
+ 
+#ifndef _UINT16_T_DECLARED
+typedef	__uint16_t	uint16_t;
+#define	_UINT16_T_DECLARED
+#endif
+ 
+#ifndef _UINT32_T_DECLARED
+typedef	__uint32_t	uint32_t;
+#define	_UINT32_T_DECLARED
+#endif
+ 
+#ifndef _UINT64_T_DECLARED
+typedef	__uint64_t	uint64_t;
+#define	_UINT64_T_DECLARED
+#endif
+ 
 /*
  * General byte order swapping functions.
  */
