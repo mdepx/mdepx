@@ -92,6 +92,7 @@ def compile(resobj, flags, vars, link_objs, debug):
 				break
 		if not o:
 			print("Source file not found for object: %s" % obj)
+			continue
 
 		ob = os.path.abspath(obj)
 		objfile = "%s/%s" % (objdir, ob)
