@@ -94,4 +94,63 @@
 
 #define	NRF_SECURE	(1 << 28)
 
+#define	ID_DCNF		0
+#define	ID_FPU		0
+#define	ID_CACHE	1
+#define	ID_SPU		3
+#define	ID_OSCILLATORS	4
+#define	ID_REGULATORS	4
+#define	ID_CLOCK	5
+#define	ID_POWER	5
+#define	ID_RESET	5
+#define	ID_CTRLAPPERI	6
+#define	ID_SPIM0	8
+#define	ID_SPIS0	8
+#define	ID_TWIM0	8
+#define	ID_TWIS0	8
+#define	ID_UARTE0	8
+#define	ID_SPIM1	9
+#define	ID_SPIS1	9
+#define	ID_TWIM1	9
+#define	ID_TWIS1	9
+#define	ID_UARTE1	9
+#define	ID_SPIM		10
+#define	ID_GPIOTE	13
+#define	ID_SAADC	14
+#define	ID_TIMER0	15
+#define	ID_TIMER1	16
+#define	ID_TIMER2	17
+#define	ID_RTC0		20
+#define	ID_RTC1		21
+#define	ID_DPPIC	23
+#define	ID_WDT0		24
+#define	ID_WDT1		25
+#define	ID_COMP		26
+#define	ID_LPCOMP	26
+#define	ID_EGU0		27
+#define	ID_EGU1		28
+#define	ID_EGU2		29
+#define	ID_EGU3		30
+#define	ID_EGU4		31
+#define	ID_EGU5		32
+#define	ID_PWM0		33
+#define	ID_PWM1		34
+#define	ID_PWM2		35
+#define	ID_PDM		38
+#define	ID_I2S		40
+#define	ID_IPC		42
+#define	ID_QSPI		43
+#define	ID_NFCT		45
+#define	ID_GPIOTE	47
+#define	ID_MUTEX	48
+#define	ID_QDEC		51
+#define	ID_USBD		54
+#define	ID_USBREG	55
+#define	ID_KMU		57
+#define	ID_NVMC		57
+#define	ID_GPIO0	66
+#define	ID_GPIO1	66
+#define	ID_CRYPTOCELL	68
+#define	ID_VMC		129
+
 #endif /* !_ARM_NORDICSEMI_NRF5340_APP_CORE_H_ */

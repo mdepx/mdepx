@@ -67,4 +67,41 @@
 #define	NRF_UICR	0x01FF8000 /* User information configuration */
 #define	NRF_CTI		0xE0042000 /* Cross-trigger interface */
 
+#define	ID_DCNF		0
+#define	ID_VREQCTRL	4
+#define	ID_CLOCK	5
+#define	ID_POWER	5
+#define	ID_RESET	5
+#define	ID_CTRLAP	6
+#define	ID_RADIO	8
+#define	ID_RNG		9
+#define	ID_GPIOTE	10
+#define	ID_WDT		11
+#define	ID_TIMER0	12
+#define	ID_ECB		13
+#define	ID_AAR		14
+#define	ID_CCM		14
+#define	ID_DPPIC	15
+#define	ID_TEMP		16
+#define	ID_RTC0		17
+#define	ID_IPC		18
+#define	ID_SPIM0	19
+#define	ID_SPIS0	19
+#define	ID_TWIM0	19
+#define	ID_TWIS0	19
+#define	ID_UARTE0	19
+#define	ID_EGU0		20
+#define	ID_RTC1		22
+#define	ID_TIMER1	24
+#define	ID_TIMER2	25
+#define	ID_SWI0		26
+#define	ID_SWI1		27
+#define	ID_SWI2		28
+#define	ID_SWI3		29
+#define	ID_ACL		128
+#define	ID_NVMC		128
+#define	ID_VMC		129
+#define	ID_P0		192
+#define	ID_P1		192
+
 #endif /* !_ARM_NORDICSEMI_NRF5340_NET_CORE_H_ */
