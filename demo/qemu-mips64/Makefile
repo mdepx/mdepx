@@ -29,7 +29,7 @@ export CFLAGS = -march=mips64 -mabi=64 -g -nostdinc -G0		\
 	-D__mips_n64 -nostdlib ${WARNFLAGS}			\
 	-DBASE_ADDR=${BASE_ADDR}
 
-export ASFLAGS = ${CFLAGS}
+export AFLAGS = ${CFLAGS}
 
 CMD = python3 -B ${OSDIR}/tools/emitter.py
 

@@ -16,7 +16,7 @@ export CFLAGS = -march=rv64imac -mabi=lp64 -mcmodel=medany		\
 	-Wmissing-prototypes -Wpointer-arith -Winline -Wcast-qual	\
 	-Wundef -Wmissing-include-dirs -Werror
 
-export ASFLAGS = ${CFLAGS}
+export AFLAGS = ${CFLAGS}
 
 CMD = python3 -B ${OSDIR}/tools/emitter.py
 

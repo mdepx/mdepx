@@ -77,7 +77,7 @@ def compile(resobj, flags, vars, link_objs, debug):
 		return False
 
 	env_cflags = os.environ.get('CFLAGS', '').split()
-	env_asflags = os.environ.get('ASFLAGS', '').split()
+	env_aflags = os.environ.get('AFLAGS', '').split()
 
 	defs = []
 	for key in flags:
@@ -91,9 +91,9 @@ def compile(resobj, flags, vars, link_objs, debug):
 		obj_cflags += resobj[obj].get('build-flags', [])
 		obj_cflags += resobj[obj].get('cflags', [])
 
-		obj_asflags = list(env_asflags)
-		obj_asflags += resobj[obj].get('build-flags', [])
-		obj_asflags += resobj[obj].get('asflags', [])
+		obj_aflags = list(env_aflags)
+		obj_aflags += resobj[obj].get('build-flags', [])
+		obj_aflags += resobj[obj].get('aflags', [])
 
 		objdir = resobj[obj].get('objdir', [DEFAULT_OBJDIR])[0]
 		if not machine(vars, objdir):
@@ -109,7 +109,7 @@ def compile(resobj, flags, vars, link_objs, debug):
 			continuE
 
 		o = None
-		d = {'c': obj_cflags, 'S': obj_asflags}
+		d = {'c': obj_cflags, 'S': obj_aflags}
 		for x in d:
 			p = "%s.%s" % (obj[:-2], x)
 			if os.path.exists(p):

@@ -49,7 +49,7 @@ def collect_nested_directives(root, context, data):
 			continue
 
 		k = "-".join(spl[1:])
-		if not k in ['cflags', 'asflags',
+		if not k in ['cflags', 'aflags',
 				'build-flags', 'search-path']:
 			continue
 
