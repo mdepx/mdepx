@@ -27,6 +27,29 @@
 #ifndef	_ARM_NORDICSEMI_NRF5340_APP_CORE_H_
 #define	_ARM_NORDICSEMI_NRF5340_APP_CORE_H_
 
+#include <arm/nordicsemi/nrf9160_cryptocell.h>
+#include <arm/nordicsemi/nrf9160_dppi.h>
+#include <arm/nordicsemi/nrf9160_egu.h>
+#include <arm/nordicsemi/nrf9160_gpio.h>
+#include <arm/nordicsemi/nrf9160_gpiote.h>
+#include <arm/nordicsemi/nrf9160_i2s.h>
+#include <arm/nordicsemi/nrf9160_ipc.h>
+#include <arm/nordicsemi/nrf9160_kmu.h>
+#include <arm/nordicsemi/nrf9160_pdm.h>
+#include <arm/nordicsemi/nrf9160_power.h>
+#include <arm/nordicsemi/nrf9160_pwm.h>
+#include <arm/nordicsemi/nrf9160_rtc.h>
+#include <arm/nordicsemi/nrf9160_saadc.h>
+#include <arm/nordicsemi/nrf9160_spim.h>
+#include <arm/nordicsemi/nrf9160_spis.h>
+#include <arm/nordicsemi/nrf9160_spu.h>
+#include <arm/nordicsemi/nrf9160_timer.h>
+#include <arm/nordicsemi/nrf9160_twim.h>
+#include <arm/nordicsemi/nrf9160_twis.h>
+#include <arm/nordicsemi/nrf9160_uicr.h>
+#include <arm/nordicsemi/nrf9160_wdt.h>
+#include <arm/nordicsemi/nrf_uarte.h>
+
 #define	NRF_DCNF	0x40000000 /* DCNF Domain configuration */
 #define	NRF_FPU		0x40000000 /* FPU Floating Point unit interrupt control */
 #define	NRF_CACHE	0x50001000 /* CACHE Cache */
@@ -47,8 +70,8 @@
 #define	NRF_TWIM1	0x40009000 /* TWIM1 Two-wire interface master 1 */
 #define	NRF_TWIS1	0x40009000 /* TWIS1 Two-wire interface slave 1 */
 #define	NRF_UARTE1	0x40009000 /* UARTE1 Universal asynchronous receiver/transmitter with EasyDMA 1 */
-#define	NRF_SPIM	0x4000A000 /* SPIM SPI master 2 (high-speed) */
-#define	NRF_GPIOTE	0x5000D000 /* GPIOTE GPIO tasks and events */
+#define	NRF_SPIM2	0x4000A000 /* SPIM SPI master 2 (high-speed) */
+#define	NRF_GPIOTE0	0x5000D000 /* GPIOTE GPIO tasks and events */
 #define	NRF_SAADC	0x4000E000 /* SAADC Successive approximation analog-to-digital converter */
 #define	NRF_TIMER0	0x4000F000 /* TIMER0 Timer 0 */
 #define	NRF_TIMER1	0x40010000 /* TIMER1 Timer 1 */
@@ -74,7 +97,7 @@
 #define	NRF_IPC		0x4002A000 /* IPC Interprocessor communication */
 #define	NRF_QSPI	0x4002B000 /* QSPI External memory (quad serial peripheral) interface */
 #define	NRF_NFCT	0x4002D000 /* NFCT Near field communication tag */
-#define	NRF_GPIOTE	0x4002F000 /* GPIOTE GPIO tasks and events */
+#define	NRF_GPIOTE1	0x4002F000 /* GPIOTE GPIO tasks and events */
 #define	NRF_MUTEX	0x40030000 /* MUTEX Mutual exclusive hardware support */
 #define	NRF_QDEC	0x40033000 /* QDEC Quadrature decoder */
 #define	NRF_USBD	0x40036000 /* USBD Universal serial bus device */
@@ -91,6 +114,14 @@
 #define	NRF_UICR	0x00FF8000 /* UICR User information configuration registers */
 #define	NRF_CTI		0xE0042000 /* CTI Cross-trigger interface */
 #define	NRF_TAD		0xE0080000 /* TAD Trace and debug control */
+
+#define	BASE_FICR	0x00FF0000 /* Factory information configuration */
+#define	BASE_UICR	0x00FF8000 /* User information configuration */
+#define	BASE_TAD	0xE0080000 /* Trace and debug control */
+#define	BASE_SCS	0xE000E000 /* System Control Space */
+#define	BASE_SCS_NS	0xE002E000 /* System Control Space Non-Secure */
+#define	BASE_UICR	0x00FF8000 /* User information configuration */
+#define	BASE_FICR	0x00FF0000 /* Factory information configuration */
 
 #define	NRF_SECURE	(1 << 28)
 
@@ -114,8 +145,8 @@
 #define	ID_TWIM1	9
 #define	ID_TWIS1	9
 #define	ID_UARTE1	9
-#define	ID_SPIM		10
-#define	ID_GPIOTE	13
+#define	ID_SPIM2	10
+#define	ID_GPIOTE0	13
 #define	ID_SAADC	14
 #define	ID_TIMER0	15
 #define	ID_TIMER1	16
@@ -141,7 +172,7 @@
 #define	ID_IPC		42
 #define	ID_QSPI		43
 #define	ID_NFCT		45
-#define	ID_GPIOTE	47
+#define	ID_GPIOTE1	47
 #define	ID_MUTEX	48
 #define	ID_QDEC		51
 #define	ID_USBD		54
