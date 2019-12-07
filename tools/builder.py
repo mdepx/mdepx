@@ -106,7 +106,7 @@ def compile(resobj, flags, vars, link_objs, debug):
 
 		if obj.endswith('.a'):
 			link_objs.append(obj)
-			continuE
+			continue
 
 		o = None
 		d = {'c': obj_cflags, 'S': obj_aflags}
