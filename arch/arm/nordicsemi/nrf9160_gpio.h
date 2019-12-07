@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2018-2019 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,28 +38,33 @@
 #define	GPIO_DETECTMODE		0x024	/* Select between default DETECT signal behaviour and LDETECT mode (For non-secure pin only) */
 #define	GPIO_DETECTMODE_SEC	0x028	/* Select between default DETECT signal behaviour and LDETECT mode (For secure pin only) */
 #define	GPIO_PIN_CNF(n)		(0x200 + (n) * 0x4)	/* Configuration of GPIO pins */
-#define	 CNF_RW_DIR_OUT		(1 << 0) /* Configure pin as an output pin */
-#define	 CNF_RW_INPUT_DIS	(1 << 1) /* Disconnect input buffer */
-#define	 CNF_RW_PULL_S		2 /* Pull configuration */
-#define	 CNF_RW_PULL_M		(0x3 << CNF_RW_PULL_S)
-#define	 CNF_RW_PULL_DISABLED	(0x0 << CNF_RW_PULL_S)
-#define	 CNF_RW_PULL_DOWN	(0x1 << CNF_RW_PULL_S)
-#define	 CNF_RW_PULL_UP		(0x2 << CNF_RW_PULL_S)
-#define	 CNF_RW_DRIVE_S		8 /* Drive configuration */
-#define	 CNF_RW_DRIVE_M		(0x7 << CNF_RW_DRIVE_S)
-#define	 CNF_RW_DRIVE_S0S1	(0 << CNF_RW_DRIVE_S) /* Std 0, std 1 */
-#define	 CNF_RW_DRIVE_H0S1	(1 << CNF_RW_DRIVE_S) /* High drive 0, std 1 */
-#define	 CNF_RW_DRIVE_S0H1	(2 << CNF_RW_DRIVE_S) /* Std 0, high drive 1 */
-#define	 CNF_RW_DRIVE_H0H1	(3 << CNF_RW_DRIVE_S) /* High drive 0, 1 */
-#define	 CNF_RW_DRIVE_D0S1	(4 << CNF_RW_DRIVE_S) /* Disconnect 0, std 1 */
-#define	 CNF_RW_DRIVE_D0H1	(5 << CNF_RW_DRIVE_S) /* Dis 0, high drive 1 */
-#define	 CNF_RW_DRIVE_S0D1	(6 << CNF_RW_DRIVE_S) /* Std 0, disconnect 1 */
-#define	 CNF_RW_DRIVE_H0D1	(6 << CNF_RW_DRIVE_S) /* High drive 0, dis 1 */
-#define	 CNF_RW_SENSE_S		16 /* Pin sensing mechanism */
-#define	 CNF_RW_SENSE_M		(0x7 << CNF_RW_SENSE_S)
-#define	 CNF_RW_SENSE_DISABLED	(0 << CNF_RW_SENSE_S)
-#define	 CNF_RW_SENSE_HIGH	(2 << CNF_RW_SENSE_S)
-#define	 CNF_RW_SENSE_LOW	(3 << CNF_RW_SENSE_S)
+#define	 CNF_DIR_OUT		(1 << 0) /* Configure pin as an output pin */
+#define	 CNF_INPUT_DIS		(1 << 1) /* Disconnect input buffer */
+#define	 CNF_PULL_S		2 /* Pull configuration */
+#define	 CNF_PULL_M		(0x3 << CNF_PULL_S)
+#define	 CNF_PULL_DISABLED	(0x0 << CNF_PULL_S)
+#define	 CNF_PULL_DOWN		(0x1 << CNF_PULL_S)
+#define	 CNF_PULL_UP		(0x2 << CNF_PULL_S)
+#define	 CNF_DRIVE_S		8 /* Drive configuration */
+#define	 CNF_DRIVE_M		(0x7 << CNF_DRIVE_S)
+#define	 CNF_DRIVE_S0S1		(0 << CNF_DRIVE_S) /* Std 0, std 1 */
+#define	 CNF_DRIVE_H0S1		(1 << CNF_DRIVE_S) /* High drive 0, std 1 */
+#define	 CNF_DRIVE_S0H1		(2 << CNF_DRIVE_S) /* Std 0, high drive 1 */
+#define	 CNF_DRIVE_H0H1		(3 << CNF_DRIVE_S) /* High drive 0, 1 */
+#define	 CNF_DRIVE_D0S1		(4 << CNF_DRIVE_S) /* Disconnect 0, std 1 */
+#define	 CNF_DRIVE_D0H1		(5 << CNF_DRIVE_S) /* Dis 0, high drive 1 */
+#define	 CNF_DRIVE_S0D1		(6 << CNF_DRIVE_S) /* Std 0, disconnect 1 */
+#define	 CNF_DRIVE_H0D1		(6 << CNF_DRIVE_S) /* High drive 0, dis 1 */
+#define	 CNF_SENSE_S		16 /* Pin sensing mechanism */
+#define	 CNF_SENSE_M		(0x7 << CNF_SENSE_S)
+#define	 CNF_SENSE_DISABLED	(0 << CNF_SENSE_S)
+#define	 CNF_SENSE_HIGH		(2 << CNF_SENSE_S)
+#define	 CNF_SENSE_LOW		(3 << CNF_SENSE_S)
+#define	 CNF_MCUSEL_S		28 /* Which MCU/Subsystem controls this pin */
+#define	 CNF_MCUSEL_APPMCU	(0 << CNF_MCUSEL_S) /* Application MCU */
+#define	 CNF_MCUSEL_NETMCU	(1 << CNF_MCUSEL_S) /* Network MCU */
+#define	 CNF_MCUSEL_PERIPHERAL	(3 << CNF_MCUSEL_S) /* Peripheral with dedicated pins */
+#define	 CNF_MCUSEL_TND		(7 << CNF_MCUSEL_S) /* Trace and Debug Subsystem */
 
 struct gpio_softc {
 	size_t base;
