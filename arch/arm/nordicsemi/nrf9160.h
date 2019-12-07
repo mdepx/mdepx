@@ -30,7 +30,6 @@
 #include <arm/nordicsemi/nrf9160_cryptocell.h>
 #include <arm/nordicsemi/nrf9160_dppi.h>
 #include <arm/nordicsemi/nrf9160_egu.h>
-#include <arm/nordicsemi/nrf9160_gpio.h>
 #include <arm/nordicsemi/nrf9160_gpiote.h>
 #include <arm/nordicsemi/nrf9160_i2s.h>
 #include <arm/nordicsemi/nrf9160_ipc.h>
@@ -48,6 +47,7 @@
 #include <arm/nordicsemi/nrf9160_twis.h>
 #include <arm/nordicsemi/nrf9160_uicr.h>
 #include <arm/nordicsemi/nrf9160_wdt.h>
+#include <arm/nordicsemi/nrf_gpio.h>
 #include <arm/nordicsemi/nrf_uarte.h>
 
 #define	BASE_SPU	0x50003000 /* System Protection Unit */

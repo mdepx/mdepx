@@ -24,8 +24,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ARM_NORDICSEMI_NRF9160_GPIO_H_
-#define _ARM_NORDICSEMI_NRF9160_GPIO_H_
+#ifndef _ARM_NORDICSEMI_NRF_GPIO_H_
+#define _ARM_NORDICSEMI_NRF_GPIO_H_
 
 #define	GPIO_OUT		0x004	/* Write GPIO port */
 #define	GPIO_OUTSET		0x008	/* Set individual bits in GPIO port */
@@ -70,4 +70,6 @@ struct gpio_softc {
 	size_t base;
 };
 
-#endif /* !_ARM_NORDICSEMI_NRF9160_GPIO_H_ */
+void gpio_init(struct gpio_softc *sc, uint32_t base);
+
+#endif /* !_ARM_NORDICSEMI_NRF_GPIO_H_ */
