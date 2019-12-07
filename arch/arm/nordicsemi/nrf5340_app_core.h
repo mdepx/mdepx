@@ -48,6 +48,7 @@
 #include <arm/nordicsemi/nrf9160_twis.h>
 #include <arm/nordicsemi/nrf9160_uicr.h>
 #include <arm/nordicsemi/nrf9160_wdt.h>
+#include <arm/nordicsemi/nrf_reset.h>
 #include <arm/nordicsemi/nrf_uarte.h>
 
 #define	NRF_DCNF	0x40000000 /* DCNF Domain configuration */
