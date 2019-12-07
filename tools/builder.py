@@ -105,6 +105,8 @@ def compile(resobj, flags, vars, link_objs, debug):
 				searchp.append('-I%s' % p)
 
 		if obj.endswith('.a'):
+			pcmd = "  AA      %s" % obj
+			print(pcmd)
 			link_objs.append(obj)
 			continue
 
