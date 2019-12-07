@@ -61,15 +61,17 @@
 #define	 CNF_SENSE_HIGH		(2 << CNF_SENSE_S)
 #define	 CNF_SENSE_LOW		(3 << CNF_SENSE_S)
 #define	 CNF_MCUSEL_S		28 /* Which MCU/Subsystem controls this pin */
-#define	 CNF_MCUSEL_APPMCU	(0 << CNF_MCUSEL_S) /* Application MCU */
-#define	 CNF_MCUSEL_NETMCU	(1 << CNF_MCUSEL_S) /* Network MCU */
-#define	 CNF_MCUSEL_PERIPHERAL	(3 << CNF_MCUSEL_S) /* Peripheral with dedicated pins */
-#define	 CNF_MCUSEL_TND		(7 << CNF_MCUSEL_S) /* Trace and Debug Subsystem */
+#define	 CNF_MCUSEL_M		(0x7 << CNF_MCUSEL_S)
+#define	 CNF_MCUSEL_APPMCU	(0x0 << CNF_MCUSEL_S) /* Application MCU */
+#define	 CNF_MCUSEL_NETMCU	(0x1 << CNF_MCUSEL_S) /* Network MCU */
+#define	 CNF_MCUSEL_PERIPHERAL	(0x3 << CNF_MCUSEL_S) /* Peripheral with dedicated pins */
+#define	 CNF_MCUSEL_TND		(0x7 << CNF_MCUSEL_S) /* Trace and Debug Subsystem */
 
 struct gpio_softc {
 	size_t base;
 };
 
 void gpio_init(struct gpio_softc *sc, uint32_t base);
+void gpio_pincfg(struct gpio_softc *sc, int pin, int cfg);
 
 #endif /* !_ARM_NORDICSEMI_NRF_GPIO_H_ */
