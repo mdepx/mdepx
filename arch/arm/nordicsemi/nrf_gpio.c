@@ -35,6 +35,13 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
+gpio_pincfg(struct gpio_softc *sc, int pin, int cfg)
+{
+
+	WR4(sc, GPIO_PIN_CNF(pin), cfg);
+}
+
+void
 gpio_init(struct gpio_softc *sc, uint32_t base)
 {
 
