@@ -27,6 +27,30 @@
 #ifndef	_ARM_NORDICSEMI_NRF5340_NET_CORE_H_
 #define	_ARM_NORDICSEMI_NRF5340_NET_CORE_H_
 
+#include <arm/nordicsemi/nrf9160_cryptocell.h>
+#include <arm/nordicsemi/nrf9160_dppi.h>
+#include <arm/nordicsemi/nrf9160_egu.h>
+#include <arm/nordicsemi/nrf9160_gpiote.h>
+#include <arm/nordicsemi/nrf9160_i2s.h>
+#include <arm/nordicsemi/nrf9160_ipc.h>
+#include <arm/nordicsemi/nrf9160_kmu.h>
+#include <arm/nordicsemi/nrf9160_pdm.h>
+#include <arm/nordicsemi/nrf9160_power.h>
+#include <arm/nordicsemi/nrf9160_pwm.h>
+#include <arm/nordicsemi/nrf9160_rtc.h>
+#include <arm/nordicsemi/nrf9160_saadc.h>
+#include <arm/nordicsemi/nrf9160_spim.h>
+#include <arm/nordicsemi/nrf9160_spis.h>
+#include <arm/nordicsemi/nrf9160_spu.h>
+#include <arm/nordicsemi/nrf9160_timer.h>
+#include <arm/nordicsemi/nrf9160_twim.h>
+#include <arm/nordicsemi/nrf9160_twis.h>
+#include <arm/nordicsemi/nrf9160_uicr.h>
+#include <arm/nordicsemi/nrf9160_wdt.h>
+#include <arm/nordicsemi/nrf_gpio.h>
+#include <arm/nordicsemi/nrf_reset.h>
+#include <arm/nordicsemi/nrf_uarte.h>
+
 #define	NRF_DCNF	0x41000000 /* Domain configuration */
 #define	NRF_VREQCTRL	0x41004000 /* Voltage request control */
 #define	NRF_CLOCK	0x41005000 /* Clock control */
@@ -66,6 +90,14 @@
 #define	NRF_FICR	0x01FF0000 /* Factory information configuration */
 #define	NRF_UICR	0x01FF8000 /* User information configuration */
 #define	NRF_CTI		0xE0042000 /* Cross-trigger interface */
+
+#define	BASE_FICR	0x00FF0000 /* Factory information configuration */
+#define	BASE_UICR	0x00FF8000 /* User information configuration */
+#define	BASE_TAD	0xE0080000 /* Trace and debug control */
+#define	BASE_SCS	0xE000E000 /* System Control Space */
+#define	BASE_SCS_NS	0xE002E000 /* System Control Space Non-Secure */
+#define	BASE_UICR	0x00FF8000 /* User information configuration */
+#define	BASE_FICR	0x00FF0000 /* Factory information configuration */
 
 #define	ID_DCNF		0
 #define	ID_VREQCTRL	4
