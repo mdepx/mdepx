@@ -35,6 +35,26 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
+gpio_outset(struct gpio_softc *sc, int pin, int out)
+{
+
+	if (out)
+		WR4(sc, GPIO_OUTSET, (1 << pin));
+	else
+		WR4(sc, GPIO_OUTCLR, (1 << pin));
+}
+
+void
+gpio_dirset(struct gpio_softc *sc, int pin, int dir)
+{
+
+	if (dir)
+		WR4(sc, GPIO_DIRSET, (1 << pin));
+	else
+		WR4(sc, GPIO_DIRCLR, (1 << pin));
+}
+
+void
 gpio_pincfg(struct gpio_softc *sc, int pin, int cfg)
 {
 

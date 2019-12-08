@@ -73,5 +73,7 @@ struct gpio_softc {
 
 void gpio_init(struct gpio_softc *sc, uint32_t base);
 void gpio_pincfg(struct gpio_softc *sc, int pin, int cfg);
+void gpio_outset(struct gpio_softc *sc, int pin, int out);
+void gpio_dirset(struct gpio_softc *sc, int pin, int dir);
 
 #endif /* !_ARM_NORDICSEMI_NRF_GPIO_H_ */
