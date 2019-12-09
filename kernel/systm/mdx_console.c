@@ -30,7 +30,7 @@
 struct kernel_console kern_console;
 
 void
-console_register(void (*func)(int, void*), void *arg)
+mdx_console_register(void (*func)(int, void*), void *arg)
 {
 
 	kern_console.console_putchar = func;

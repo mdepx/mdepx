@@ -32,6 +32,6 @@ struct kernel_console {
 	void *console_putchar_arg;
 };
 
-void console_register(void (*func)(int, void*), void *arg);
+void mdx_console_register(void (*func)(int, void*), void *arg);
 
 #endif /* !_SYS_CONSOLE_H_ */

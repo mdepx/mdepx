@@ -55,7 +55,7 @@ malloc(size_t size)
 	void *ret;
 
 	critical_enter();
-	ret = fl_malloc(size);
+	ret = mdx_fl_malloc(size);
 	critical_exit();
 
 	return (ret);
@@ -66,7 +66,7 @@ free(void *ptr)
 {
 
 	critical_enter();
-	fl_free(ptr);
+	mdx_fl_free(ptr);
 	critical_exit();
 }
 
@@ -76,7 +76,7 @@ calloc(size_t number, size_t size)
 	void *ret;
 
 	critical_enter();
-	ret = fl_calloc(number, size);
+	ret = mdx_fl_calloc(number, size);
 	critical_exit();
 
 	return (ret);
@@ -88,7 +88,7 @@ realloc(void *ptr, size_t size)
 	void *ret;
 
 	critical_enter();
-	ret = fl_realloc(ptr, size);
+	ret = mdx_fl_realloc(ptr, size);
 	critical_exit();
 
 	return (ret);
@@ -99,7 +99,7 @@ malloc_add_region(uintptr_t base, int size)
 {
 
 	critical_enter();
-	fl_add_region(base, size);
+	mdx_fl_add_region(base, size);
 	critical_exit();
 }
 
@@ -108,6 +108,6 @@ malloc_init(void)
 {
 
 	critical_enter();
-	fl_init();
+	mdx_fl_init();
 	critical_exit();
 }

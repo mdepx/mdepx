@@ -66,7 +66,7 @@ size2i(uint32_t size)
 
 
 static void
-fl_add_node(struct node_s *node)
+mdx_fl_add_node(struct node_s *node)
 {
 	struct node_s *next;
 	struct node_s *prev;
@@ -86,7 +86,7 @@ fl_add_node(struct node_s *node)
 }
 
 void
-fl_add_region(uintptr_t base, int size)
+mdx_fl_add_region(uintptr_t base, int size)
 {
 	struct node_s *node;
 
@@ -97,7 +97,7 @@ fl_add_region(uintptr_t base, int size)
 	node = (struct node_s *)(base + NODE_S);
 	node->size = size - 2 * NODE_S;
 	node->flags = NODE_S;
-	fl_add_node(node);
+	mdx_fl_add_node(node);
 
 	node = (struct node_s *)(base + size - NODE_S);
 	node->size = NODE_S;
@@ -105,7 +105,7 @@ fl_add_region(uintptr_t base, int size)
 }
 
 void
-fl_init(void)
+mdx_fl_init(void)
 {
 	int i;
 
@@ -117,7 +117,7 @@ fl_init(void)
 }
 
 void
-fl_dump(void)
+mdx_fl_dump(void)
 {
 	struct node_s *node;
 
@@ -133,7 +133,7 @@ fl_dump(void)
 }
 
 void *
-fl_malloc(size_t size)
+mdx_fl_malloc(size_t size)
 {
 	struct node_s *node;
 	struct node_s *next;
@@ -174,7 +174,7 @@ fl_malloc(size_t size)
 			new = (struct node_s *)((uint8_t *)node + size);
 			new->size = avail;
 			new->flags = size;
-			fl_add_node(new);
+			mdx_fl_add_node(new);
 		}
 
 		node->flags |= FLAG_ALLOCATED;
@@ -188,7 +188,7 @@ fl_malloc(size_t size)
 }
 
 void
-fl_free(void *ptr)
+mdx_fl_free(void *ptr)
 {
 	struct node_s *node;
 	struct node_s *prev;
@@ -232,18 +232,18 @@ fl_free(void *ptr)
 		node = prev;
 	}
 
-	fl_add_node(node);
+	mdx_fl_add_node(node);
 }
 
 void *
-fl_calloc(size_t number, size_t size)
+mdx_fl_calloc(size_t number, size_t size)
 {
 	void *res;
 	size_t sz;
 
 	sz = number * size;
 
-	res = fl_malloc(sz);
+	res = mdx_fl_malloc(sz);
 	if (res)
 		bzero(res, sz);
 
@@ -251,7 +251,7 @@ fl_calloc(size_t number, size_t size)
 }
 
 void *
-fl_realloc(void *ptr, size_t size)
+mdx_fl_realloc(void *ptr, size_t size)
 {
 	struct node_s *node;
 	struct node_s *next;
@@ -260,10 +260,10 @@ fl_realloc(void *ptr, size_t size)
 	void *newptr;
 
 	if (ptr == NULL)
-		return (fl_malloc(size));
+		return (mdx_fl_malloc(size));
 
 	if (size == 0) {
-		fl_free(ptr);
+		mdx_fl_free(ptr);
 		return (NULL);
 	}
 
@@ -288,7 +288,7 @@ fl_realloc(void *ptr, size_t size)
 			node->size = size;
 			subs->flags &= FLAG_ALLOCATED;
 			subs->flags |= node->size;
-			fl_add_node(new);
+			mdx_fl_add_node(new);
 		} else if (node->size > (size + NODE_S)) {
 			new = (struct node_s *)((uint8_t *)node + size);
 			new->size = node->size - size;
@@ -296,7 +296,7 @@ fl_realloc(void *ptr, size_t size)
 			node->size = size;
 			next->flags &= FLAG_ALLOCATED;
 			next->flags |= new->size;
-			fl_add_node(new);
+			mdx_fl_add_node(new);
 		}
 	} else {
 		if (((next->flags & FLAG_ALLOCATED) == 0) &&
@@ -315,7 +315,7 @@ fl_realloc(void *ptr, size_t size)
 			node->size = size;
 			subs->flags &= FLAG_ALLOCATED;
 			subs->flags |= node->size;
-			fl_add_node(new);
+			mdx_fl_add_node(new);
 
 		} else if (((next->flags & FLAG_ALLOCATED) == 0) &&
 		    (node->size + next->size) == size) {
@@ -331,10 +331,10 @@ fl_realloc(void *ptr, size_t size)
 			subs->flags &= FLAG_ALLOCATED;
 			subs->flags |= node->size;
 		} else {
-			newptr = fl_malloc(size);
+			newptr = mdx_fl_malloc(size);
 			if (newptr) {
 				memcpy(newptr, ptr, node->size);
-				fl_free(ptr);
+				mdx_fl_free(ptr);
 			}
 
 			return (newptr);
