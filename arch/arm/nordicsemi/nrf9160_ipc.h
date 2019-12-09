@@ -39,7 +39,7 @@
 #define	IPC_RECEIVE_CNF(n)	(0x590 + (n) * 0x4)	/* Receive event configuration for EVENTS_RECEIVE(n). */
 #define	IPC_GPMEM(n)		(0x610 + (n) * 0x4)	/* General purpose memory. */
 
-struct ipc_softc {
+struct nrf_ipc_softc {
 	size_t base;
 };
 

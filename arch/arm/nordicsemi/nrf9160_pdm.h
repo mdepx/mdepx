@@ -51,7 +51,7 @@
 #define	PDM_SAMPLE_PTR		0x560	/* RAM address pointer to write samples to with EasyDMA */
 #define	PDM_SAMPLE_MAXCNT	0x564	/* Number of samples to allocate memory for in EasyDMA mode */
 
-struct pdm_softc {
+struct nrf_pdm_softc {
 	size_t base;
 };
 

@@ -44,11 +44,11 @@
 #define	POWER_POWERSTATUS	0x440 /* Modem domain power status */
 #define	POWER_GPREGRET(n)	(0x51C + (n) * 0x4) /* General purpose retention register */
 
-struct power_softc {
+struct nrf_power_softc {
 	size_t base;
 };
 
-void power_init(struct power_softc *sc, uint32_t base);
-void power_reset_events(struct power_softc *sc);
+void nrf_power_init(struct nrf_power_softc *sc, uint32_t base);
+void nrf_power_reset_events(struct nrf_power_softc *sc);
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_POWER_H_ */

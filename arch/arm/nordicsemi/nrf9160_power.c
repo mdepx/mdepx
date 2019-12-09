@@ -35,7 +35,7 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
-power_reset_events(struct power_softc *sc)
+nrf_power_reset_events(struct nrf_power_softc *sc)
 {
 
 	WR4(sc, POWER_EVENTS_SLEEPENTER, 0);
@@ -43,7 +43,7 @@ power_reset_events(struct power_softc *sc)
 }
 
 void
-power_init(struct power_softc *sc, uint32_t base)
+nrf_power_init(struct nrf_power_softc *sc, uint32_t base)
 {
 
 	sc->base = base;

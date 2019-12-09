@@ -67,7 +67,7 @@
 #define	SPIS_DEF		0x55C	/* Default character. Character clocked out in case of an ignored transaction. */
 #define	SPIS_ORC		0x5C0	/* Over-read character */
 
-struct spis_softc {
+struct nrf_spis_softc {
 	size_t base;
 };
 

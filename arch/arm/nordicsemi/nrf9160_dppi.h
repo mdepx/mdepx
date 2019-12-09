@@ -36,7 +36,7 @@
 #define	DPPI_CHENCLR			0x508 /* Channel enable clear register */
 #define	DPPI_CHG(n)			(0x800 + 0x4 * n) /* Channel group n */
 
-struct dppi_softc {
+struct nrf_dppi_softc {
 	size_t base;
 };
 

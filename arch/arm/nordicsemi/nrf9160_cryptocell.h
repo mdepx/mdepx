@@ -29,7 +29,7 @@
 
 #define	CRYPTOCELL_ENABLE	0x500	/* Enable CRYPTOCELL subsystem */
 
-struct cryptocell_softc {
+struct nrf_cryptocell_softc {
 	size_t base;
 };
 

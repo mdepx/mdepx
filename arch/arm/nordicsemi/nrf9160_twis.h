@@ -68,7 +68,7 @@
 #define	TWIS_CONFIG		0x594	/* Configuration register for the address match mechanism */
 #define	TWIS_ORC		0x5C0	/* Over-read character. Character sent out in case of an over-read of the transmit buffer. */
 
-struct twis_softc {
+struct nrf_twis_softc {
 	size_t base;
 };
 

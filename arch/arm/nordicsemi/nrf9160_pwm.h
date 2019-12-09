@@ -59,7 +59,7 @@
 #define	PWM_SEQ_ENDDELAY(n)		(0x52C + (n) * 0x20)	/* Time added after the sequence */
 #define	PWM_PSEL_OUT(n)			(0x560 + (n) * 0x4)	/* Output pin select for PWM channel n, n == 0..3 */
 
-struct pwm_softc {
+struct nrf_pwm_softc {
 	size_t base;
 };
 

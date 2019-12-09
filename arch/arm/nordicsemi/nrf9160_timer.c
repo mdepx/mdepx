@@ -47,9 +47,9 @@
 #endif
 
 void
-timer_intr(void *arg, struct trapframe *tf, int irq)
+nrf_timer_intr(void *arg, struct trapframe *tf, int irq)
 {
-	struct timer_softc *sc;
+	struct nrf_timer_softc *sc;
 
 	sc = arg;
 
@@ -61,9 +61,9 @@ timer_intr(void *arg, struct trapframe *tf, int irq)
 }
 
 static uint32_t
-timer_count(void *arg)
+nrf_timer_count(void *arg)
 {
-	struct timer_softc *sc;
+	struct nrf_timer_softc *sc;
 	uint32_t count;
 
 	sc = arg;
@@ -77,9 +77,9 @@ timer_count(void *arg)
 }
 
 static void
-timer_stop(void *arg)
+nrf_timer_stop(void *arg)
 {
-	struct timer_softc *sc;
+	struct nrf_timer_softc *sc;
 
 	dprintf("%s\n", __func__);
 
@@ -90,9 +90,9 @@ timer_stop(void *arg)
 }
 
 static void
-timer_start(void *arg, uint32_t ticks)
+nrf_timer_start(void *arg, uint32_t ticks)
 {
-	struct timer_softc *sc;
+	struct nrf_timer_softc *sc;
 	uint32_t reg;
 
 	dprintf("%s: ticks %d\n", __func__, ticks);
@@ -108,7 +108,7 @@ timer_start(void *arg, uint32_t ticks)
 }
 
 void
-timer_init(struct timer_softc *sc, uint32_t base)
+nrf_timer_init(struct nrf_timer_softc *sc, uint32_t base)
 {
 
 	sc->base = base;
@@ -117,9 +117,9 @@ timer_init(struct timer_softc *sc, uint32_t base)
 	WR4(sc, TIMER_BITMODE, BITMODE_32);
 	WR4(sc, TIMER_INTENSET, INTENSET_COMPARE(sc->cc_idx));
 
-	sc->mt.start = timer_start;
-	sc->mt.stop = timer_stop;
-	sc->mt.count = timer_count;
+	sc->mt.start = nrf_timer_start;
+	sc->mt.stop = nrf_timer_stop;
+	sc->mt.count = nrf_timer_count;
 	sc->mt.width = 0xffffffff;
 	sc->mt.arg = sc;
 	callout_register(&sc->mt);

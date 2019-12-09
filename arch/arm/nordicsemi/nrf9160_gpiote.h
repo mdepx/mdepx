@@ -55,7 +55,7 @@
 #define	 CONFIG_POLARITY_TOGGLE	(0x3 << CONFIG_POLARITY_S)
 #define	 CONFIG_OUTINIT		(1 << 20) /* Initial value of the output */
 
-struct gpiote_softc {
+struct nrf_gpiote_softc {
 	size_t base;
 };
 

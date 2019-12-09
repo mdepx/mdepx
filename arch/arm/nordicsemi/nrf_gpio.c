@@ -35,7 +35,7 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
-gpio_outset(struct gpio_softc *sc, int pin, int out)
+nrf_gpio_outset(struct nrf_gpio_softc *sc, int pin, int out)
 {
 
 	if (out)
@@ -45,7 +45,7 @@ gpio_outset(struct gpio_softc *sc, int pin, int out)
 }
 
 void
-gpio_dirset(struct gpio_softc *sc, int pin, int dir)
+nrf_gpio_dirset(struct nrf_gpio_softc *sc, int pin, int dir)
 {
 
 	if (dir)
@@ -55,14 +55,14 @@ gpio_dirset(struct gpio_softc *sc, int pin, int dir)
 }
 
 void
-gpio_pincfg(struct gpio_softc *sc, int pin, int cfg)
+nrf_gpio_pincfg(struct nrf_gpio_softc *sc, int pin, int cfg)
 {
 
 	WR4(sc, GPIO_PIN_CNF(pin), cfg);
 }
 
 void
-gpio_init(struct gpio_softc *sc, uint32_t base)
+nrf_gpio_init(struct nrf_gpio_softc *sc, uint32_t base)
 {
 
 	sc->base = base;

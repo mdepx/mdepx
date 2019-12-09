@@ -67,18 +67,18 @@
 #define	 PERIPHID_LOCK			(1 << 8) /* The content of this register can't be changed until the next reset */
 #define	 PERIPHID_PRESENT		(1 << 31) /* Indicate if a peripheral is present with ID n */
 
-struct spu_softc {
+struct nrf_spu_softc {
 	size_t base;
 };
 
-void spu_init(struct spu_softc *sc, uint32_t base);
-void spu_periph_set_attr(struct spu_softc *sc, int periph_id,
+void nrf_spu_init(struct nrf_spu_softc *sc, uint32_t base);
+void nrf_spu_periph_set_attr(struct nrf_spu_softc *sc, int periph_id,
     int secure_attr, int secure_dma);
-void spu_flash_set_perm(struct spu_softc *sc, int region_id,
+void nrf_spu_flash_set_perm(struct nrf_spu_softc *sc, int region_id,
     int secure);
-void spu_sram_set_perm(struct spu_softc *sc, int region_id,
+void nrf_spu_sram_set_perm(struct nrf_spu_softc *sc, int region_id,
     int secure);
-void spu_gpio_set_perm(struct spu_softc *sc, int region_id,
+void nrf_spu_gpio_set_perm(struct nrf_spu_softc *sc, int region_id,
     int perm);
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_SPU_H_ */

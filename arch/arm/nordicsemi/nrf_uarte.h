@@ -86,7 +86,7 @@
 #define	UARTE_TXD_AMOUNT 0x54C	/* Number of bytes transferred in the last transaction */
 #define	UARTE_CONFIG	0x56C	/* Configuration of parity and hardware flow control */
 
-struct uarte_softc {
+struct nrf_uarte_softc {
 	uint32_t base;
 	uint8_t rx_data[16];
 	uint8_t pin_tx;
@@ -96,11 +96,11 @@ struct uarte_softc {
 	void *cb_arg;
 };
 
-void uarte_init(struct uarte_softc *sc, uint32_t base, uint8_t pin_tx,
+void nrf_uarte_init(struct nrf_uarte_softc *sc, uint32_t base, uint8_t pin_tx,
     uint8_t pin_rx, uint32_t baudrate);
-void uarte_putc(struct uarte_softc *sc, char ch);
-void uarte_intr(void *arg, struct trapframe *tf, int irq);
-void uarte_register_callback(struct uarte_softc *sc,
+void nrf_uarte_putc(struct nrf_uarte_softc *sc, char ch);
+void nrf_uarte_intr(void *arg, struct trapframe *tf, int irq);
+void nrf_uarte_register_callback(struct nrf_uarte_softc *sc,
     void (*func)(int c, void *arg), void *arg);
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_UARTE_H_ */

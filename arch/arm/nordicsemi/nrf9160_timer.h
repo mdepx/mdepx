@@ -52,13 +52,13 @@
 #define	TIMER_PRESCALER		0x510	/* Timer prescaler register */
 #define	TIMER_CC(n)		(0x540 + (n) * 0x4)	/* Capture/Compare register n */
 
-struct timer_softc {
+struct nrf_timer_softc {
 	size_t base;
 	uint8_t cc_idx;
 	struct mi_timer mt;
 };
 
-void timer_init(struct timer_softc *sc, uint32_t base);
-void timer_intr(void *arg, struct trapframe *tf, int irq);
+void nrf_timer_init(struct nrf_timer_softc *sc, uint32_t base);
+void nrf_timer_intr(void *arg, struct trapframe *tf, int irq);
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_TIMER_H_ */

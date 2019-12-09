@@ -35,7 +35,7 @@
 #define	EGU_INTENSET			0x304 /* Enable interrupt */
 #define	EGU_INTENCLR			0x308 /* Disable interrupt */
 
-struct egu_softc {
+struct nrf_egu_softc {
 	size_t base;
 };
 

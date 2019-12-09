@@ -42,10 +42,10 @@
 #define	UICR_KEYSLOT_CONFIG_PERM(n)	(0x404 + (n) * 0x8) /* Define permissions for the key slot with ID=n+1. Bits 0-15 and 16-31 can only be written once. */
 #define	UICR_KEYSLOT_KEY_VALUE(n, o)	(0x800 + (n) * 0x10 + (o) * 0x4) /* Define bits [31+o*32:0+o*32] of value assigned to KMU key slot ID=n+1 */
 
-struct uicr_softc {
+struct nrf_uicr_softc {
 	size_t base;
 };
 
-void uicr_init(struct uicr_softc *sc, uint32_t base);
+void nrf_uicr_init(struct nrf_uicr_softc *sc, uint32_t base);
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_UICR_H_ */

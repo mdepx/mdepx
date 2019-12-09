@@ -70,7 +70,7 @@
 #define	TWIM_TXD_LIST		0x550	/* EasyDMA list type */
 #define	TWIM_ADDRESS		0x588	/* Address used in the TWI transfer */
 
-struct twim_softc {
+struct nrf_twim_softc {
 	size_t base;
 };
 

@@ -67,13 +67,13 @@
 #define	 CNF_MCUSEL_PERIPHERAL	(0x3 << CNF_MCUSEL_S) /* Peripheral with dedicated pins */
 #define	 CNF_MCUSEL_TND		(0x7 << CNF_MCUSEL_S) /* Trace and Debug Subsystem */
 
-struct gpio_softc {
+struct nrf_gpio_softc {
 	size_t base;
 };
 
-void gpio_init(struct gpio_softc *sc, uint32_t base);
-void gpio_pincfg(struct gpio_softc *sc, int pin, int cfg);
-void gpio_outset(struct gpio_softc *sc, int pin, int out);
-void gpio_dirset(struct gpio_softc *sc, int pin, int dir);
+void nrf_gpio_init(struct nrf_gpio_softc *sc, uint32_t base);
+void nrf_gpio_pincfg(struct nrf_gpio_softc *sc, int pin, int cfg);
+void nrf_gpio_outset(struct nrf_gpio_softc *sc, int pin, int out);
+void nrf_gpio_dirset(struct nrf_gpio_softc *sc, int pin, int dir);
 
 #endif /* !_ARM_NORDICSEMI_NRF_GPIO_H_ */

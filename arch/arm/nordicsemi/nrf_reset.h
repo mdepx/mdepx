@@ -32,11 +32,11 @@
 #define	 FORCEOFF_RELEASE	(0 << 0)	/* Release force off signal */
 #define	 FORCEOFF_HOLD		(1 << 0)	/* Hold force off signal */
 
-struct reset_softc {
+struct nrf_reset_softc {
 	uint32_t base;
 };
 
-void reset_init(struct reset_softc *sc, uint32_t base);
-void reset_release(struct reset_softc *sc);
+void nrf_reset_init(struct nrf_reset_softc *sc, uint32_t base);
+void nrf_reset_release(struct nrf_reset_softc *sc);
 
 #endif /* !_ARM_NORDICSEMI_NRF_RESET_H_ */

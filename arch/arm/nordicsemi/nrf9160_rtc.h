@@ -43,7 +43,7 @@
 #define	RTC_PRESCALER		0x508	/* 12 bit prescaler for COUNTER frequency (32768/(PRESCALER+1)) */
 #define	RTC_CC(n)		(0x540 + (n) * 0x4) /* Compare register n */
 
-struct rtc_softc {
+struct nrf_rtc_softc {
 	size_t base;
 };
 

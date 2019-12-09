@@ -64,7 +64,7 @@
 #define	SPIM_CONFIG		0x554	/* Configuration register */
 #define	SPIM_ORC		0x5C0	/* Over-read character. Character clocked out in case and over-read of the TXD buffer. */
 
-struct spim_softc {
+struct nrf_spim_softc {
 	size_t base;
 };
 

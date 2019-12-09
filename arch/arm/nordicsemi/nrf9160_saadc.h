@@ -67,7 +67,7 @@
 #define	SAADC_RESULT_MAXCNT		0x630	/* Maximum number of buffer words to transfer */
 #define	SAADC_RESULT_AMOUNT		0x634	/* Number of buffer words transferred since last START */
 
-struct saadc_softc {
+struct nrf_saadc_softc {
 	size_t base;
 };
 

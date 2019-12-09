@@ -60,7 +60,7 @@
 #define	I2S_PSEL_SDIN		0x56C	/* Pin select for SDIN signal. */
 #define	I2S_PSEL_SDOUT		0x570	/* Pin select for SDOUT signal. */
 
-struct i2s_softc {
+struct nrf_i2s_softc {
 	size_t base;
 };
 

@@ -35,14 +35,14 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
-reset_release(struct reset_softc *sc)
+nrf_reset_release(struct nrf_reset_softc *sc)
 {
 
 	WR4(sc, RESET_NETWORK_FORCEOFF, FORCEOFF_RELEASE);
 }
 
 void
-reset_init(struct reset_softc *sc, uint32_t base)
+nrf_reset_init(struct nrf_reset_softc *sc, uint32_t base)
 {
 
 	sc->base = base;

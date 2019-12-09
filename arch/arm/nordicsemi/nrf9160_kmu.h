@@ -38,7 +38,7 @@
 #define	KMU_STATUS			0x40C	/* Status bits for KMU operation */
 #define	KMU_SELECTKEYSLOT		0x500	/* Select key slot ID to be read over AHB or pushed over secure APB when TASKS_PUSH_KEYSLOT is started */
 
-struct kmu_softc {
+struct nrf_kmu_softc {
 	size_t base;
 };
 

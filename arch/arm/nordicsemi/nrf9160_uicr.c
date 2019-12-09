@@ -35,7 +35,7 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
-uicr_init(struct uicr_softc *sc, uint32_t base)
+nrf_uicr_init(struct nrf_uicr_softc *sc, uint32_t base)
 {
 
 	sc->base = base;

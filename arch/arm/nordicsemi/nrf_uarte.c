@@ -35,9 +35,9 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
-uarte_intr(void *arg, struct trapframe *tf, int irq)
+nrf_uarte_intr(void *arg, struct trapframe *tf, int irq)
 {
-	struct uarte_softc *sc;
+	struct nrf_uarte_softc *sc;
 
 	sc = arg;
 
@@ -50,7 +50,7 @@ uarte_intr(void *arg, struct trapframe *tf, int irq)
 }
 
 void
-uarte_putc(struct uarte_softc *sc, char ch)
+nrf_uarte_putc(struct nrf_uarte_softc *sc, char ch)
 {
 	int timeout;
 
@@ -69,7 +69,7 @@ uarte_putc(struct uarte_softc *sc, char ch)
 }
 
 static void
-uarte_start(struct uarte_softc *sc)
+nrf_uarte_start(struct nrf_uarte_softc *sc)
 {
 
 	WR4(sc, UARTE_INTENSET, INTENSET_RXDRDY);
@@ -94,7 +94,7 @@ uarte_start(struct uarte_softc *sc)
 }
 
 void
-uarte_register_callback(struct uarte_softc *sc,
+nrf_uarte_register_callback(struct nrf_uarte_softc *sc,
     void (*func)(int c, void *arg), void *arg)
 {
 
@@ -103,7 +103,7 @@ uarte_register_callback(struct uarte_softc *sc,
 }
 
 void
-uarte_init(struct uarte_softc *sc, uint32_t base,
+nrf_uarte_init(struct nrf_uarte_softc *sc, uint32_t base,
     uint8_t pin_tx, uint8_t pin_rx,
     uint32_t baudrate)
 {
@@ -113,5 +113,5 @@ uarte_init(struct uarte_softc *sc, uint32_t base,
 	sc->pin_rx = pin_rx;
 	sc->baudrate = baudrate;
 
-	uarte_start(sc);
+	nrf_uarte_start(sc);
 }

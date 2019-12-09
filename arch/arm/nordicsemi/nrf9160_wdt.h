@@ -40,7 +40,7 @@
 #define	WDT_CONFIG		0x50C	/* Configuration register */
 #define	WDT_RR(n)		(0x600 + (n) * 0x4)	/* Reload request n (0 to 7) */
 
-struct wdt_softc {
+struct nrf_wdt_softc {
 	size_t base;
 };
 
