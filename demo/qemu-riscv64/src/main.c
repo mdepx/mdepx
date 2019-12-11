@@ -184,7 +184,7 @@ app_init(void)
 
 	uart_16550_init(&uart_sc, UART_BASE,
 	    UART_CLOCK_RATE, DEFAULT_BAUDRATE, 0);
-	console_register(uart_putchar, (void *)&uart_sc);
+	mdx_console_register(uart_putchar, (void *)&uart_sc);
 
 #ifdef MDX_SCHED
 	mdx_sem_init(&sem, 1);

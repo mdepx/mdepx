@@ -184,7 +184,7 @@ app_init(void)
 
 	e300g_uart_init(&uart_sc, 0x10010000,
 	    500000000, DEFAULT_BAUDRATE);
-	console_register(uart_putchar, (void *)&uart_sc);
+	mdx_console_register(uart_putchar, (void *)&uart_sc);
 
 	mdx_sem_init(&sem, 1);
 	mdx_mutex_init(&m);

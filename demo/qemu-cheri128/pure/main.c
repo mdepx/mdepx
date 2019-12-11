@@ -104,7 +104,7 @@ setup_uart(void)
 	cap = cheri_csetbounds(cap, 6);
 
 	uart_16550_init(&uart_sc, cap, UART_CLOCK_RATE, DEFAULT_BAUDRATE, 0);
-	console_register(uart_putchar, (void *)&uart_sc);
+	mdx_console_register(uart_putchar, (void *)&uart_sc);
 }
 
 int

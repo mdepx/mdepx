@@ -151,7 +151,7 @@ app_init(void)
 
 	uart_16550_init(&uart_sc, UART_BASE | 0xffffffffa0000000,
 	    UART_CLOCK_RATE, DEFAULT_BAUDRATE, 0);
-	console_register(uart_putchar, (void *)&uart_sc);
+	mdx_console_register(uart_putchar, (void *)&uart_sc);
 
 	mips_install_vectors();
 	mips_install_intr_map(mips_intr_map);
