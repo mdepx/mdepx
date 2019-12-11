@@ -36,7 +36,7 @@ mdx_fifo_init(struct mdx_fifo *f)
 {
 
 	list_init(&f->list);
-
+	sl_init(&f->l);
 	mdx_sem_init(&f->sem, 0);
 }
 
@@ -44,9 +44,34 @@ void
 mdx_fifo_put(struct mdx_fifo *f, struct entry *e)
 {
 
+	critical_enter();
+	sl_lock(&f->l);
+
 	list_append(&f->list, e);
 
+	sl_unlock(&f->l);
+	critical_exit();
+
 	mdx_sem_post(&f->sem);
+}
+
+struct entry *
+mdx_fifo_get_wait(struct mdx_fifo *f)
+{
+	struct entry *e;
+
+	mdx_sem_wait(&f->sem);
+
+	critical_enter();
+	sl_lock(&f->l);
+
+	e = f->list.next;
+	list_remove(e);
+
+	sl_unlock(&f->l);
+	critical_exit();
+
+	return (e);
 }
 
 struct entry *
@@ -54,11 +79,17 @@ mdx_fifo_get(struct mdx_fifo *f)
 {
 	struct entry *e;
 
-	mdx_sem_wait(&f->sem);
+	if (mdx_sem_trywait(&f->sem) == 0)
+		return (NULL);
+
+	critical_enter();
+	sl_lock(&f->l);
 
 	e = f->list.next;
-
 	list_remove(e);
+
+	sl_unlock(&f->l);
+	critical_exit();
 
 	return (e);
 }

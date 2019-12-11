@@ -31,6 +31,7 @@
 #include <sys/sem.h>
 
 struct mdx_fifo {
+	struct spinlock l;
 	struct entry list;
 	mdx_sem_t sem;
 };
@@ -38,5 +39,6 @@ struct mdx_fifo {
 void mdx_fifo_init(struct mdx_fifo *f);
 void mdx_fifo_put(struct mdx_fifo *f, struct entry *e);
 struct entry * mdx_fifo_get(struct mdx_fifo *f);
+struct entry * mdx_fifo_get_wait(struct mdx_fifo *f);
 
 #endif /* !_SYS_FIFO_H_ */
