@@ -31,4 +31,14 @@
 #define	MDX_ERROR	-1
 #define	MDX_EXIST	-2
 
+#define	EIO		5
+#define	ENOMEM		12
+#define	EBUSY		16
+#define	ENODEV		19
+#define	EINVAL		22
+#define	EFBIG		27
+#define	EALREADY	37
+#define	ENOBUFS		55
+#define	ENOTCONN	57
+
 #endif
