@@ -708,6 +708,26 @@ atomic_testandset_32(volatile uint32_t *p, u_int v)
 }
 
 static __inline int
+atomic_testandclear_32(volatile uint32_t *p, u_int v)
+{
+	uint32_t tmp, tmp2, res, mask;
+
+	mask = 1u << (v & 0x1f);
+	tmp = tmp2 = 0;
+	__asm __volatile(
+	"1:	ldrex	%0, [%4]	\n"
+	"	and	%1, %0, %3	\n"
+	"	strex	%2, %1, [%4]	\n"
+	"	cmp	%2, #0		\n"
+	"	it	ne		\n"
+	"	bne	1b		\n"
+	: "=&r" (res), "=&r" (tmp), "=&r" (tmp2)
+	: "r" (~mask), "r" (p)
+	: "cc", "memory");
+	return ((res & mask) != 0);
+}
+
+static __inline int
 atomic_testandset_int(volatile u_int *p, u_int v)
 {
 
