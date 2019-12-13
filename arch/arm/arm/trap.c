@@ -43,13 +43,14 @@ static void
 dump_frame(struct trapframe *tf)
 {
 
+	printf("tf %p\n", tf);
 	printf("tf->hwregs->r0 == %x\n", tf->hwregs.r0);
 	printf("tf->hwregs->r1 == %x\n", tf->hwregs.r1);
 	printf("tf->hwregs->r2 == %x\n", tf->hwregs.r2);
 	printf("tf->hwregs->r3 == %x\n", tf->hwregs.r3);
 	printf("tf->hwregs->r12 == %x\n", tf->hwregs.r12);
-	printf("tf->hwregs->r14 == %x\n", tf->hwregs.r14);
-	printf("tf->hwregs->r15 == %x\n", tf->hwregs.r15);
+	printf("tf->hwregs->r14 (lr) == %x\n", tf->hwregs.r14);
+	printf("tf->hwregs->r15 (pc) == %x\n", tf->hwregs.r15);
 
 	printf("tf->tf_r4 == %x\n", tf->tf_r4);
 	printf("tf->tf_r5 == %x\n", tf->tf_r5);
