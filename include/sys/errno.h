@@ -32,6 +32,7 @@
 #define	MDX_EXIST	-2
 
 #define	EIO		5
+#define	EDEADLK		11
 #define	ENOMEM		12
 #define	EBUSY		16
 #define	ENODEV		19
