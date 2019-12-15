@@ -32,7 +32,6 @@
 #include <arm/nordicsemi/nrf9160_egu.h>
 #include <arm/nordicsemi/nrf9160_gpiote.h>
 #include <arm/nordicsemi/nrf9160_i2s.h>
-#include <arm/nordicsemi/nrf9160_ipc.h>
 #include <arm/nordicsemi/nrf9160_kmu.h>
 #include <arm/nordicsemi/nrf9160_pdm.h>
 #include <arm/nordicsemi/nrf9160_power.h>
@@ -48,6 +47,7 @@
 #include <arm/nordicsemi/nrf9160_uicr.h>
 #include <arm/nordicsemi/nrf9160_wdt.h>
 #include <arm/nordicsemi/nrf_gpio.h>
+#include <arm/nordicsemi/nrf_ipc.h>
 #include <arm/nordicsemi/nrf_reset.h>
 #include <arm/nordicsemi/nrf_uarte.h>
 
