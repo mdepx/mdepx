@@ -47,8 +47,15 @@
 /* Execution PSR (EPSR) register */
 #define	XPSR_T		(1 << 24) /* Thumb state bit (T-bit) */
 
-#define	EXCP_RET_HANDLER	0xFFFFFFF1
-#define	EXCP_RET_THREAD_MSP	0xFFFFFFF9
-#define	EXCP_RET_THREAD_PSP	0xFFFFFFFD
+/* Exception Return. */
+#define	EXCP_RET		(0xff << 24)
+#define	EXCP_RET_FTYPE		(1 << 4) /* The PE did not allocate space on the stack for FP context. */
+#define	EXCP_RET_MODE_THREAD	(1 << 3) /* Indicates the mode that was stacked from. */
+#define	EXCP_RET_SPSEL_PSP	(1 << 2) /* Indicates which stack contains the exception stack frame. */
+
+/* Exception Return with Security Extensions. */
+#define	EXCP_RET_S_SECURE	(1 << 6) /* Indicates whether registers have been pushed to a Secure or Non-secure stack. */
+#define	EXCP_RET_DCRS		(1 << 5) /* Default rules for stacking the callee registers are followed. */
+#define	EXCP_RET_ES_SECURE	(1 << 0) /* Indicates the Security state the exception was taken to. */
 
 #endif /* !_MACHINE_CPUREGS_H_ */

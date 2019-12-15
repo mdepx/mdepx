@@ -83,7 +83,10 @@ md_setup_frame(struct trapframe *tf, void *entry,
 {
 	struct hwregs *hw;
 
-	tf->tf_r14 = EXCP_RET_THREAD_MSP;
+	tf->tf_r14 = EXCP_RET | EXCP_RET_FTYPE | EXCP_RET_MODE_THREAD;
+
+	/* Security Extensions only. Ignored on non-trustzone devices. */
+	tf->tf_r14 |= EXCP_RET_DCRS;
 
 	hw = (struct hwregs *)&tf->hwregs;
 	hw->r0 = (uint32_t)arg;
