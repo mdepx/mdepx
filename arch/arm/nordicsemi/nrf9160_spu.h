@@ -38,6 +38,13 @@
 #define	SPU_INTENCLR		0x308	/* Disable interrupt */
 #define	SPU_CAP			0x400	/* Show implemented features for the current device */
 #define	SPU_EXTDOMAIN_PERM(n)	(0x440 + (n) * 0x4)	/* Access for bus access generated from the external domain n. List capabilities of the external domain n */
+#define	 EXTDOMAIN_USERMAPPING_SHIFT	0 /* Define configuration capabilities for TrustZone Cortex-M secure attribute */
+#define	 EXTDOMAIN_USERMAPPING_M	(0x3 << EXTDOMAIN_USERMAPPING_SHIFT)
+#define	 EXTDOMAIN_USERMAPPING_NS	(0x0 << EXTDOMAIN_USERMAPPING_SHIFT)
+#define	 EXTDOMAIN_USERMAPPING_SECURE	(0x1 << EXTDOMAIN_USERMAPPING_SHIFT)
+#define	 EXTDOMAIN_USERMAPPING_US	(0x2 << EXTDOMAIN_USERMAPPING_SHIFT)
+#define	 EXTDOMAIN_SECATTR_SECURE		(1 << 4) /* Bus accesses from this domain have secure attribute set */
+#define	 EXTDOMAIN_LOCK			(1 << 8) /* The content of this register can't be changed until the next reset */
 #define	SPU_DPPI_PERM(n)	(0x480 + (n) * 0x8)	/* Select between secure and non-secure attribute for the DPPI channels. */
 #define	SPU_DPPI_LOCK(n)	(0x484 + (n) * 0x8)	/* Prevent further modification of the corresponding PERM register */
 #define	SPU_GPIOPORT_PERM(n)	(0x4C0 + (n) * 0x8)	/* Select between secure and non-secure attribute for pins 0 to 31 of port n. Retained. */
@@ -73,12 +80,13 @@ struct nrf_spu_softc {
 
 void nrf_spu_init(struct nrf_spu_softc *sc, uint32_t base);
 void nrf_spu_periph_set_attr(struct nrf_spu_softc *sc, int periph_id,
-    int secure_attr, int secure_dma);
+    bool secure_attr, bool secure_dma);
 void nrf_spu_flash_set_perm(struct nrf_spu_softc *sc, int region_id,
-    int secure);
+    bool secure);
 void nrf_spu_sram_set_perm(struct nrf_spu_softc *sc, int region_id,
-    int secure);
+    bool secure);
 void nrf_spu_gpio_set_perm(struct nrf_spu_softc *sc, int region_id,
     int perm);
+void nrf_spu_extdomain(struct nrf_spu_softc *sc, bool secure, bool lock);
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_SPU_H_ */

@@ -36,7 +36,7 @@
 
 void
 nrf_spu_periph_set_attr(struct nrf_spu_softc *sc, int periph_id,
-    int secure_attr, int secure_dma)
+    bool secure_attr, bool secure_dma)
 {
 	int reg;
 
@@ -61,7 +61,7 @@ nrf_spu_periph_set_attr(struct nrf_spu_softc *sc, int periph_id,
 
 void
 nrf_spu_flash_set_perm(struct nrf_spu_softc *sc, int region_id,
-    int secure)
+    bool secure)
 {
 	int reg;
 
@@ -77,7 +77,7 @@ nrf_spu_flash_set_perm(struct nrf_spu_softc *sc, int region_id,
 
 void
 nrf_spu_sram_set_perm(struct nrf_spu_softc *sc, int region_id,
-    int secure)
+    bool secure)
 {
 	int reg;
 
@@ -100,8 +100,24 @@ nrf_spu_gpio_set_perm(struct nrf_spu_softc *sc, int region_id,
 }
 
 void
+nrf_spu_extdomain(struct nrf_spu_softc *sc, bool secure, bool lock)
+{
+	int reg;
+
+	reg = EXTDOMAIN_USERMAPPING_US;
+	if (secure)
+		reg |= EXTDOMAIN_SECATTR_SECURE;
+
+	if (lock)
+		reg |= EXTDOMAIN_LOCK;
+
+	WR4(sc, SPU_EXTDOMAIN_PERM(0), reg);
+}
+
+void
 nrf_spu_init(struct nrf_spu_softc *sc, uint32_t base)
 {
 
 	sc->base = base;
+
 }
