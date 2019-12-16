@@ -27,8 +27,15 @@
 #ifndef _ARM_NORDICSEMI_NRF_IPC_H_
 #define _ARM_NORDICSEMI_NRF_IPC_H_
 
+#include <machine/frame.h>
+
+#define	NRF_IPC_MAX_EVENTS	16
+
 #define	IPC_TASKS_SEND(n)	(0x000 + (n) * 0x4)	/* Trigger events on channel enabled in SEND_CNF(n). */
 #define	IPC_SUBSCRIBE_SEND(n)	(0x080 + (n) * 0x4)	/* Subscribe configuration for task SEND(n) */
+#define	 SUBSCRIBE_SEND_CHIDX_S	0			/* Channel that task SEND[n] will subscribe to */
+#define	 SUBSCRIBE_SEND_CHIDX_M	(0xff << SUBSCRIBE_SEND_CHIDX_S)
+#define	 SUBSCRIBE_SEND_EN	(1 << 31)		/* Enable subscription */
 #define	IPC_EVENTS_RECEIVE(n)	(0x100 + (n) * 0x4)	/* Event received on one or more of the enabled channels in RECEIVE_C */
 #define	IPC_PUBLISH_RECEIVE(n)	(0x180 + (n) * 0x4)	/* Publish configuration for event RECEIVE(n) */
 #define	IPC_INTEN		0x300			/* Enable or disable interrupt */
@@ -44,5 +51,13 @@ struct nrf_ipc_softc {
 };
 
 void nrf_ipc_init(struct nrf_ipc_softc *sc, uint32_t base);
+void nrf_ipc_intr(void *arg, struct trapframe *tf, int irq);
+
+void nrf_ipc_trigger(struct nrf_ipc_softc *sc, int ev);
+void nrf_ipc_configure_send(struct nrf_ipc_softc *sc,
+    int ev, int chanmask);
+void nrf_ipc_configure_recv(struct nrf_ipc_softc *sc,
+    int ev, int chanmask);
+void nrf_ipc_inten(struct nrf_ipc_softc *sc, int ev, bool set);
 
 #endif /* !_ARM_NORDICSEMI_NRF_IPC_H_ */

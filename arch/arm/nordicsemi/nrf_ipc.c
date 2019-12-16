@@ -35,6 +35,58 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
+nrf_ipc_trigger(struct nrf_ipc_softc *sc, int ev)
+{
+
+	WR4(sc, IPC_TASKS_SEND(ev), 1);
+}
+
+void
+nrf_ipc_configure_send(struct nrf_ipc_softc *sc,
+    int ev, int chanmask)
+{
+
+	WR4(sc, IPC_SEND_CNF(ev), chanmask);
+}
+
+void
+nrf_ipc_configure_recv(struct nrf_ipc_softc *sc,
+    int ev, int chanmask)
+{
+
+	WR4(sc, IPC_RECEIVE_CNF(ev), chanmask);
+}
+
+void
+nrf_ipc_inten(struct nrf_ipc_softc *sc, int ev, bool set)
+{
+
+	if (set)
+		WR4(sc, IPC_INTENSET, (1 << ev));
+	else
+		WR4(sc, IPC_INTENCLR, (1 << ev));
+}
+
+void
+nrf_ipc_intr(void *arg, struct trapframe *tf, int irq)
+{
+	struct nrf_ipc_softc *sc;
+	int reg;
+	int ev;
+
+	sc = arg;
+
+	for (ev = 0; ev < NRF_IPC_MAX_EVENTS; ev++) {
+		reg = RD4(sc, IPC_EVENTS_RECEIVE(ev));
+		if (reg) {
+			printf("%s: ev %d chanmask %x\n",
+			    __func__, ev, reg);
+			WR4(sc, IPC_EVENTS_RECEIVE(ev), 0);
+		}
+	}
+}
+
+void
 nrf_ipc_init(struct nrf_ipc_softc *sc, uint32_t base)
 {
 
