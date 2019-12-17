@@ -46,8 +46,14 @@
 #define	IPC_RECEIVE_CNF(n)	(0x590 + (n) * 0x4)	/* Receive event configuration for EVENTS_RECEIVE(n). */
 #define	IPC_GPMEM(n)		(0x610 + (n) * 0x4)	/* General purpose memory. */
 
+struct ipc_event {
+	void (*cb)(void *arg);
+	void *user;
+};
+
 struct nrf_ipc_softc {
 	size_t base;
+	struct ipc_event ev[NRF_IPC_MAX_EVENTS];
 };
 
 void nrf_ipc_init(struct nrf_ipc_softc *sc, uint32_t base);
@@ -57,7 +63,7 @@ void nrf_ipc_trigger(struct nrf_ipc_softc *sc, int ev);
 void nrf_ipc_configure_send(struct nrf_ipc_softc *sc,
     int ev, int chanmask);
 void nrf_ipc_configure_recv(struct nrf_ipc_softc *sc,
-    int ev, int chanmask);
+    int ev, int chanmask, void (*cb)(void *arg), void *user);
 void nrf_ipc_inten(struct nrf_ipc_softc *sc, int ev, bool set);
 
 #endif /* !_ARM_NORDICSEMI_NRF_IPC_H_ */

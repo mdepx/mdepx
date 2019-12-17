@@ -29,6 +29,15 @@
 
 #include "nrf_ipc.h"
 
+#define	NRF_IPC_DEBUG
+#undef	NRF_IPC_DEBUG
+
+#ifdef	NRF_IPC_DEBUG
+#define	dprintf(fmt, ...)	printf(fmt, ##__VA_ARGS__)
+#else
+#define	dprintf(fmt, ...)
+#endif
+
 #define	RD4(_sc, _reg)		\
 	*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	\
@@ -51,8 +60,11 @@ nrf_ipc_configure_send(struct nrf_ipc_softc *sc,
 
 void
 nrf_ipc_configure_recv(struct nrf_ipc_softc *sc,
-    int ev, int chanmask)
+    int ev, int chanmask, void (*cb)(void *arg), void *user)
 {
+
+	sc->ev[ev].cb = cb;
+	sc->ev[ev].user = user;
 
 	WR4(sc, IPC_RECEIVE_CNF(ev), chanmask);
 }
@@ -71,17 +83,20 @@ void
 nrf_ipc_intr(void *arg, struct trapframe *tf, int irq)
 {
 	struct nrf_ipc_softc *sc;
-	int reg;
-	int ev;
+	struct ipc_event *ev;
+	int pending;
+	int i;
 
 	sc = arg;
 
-	for (ev = 0; ev < NRF_IPC_MAX_EVENTS; ev++) {
-		reg = RD4(sc, IPC_EVENTS_RECEIVE(ev));
-		if (reg) {
-			printf("%s: ev %d chanmask %x\n",
-			    __func__, ev, reg);
-			WR4(sc, IPC_EVENTS_RECEIVE(ev), 0);
+	pending = RD4(sc, IPC_INTPEND);
+	for (i = 0; i < NRF_IPC_MAX_EVENTS; i++) {
+		if (pending & (1 << i)) {
+			ev = &sc->ev[i];
+			WR4(sc, IPC_EVENTS_RECEIVE(i), 0);
+			dprintf("%s: ev %d\n", __func__, i);
+			if (ev->cb != NULL)
+				ev->cb(ev->user);
 		}
 	}
 }
