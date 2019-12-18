@@ -125,14 +125,15 @@ static const char *h(const void *buf, size_t len)
 #endif
 
 typedef struct {
-	uint64_t a;
-	uint64_t b;
+	uint8_t a[16];
 } uint128_t;
 
 static void xor_128(const uint128_t *p, const uint128_t *q, uint128_t *r)
 {
-	r->a = p->a ^ q->a;
-	r->b = p->b ^ q->b;
+	int i;
+
+	for (i = 0; i < 16; i++)
+		r->a[i] = p->a[i] ^ q->a[i];
 }
 
 static int le_encrypt(const uint8_t key[16], const uint8_t plaintext[16],
