@@ -34,6 +34,7 @@ struct mdx_ringbuf {
 	int flags;
 #define	MDX_RINGBUF_OWN		(1 << 1)
 	struct mdx_ringbuf *next;
+	uint32_t user;
 };
 
 struct mdx_ringbuf_softc {
