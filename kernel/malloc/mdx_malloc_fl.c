@@ -45,7 +45,7 @@ struct node_s {
 
 #define	NODE_S	sizeof(struct node_s)
 
-struct node_s nodelist[32];
+static struct node_s nodelist[32];
 
 static int
 size2i(uint32_t size)
@@ -63,7 +63,6 @@ size2i(uint32_t size)
 
 	return (i);
 }
-
 
 static void
 mdx_fl_add_node(struct node_s *node)
