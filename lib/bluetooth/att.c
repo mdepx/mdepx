@@ -302,6 +302,7 @@ static uint8_t att_find_info_rsp(struct bt_conn *conn, uint16_t start_handle,
 
 	memset(&data, 0, sizeof(data));
 
+	data.conn = conn;
 	data.buf = bt_att_create_pdu(conn, BT_ATT_OP_FIND_INFO_RSP, 0);
 	if (!data.buf) {
 		return BT_ATT_ERR_UNLIKELY;
@@ -408,6 +409,7 @@ static uint8_t att_find_type_rsp(struct bt_conn *conn, uint16_t start_handle,
 		return BT_ATT_ERR_UNLIKELY;
 	}
 
+	data.conn = conn;
 	data.value = value;
 	data.value_len = value_len;
 
@@ -545,6 +547,7 @@ static uint8_t att_read_type_rsp(struct bt_conn *conn, struct bt_uuid *uuid,
 		return BT_ATT_ERR_UNLIKELY;
 	}
 
+	data.conn = conn;
 	data.uuid = uuid;
 	data.rsp = bt_buf_add(data.buf, sizeof(*data.rsp));
 	data.rsp->len = 0;
