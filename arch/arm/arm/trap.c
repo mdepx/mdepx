@@ -35,8 +35,10 @@
 #include <arm/arm/nvic.h>
 
 struct trapframe *arm_exception(struct trapframe *tf, int irq);
+
 #ifdef MDX_SCHED
 static struct thread intr_thread[MDX_CPU_MAX];
+size_t intr_stack[MDX_CPU_MAX][MDX_ARM_INTR_STACK_SIZE];
 #endif
 
 static void
@@ -94,7 +96,7 @@ arm_exception(struct trapframe *tf, int exc_code)
 	released = false;
 	intr = false;
 
-	/* TODO: use interrupt stack. */
+	/* TODO: compare thread's stack base and tf. */
 
 	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
 	curthread->td_critnest++;

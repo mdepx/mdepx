@@ -38,6 +38,12 @@ exception:
 	stmdb	sp!, {r3-r11, r14}	/* Save primask, r4-r11 and r14. */
 	cpsid	i			/* Disable interrupts. */
 	mov	r0, sp			/* r0 = trapframe. */
+
+	/* Setup interrupt stack. */
+	ldr	r4, =intr_stack		/* r4 = interrupt stack (bottom) */
+	add	r4, r4, MDX_ARM_INTR_STACK_SIZE	/* interrupt stack (top) */
+	msr	msp, r4
+
 	bl	arm_exception		/* Branch link to arm_exception() */
 	ldmia	r0!, {r3-r11, r14}	/* Load primask, r4-r11 and r14. */
 	msr 	msp, r0			/* Restore sp. */
