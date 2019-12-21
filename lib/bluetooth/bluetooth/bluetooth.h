@@ -198,4 +198,7 @@ static inline int bt_addr_le_to_str(const bt_addr_le_t *addr, char *str,
 			addr->val[5], addr->val[4], addr->val[3],
 			addr->val[2], addr->val[1], addr->val[0], type);
 }
+
+int hci_le_set_random_address(const bt_addr_t *addr);
+
 #endif /* __BT_BLUETOOTH_H */

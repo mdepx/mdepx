@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016, Intel Corporation
+ * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -66,6 +67,7 @@ typedef struct {
 #define BT_EIR_UUID32_ALL		0x05 /* 32-bit UUID, all listed */
 #define BT_EIR_UUID128_SOME		0x06 /* 128-bit UUID, more available */
 #define BT_EIR_UUID128_ALL		0x07 /* 128-bit UUID, all listed */
+#define BT_EIR_NAME_SHORTENED		0x08 /* Shortened name */
 #define BT_EIR_NAME_COMPLETE		0x09 /* Complete name */
 #define BT_EIR_TX_POWER			0x0a /* Tx Power */
 #define BT_EIR_SOLICIT16		0x14 /* Solicit UUIDs, 16-bit */
@@ -77,6 +79,7 @@ typedef struct {
 #define BT_EIR_SVC_DATA128		0x21 /* Service data, 128-bit UUID */
 #define BT_EIR_MANUFACTURER_DATA	0xff /* Manufacturer Specific Data */
 
+#define BT_LE_AD_LIMITED		0x01 /* Limited Discoverable */
 #define BT_LE_AD_GENERAL		0x02 /* General Discoverable */
 #define BT_LE_AD_NO_BREDR		0x04 /* BR/EDR not supported */
 
@@ -197,6 +200,11 @@ struct bt_hci_rp_le_read_local_features {
 	uint8_t  features[8];
 } __packed;
 
+#define BT_HCI_OP_LE_SET_RANDOM_ADDRESS		BT_OP(BT_OGF_LE, 0x0005)
+struct bt_hci_cp_le_set_random_address {
+	bt_addr_t bdaddr;
+} __packed;
+
 /* Advertising types */
 #define BT_LE_ADV_IND				0x00
 #define BT_LE_ADV_DIRECT_IND			0x01
@@ -273,6 +281,12 @@ struct bt_hci_cp_le_create_conn {
 } __packed;
 
 #define BT_HCI_OP_LE_CREATE_CONN_CANCEL		BT_OP(BT_OGF_LE, 0x000e)
+
+#define BT_HCI_OP_LE_CLEAR_WHITE_LIST		BT_OP(BT_OGF_LE, 0x0010)
+#define BT_HCI_OP_LE_ADD_DEVICE_TO_WHITE_LIST	BT_OP(BT_OGF_LE, 0x0011)
+struct bt_hci_cp_le_clear_white_list {
+	bt_addr_le_t addr;
+} __packed;
 
 #define BT_HCI_OP_LE_CONN_UPDATE		BT_OP(BT_OGF_LE, 0x0013)
 struct hci_cp_le_conn_update {
@@ -388,6 +402,8 @@ struct bt_hci_ev_le_advertising_info {
 	uint8_t      length;
 	uint8_t      data[0];
 } __packed;
+
+#define BT_HCI_EVT_LE_CONN_UPDATE_COMPLETE	0x03
 
 #define BT_HCI_EVT_LE_LTK_REQUEST		0x05
 struct bt_hci_evt_le_ltk_request {

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016, Intel Corporation
+ * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -772,7 +773,7 @@ static void le_conn_complete(struct bt_buf *buf)
 	}
 
 	conn->handle   = handle;
-	conn->src.type = BT_ADDR_LE_PUBLIC;
+	conn->src.type = BT_ADDR_LE_RANDOM;
 	memcpy(conn->src.val, bt_dev.bdaddr.val, sizeof(bt_dev.bdaddr.val));
 	copy_id_addr(conn, &evt->peer_addr);
 	conn->le_conn_interval = sys_le16_to_cpu(evt->interval);
@@ -936,6 +937,9 @@ static void hci_le_meta_event(struct bt_buf *buf)
 		break;
 	case BT_HCI_EVT_LE_ADVERTISING_REPORT:
 		le_adv_report(buf);
+		break;
+	case BT_HCI_EVT_LE_CONN_UPDATE_COMPLETE:
+		BT_DBG("meta event: connection update complete\n");
 		break;
 	case BT_HCI_EVT_LE_LTK_REQUEST:
 		le_ltk_request(buf);
@@ -1154,6 +1158,31 @@ static void le_read_buffer_size_complete(struct bt_buf *buf)
 
 	bt_dev.le_mtu = sys_le16_to_cpu(rp->le_max_len);
 	bt_dev.le_pkts = rp->le_max_num;
+}
+
+int hci_le_set_random_address(const bt_addr_t *addr)
+{
+	struct bt_buf *buf;
+	void *data;
+	int err;
+
+	BT_DBG("%s", bt_addr_str(addr));
+
+	buf = bt_hci_cmd_create(BT_HCI_OP_LE_SET_RANDOM_ADDRESS,
+	    sizeof(bt_addr_t));
+	if (!buf)
+		return (-ENOBUFS);
+
+	data = bt_buf_add(buf, sizeof(bt_addr_t));
+	memcpy(data, addr, sizeof(bt_addr_t));
+
+	err = bt_hci_cmd_send_sync(BT_HCI_OP_LE_SET_RANDOM_ADDRESS, buf, NULL);
+	if (err)
+		return (err);
+
+	memcpy(&bt_dev.bdaddr, addr, sizeof(bt_addr_t));
+
+	return (0);
 }
 
 static int hci_init(void)
@@ -1498,6 +1527,8 @@ send_set_param:
 	set_param->max_interval		= sys_cpu_to_le16(0x0800);
 	set_param->type			= type;
 	set_param->channel_map		= 0x07;
+	set_param->own_addr_type	= 0x1;	/* random */
+	set_param->filter_policy	= 0x0;
 
 	bt_hci_cmd_send(BT_HCI_OP_LE_SET_ADV_PARAMETERS, buf);
 
