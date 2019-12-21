@@ -45,13 +45,25 @@ fiber_start(char *stack, unsigned stack_size, nano_fiber_entry_t entry,
 
 	KASSERT(arg2 == 0, ("Not supported"));
 
+	stack_size = BLUETOOTH_STACK_SIZE;
+
 	td = zalloc(sizeof(struct thread));
+	if (td == NULL) {
+		printf("Could not allocate thread.");
+		return;
+	}
+
 	td->td_stack_size = stack_size;
-	td->td_stack = (void *)(stack + stack_size);
+	td->td_stack_bottom = zalloc(stack_size);
+	if (td->td_stack_bottom == NULL) {
+		printf("Could not allocate stack.");
+		free(td);
+		return;
+	}
 
-	bzero(stack, stack_size);
+	td->td_stack = (void *)((uintptr_t)td->td_stack_bottom + stack_size);
 
-	quantum = 10000;
+	quantum = 100000;
 
 	mdx_thread_setup(td, "fiber", prio, quantum, entry, (void *)arg1);
 	mdx_sched_add(td);
