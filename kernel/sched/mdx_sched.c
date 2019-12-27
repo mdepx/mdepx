@@ -207,8 +207,8 @@ mdx_sched_next(void)
 
 	if (!td->td_idle) {
 		td->td_state = TD_STATE_RUNNING;
-		callout_init(&td->td_c);
-		callout_set(&td->td_c, td->td_quantum, mdx_sched_cb, td);
+		mdx_callout_init(&td->td_c);
+		mdx_callout_set(&td->td_c, td->td_quantum, mdx_sched_cb, td);
 	}
 
 	dprintf("%s%d: curthread %p, tf %p, name %s, idx %x\n",

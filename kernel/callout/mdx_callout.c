@@ -55,34 +55,34 @@ static struct spinlock l[MDX_CPU_MAX];
 #define	callout_unlock(cpuid)	(void)cpuid;
 #endif
 
-static struct callout *
+static struct mdx_callout *
 first(int cpuid)
 {
-	struct callout *c;
+	struct mdx_callout *c;
 
 	if (list_empty(&callouts_list[cpuid]))
 		return (NULL);
 
-	c = CONTAINER_OF(callouts_list[cpuid].next, struct callout, node);
+	c = CONTAINER_OF(callouts_list[cpuid].next, struct mdx_callout, node);
 
 	return (c);
 }
 
-static struct callout *
-next(int cpuid, struct callout *c0)
+static struct mdx_callout *
+next(int cpuid, struct mdx_callout *c0)
 {
-	struct callout *c;
+	struct mdx_callout *c;
 
 	if (c0->node.next == &callouts_list[cpuid])
 		return (NULL);
 
-	c = CONTAINER_OF(c0->node.next, struct callout, node);
+	c = CONTAINER_OF(c0->node.next, struct mdx_callout, node);
 
 	return (c);
 }
 
 void
-callout_init(struct callout *c)
+mdx_callout_init(struct mdx_callout *c)
 {
 
 	c->state = CALLOUT_STATE_READY;
@@ -110,9 +110,9 @@ get_elapsed(uint32_t *count_saved)
 }
 
 static void
-callout_set_one(struct callout *c0)
+mdx_callout_set_one(struct mdx_callout *c0)
 {
-	struct callout *c;
+	struct mdx_callout *c;
 	uint32_t elapsed;
 	int cpuid;
 
@@ -157,7 +157,7 @@ callout_set_one(struct callout *c0)
 }
 
 int
-callout_set_locked(struct callout *c, uint32_t ticks,
+mdx_callout_set_locked(struct mdx_callout *c, uint32_t ticks,
     void (*func)(void *arg), void *arg)
 {
 
@@ -179,14 +179,14 @@ callout_set_locked(struct callout *c, uint32_t ticks,
 	c->arg = arg;
 	c->cpuid = PCPU_GET(cpuid);
 
-	callout_set_one(c);
+	mdx_callout_set_one(c);
 	c->flags |= CALLOUT_FLAG_ACTIVE;
 
 	return (MDX_OK);
 }
 
 int
-callout_set(struct callout *c, uint32_t ticks,
+mdx_callout_set(struct mdx_callout *c, uint32_t ticks,
     void (*func)(void *arg), void *arg)
 {
 	int cpuid;
@@ -197,7 +197,7 @@ callout_set(struct callout *c, uint32_t ticks,
 	cpuid = PCPU_GET(cpuid);
 
 	callout_lock(cpuid);
-	error = callout_set_locked(c, ticks, func, arg);
+	error = mdx_callout_set_locked(c, ticks, func, arg);
 	callout_unlock(cpuid);
 
 	critical_exit();
@@ -206,9 +206,9 @@ callout_set(struct callout *c, uint32_t ticks,
 }
 
 static int
-callout_cancel_locked(struct callout *c)
+mdx_callout_cancel_locked(struct mdx_callout *c)
 {
-	struct callout *n;
+	struct mdx_callout *n;
 
 	if ((c->flags & CALLOUT_FLAG_ACTIVE) == 0) {
 		/* Callout c is not in the callouts queue. */
@@ -227,7 +227,7 @@ callout_cancel_locked(struct callout *c)
 }
 
 int
-callout_cancel(struct callout *c)
+mdx_callout_cancel(struct mdx_callout *c)
 {
 	int error;
 
@@ -236,16 +236,16 @@ callout_cancel(struct callout *c)
 	    ("%s: Not in critical section.", __func__));
 
 	callout_lock(c->cpuid);
-	error = callout_cancel_locked(c);
+	error = mdx_callout_cancel_locked(c);
 	callout_unlock(c->cpuid);
 
 	return (error);
 }
 
 int
-callout_callback(struct mi_timer *mt)
+mdx_callout_callback(struct mi_timer *mt)
 {
-	struct callout *c, *tmp;
+	struct mdx_callout *c, *tmp;
 	uint32_t ticks_elapsed;
 	int cpuid;
 
@@ -298,7 +298,7 @@ callout_callback(struct mi_timer *mt)
 }
 
 int
-callout_register(struct mi_timer *mt)
+mdx_callout_register(struct mi_timer *mt)
 {
 	int i;
 

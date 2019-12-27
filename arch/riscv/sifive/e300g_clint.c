@@ -113,7 +113,7 @@ clint_intr(void)
 
 	csr_clear(mie, MIE_MTIE);
 
-	callout_callback(&sc->mt);
+	mdx_callout_callback(&sc->mt);
 }
 
 static void
@@ -250,7 +250,7 @@ e300g_clint_init(struct clint_softc *sc, uint32_t base)
 	sc->mt.width = 0xffffffff;
 	sc->mt.arg = sc;
 
-	callout_register(&sc->mt);
+	mdx_callout_register(&sc->mt);
 
 	csr_clear(mie, MIE_MTIE);
 	csr_clear(mip, MIP_MTIP);

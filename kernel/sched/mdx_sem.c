@@ -108,13 +108,13 @@ mdx_sem_timedwait(mdx_sem_t *sem, int ticks)
 		}
 
 		/* Lock is owned by another thread, sleep. */
-		callout_cancel(&td->td_c);
+		mdx_callout_cancel(&td->td_c);
 		if (ticks) {
 			t.td = td;
 			t.sem = sem;
 			t.timeout = false;
-			callout_init(&td->td_c);
-			callout_set(&td->td_c, ticks, mdx_sem_cb, &t);
+			mdx_callout_init(&td->td_c);
+			mdx_callout_set(&td->td_c, ticks, mdx_sem_cb, &t);
 		}
 
 		td->td_state = TD_STATE_SEM_WAIT;
@@ -196,7 +196,7 @@ mdx_sem_post(mdx_sem_t *sem)
 
 		/* mdx_sem_cb could be called here by another CPU. */
 
-		error = callout_cancel(&td->td_c);
+		error = mdx_callout_cancel(&td->td_c);
 		if (error) {
 			/*
 			 * We are here by one of the reasons:

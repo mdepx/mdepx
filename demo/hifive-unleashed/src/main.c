@@ -58,7 +58,7 @@ extern uint32_t _ebss;
 static struct spinlock l1;
 static mdx_mutex_t m __unused;
 static mdx_mutex_t m1 __unused;
-static struct callout c1[1000] __unused;
+static struct mdx_callout c1[1000] __unused;
 static mdx_sem_t sem;
 
 #ifdef MDX_SCHED_SMP
@@ -164,7 +164,7 @@ test_m2(void *arg)
 static void __unused
 cb(void *arg)
 {
-	struct callout *c;
+	struct mdx_callout *c;
 	uint32_t ticks;
 
 	c = arg;
@@ -172,7 +172,7 @@ cb(void *arg)
 	ticks = c->ticks_orig;
 	ticks /= 2;
 	printf("ticks %d\n", ticks);
-	callout_set_locked(c, ticks, cb, (void *)c);
+	mdx_callout_set_locked(c, ticks, cb, (void *)c);
 }
 
 int
@@ -273,7 +273,7 @@ main(void)
 
 #if 1
 	for (j = 0; j < 100; j++)
-		callout_set(&c1[j], USEC_TO_TICKS(100000) * j, cb,
+		mdx_callout_set(&c1[j], USEC_TO_TICKS(100000) * j, cb,
 		    (void *)&c1[j]);
 #endif
 

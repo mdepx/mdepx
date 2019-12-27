@@ -57,7 +57,7 @@ nrf_timer_intr(void *arg, struct trapframe *tf, int irq)
 
 	WR4(sc, TIMER_EVENTS_COMPARE(sc->cc_idx), 0);
 
-	callout_callback(&sc->mt);
+	mdx_callout_callback(&sc->mt);
 }
 
 static uint32_t
@@ -122,5 +122,5 @@ nrf_timer_init(struct nrf_timer_softc *sc, uint32_t base)
 	sc->mt.count = nrf_timer_count;
 	sc->mt.width = 0xffffffff;
 	sc->mt.arg = sc;
-	callout_register(&sc->mt);
+	mdx_callout_register(&sc->mt);
 }

@@ -41,7 +41,7 @@ struct thread {
 	uint32_t		td_stack_size;	/* Size of the stack. */
 	uint8_t *		td_stack_bottom;/* Bottom of the stack. */
 	struct entry		td_node;	/* Entry in runq or mutex q */
-	struct callout		td_c;		/* Thread deadline callout. */
+	struct mdx_callout	td_c;		/* Thread deadline callout. */
 	uint32_t		td_quantum;	/* Time slice. */
 	uint8_t			td_idle;	/* This is an idle thread. */
 	uint32_t		td_index;	/* For debugging only. */

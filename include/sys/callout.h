@@ -36,7 +36,7 @@
 
 #include <machine/pcpu.h>
 
-struct callout {
+struct mdx_callout {
 	int state;
 #define	CALLOUT_STATE_READY	0
 #define	CALLOUT_STATE_FIRED	1
@@ -63,13 +63,13 @@ struct mi_timer {
 #define	MI_TIMER_EXCP		2
 };
 
-void callout_init(struct callout *c);
-int callout_set_locked(struct callout *c, uint32_t ticks,
+void mdx_callout_init(struct mdx_callout *c);
+int mdx_callout_set_locked(struct mdx_callout *c, uint32_t ticks,
     void (*func)(void *arg), void *arg);
-int callout_set(struct callout *c, uint32_t ticks,
+int mdx_callout_set(struct mdx_callout *c, uint32_t ticks,
     void (*func)(void *arg), void *arg);
-int callout_callback(struct mi_timer *);
-int callout_register(struct mi_timer *);
-int callout_cancel(struct callout *c);
+int mdx_callout_callback(struct mi_timer *);
+int mdx_callout_register(struct mi_timer *);
+int mdx_callout_cancel(struct mdx_callout *c);
 
 #endif /* _SYS_CALLOUT_H_ */
