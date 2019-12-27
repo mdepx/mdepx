@@ -57,7 +57,7 @@ mdx_thread_alloc(uint32_t stack_size)
 		return (NULL);
 	}
 
-	td->stack_bottom = addr;
+	td->td_stack_bottom = addr;
 
 	new_stack = (uintptr_t)addr + stack_size;
 
