@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016, Intel Corporation
+ * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -121,6 +122,43 @@ struct bt_buf *bt_l2cap_create_pdu(struct bt_conn *conn)
 				bt_dev.drv->head_reserve;
 
 	return bt_buf_get(BT_ACL_OUT, head_reserve);
+}
+
+static void l2cap_le_conn_rsp(struct bt_conn *conn, uint8_t ident,
+    struct bt_buf *buf)
+{
+	struct bt_l2cap_le_conn_rsp *rsp = (void *)buf->data;
+
+	printf("result %d\n", rsp->result);
+}
+
+void l2cap_le_conn_req(struct bt_conn *conn, struct bt_l2cap_chan *chan)
+{
+	struct bt_l2cap_le_conn_req *req;
+	struct bt_l2cap_sig_hdr *hdr;
+	struct bt_buf *buf;
+
+	buf = bt_l2cap_create_pdu(NULL);
+	if (!buf) {
+		return;
+	}
+
+	hdr = bt_buf_add(buf, sizeof(*hdr));
+	hdr->code = BT_L2CAP_LE_CONN_REQ;
+	hdr->ident = get_ident(conn);
+	hdr->len = sys_cpu_to_le16(sizeof(*req));
+
+	req = bt_buf_add(buf, sizeof(*req));
+#if 0
+	/* TODO: set fields. */
+	req->psm = PSM_LE_PSM_IPSP;
+	req->scid = 1;
+	req->mtu = 1280; /* MTU size shall be 1280 octets or higher. */
+	req->mps = 24;
+	req->credits = 1;
+#endif
+
+	bt_l2cap_send(conn, BT_L2CAP_CID_LE_SIG, buf);
 }
 
 void bt_l2cap_send(struct bt_conn *conn, uint16_t cid, struct bt_buf *buf)
@@ -271,6 +309,9 @@ static void le_sig(struct bt_conn *conn, struct bt_buf *buf)
 		break;
 	case BT_L2CAP_CONN_PARAM_REQ:
 		le_conn_param_update_req(conn, hdr->ident, buf);
+		break;
+	case BT_L2CAP_LE_CONN_RSP:
+		l2cap_le_conn_rsp(conn, hdr->ident, buf);
 		break;
 	default:
 		BT_WARN("Unknown L2CAP PDU code 0x%02x\n", hdr->code);

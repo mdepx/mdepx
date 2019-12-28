@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016, Intel Corporation
+ * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +31,24 @@
  */
 /* l2cap.h - L2CAP handling */
 
+/* Protocol and Service Multiplexers (PSMs) */
+
+#define	PSM_SDP			0x0001	/* Service Discovery Protocol */
+#define	PSM_RFCOMM		0x0003
+#define	PSM_TCS_BIN		0x0005	/* Telephony Control Specification */
+#define	PSM_TCS_BIN_CORDLESS	0x0007
+#define	PSM_BNEP		0x000F	/* Bluetooth Network Encapsulation Protocol */
+#define	PSM_HID_CONTROL		0x0011	/* Human Interface Device */
+#define	PSM_HID_INTERRUPT	0x0013
+#define	PSM_UPNP		0x0015
+#define	PSM_AVCTP		0x0017	/* Audio/Video Control Transport Protocol */
+#define	PSM_AVDTP		0x0019	/* Audio/Video Distribution Transport Protocol */
+#define	PSM_AVCTP_BROWSING	0x001B	/* Audio/Video Remote Control Profile */
+#define	PSM_UDI_C_PLANE		0x001D	/* Unrestricted Digital Information */
+#define	PSM_ATT			0x001F
+#define	PSM_3DSP		0x0021	/* 3D Synchronization Profile */
+#define	PSM_LE_PSM_IPSP		0x0023	/* Internet Protocol Support Profile */
+#define	PSM_LE_PSM_OTS		0x0025	/* Object Transfer Service (OTS) */
 
 #define BT_L2CAP_CID_ATT		0x0004
 #define BT_L2CAP_CID_LE_SIG		0x0005
@@ -67,6 +86,36 @@ struct bt_l2cap_conn_param_req {
 #define BT_L2CAP_CONN_PARAM_RSP		0x13
 struct bt_l2cap_conn_param_rsp {
 	uint16_t result;
+} __packed;
+
+#define	BT_L2CAP_LE_CONN_REQ		0x14
+struct bt_l2cap_le_conn_req {
+	uint16_t psm;		/* LE Protocol/Service Multiplexer */
+	uint16_t scid;		/* Source CID */
+	uint16_t mtu;		/* Maximum Transmission Unit */
+	uint16_t mps;		/* Maximum PDU Size */
+	uint16_t credits;	/* Initial Credits */
+} __packed;
+
+#define	BT_L2CAP_LE_CONN_RSP		0x15
+struct bt_l2cap_le_conn_rsp {
+	uint16_t dcid;		/* Destination CID */
+	uint16_t mtu;		/* Maximum Transmission Unit */
+	uint16_t mps;		/* Maximum PDU Size */
+	uint16_t credits;	/* Initial Credits */
+	uint16_t result;
+#define	RESULT_SUCCESS				0x00
+#define	RESULT_ERR_RESERVED			0x01
+#define	RESULT_ERR_LE_PSM_NOT_SUPP		0x02
+#define	RESULT_ERR_RESERVED_1			0x03
+#define	RESULT_ERR_NO_RES_AVAIL			0x04
+#define	RESULT_ERR_INSUFF_AUTHENTICATION	0x05
+#define	RESULT_ERR_INSUFF_AUTHORIZATION		0x06
+#define	RESULT_ERR_INSUFF_ENCRYPYION_KEY_SIZE	0x07
+#define	RESULT_ERR_INSUFF_ENCRYPTION		0x08
+#define	RESULT_ERR_INVALID_SCID			0x09
+#define	RESULT_ERR_SCID_ALLOCATED		0x0A
+#define	RESULT_ERR_UNACCEPT_PARAMETERS		0x0B
 } __packed;
 
 struct bt_l2cap_chan {
@@ -108,3 +157,5 @@ void bt_l2cap_update_conn_param(struct bt_conn *conn);
 
 /* Initialize L2CAP and supported channels */
 int bt_l2cap_init(void);
+
+void l2cap_le_conn_req(struct bt_conn *conn, struct bt_l2cap_chan *chan);
