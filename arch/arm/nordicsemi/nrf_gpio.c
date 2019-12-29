@@ -34,6 +34,16 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
+bool
+nrf_gpio_get(struct nrf_gpio_softc *sc, int pin)
+{
+
+	if (RD4(sc, GPIO_IN) & (1 << pin))
+		return (true);
+
+	return (false);
+}
+
 void
 nrf_gpio_outset(struct nrf_gpio_softc *sc, int pin, int out)
 {
