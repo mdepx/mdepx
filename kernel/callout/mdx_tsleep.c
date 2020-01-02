@@ -54,7 +54,7 @@ void
 mdx_tsleep(uint32_t ticks)
 {
 	struct thread *td;
-	struct callout c;
+	struct mdx_callout c;
 
 	td = curthread;
 
@@ -63,8 +63,8 @@ mdx_tsleep(uint32_t ticks)
 	KASSERT(td->td_critnest == 0,
 	    ("%s: sleeping in critical section is not allowed", __func__));
 
-	callout_init(&c);
-	callout_set(&c, ticks, mdx_tsleep_cb, td);
+	mdx_callout_init(&c);
+	mdx_callout_set(&c, ticks, mdx_tsleep_cb, td);
 
 #ifdef MDX_MIPS_QEMU
 	/*

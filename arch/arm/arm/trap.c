@@ -38,8 +38,9 @@ struct trapframe *arm_exception(struct trapframe *tf, int irq);
 
 #ifdef MDX_SCHED
 static struct thread intr_thread[MDX_CPU_MAX];
-size_t intr_stack[MDX_CPU_MAX][MDX_ARM_INTR_STACK_SIZE];
 #endif
+
+size_t intr_stack[MDX_CPU_MAX][MDX_ARM_INTR_STACK_SIZE];
 
 static void
 dump_frame(struct trapframe *tf)
