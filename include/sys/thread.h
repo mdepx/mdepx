@@ -56,6 +56,7 @@ struct thread {
 #define	TD_STATE_SEM_WAIT	6
 #define	TD_STATE_SEM_UNLOCK	7
 #define	TD_STATE_SEM_UNLOCK_ACK	8
+#define	TD_STATE_YIELDING	9
 };
 
 void mdx_thread_init(int cpuid);
@@ -77,6 +78,7 @@ int mdx_sched_ack(struct thread *td, struct trapframe *tf);
 int mdx_sched_park(struct thread *td);
 void mdx_sched_cpu_add(struct pcpu *pcpup);
 void mdx_sched_cpu_avail(struct pcpu *pcpup, bool available);
+void mdx_sched_yield(void);
 
 /* Thread MD part */
 void md_init(int cpuid);

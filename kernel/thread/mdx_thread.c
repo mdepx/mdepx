@@ -78,9 +78,6 @@ mdx_thread_setup(struct thread *td, const char *name,
 	if (td == NULL || td->td_stack == NULL)
 		return (MDX_ERROR);
 
-	if (quantum == 0)
-		return (MDX_ERROR);
-
 	if (entry == NULL)
 		return (MDX_ERROR);
 

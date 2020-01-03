@@ -174,13 +174,11 @@ mdx_sched_park(struct thread *td)
 
 	switch (td->td_state) {
 	case TD_STATE_WAKEUP:
-		panic("could we get here ?");
+		panic("wrong state, thread name %s", td->td_name);
 	case TD_STATE_RUNNING:
-		/*
-		 * Current thread is still running and has quantum.
-		 * Do not switch.
-		 */
+		/* Current thread is still running. Do not switch. */
 		return (MDX_OK);
+	case TD_STATE_YIELDING:
 	default:
 		mdx_sched_add(td);
 
@@ -205,12 +203,17 @@ mdx_sched_next(void)
 		list_append(&pcpu_list, &p->pc_avail);
 	mdx_sched_unlock();
 
-	if (!td->td_idle) {
+	if (!td->td_idle)
 		td->td_state = TD_STATE_RUNNING;
+
+	if (td->td_quantum) {
+		KASSERT(td->td_idle == 0, ("idle thread has quantum"));
+
 		mdx_callout_init(&td->td_c);
 		mdx_callout_set(&td->td_c, td->td_quantum, mdx_sched_cb, td);
 	}
 
+	dprintf("%s\n", td->td_name);
 	dprintf("%s%d: curthread %p, tf %p, name %s, idx %x\n",
 	    __func__, PCPU_GET(cpuid), td, td->td_tf,
 		td->td_name, (uint32_t)td->td_index);
@@ -219,11 +222,24 @@ mdx_sched_next(void)
 }
 
 void
+mdx_sched_yield(void)
+{
+	struct thread *td;
+
+	td = curthread;
+	td->td_state = TD_STATE_YIELDING;
+
+	/* Interrupt could happen here. */
+
+	md_thread_yield();
+}
+
+void
 mdx_sched_enter(void)
 {
 
 	KASSERT(curthread->td_idle == 1,
-	    ("sched_enter() called from non-idle thread"));
+	    ("mdx_sched_enter() called from non-idle thread"));
 
 	md_thread_yield();
 
