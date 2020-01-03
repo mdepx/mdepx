@@ -96,8 +96,9 @@ mdx_sched_cb(void *arg)
 	td = arg;
 
 	mdx_sched_lock();
-	if (td->td_state == TD_STATE_RUNNING)
-		td->td_state = TD_STATE_READY;
+	KASSERT(td->td_state == TD_STATE_RUNNING,
+	    ("sched_cb for not running thread"));
+	td->td_state = TD_STATE_READY;
 	mdx_sched_unlock();
 }
 
