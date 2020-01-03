@@ -63,7 +63,7 @@ fiber_start(char *stack, unsigned stack_size, nano_fiber_entry_t entry,
 
 	td->td_stack = (void *)((uintptr_t)td->td_stack_bottom + stack_size);
 
-	quantum = 100000;
+	quantum = 0;
 
 	mdx_thread_setup(td, "fiber", prio, quantum, entry, (void *)arg1);
 	mdx_sched_add(td);
