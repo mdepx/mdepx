@@ -35,6 +35,9 @@
 #define	RTC_EVENTS_OVRFLW	0x104	/* Event on COUNTER overflow */
 #define	RTC_EVENTS_COMPARE(n)	(0x140 + (n) * 0x4) /* Compare event on CCn match */
 #define	RTC_INTENSET		0x304	/* Enable interrupt */
+#define	 INTENSET_TICK		(1 << 0)
+#define	 INTENSET_OVRFLW	(1 << 1)
+#define	 INTENSET_COMPARE_S	16
 #define	RTC_INTENCLR		0x308	/* Disable interrupt */
 #define	RTC_EVTEN		0x340	/* Enable or disable event routing */
 #define	RTC_EVTENSET		0x344	/* Enable event routing */
