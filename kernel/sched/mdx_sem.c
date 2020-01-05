@@ -128,8 +128,8 @@ mdx_sem_timedwait(mdx_sem_t *sem, int ticks)
 
 		/*
 		 * We are here by one of the reasons:
-		 * 1. sem_post added us to the sched
-		 * 2. sem_cb added us to the sched
+		 * 1. sem_post added us to the sched run queue
+		 * 2. sem_cb added us to the sched run queue
 		 *
 		 * td_c is cancelled here
 		 */
