@@ -53,15 +53,15 @@ fiber_start(char *stack, unsigned stack_size, nano_fiber_entry_t entry,
 		return;
 	}
 
-	td->td_stack_size = stack_size;
-	td->td_stack_bottom = zalloc(stack_size);
-	if (td->td_stack_bottom == NULL) {
+	td->td_stack = zalloc(stack_size);
+	if (td->td_stack == NULL) {
 		printf("Could not allocate stack.");
 		free(td);
 		return;
 	}
 
-	td->td_stack = (void *)((uintptr_t)td->td_stack_bottom + stack_size);
+	td->td_stack_size = stack_size;
+	td->td_flags = TD_FLAGS_DYN_ALLOC_TD | TD_FLAGS_DYN_ALLOC_SP;
 
 	quantum = 0;
 

@@ -38,14 +38,17 @@ struct thread {
 	volatile u_int		td_critnest;	/* Critical section nesting. */
 	struct trapframe *	td_tf;		/* Trapframe on stack. */
 	uint8_t *		td_stack;	/* Pointer to stack. */
+	uint8_t *		td_stack_top;	/* Top of the stack. */
 	uint32_t		td_stack_size;	/* Size of the stack. */
-	uint8_t *		td_stack_bottom;/* Bottom of the stack. */
 	struct entry		td_node;	/* Entry in runq or mutex q */
 	struct mdx_callout	td_c;		/* Thread deadline callout. */
 	uint32_t		td_quantum;	/* Time slice. */
 	uint8_t			td_idle;	/* This is an idle thread. */
 	uint32_t		td_index;	/* For debugging only. */
 	int			td_prio;	/* Priority. 0 for idle. */
+	int			td_flags;	/* Thread's flags. */
+#define	TD_FLAGS_DYN_ALLOC_SP	(1 << 0)	/* Stack allocated dynamic. */
+#define	TD_FLAGS_DYN_ALLOC_TD	(1 << 1)	/* Thread allocated dynamic. */
 	int			td_state;	/* Current state. */
 #define	TD_STATE_READY		0
 #define	TD_STATE_RUNNING	1
@@ -66,6 +69,7 @@ struct thread *mdx_thread_create(const char *name, int prio,
 struct thread * mdx_thread_alloc(uint32_t stack_size);
 int mdx_thread_setup(struct thread *td, const char *name,
     int prio, uint32_t quantum, void *entry, void *arg);
+void mdx_thread_terminate_cleanup(struct thread *td);
 
 void cpu_idle(void);
 

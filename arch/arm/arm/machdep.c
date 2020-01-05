@@ -134,7 +134,7 @@ md_init(int cpuid)
 
 #ifndef MDX_THREAD_DYNAMIC_ALLOC
 	td = &main_thread;
-	td->td_stack = (uint8_t *)main_thread_stack + MDX_THREAD_STACK_SIZE;
+	td->td_stack = (uint8_t *)main_thread_stack;
 	td->td_stack_size = MDX_THREAD_STACK_SIZE;
 	mdx_thread_setup(td, "main", 1, 10000, main, NULL);
 #else

@@ -209,6 +209,11 @@ mips_exception(struct trapframe *tf)
 	if (intr)
 		mips_handle_intr(cause);
 
+	if (td->td_state == TD_STATE_TERMINATING) {
+		mdx_thread_terminate_cleanup(td);
+		released = true;
+	}
+
 	if (!released) 
 		released = mdx_sched_park(td);
 

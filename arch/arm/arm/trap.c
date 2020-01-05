@@ -99,6 +99,7 @@ arm_exception(struct trapframe *tf, int exc_code)
 
 	/* TODO: compare thread's stack base and tf. */
 
+	/* Switch to the interrupt thread */
 	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
 	curthread->td_critnest++;
 
@@ -112,6 +113,11 @@ arm_exception(struct trapframe *tf, int exc_code)
 
 	if (intr)
 		arm_nvic_intr(irq, tf);
+
+	if (td->td_state == TD_STATE_TERMINATING) {
+		mdx_thread_terminate_cleanup(td);
+		released = true;
+	}
 
 	if (!released)
 		released = mdx_sched_park(td);

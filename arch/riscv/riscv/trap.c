@@ -130,6 +130,11 @@ riscv_exception(struct trapframe *tf)
 	if (intr)
 		riscv_intr(irq);
 
+	if (td->td_state == TD_STATE_TERMINATING) {
+		mdx_thread_terminate_cleanup(td);
+		released = true;
+	}
+
 	/* Check if this thread has no more CPU time. */
 	if (!released)
 		released = mdx_sched_park(td);

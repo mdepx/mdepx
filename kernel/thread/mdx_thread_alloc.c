@@ -45,27 +45,26 @@ mdx_thread_alloc(uint32_t stack_size)
 {
 	struct thread *td;
 	uintptr_t new_stack;
-	void *addr;
 
 	td = zalloc(sizeof(struct thread));
 	if (td == NULL)
 		return (NULL);
-	td->td_stack_size = stack_size;
-	addr = zalloc(td->td_stack_size);
-	if (addr == NULL) {
+	td->td_stack = zalloc(stack_size);
+	if (td->td_stack == NULL) {
 		free(td);
 		return (NULL);
 	}
 
-	td->td_stack_bottom = addr;
+	td->td_stack_size = stack_size;
 
-	new_stack = (uintptr_t)addr + stack_size;
+	new_stack = (uintptr_t)td->td_stack + stack_size;
 
-	/* Align the stack as CHERI CPU required. */
+	/* (TODO) Align the stack as CHERI CPU required. */
 	while (new_stack & 0xf)
 		new_stack--;
 
-	td->td_stack = (void *)new_stack;
+	td->td_stack_top = (uint8_t *)new_stack;
+	td->td_flags = TD_FLAGS_DYN_ALLOC_SP | TD_FLAGS_DYN_ALLOC_TD;
 
 	return (td);
 }

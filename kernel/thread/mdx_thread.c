@@ -46,6 +46,26 @@
 #endif
 
 /*
+ * Called by exception handler to release thread's resources
+ * in case of thread termination.
+ */
+void
+mdx_thread_terminate_cleanup(struct thread *td)
+{
+
+	dprintf("%s: %s\n", __func__, td->td_name);
+
+	KASSERT(td->td_state == TD_STATE_TERMINATING,
+		("thread is not in terminating state"));
+
+	if (td->td_flags & TD_FLAGS_DYN_ALLOC_SP)
+		free(td->td_stack);
+
+	if (td->td_flags & TD_FLAGS_DYN_ALLOC_TD)
+		free(td);
+}
+
+/*
  * Used by thread to terminate itself.
  */
 static void
@@ -53,9 +73,9 @@ mdx_thread_terminate(void)
 {
 	struct thread *td;
 
-	dprintf("%s: %s\n", __func__, td->td_name);
-
 	td = curthread;
+
+	dprintf("%s: %s\n", __func__, td->td_name);
 
 	critical_enter();
 	td->td_state = TD_STATE_TERMINATING;
@@ -84,7 +104,8 @@ mdx_thread_setup(struct thread *td, const char *name,
 	td->td_name = name;
 	td->td_quantum = quantum;
 	td->td_state = TD_STATE_READY;
-	td->td_tf = (struct trapframe *)((uint8_t *)td->td_stack
+	td->td_stack_top = (uint8_t *)td->td_stack + td->td_stack_size;
+	td->td_tf = (struct trapframe *)((uint8_t *)td->td_stack_top
 	    - sizeof(struct trapframe));
 	td->td_prio = prio;
 	md_setup_frame(td->td_tf, entry, arg, mdx_thread_terminate);
