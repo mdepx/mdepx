@@ -783,7 +783,25 @@ static void le_conn_complete(struct bt_buf *buf)
 	bt_l2cap_connected(conn);
 
 	if (evt->role == BT_HCI_ROLE_SLAVE) {
+		/* Set initiator address. */
+		bt_addr_le_copy(&conn->init_addr, &evt->peer_addr);
+
+		/* Set responder address. */
+		conn->resp_addr.type = BT_ADDR_LE_RANDOM;
+		memcpy(conn->resp_addr.val,
+		    bt_dev.bdaddr.val, sizeof(bt_dev.bdaddr.val));
+
 		bt_l2cap_update_conn_param(conn);
+	} else {
+		/* TODO: not tested. */
+
+		/* Set initiator address. */
+		conn->init_addr.type = BT_ADDR_LE_RANDOM;
+		memcpy(conn->init_addr.val,
+		    bt_dev.bdaddr.val, sizeof(bt_dev.bdaddr.val));
+
+		/* Set responder address. */
+		bt_addr_le_copy(&conn->resp_addr, &evt->peer_addr);
 	}
 
 	bt_connected(conn);

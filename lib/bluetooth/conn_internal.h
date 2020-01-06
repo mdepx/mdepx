@@ -68,6 +68,9 @@ struct bt_conn {
 	bt_addr_le_t		src;
 	bt_addr_le_t		dst;
 
+	bt_addr_le_t		init_addr;	/* Initiator address. */
+	bt_addr_le_t		resp_addr;	/* Responder address. */
+
 	uint8_t			encrypt;
 
 	uint16_t		rx_len;
