@@ -647,7 +647,7 @@ static void att_read_type_rsp(struct bt_conn *conn, uint8_t err,
 	     length -= rsp->len, pdu = (void *)((uintptr_t)pdu + rsp->len)) {
 		const struct bt_gatt_attr *attr;
 		const struct bt_att_data *data = pdu;
-		struct gatt_chrc *chrc = __DECONST(void *, data->value);
+		const struct gatt_chrc *chrc = (const void *)data->value;
 
 		handle = sys_le16_to_cpu(data->handle);
 		/* Handle 0 is invalid */

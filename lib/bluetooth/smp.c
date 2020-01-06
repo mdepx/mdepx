@@ -247,7 +247,7 @@ static int smp_c1(const uint8_t k[16], const uint8_t r[16],
 	/* c1 = e(k, e(k, r XOR p1) XOR p2) */
 
 	/* Using enc_data as temporary output buffer */
-	xor_128(__DECONST(uint128_t *, r), (uint128_t *)p1, (uint128_t *)enc_data);
+	xor_128((const uint128_t *)r, (uint128_t *)p1, (uint128_t *)enc_data);
 
 	err = le_encrypt(k, enc_data, enc_data);
 	if (err) {

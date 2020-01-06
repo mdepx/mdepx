@@ -27,7 +27,6 @@
 #ifndef	_BLUETOOTH_MDX_SUPPORT_H_
 #define	_BLUETOOTH_MDX_SUPPORT_H_
 
-#define	__DECONST(type, var)	((type)(__uintptr_t)(const void *)(var))
 #define	ARRAY_SIZE(a)		(sizeof(a) / sizeof((a)[0]))
 #define	ARG_UNUSED(n)		(void)(n)
 

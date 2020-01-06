@@ -265,19 +265,19 @@ struct bt_keys *bt_keys_find_irk(const bt_addr_le_t *addr)
 	bt_keys_foreach(&irks, cur, irk.next) {
 		struct bt_irk *irk = &(*cur)->irk;
 
-		if (!bt_addr_cmp(__DECONST(bt_addr_t *, addr->val), &irk->rpa)){
+		if (!bt_addr_cmp((const bt_addr_t *)addr->val, &irk->rpa)) {
 			BT_DBG("cached RPA %s for %s\n", bt_addr_str(&irk->rpa),
 			       bt_addr_le_str(&(*cur)->addr));
 			return *cur;
 		}
 
-		if (bt_smp_irk_matches(irk->val, __DECONST(bt_addr_t *, addr->val))) {
+		if (bt_smp_irk_matches(irk->val, (const void *)addr->val)) {
 			struct bt_keys *match = *cur;
 
 			BT_DBG("RPA %s matches %s\n", bt_addr_str(&irk->rpa),
 			       bt_addr_le_str(&(*cur)->addr));
 
-			bt_addr_copy(&irk->rpa, __DECONST(bt_addr_t *, addr->val));
+			bt_addr_copy(&irk->rpa, (const bt_addr_t *)addr->val);
 
 			/* Move to the beginning of the list for faster
 			 * future lookups.
