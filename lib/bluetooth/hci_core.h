@@ -135,7 +135,7 @@ static inline bool bt_addr_le_is_rpa(const bt_addr_le_t *addr)
 		return false;
 
 	if ((addr->val[5] & 0xc0) == 0x40)
-	       return true;
+		return true;
 
 	return false;
 }
