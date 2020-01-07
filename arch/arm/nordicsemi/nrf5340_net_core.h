@@ -36,7 +36,6 @@
 #include <arm/nordicsemi/nrf9160_pdm.h>
 #include <arm/nordicsemi/nrf9160_power.h>
 #include <arm/nordicsemi/nrf9160_pwm.h>
-#include <arm/nordicsemi/nrf9160_rtc.h>
 #include <arm/nordicsemi/nrf9160_saadc.h>
 #include <arm/nordicsemi/nrf9160_spim.h>
 #include <arm/nordicsemi/nrf9160_spis.h>
@@ -49,6 +48,7 @@
 #include <arm/nordicsemi/nrf_gpio.h>
 #include <arm/nordicsemi/nrf_ipc.h>
 #include <arm/nordicsemi/nrf_reset.h>
+#include <arm/nordicsemi/nrf_rtc.h>
 #include <arm/nordicsemi/nrf_uarte.h>
 
 #define	NRF_DCNF	0x41000000 /* Domain configuration */

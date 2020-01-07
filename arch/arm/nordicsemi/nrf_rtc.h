@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2018-2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,5 +49,7 @@
 struct nrf_rtc_softc {
 	size_t base;
 };
+
+void nrf_rtc_init(struct nrf_rtc_softc *sc, uint32_t base);
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_RTC_H_ */
