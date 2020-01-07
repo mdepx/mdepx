@@ -6,6 +6,7 @@ Mdepx is an operating system for embedded applications.
 - Real-time
 - Priority based time sliced round-robin scheduling
 - Fully preemptible
+- Cooperative scheduling
 - Tickless operation
 - Static/Dynamic memory allocation
 - Timed Mutexes, Semaphores
@@ -13,19 +14,21 @@ Mdepx is an operating system for embedded applications.
 - BSD libc included
 
 ## Supported platforms
-- ARM Cortex-M family (ARMv7, ARMv8)
+- ARM Cortex-M family (ARMv7-M, ARMv8-M)
 - MIPS32, MIPS64
-- RISC-V rv32ima, rv64ima
+- RISC-V rv32, rv64
 
 ## Generic demo applications
   * QEMU/RISC-V rv64ima (SMP)
   * QEMU/MIPS64
+  * QEMU/CHERI128
   * HiFive Unleashed (SMP)
   * HiFive Unleashed Monitor Core
 
 ## Featured applications (external)
+  * [LTE 4G Link with nRF9160](https://github.com/machdep/nrf9160)
+  * [Bluetooth LE with nRF5340](https://github.com/machdep/nrf5340)
   * CTSRD CHERI [device-model](https://github.com/CTSRD-CHERI/device-model)
-  * [Setting up LTE 4G Link with nRF9160](https://github.com/machdep/nrf9160)
   * [Driving OLED display on HiFive1 board](https://github.com/machdep/hifive1-oled)
   * GFE (Government Furnished Equipment) [Bluespec Piccolo demo](https://github.com/CTSRD-CHERI/piccolo-demo)
   * [Driving MIPI DSI Display with STM32F469I-DISCO](https://github.com/osfive/stm32f469i-disco-dsi)
@@ -39,7 +42,7 @@ Mdepx has a python3-based build system. You have to construct a configuration fi
 
 Please submit pull requests on github or send patches to br@machdep.com.
 
-Note that Mdepx uses FreeBSD [style(9)](https://www.freebsd.org/cgi/man.cgi?query=style&sektion=9) guide.
+Note that mdepx uses FreeBSD [style(9)](https://www.freebsd.org/cgi/man.cgi?query=style&sektion=9) guide.
 
 # License
 
