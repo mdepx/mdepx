@@ -39,15 +39,16 @@ typedef	__uint32_t		__uintmax_t;
 typedef	__int32_t		__intmax_t;
 typedef	__uint8_t		__u_char_t;
 
-typedef __uint32_t		__register_t;
-typedef __uint32_t		__uintptr_t;
-typedef __int32_t		__intptr_t;
-typedef __int32_t		__ptrdiff_t;
-typedef __uint32_t		__size_t;
-typedef __int32_t		__ssize_t;
-typedef __uint32_t		__vm_paddr_t;
-typedef __uint32_t		__vm_offset_t;
-typedef __uint32_t		__vm_size_t;
+typedef	__uint32_t		__register_t;
+typedef	__uint32_t		__uintptr_t;
+typedef	__int32_t		__intptr_t;
+typedef	__int32_t		__ptrdiff_t;
+typedef	__uint32_t		__size_t;
+typedef	__int32_t		__ssize_t;
+typedef	__uint32_t		__vm_paddr_t;
+typedef	__uint32_t		__vm_offset_t;
+typedef	__uint32_t		__vm_size_t;
+typedef	__uint32_t		__time_t;
 
 #define	NBBY			8
 

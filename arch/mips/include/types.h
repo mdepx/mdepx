@@ -55,6 +55,7 @@ typedef	__uint64_t		__register_t;
 typedef	__uint64_t		__vm_paddr_t;
 typedef	__uint64_t		__vm_offset_t;
 typedef	__uint64_t		__vm_size_t;
+typedef	__uint64_t		__time_t;
 #else
 typedef	__int32_t		__ptrdiff_t;
 typedef	__int32_t		__segsz_t;
@@ -67,6 +68,7 @@ typedef	__uint32_t		__register_t;
 typedef	__uint32_t		__vm_paddr_t;
 typedef	__uint32_t		__vm_offset_t;
 typedef	__uint32_t		__vm_size_t;
+typedef	__uint32_t		__time_t;
 #endif
 
 typedef	__uint64_t		__uintmax_t;

@@ -76,6 +76,7 @@ typedef	unsigned long	u_long;
 typedef	__int64_t	__off_t;
 typedef	__off_t		off_t;
 typedef	__register_t	register_t;
+typedef	__time_t	time_t;
 
 typedef	__uint8_t	__sa_family_t;
 typedef	__uint32_t	__socklen_t;
@@ -93,11 +94,11 @@ typedef	_Bool		bool;
 #define	true		1
 #define	false		0
 
-/* Capabilities */
 #ifndef __has_feature
 #define	__has_feature(x)	0
 #endif
 
+/* CHERI Capabilities */
 #if __has_feature(capabilities)
 typedef	void * __capability capability;
 typedef	void * __capability otype_t;
