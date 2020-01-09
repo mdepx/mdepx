@@ -36,7 +36,7 @@ struct timespec {
 
 struct timeval {
 	time_t	tv_sec;		/* Seconds. */
-	long	tv_usec;	/* Nanoseconds. */
+	long	tv_usec;	/* Microseconds. */
 };
 
 #endif /* !_SYS_TIME_H_ */
