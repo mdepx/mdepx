@@ -24,23 +24,41 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_TIME_H_
-#define	_TIME_H_
-
 #include <sys/types.h>
+#include <time.h>
 
-struct tm {
-	int	tm_sec;		/* Seconds [0-60] (could be leap). */
-	int	tm_min;		/* Minutes [0-59]. */
-	int	tm_hour;	/* Hours [0-23]. */
-	int	tm_mday;	/* Day of the month [0-31]. */
-	int	tm_mon;		/* Month [0-11]. */
-	int	tm_year;	/* Years since 1900. */
-	int	tm_wday;	/* Day of the week since Sun [0-6]. */
-	int	tm_yday;	/* Days since January 1 [0-365]. */
-	int	tm_isdst;	/* Daylight saving time flag. */
-};
+#define	JDN_EPOCH_START		2440588	/* 1 Jan, 1970. */
 
-time_t mktime(struct tm *tm);
+static int
+gregorian2jdn(int y, int m, int d)
+{
+	int jdn;
 
-#endif /* !_TIME_H_ */
+	/*
+	 * 12.92 Converting between Gregorian Calendar Day and Julian
+	 * Day Number.
+	 * Page 604, Explanatory Supplement To The Astronomical Almanac,
+	 * P. Kenneth Seidelmann, U.S. Naval Observatory.
+	 */
+
+	jdn = (1461 * (y + 4800 + (m - 14) / 12)) / 4 +
+	    (367 * (m - 2 - 12 * ((m - 14) / 12))) / 12 -
+	    (3 * ((y + 4900 + (m / 14) / 12) / 100)) / 4 +
+	    d - 32075;
+
+	return (jdn);
+}
+
+time_t
+mktime(struct tm *tm)
+{
+	time_t t;
+	int jdn;
+
+	jdn = gregorian2jdn(tm->tm_year + 1900, tm->tm_mon, tm->tm_mday);
+	jdn -= JDN_EPOCH_START;
+
+	t = ((jdn * 24 + tm->tm_hour) * 60 + tm->tm_min) * 60 + tm->tm_sec;
+
+	return (t);
+}
