@@ -30,8 +30,13 @@
 #include <sys/types.h>
 
 struct timespec {
-	time_t	tv_spec;	/* Seconds. */
+	time_t	tv_sec;		/* Seconds. */
 	long	tv_nsec;	/* Nanoseconds. */
+};
+
+struct timeval {
+	time_t	tv_sec;		/* Seconds. */
+	long	tv_usec;	/* Nanoseconds. */
 };
 
 #endif /* !_SYS_TIME_H_ */
