@@ -27,6 +27,9 @@
 #ifndef _ARM_NORDICSEMI_NRF9160_RTC_H_
 #define _ARM_NORDICSEMI_NRF9160_RTC_H_
 
+#include <sys/time.h>
+#include <machine/frame.h>
+
 #define	RTC_TASKS_START		0x000	/* Start RTC COUNTER */
 #define	RTC_TASKS_STOP		0x004	/* Stop RTC COUNTER */
 #define	RTC_TASKS_CLEAR		0x008	/* Clear RTC COUNTER */
@@ -48,8 +51,15 @@
 
 struct nrf_rtc_softc {
 	size_t base;
+	struct timespec ts;
+	uint16_t prescaler;
+	uint32_t freq;
+	uint32_t period;
 };
 
-void nrf_rtc_init(struct nrf_rtc_softc *sc, uint32_t base);
+void nrf_rtc_init(struct nrf_rtc_softc *sc, uint32_t base, uint16_t prescaler);
+void nrf_rtc_intr(void *arg, struct trapframe *tf, int irq);
+
+struct rtc_driver nrf_rtc_driver;
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_RTC_H_ */
