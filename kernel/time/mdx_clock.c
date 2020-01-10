@@ -24,30 +24,62 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_SYS_TIME_H_
-#define	_SYS_TIME_H_
+#include <sys/cdefs.h>
+#include <sys/time.h>
 
-#include <sys/types.h>
+static struct rtc_driver *l_rtc_driver;
+static void *l_rtc_arg;
 
-struct timespec {
-	time_t	tv_sec;		/* Seconds. */
-	long	tv_nsec;	/* Nanoseconds. */
-};
+int
+mdx_clock_gettime(clockid_t clk_id, struct timespec *tp)
+{
 
-struct timeval {
-	time_t	tv_sec;		/* Seconds. */
-	long	tv_usec;	/* Microseconds. */
-};
+	switch (clk_id) {
+	case CLOCK_REALTIME:
+		if (l_rtc_driver == NULL)
+			return (-1);
+		return (l_rtc_driver->gettime(tp, l_rtc_arg));
+	default:
+		return (-1);
+	}
 
-#define	CLOCK_REALTIME	0
+	return (0);
+}
 
-int mdx_clock_gettime(clockid_t clk_id, struct timespec *tp);
-int mdx_clock_settime(clockid_t clk_id, const struct timespec *tp);
-int mdx_clock_register(clockid_t clk_id, void *drv, void *arg);
+int
+mdx_clock_settime(clockid_t clk_id, const struct timespec *tp)
+{
 
-struct rtc_driver {
-	int (*gettime)(struct timespec *tp, void *arg);
-	int (*settime)(const struct timespec *tp, void *arg);
-};
+	switch (clk_id) {
+	case CLOCK_REALTIME:
+		if (l_rtc_driver == NULL)
+			return (-1);
+		return (l_rtc_driver->settime(tp, l_rtc_arg));
+	default:
+		return (-1);
+	}
 
-#endif /* !_SYS_TIME_H_ */
+	return (0);
+}
+
+int
+mdx_clock_register(clockid_t clk_id, void *drv, void *arg)
+{
+	struct rtc_driver *rtc_drv;
+
+	if (clk_id != CLOCK_REALTIME)
+		return (-1);
+
+	if (drv == NULL)
+		return (-1);
+
+	rtc_drv = drv;
+
+	if (rtc_drv->settime == NULL || rtc_drv->gettime == NULL)
+		return (-1);
+
+	l_rtc_driver = rtc_drv;
+	l_rtc_arg = arg;
+
+	return (0);
+}

@@ -85,6 +85,7 @@ typedef	__uint16_t	in_port_t;
 typedef	__uint32_t	in_addr_t;
 
 typedef char *		caddr_t; /* core address */
+typedef	uint8_t		clockid_t;
 
 #define	INT_MAX		__INT_MAX
 #define	NULL		((void *)0)
