@@ -24,15 +24,17 @@
  * SUCH DAMAGE.
  */
 
+#include <sys/cdefs.h>
 #include <sys/types.h>
 #include <time.h>
 
 #define	JDN_EPOCH_START		2440588	/* 1 Jan, 1970. */
+#define	SEC_IN_DAY		(60 * 60 * 24)
 
-static int
-gregorian2jdn(int y, int m, int d)
+static void
+jdn2gregorian(int jdn, int *year, int *mon, int *mday)
 {
-	int jdn;
+	long l, n, i, j, d, m, y;
 
 	/*
 	 * 12.92 Converting between Gregorian Calendar Day and Julian
@@ -41,24 +43,45 @@ gregorian2jdn(int y, int m, int d)
 	 * P. Kenneth Seidelmann, U.S. Naval Observatory.
 	 */
 
-	jdn = (1461 * (y + 4800 + (m - 14) / 12)) / 4 +
-	    (367 * (m - 2 - 12 * ((m - 14) / 12))) / 12 -
-	    (3 * ((y + 4900 + (m / 14) / 12) / 100)) / 4 +
-	    d - 32075;
+	l = jdn + 68569;
+	n = (4 * l) / 146097;
+	l = l - (146097 * n + 3) / 4;
+	i = (4000 * (l + 1)) / 1461001;
+	l = l - (1461 * i) / 4 + 31;
+	j = (80 * l) / 2447;
+	d = l - (2447 * j) / 80;
+	l = j / 11;
+	m = j + 2 - 12 * l;
+	y = 100 * (n - 49) + i + l;
 
-	return (jdn);
+	*year = (int)y;
+	*mon = (int)m;
+	*mday = (int)d;
 }
 
-time_t
-mktime(struct tm *tm)
+struct tm *
+gmtime_r(const time_t *tp, struct tm *result)
 {
-	time_t t;
+	int year, mon, mday;
+	int sec, min, hour;
 	int jdn;
 
-	jdn = gregorian2jdn(tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday);
-	jdn -= JDN_EPOCH_START;
+	jdn = *tp / SEC_IN_DAY;
+	jdn += JDN_EPOCH_START;
 
-	t = ((jdn * 24 + tm->tm_hour) * 60 + tm->tm_min) * 60 + tm->tm_sec;
+	jdn2gregorian(jdn, &year, &mon, &mday);
 
-	return (t);
+	result->tm_year = year - 1900;
+	result->tm_mon = mon - 1;
+	result->tm_mday = mday;
+
+	hour = (*tp / (60 * 60)) % 24;
+	min = (*tp / 60) % 60;
+	sec = *tp % 60;
+
+	result->tm_hour = hour;
+	result->tm_min = min;
+	result->tm_sec = sec;
+
+	return (result);
 }
