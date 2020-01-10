@@ -42,5 +42,6 @@ struct tm {
 };
 
 time_t mktime(struct tm *tm);
+struct tm * gmtime_r(const time_t *tp, struct tm *result);
 
 #endif /* !_TIME_H_ */
