@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2018-2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -192,6 +192,10 @@
 #define	 WRPCR_REGEN	(1 << 24)	/* Regulator Enable */
 #define	 WRPCR_ODF_S	16		/* PLL Output Division Factor */
 #define	 WRPCR_ODF_M	0x3
+#define	 WRPCR_ODF_1	(0 << WRPCR_ODF_S)
+#define	 WRPCR_ODF_2	(1 << WRPCR_ODF_S)
+#define	 WRPCR_ODF_4	(2 << WRPCR_ODF_S)
+#define	 WRPCR_ODF_8	(3 << WRPCR_ODF_S)
 #define	 WRPCR_IDF_S	11		/* PLL Input Division Factor */
 #define	 WRPCR_IDF_M	0xf
 #define	 WRPCR_NDIV_S	2		/* PLL Loop Division Factor */
@@ -202,9 +206,19 @@ struct stm32f4_dsi_softc {
 	uint32_t base;
 };
 
+struct stm32f4_dsi_config {
+	uint8_t ndiv;
+	uint8_t odf;
+	uint8_t idf;
+	uint8_t nlanes;
+	uint8_t video_mode;
+	uint32_t hse_val;
+};
+
 int stm32f4_dsi_init(struct stm32f4_dsi_softc *sc,
     dsi_device_t *dsi_dev, uint32_t base);
 void stm32f4_dsi_setup(struct stm32f4_dsi_softc *sc,
+    const struct stm32f4_dsi_config *,
     const struct layer_info *);
 
 #endif /* !_ARM_STM_STM32F4_DSI_H_ */
