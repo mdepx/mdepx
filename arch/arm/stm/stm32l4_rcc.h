@@ -122,6 +122,7 @@
 #define	 APB2ENR_LTDCEN		(1 << 26) /* LCD-TFT clock enable */
 #define	 APB2ENR_USART1EN	(1 << 14)
 #define	 APB2ENR_SPI1EN		(1 << 12) /* SPI1 clock enable */
+#define	 APB2ENR_TIM1EN		(1 << 11) /* TIM1 timer clock enable */
 #define	 APB2ENR_SDMMC1EN	(1 << 10)
 #define	 APB2ENR_SYSCFGEN	(1 << 0)
 #define	RCC_CCIPR		0x88	/* Peripherals independent clock configuration register */
