@@ -27,6 +27,9 @@
 #ifndef	_SYS_SPINLOCK_H_
 #define	_SYS_SPINLOCK_H_
 
+#include <sys/systm.h>
+#include <sys/thread.h>
+
 #include <machine/atomic.h>
 
 struct spinlock {
