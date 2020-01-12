@@ -43,13 +43,12 @@ stm32l4_rcc_dsisel(struct stm32l4_rcc_softc *sc)
 	WR4(sc, RCC_CCIPR2, reg);
 }
 
-
 void
 stm32l4_rcc_hse_enable(struct stm32l4_rcc_softc *sc)
 {
 	uint32_t reg;
 
-	/* Use external ocsillator */
+	/* Enable High-Speed External (HSE) ocsillator */
 	reg = RD4(sc, RCC_CR);
 	reg |= CR_HSEON;
 	WR4(sc, RCC_CR, reg);
@@ -129,7 +128,7 @@ stm32l4_rcc_lsi_enable(struct stm32l4_rcc_softc *sc)
 	reg |= CSR_LSION;
 	WR4(sc, RCC_CSR, reg);
 
-	timeout = 1000;	/* ~480 on stm32l431kc */
+	timeout = 1000;	/* ~480 is required on stm32l431kc */
 	do {
 		reg = RD4(sc, RCC_CSR);
 		if (reg & CSR_LSIRDY)
