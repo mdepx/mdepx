@@ -58,4 +58,7 @@
 #define	EXCP_RET_DCRS		(1 << 5) /* Default rules for stacking the callee registers are followed. */
 #define	EXCP_RET_ES_SECURE	(1 << 0) /* Indicates the Security state the exception was taken to. */
 
+#define	EXCP_RET_RESERVED1	(1 << 1)
+#define	EXCP_RET_RESERVED2	(0x1ffff << 7)
+
 #endif /* !_MACHINE_CPUREGS_H_ */
