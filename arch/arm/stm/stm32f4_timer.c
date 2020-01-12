@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2018, 2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,8 +25,21 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/systm.h>
+#include <sys/callout.h>
+
 #include <machine/frame.h>
+
 #include <arm/stm/stm32f4_timer.h>
+
+#define	TIM_DEBUG
+#undef	TIM_DEBUG
+
+#ifdef	TIM_DEBUG
+#define	dprintf(fmt, ...)	printf(fmt, ##__VA_ARGS__)
+#else
+#define	dprintf(fmt, ...)
+#endif
 
 #define	RD4(_sc, _reg)		\
 	*(volatile uint32_t *)((_sc)->base + _reg)
@@ -41,43 +54,29 @@ stm32f4_timer_intr(void *arg, struct trapframe *tf, int irq)
 
 	sc = arg;
 
+	dprintf("%s\n", __func__);
+
+	reg = RD4(sc, TIM_DIER);
+	reg &= ~DIER_CC1IE;
+	WR4(sc, TIM_DIER, reg);
+
 	reg = RD4(sc, TIM_SR);
-	reg &= ~SR_UIF;
+	reg &= ~SR_CC1IF;
 	WR4(sc, TIM_SR, reg);
 
-	reg = RD4(sc, TIM_DIER);
-	reg &= ~DIER_UIE;
-	WR4(sc, TIM_DIER, reg);
+	mdx_callout_callback(&sc->mt);
 }
 
 void
-stm32f4_timer_setup(struct stm32f4_timer_softc *sc, uint32_t usec)
-{
-	uint32_t ticks;
-	uint32_t reg;
-
-	ticks = usec * (sc->freq / 1000000);
-
-	WR4(sc, TIM_CNT, ticks);
-
-	reg = RD4(sc, TIM_CR1);
-	reg |= CR1_CEN;
-	reg |= CR1_DIR;
-	WR4(sc, TIM_CR1, reg);
-
-	reg = RD4(sc, TIM_DIER);
-	reg |= DIER_UIE;
-	WR4(sc, TIM_DIER, reg);
-}
-
-void
-stm32f4_timer_udelay(struct stm32f4_timer_softc *sc, uint32_t usec)
+stm32f4_timer_udelay(struct stm32f4_timer_softc *sc, uint32_t ticks)
 {
 
+	/* TODO */
 }
 
+#if 0
 void
-stm32f4_timer_usleep(struct stm32f4_timer_softc *sc, uint32_t usec)
+stm32f4_timer_usleep(struct stm32f4_timer_softc *sc, uint32_t ticks)
 {
 	uint32_t primask;
 
@@ -86,12 +85,63 @@ stm32f4_timer_usleep(struct stm32f4_timer_softc *sc, uint32_t usec)
 
 	__asm __volatile("cpsid i");
 
-	stm32f4_timer_setup(sc, usec);
+	stm32f4_timer_setup(sc, ticks);
 
 	__asm __volatile("wfi");
 
 	__asm __volatile( "msr     primask, %0\n"
 	    :: "r" (primask) : "memory");
+}
+#endif
+
+static void
+stm32f4_timer_start(void *arg, uint32_t ticks)
+{
+	struct stm32f4_timer_softc *sc;
+	uint32_t reg;
+	uint16_t val;
+
+	sc = arg;
+
+	dprintf("%s: %d\n", __func__, ticks);
+
+	val = RD4(sc, TIM_CNT);
+	val += ticks;
+	WR4(sc, TIM_CCR1, val);
+
+	reg = RD4(sc, TIM_CR1);
+	reg |= CR1_CEN;
+	WR4(sc, TIM_CR1, reg);
+
+	reg = RD4(sc, TIM_DIER);
+	reg |= DIER_CC1IE;
+	WR4(sc, TIM_DIER, reg);
+}
+
+static void
+stm32f4_timer_stop(void *arg)
+{
+	struct stm32f4_timer_softc *sc;
+	uint32_t reg;
+
+	sc = arg;
+
+	reg = RD4(sc, TIM_CR1);
+	reg &= ~CR1_CEN;
+	WR4(sc, TIM_CR1, reg);
+}
+
+static uint32_t
+stm32f4_timer_count(void *arg)
+{
+	struct stm32f4_timer_softc *sc;
+	uint32_t reg;
+
+	sc = arg;
+
+	reg = RD4(sc, TIM_CNT);
+
+	return (reg);
 }
 
 int
@@ -101,6 +151,20 @@ stm32f4_timer_init(struct stm32f4_timer_softc *sc,
 
 	sc->base = base;
 	sc->freq = freq;
+
+	/*
+	 * Since the timer is 16-bit only, set some reasonable prescaler.
+	 * Let's say 10000 ticks is 1 second.
+	 */
+	WR4(sc, TIM_CR1, 0);
+	WR4(sc, TIM_PSC, (freq / 10000) - 1);
+
+	sc->mt.start = stm32f4_timer_start;
+	sc->mt.stop = stm32f4_timer_stop;
+	sc->mt.count = stm32f4_timer_count;
+	sc->mt.width = 0x0000ffff;
+	sc->mt.arg = sc;
+	mdx_callout_register(&sc->mt);
 
 	return (0);
 }

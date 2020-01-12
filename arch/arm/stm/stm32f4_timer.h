@@ -27,15 +27,19 @@
 #ifndef _ARM_STM_STM32F4_TIMER_H_
 #define _ARM_STM_STM32F4_TIMER_H_
 
+#include <sys/callout.h>
+
 #define	TIM_CR1		0x00 /* Control register 1 */
-#define	 CR1_DIR	(1 << 4) /* Direction */
+#define	 CR1_DIR	(1 << 4) /* Counter used as downcounter */
 #define	 CR1_CEN	(1 << 0) /* Counter enable */
 #define	TIM_CR2		0x04 /* Control register 2 */
 #define	TIM_SMCR	0x08 /* Slave mode control register */
 #define	TIM_DIER	0x0C /* DMA/interrupt enable register */
 #define	 DIER_UIE	(1 << 0) /* Update interrupt enable */
+#define	 DIER_CC1IE	(1 << 1) /* Capture/Compare 1 interrupt enable */
 #define	TIM_SR		0x10 /* Status register */
 #define	 SR_UIF		(1 << 0) /* Update interrupt flag */
+#define	 SR_CC1IF	(1 << 1) /* Capture/Compare 1 interrupt flag */
 #define	TIM_EGR		0x14 /* Event generation register */
 #define	 EGR_UG		(1 << 0) /* Update generation */
 #define	TIM_CCMR1	0x18 /* Capture/compare mode register 1 */
@@ -56,13 +60,12 @@
 struct stm32f4_timer_softc {
 	uint32_t base;
 	uint32_t freq;
+	struct mi_timer mt;
 };
 
 int stm32f4_timer_init(struct stm32f4_timer_softc *sc,
     uint32_t base, uint32_t freq);
-void stm32f4_timer_setup(struct stm32f4_timer_softc *sc, uint32_t usec);
 void stm32f4_timer_intr(void *arg, struct trapframe *tf, int irq);
-void stm32f4_timer_udelay(struct stm32f4_timer_softc *sc, uint32_t usec);
-void stm32f4_timer_usleep(struct stm32f4_timer_softc *sc, uint32_t usec);
+void stm32f4_timer_udelay(struct stm32f4_timer_softc *sc, uint32_t ticks);
 
 #endif /* !_ARM_STM_STM32F4_TIMER_H_ */
