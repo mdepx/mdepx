@@ -81,6 +81,16 @@ next(int cpuid, struct mdx_callout *c0)
 	return (c);
 }
 
+static void
+mi_tmr_start(uint32_t ticks)
+{
+
+	if (ticks > mi_tmr->width)
+		mi_tmr->start(mi_tmr->arg, mi_tmr->width);
+	else
+		mi_tmr->start(mi_tmr->arg, ticks);
+}
+
 void
 mdx_callout_init(struct mdx_callout *c)
 {
@@ -94,15 +104,19 @@ get_elapsed(uint32_t *count_saved)
 {
 	uint32_t elapsed;
 	uint32_t count;
+	uint32_t saved;
 	int cpuid;
 
 	cpuid = PCPU_GET(cpuid);
 
 	count = mi_tmr->count(mi_tmr->arg);
-	if (count > mi_tmr->count_saved[cpuid])
-		elapsed = (count - mi_tmr->count_saved[cpuid]);
+	saved = mi_tmr->count_saved[cpuid];
+
+	if (count > saved)
+		elapsed = (count - saved);
 	else
-		elapsed = (mi_tmr->width - mi_tmr->count_saved[cpuid] + count);
+		elapsed = (mi_tmr->width - saved + count);
+
 	if (count_saved != NULL)
 		*count_saved = count;
 
@@ -143,16 +157,16 @@ mdx_callout_set_one(struct mdx_callout *c0)
 	switch (mi_tmr->state[cpuid]) {
 	case MI_TIMER_RUNNING:
 		if (c0 == first(cpuid))
-			mi_tmr->start(mi_tmr->arg, c0->ticks - elapsed);
+			mi_tmr_start(c0->ticks - elapsed);
 		break;
 	case MI_TIMER_EXCP:
 		/* We are in the exception handler */
 		break;
 	case MI_TIMER_READY:
-		/* We are free to run. */
+		/* Start the timer. */
 		mi_tmr->state[cpuid] = MI_TIMER_RUNNING;
 		mi_tmr->count_saved[cpuid] = mi_tmr->count(mi_tmr->arg);
-		mi_tmr->start(mi_tmr->arg, first(cpuid)->ticks);
+		mi_tmr_start(first(cpuid)->ticks);
 	}
 }
 
@@ -286,7 +300,7 @@ mdx_callout_callback(struct mi_timer *mt)
 	if ((c = first(cpuid)) != NULL) {
 		if (mi_tmr->state[cpuid] == MI_TIMER_EXCP) {
 			mi_tmr->state[cpuid] = MI_TIMER_RUNNING;
-			mi_tmr->start(mi_tmr->arg, c->ticks);
+			mi_tmr_start(c->ticks);
 		}
 	} else {
 		mi_tmr->state[cpuid] = MI_TIMER_READY;
