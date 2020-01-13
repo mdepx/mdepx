@@ -38,6 +38,17 @@
 
 #include <machine/pcpu.h>
 
+/*
+ * A hardware timer must be:
+ * (1) upcouning
+ * (2) free running with automatic reloading
+ *
+ * One shot timers are not supported.
+ *
+ * Example drivers see at:
+ *     grep mdx_callout_register arch/ -R
+ */
+
 static struct mi_timer *mi_tmr;
 static struct entry callouts_list[MDX_CPU_MAX];
 
