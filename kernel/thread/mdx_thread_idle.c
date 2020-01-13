@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2019-2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,13 +31,6 @@
 
 static struct thread idle_thread[MDX_CPU_MAX];
 uint8_t idle_thread_stack[MDX_CPU_MAX][MDX_THREAD_STACK_SIZE];
-
-/* TODO: remove main_thread from this file ? */
-#if !defined(MDX_THREAD_DYNAMIC_ALLOC)
-struct thread main_thread;
-/* CHERI requires __CHERI_CAPABILITY_WIDTH__/8 byte alignment. */
-uint8_t main_thread_stack[MDX_THREAD_STACK_SIZE] __aligned(16);
-#endif
 
 void
 mdx_thread_init(int cpuid)

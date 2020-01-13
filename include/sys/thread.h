@@ -93,6 +93,6 @@ void md_thread_terminate(struct thread *td);
 void md_init_secondary(int cpuid);
 
 int main(void);
-int app_init(void);
+void board_init(void);
 
 #endif /* !_SYS_THREAD_H_ */

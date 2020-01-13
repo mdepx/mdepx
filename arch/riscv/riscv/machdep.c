@@ -35,11 +35,6 @@
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
 
-#ifndef MDX_THREAD_DYNAMIC_ALLOC
-extern struct thread main_thread;
-extern uint8_t main_thread_stack[MDX_THREAD_STACK_SIZE];
-#endif
-
 /* Interrupt stack */
 static size_t intr_stack[MDX_CPU_MAX][MDX_RISCV_INTR_STACK_SIZE];
 uint8_t __riscv_boot_ap[MDX_CPU_MAX];
@@ -173,25 +168,13 @@ md_init(int hart)
 	/* Enable supervisor interrupts. */
 	csr_set(mie, MIE_MSIE);
 
-	/* Allow the app to register a timer and (optionally) malloc. */
-	app_init();
+	/*
+	 * Let the app to register a timer, malloc and create a main thread
+	 * if required (everything is optional).
+	 */
+	board_init();
 
 #ifdef MDX_SCHED
-	struct thread *td;
-
-#ifdef MDX_THREAD_DYNAMIC_ALLOC
-	td = mdx_thread_create("main", 1, 10000,
-	    MDX_THREAD_STACK_SIZE, main, NULL);
-	if (td == NULL)
-		panic("can't create the main thread\n");
-#else
-	td = &main_thread;
-	td->td_stack = (uint8_t *)main_thread_stack;
-	td->td_stack_size = MDX_THREAD_STACK_SIZE;
-	mdx_thread_setup(td, "main", 1, 10000, main, NULL);
-#endif
-
-	mdx_sched_add(td);
 	mdx_sched_cpu_add(pcpup);
 	mdx_sched_cpu_avail(pcpup, true);
 

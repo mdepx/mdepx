@@ -27,41 +27,40 @@
 #include <sys/cdefs.h>
 #include <sys/console.h>
 #include <sys/endian.h>
+#include <sys/thread.h>
 #include <sys/systm.h>
 #include <sys/malloc.h>
-#include <sys/thread.h>
+#include <sys/mutex.h>
 
 #include <machine/frame.h>
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
-#include <machine/cheric.h>
 
 #include <mips/mips/timer.h>
 #include <mips/mips/trap.h>
 
 #include <dev/uart/uart_16550.h>
 
+#include "board.h"
+
 extern char MipsException[], MipsExceptionEnd[];
 extern char MipsTLBMiss[], MipsTLBMissEnd[];
 extern char MipsCache[], MipsCacheEnd[];
 
-#define	USEC_TO_TICKS(n)	(100 * (n))	/* 100MHz clock. */
+static struct mips_timer_softc timer_sc;
+static struct uart_16550_softc uart_sc;
+
 #define	UART_BASE		0x180003f8
 #define	UART_CLOCK_RATE		3686400
 #define	DEFAULT_BAUDRATE	115200
 #define	MIPS_DEFAULT_FREQ	1000000
 
-static struct mips_timer_softc timer_sc;
-static struct uart_16550_softc uart_sc;
-
-void * __capability kernel_sealcap;
+#ifndef MDX_THREAD_DYNAMIC_ALLOC
+extern struct thread main_thread;
+extern uint8_t main_thread_stack[MDX_THREAD_STACK_SIZE];
+#endif
 
 void cpu_reset(void);
-int main(void);
-
-struct thread main_thread;
-/* CHERI requires __CHERI_CAPABILITY_WIDTH__/8 byte alignment. */
-uint8_t main_thread_stack[MDX_THREAD_STACK_SIZE] __aligned(16);
 
 static void
 softintr(void *arg, struct trapframe *frame, int i)
@@ -118,54 +117,22 @@ void
 udelay(uint32_t usec)
 {
 
-}
-
-static inline void __unused
-trace_enable(void)
-{
-
-	__asm __volatile("li $zero, 0xbeef");
-}
-
-static inline void __unused
-trace_disable(void)
-{
-
-	__asm __volatile("li $zero, 0xdead");
-}
-
-static void
-setup_uart(void)
-{
-	capability cap;
-
-	cap = cheri_getdefault();
-	cap = cheri_setoffset(cap, MIPS_XKPHYS_UNCACHED_BASE + UART_BASE);
-	cap = cheri_csetbounds(cap, 6);
-
-	uart_16550_init(&uart_sc, cap, UART_CLOCK_RATE, DEFAULT_BAUDRATE, 0);
-	mdx_console_register(uart_putchar, (void *)&uart_sc);
+	mips_timer_udelay(&timer_sc, usec);
 }
 
 static void
 mips_install_vectors(void)
 {
 
-#if 0
 	if (MipsCacheEnd - MipsCache > 0x80)
 		panic("Cache error code is too big");
 	if (MipsTLBMissEnd - MipsTLBMiss > 0x80)
 		panic("TLB code is too big");
-#endif
 
 	/* Install exception code. */
 	bcopy(MipsException, (void *)MIPS_EXC_VEC_GENERAL,
 	    MipsExceptionEnd - MipsException);
 
-	bcopy(MipsException, (void *)CHERI_CCALL_EXC_VEC,
-	    MipsExceptionEnd - MipsException);
-
-#if 0
 	/* Install Cache Error code */
 	bcopy(MipsCache, (void *)MIPS_EXC_VEC_CACHE_ERR,
 	    MipsCacheEnd - MipsCache);
@@ -175,18 +142,24 @@ mips_install_vectors(void)
 	    MipsTLBMissEnd - MipsTLBMiss);
 	bcopy(MipsTLBMiss, (void *)MIPS_EXC_VEC_XTLB_MISS,
 	    MipsTLBMissEnd - MipsTLBMiss);
-#endif
 }
 
-int
-app_init(void)
+void
+board_init(void)
 {
 	uint64_t malloc_base;
 	uint32_t status;
 	int malloc_size;
 
+	uart_16550_init(&uart_sc, UART_BASE | 0xffffffffa0000000,
+	    UART_CLOCK_RATE, DEFAULT_BAUDRATE, 0);
+	mdx_console_register(uart_putchar, (void *)&uart_sc);
+
 	mips_install_vectors();
 	mips_install_intr_map(mips_intr_map);
+
+	mips_timer_init(&timer_sc, MIPS_DEFAULT_FREQ,
+	    USEC_TO_TICKS(1));
 
 	malloc_init();
 	malloc_base = BASE_ADDR + 0x01000000;
@@ -203,37 +176,22 @@ app_init(void)
 	status |= MIPS_SR_SX;
 	mips_wr_status(status);
 
-	/* Setup capability-enabled JTAG UART. */
-	setup_uart();
+	/* Create the main thread. */
 
-	mips_timer_init(&timer_sc, MIPS_DEFAULT_FREQ,
-	    USEC_TO_TICKS(1));
-
-	CHERI_PRINT_PTR(cheri_getpcc());
-
-	return (0);
-}
-
-static void
-test_thr(void)
-{
-
-	while (1)
-		printf("hi\n");
-}
-
-int
-main(void)
-{
+#ifdef MDX_SCHED
 	struct thread *td;
 
-	td = mdx_thread_create("test", 1, (USEC_TO_TICKS(1000) * 100),
-	    4096, test_thr, (void *)0);
-	td->td_index = 0;
+#ifdef MDX_THREAD_DYNAMIC_ALLOC
+	td = mdx_thread_create("main", 1, USEC_TO_TICKS(500000),
+	    MDX_THREAD_STACK_SIZE, main, NULL);
+	if (td == NULL)
+		panic("can't create the main thread\n");
+#else
+	td = &main_thread;
+	td->td_stack = (uint8_t *)main_thread_stack;
+	td->td_stack_size = MDX_THREAD_STACK_SIZE;
+	mdx_thread_setup(td, "main", 1, USEC_TO_TICKS(500000), main, NULL);
+#endif
 	mdx_sched_add(td);
-
-	while (1)
-		printf("Hello Hybrid Capability World\n");
-
-	return (0);
+#endif
 }

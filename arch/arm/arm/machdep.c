@@ -33,11 +33,6 @@
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
 
-#ifndef MDX_THREAD_DYNAMIC_ALLOC
-extern struct thread main_thread;
-extern uint8_t main_thread_stack[MDX_THREAD_STACK_SIZE];
-#endif
-
 void
 critical_enter(void)
 {
@@ -126,25 +121,13 @@ md_init(int cpuid)
 	mdx_sched_init();
 #endif
 
-	/* Allow the app to register malloc and timer. */
-	app_init();
+	/*
+	 * Let the app to register a timer, malloc and create a main thread
+	 * if required (everything is optional).
+	 */
+	board_init();
 
 #ifdef MDX_SCHED
-	struct thread *td;
-
-#ifndef MDX_THREAD_DYNAMIC_ALLOC
-	td = &main_thread;
-	td->td_stack = (uint8_t *)main_thread_stack;
-	td->td_stack_size = MDX_THREAD_STACK_SIZE;
-	mdx_thread_setup(td, "main", 1, 10000, main, NULL);
-#else
-	td = mdx_thread_create("main", 1, 10000,
-	    MDX_THREAD_STACK_SIZE, main, NULL);
-	if (td == NULL)
-		panic("can't create the main thread\n");
-#endif
-
-	mdx_sched_add(td);
 	mdx_sched_cpu_add(pcpup);
 	mdx_sched_cpu_avail(pcpup, true);
 
