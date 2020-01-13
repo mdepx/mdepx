@@ -38,6 +38,7 @@
 #include <arm/stm/stm32l4_rcc.h>
 #include <arm/stm/stm32l4_rtc.h>
 #include <arm/stm/stm32f4_dsi.h>
+#include <arm/stm/stm32f4_i2c.h>
 
 #define	USART1_BASE	0x40013800
 #define	USART2_BASE	0x40004400
@@ -58,5 +59,9 @@
 #define	SYSCFG_BASE	0x40010000
 #define	RTC_BASE	0x40002800
 #define	DSIHOST_BASE	0x40016C00
+#define	I2C1_BASE	0x40005400
+#define	I2C2_BASE	0x40005800
+#define	I2C3_BASE	0x40005C00
+#define	I2C4_BASE	0x40008400
 
 #endif	/* !_ARM_STM_STM32F4_H_ */

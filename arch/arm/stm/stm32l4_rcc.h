@@ -112,6 +112,8 @@
 #define	 APB1ENR1_USART3EN	(1 << 18) /* USART3 clock enable */
 #define	 APB1ENR1_USART2EN	(1 << 17) /* USART2 clock enable */
 #define	 APB1ENR1_I2C3EN	(1 << 23) /* I2C3 clock enable */
+#define	 APB1ENR1_I2C2EN	(1 << 22) /* I2C2 clock enable */
+#define	 APB1ENR1_I2C1EN	(1 << 21) /* I2C2 clock enable */
 #define	 APB1ENR1_SPI3EN	(1 << 15) /* SPI3 clock enable */
 #define	 APB1ENR1_SPI2EN	(1 << 14) /* SPI2 clock enable */
 #define	 APB1ENR1_RTCAPBEN	(1 << 10) /* RTC APB clock enable */
