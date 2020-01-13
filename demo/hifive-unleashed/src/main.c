@@ -39,59 +39,23 @@
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
 
-#include <riscv/sifive/e300g_clint.h>
-#include <riscv/sifive/e300g_uart.h>
+#include "board.h"
 
-#define	CLINT_BASE		0x02000000
-#define	UART_BASE		0x10000000
-#define	UART_CLOCK_RATE		3686400
-#define	DEFAULT_BAUDRATE	115200
-#define	USEC_TO_TICKS(n)	(10 * (n))
-
-static struct uart_softc uart_sc;
-static struct clint_softc clint_sc;
-
-extern uint8_t __riscv_boot_ap[2];
-extern uint32_t _sbss;
-extern uint32_t _ebss;
-
-static struct spinlock l1;
-static mdx_mutex_t m __unused;
+static mdx_mutex_t m0 __unused;
 static mdx_mutex_t m1 __unused;
 static struct mdx_callout c1[1000] __unused;
-static mdx_sem_t sem;
-
-#ifdef MDX_SCHED_SMP
-uint8_t mp_release __section(".data") = 0;
-#endif
-
-static void
-uart_putchar(int c, void *arg)
-{
-	struct uart_softc *sc;
-
-	sc = arg;
-
-	if (sc == NULL)
-		return;
-
-	if (c == '\n')
-		e300g_uart_putc(sc, '\r');
-
-	e300g_uart_putc(sc, c);
-}
 
 static void __unused
 test_thr(void *arg)
 {
 
 	while (1) {
-		if (!mdx_mutex_timedlock(&m, 1000))
+		if (!mdx_mutex_timedlock(&m0, 1000))
 			continue;
 		printf("cpu%d: hello from thread%04d cn %d mstatus %x\n",
 		    PCPU_GET(cpuid), (size_t)arg, curthread->td_critnest,
 		    csr_read(mstatus));
-		mdx_mutex_unlock(&m);
+		mdx_mutex_unlock(&m0);
 
 		mdx_tsleep(1000);
 	}
@@ -175,25 +139,6 @@ cb(void *arg)
 	mdx_callout_set_locked(c, ticks, cb, (void *)c);
 }
 
-int
-app_init(void)
-{
-
-	malloc_init();
-	malloc_add_region(0x80800000, 0x7800000);
-
-	e300g_uart_init(&uart_sc, 0x10010000,
-	    500000000, DEFAULT_BAUDRATE);
-	mdx_console_register(uart_putchar, (void *)&uart_sc);
-
-	mdx_sem_init(&sem, 1);
-	mdx_mutex_init(&m);
-
-	e300g_clint_init(&clint_sc, CLINT_BASE);
-
-	return (0);
-}
-
 static void __unused
 test(void *arg)
 {
@@ -216,13 +161,7 @@ main(void)
 
 	printf("cpu%d: pcpu size %d\n", PCPU_GET(cpuid), sizeof(struct pcpu));
 
-	sl_init(&l1);
-
-#ifdef MDX_SCHED_SMP
-	printf("Releasing CPUs...\n");
-	for (j = 2; j < 5; j++)
-		__riscv_boot_ap[j] = 1;
-#endif
+	mdx_mutex_init(&m0);
 
 	/* Some testing routines. */
 #if 0
