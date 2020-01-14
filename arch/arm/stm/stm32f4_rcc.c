@@ -74,12 +74,11 @@ stm32f4_rcc_pllsai(struct stm32f4_rcc_softc *sc,
 
 void
 stm32f4_rcc_pll_configure(struct stm32f4_rcc_softc *sc,
-    int pllm, int plln, int pllq, int pllp, uint8_t external,
-    uint32_t rcc_cfgr)
+    struct stm32f4_rcc_pll_conf *conf)
 {
 	uint32_t reg;
 
-	if (external) {
+	if (conf->external) {
 		/* Use external ocsillator */
 		reg = RD4(sc, RCC_CR);
 		reg |= CR_HSEON;
@@ -94,13 +93,13 @@ stm32f4_rcc_pll_configure(struct stm32f4_rcc_softc *sc,
 			;
 	}
 
-	WR4(sc, RCC_CFGR, rcc_cfgr);
+	WR4(sc, RCC_CFGR, conf->rcc_cfgr);
 
-	reg = (pllm << PLLCFGR_PLLM_S);
-	reg |= (plln << PLLCFGR_PLLN_S);
-	reg |= (pllq << PLLCFGR_PLLQ_S);
-	reg |= (pllp << PLLCFGR_PLLP_S);
-	if (external)
+	reg = (conf->pllm << PLLCFGR_PLLM_S);
+	reg |= (conf->plln << PLLCFGR_PLLN_S);
+	reg |= (conf->pllq << PLLCFGR_PLLQ_S);
+	reg |= (conf->pllp << PLLCFGR_PLLP_S);
+	if (conf->external)
 		reg |= PLLCFGR_PLLSRC_HSE;
 	WR4(sc, RCC_PLLCFGR, reg);
 
