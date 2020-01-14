@@ -83,6 +83,12 @@ md_setup_frame(struct trapframe *tf, void *entry,
 	/* Security Extensions only. Ignored on non-trustzone devices. */
 	tf->tf_r14 |= EXCP_RET_DCRS;
 
+#ifndef	MDX_ARM_TRUSTZONE
+	tf->tf_r14 |= EXCP_RET_RESERVED2;
+	tf->tf_r14 |= EXCP_RET_ES_SECURE;
+	tf->tf_r14 |= EXCP_RET_S_SECURE;
+#endif
+
 	hw = (struct hwregs *)&tf->hwregs;
 	hw->r0 = (uint32_t)arg;
 	hw->r14 = (uint32_t)terminate;
