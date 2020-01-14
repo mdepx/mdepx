@@ -47,6 +47,8 @@
 #define	TIM_CCER	0x20 /* Capture/compare enable register */
 #define	TIM_CNT		0x24 /* Counter */
 #define	TIM_PSC		0x28 /* Prescaler */
+#define	 PSC_SHIFT	(0)
+#define	 PSC_MASK	(0xffff << PSC_SHIFT)
 #define	TIM_ARR		0x2C /* Auto-reload register */
 #define	TIM_RCR		0x30 /* Repetition counter register */
 #define	TIM_CCR1	0x34 /* Capture/compare register 1 */
