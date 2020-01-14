@@ -40,6 +40,10 @@
 #define	DSI_DCS_READ_P0		0x06 /* DCS read, no parameters */
 #define	DSI_MAX_RET_PKT_SIZE	0x37 /* Set maximum return packet size */
 
+#define	DSI_PP_STREAM_18	0x1e /* 18-bit RGB-666 packed pixel stream */
+#define	DSI_LPP_STREAM_18	0x2e /* 18-bit RGB-666 loosely packed */
+#define	DSI_PP_STREAM_24	0x3e /* 24-bit RGB-888 packed pixel stream */
+
 struct dsi_device {
 	void (*dsi_short)(struct dsi_device *, uint8_t vchid, uint8_t data_type,
 	    uint8_t data0, uint8_t data1);
