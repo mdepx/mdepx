@@ -68,13 +68,19 @@ def proc(d, key, val):
 			d[k].append(v.strip("'"))
 		else:
 			d[k] = [v.strip("'")]
-	else:
+	elif v:
 		spl = v.split()
 		for s in spl:
 			if k in d:
 				d[k].append(s)
 			else:
 				d[k] = [s]
+	else:
+		if k in d:
+			d[k].append('')
+		else:
+			d[k] = ['']
+
 
 #
 # Find the key value pair
@@ -100,10 +106,14 @@ def proc0(d, data):
 			continue
 
 		elif ((c == ';' or i == len(data) - 1) and depth == 0):
-			if val == '':
+			if key == '':
+				if tmp.strip():
+					key = tmp
+					tmp = ''
+			elif val == '':
 				val = tmp
 				tmp = ''
-			if (key and val):
+			if key:
 				proc(d, key, val)
 				key = ''
 				val = ''
