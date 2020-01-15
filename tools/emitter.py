@@ -92,6 +92,12 @@ def process_directives(root, context, data):
 					"even number of arguments")
 				sys.exit(5)
 			vars[x] = args
+		elif x in ['archive']:
+			if (len(args) > 1):
+				print("Error: archive directive accepts "
+					"one argument only (filename).")
+				sys.exit(5)
+			vars[x] = args
 		elif x in ['machine']:
 			vars[x] = os.path.join(root, args[0])
 		elif x in ['ldadd']:

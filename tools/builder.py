@@ -139,6 +139,39 @@ def compile(resobj, flags, vars, link_objs, debug):
 
 	return True
 
+def archive(vars, objs, debug):
+	args = vars.get('archive', None)
+	if not args:
+		# Nothing to archive
+		return True
+	filename = args[0]
+
+	if 'ldadd' in vars:
+		objs += vars['ldadd']
+
+	ar = os.environ.get('AR', '')
+	if ar:
+		archiver = ar
+	else:
+		cross_compile = os.environ.get('CROSS_COMPILE', '')
+		archiver = '%sar' % cross_compile
+
+	archiver_fp = find_elf(archiver)
+	if not archiver_fp:
+		print("Archiver not found: %s" % linker)
+		return False
+
+	cmd = [archiver, "cr", filename] + objs
+	pcmd = "  AR      %s" % filename
+	print(pcmd)
+	if debug:
+		print(" ".join(cmd))
+
+	if run(archiver_fp, cmd) != 0:
+		return False
+
+	return True
+
 def link(vars, link_objs, debug):
 
 	args = vars.get('link', None)
@@ -180,12 +213,15 @@ def link(vars, link_objs, debug):
 	return True
 
 def build(resobj, flags, vars, debug=False):
-	link_objs = []
+	objs = []
 
-	if not compile(resobj, flags, vars, link_objs, debug):
+	if not compile(resobj, flags, vars, objs, debug):
 		return False
 
-	if not link(vars, link_objs, debug):
+	if not archive(vars, objs, debug):
+		return False
+
+	if not link(vars, objs, debug):
 		return False
 
 	return True
