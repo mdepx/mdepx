@@ -150,7 +150,7 @@ def open_modules(root, context):
 				else:
 					p = os.path.join(root, el)
 				p = os.path.expanduser(p)
-				p1 = os.path.join(p, 'mdepx.conf')
+				p1 = os.path.join(p, 'module.conf')
 				if not os.path.exists(p1):
 					continue
 				with open(p1) as f:
