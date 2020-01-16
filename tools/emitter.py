@@ -92,12 +92,6 @@ def process_directives(root, context, data):
 					"even number of arguments")
 				sys.exit(5)
 			vars[x] = args
-		elif x in ['archive']:
-			if (len(args) > 1):
-				print("Error: archive directive accepts "
-					"one argument only (filename).")
-				sys.exit(5)
-			vars[x] = args
 		elif x in ['machine']:
 			vars[x] = os.path.join(root, args[0])
 		elif x in ['ldadd']:
@@ -121,6 +115,7 @@ def process_directives(root, context, data):
 					proc1(root, node, data)
 		elif x in ['module']:
 			for m in args:
+				#print('process_dmodule %s' % m)
 				if m in context:
 					node = context[m]
 					if 'root' in node:
@@ -131,6 +126,8 @@ def process_directives(root, context, data):
 					proc1(p, node, data)
 
 def proc1(root, context, data):
+	#print("proc1 '%s'" % context)
+
 	data1 = copy.deepcopy(data)
 	collect_nested_directives(root, context, data1)
 	process_directives(root, context, data1)
@@ -138,28 +135,34 @@ def proc1(root, context, data):
 	return resobj
 
 def open_modules(root, context):
-
+	# Include contexts
 	ky = context.copy()
-
 	for k in ky:
-		v = context[k]
-		if k == 'module':
-			for el in v:
+		v = ky[k]
+		if k in ['module', 'include']:
+			for el in list(set(v)):
+				#print("opening module %s" % el)
 				if el in context and 'root' in context[el]:
 					p = context[el]['root'][0]
 				else:
 					p = os.path.join(root, el)
 				p = os.path.expanduser(p)
-				p1 = os.path.join(p, 'module.conf')
+				if k == 'module':
+					filename = 'module.conf'
+				else:
+					filename = 'mdepx.conf'
+				p1 = os.path.join(p, filename)
 				if not os.path.exists(p1):
 					continue
 				with open(p1) as f:
 					data = f.read()
-					if not el in context:
-						context[el] = {}
 					proc0(context, data)
-					open_modules(p, context[el])
-		elif type(v) == dict:
+
+	# Now open modules of contexts
+	ky = context.copy()
+	for k in ky:
+		v = ky[k]
+		if type(v) == dict:
 			if 'root' in v:
 				p = v['root'][0]
 			else:
