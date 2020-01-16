@@ -35,12 +35,8 @@ def merge(a, b, path = None):
 		if key in a:
 			if type(a[key]) == dict and type(b[key]) == dict:
 				merge(a[key], b[key], path + [str(key)])
-			elif a[key] == b[key]:
-				# same leaf value
-				pass
 			else:
-				# conflict, keep original value
-				pass
+				a[key] += b[key]
 		else:
 			a[key] = b[key]
 	return a
