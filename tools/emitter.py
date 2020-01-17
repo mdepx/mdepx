@@ -110,6 +110,7 @@ def process_directives(root, context, data):
 						resobj[o][key].append(el)
 		elif x in ['options']:
 			for opt in args:
+				#print('options %s' % opt)
 				if opt in context:
 					node = context[opt]
 					proc1(root, node, data)
@@ -141,11 +142,12 @@ def open_modules(root, context):
 		v = ky[k]
 		if k in ['module', 'include']:
 			for el in list(set(v)):
-				#print("opening module %s" % el)
+				#print("opening %s %s, root %s" % (k, el, root))
 				if el in context and 'root' in context[el]:
 					p = context[el]['root'][0]
 				else:
-					p = os.path.join(root, el)
+					p = el
+				p = os.path.join(root, p)
 				p = os.path.expanduser(p)
 				if k == 'module':
 					filename = 'module.conf'
@@ -153,6 +155,7 @@ def open_modules(root, context):
 					filename = 'mdepx.conf'
 				p1 = os.path.join(p, filename)
 				if not os.path.exists(p1):
+					print('%s not found %s' % (k, p1))
 					continue
 				with open(p1) as f:
 					data = f.read()
@@ -166,7 +169,8 @@ def open_modules(root, context):
 			if 'root' in v:
 				p = v['root'][0]
 			else:
-				p = os.path.join(root, k)
+				p = k
+			p = os.path.join(root, p)
 			open_modules(p, v)
 
 if __name__ == '__main__':
