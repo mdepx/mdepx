@@ -55,11 +55,11 @@ def collect_flags(result, m, d, deep):
 		# Process everything else
 		d1 = d[k]
 		if type(d1) == list:
-			for itm in d1:
-				if type(itm) == str:
-					s = "%s_%s" % (m, k)
-					result[s] = itm
-				else:
-					sys.exit(5)
+			# Take first value only
+			s = "%s_%s" % (m, k)
+			if type(d1[0]) == str:
+				result[s] = d1[0]
+			else:
+				sys.exit(5)
 		elif type(d1) == dict and deep == True:
 			collect_flags(result, "%s_%s" % (m, k), d1, True)
