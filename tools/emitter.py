@@ -153,9 +153,10 @@ def open_modules(root, context):
 					filename = 'module.conf'
 				else:
 					filename = 'mdepx.conf'
+				if not os.path.exists(p):
+					print('directory not found %s' % p)
 				p1 = os.path.join(p, filename)
 				if not os.path.exists(p1):
-					print('%s not found %s' % (k, p1))
 					continue
 				with open(p1) as f:
 					data = f.read()
