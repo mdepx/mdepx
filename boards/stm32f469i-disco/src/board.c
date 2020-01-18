@@ -146,7 +146,6 @@ board_init(void)
 {
 	struct stm32f4_dsi_config dconf;
 	struct stm32f4_rcc_pll_conf pconf;
-	struct thread *td;
 	uint32_t reg;
 
 	stm32f4_flash_init(&flash_sc, FLASH_BASE);
