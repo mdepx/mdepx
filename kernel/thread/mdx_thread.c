@@ -58,11 +58,13 @@ mdx_thread_terminate_cleanup(struct thread *td)
 	KASSERT(td->td_state == TD_STATE_TERMINATING,
 		("thread is not in terminating state"));
 
+#ifdef MDX_THREAD_DYNAMIC_ALLOC
 	if (td->td_flags & TD_FLAGS_DYN_ALLOC_SP)
 		free(td->td_stack);
 
 	if (td->td_flags & TD_FLAGS_DYN_ALLOC_TD)
 		free(td);
+#endif
 }
 
 /*
