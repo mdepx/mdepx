@@ -35,15 +35,15 @@ uint8_t idle_thread_stack[MDX_CPU_MAX][MDX_THREAD_STACK_SIZE];
 void
 mdx_thread_init(int cpuid)
 {
-	struct thread *t;
+	struct thread *td;
 
-	t = &idle_thread[cpuid];
-	bzero(t, sizeof(struct thread));
-	t->td_name = "idle";
-	t->td_quantum = 0;
-	t->td_prio = 0;
-	t->td_idle = 1;
-	t->td_state = TD_STATE_READY;
+	td = &idle_thread[cpuid];
+	bzero(td, sizeof(struct thread));
+	td->td_name = "idle";
+	td->td_quantum = 0;
+	td->td_prio = 0;
+	td->td_idle = 1;
+	td->td_state = TD_STATE_READY;
 
-	PCPU_SET(curthread, t);
+	PCPU_SET(curthread, td);
 }
