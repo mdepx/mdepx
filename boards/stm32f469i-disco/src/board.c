@@ -62,9 +62,6 @@ extern uint32_t _edata;
 extern uint32_t _sbss;
 extern uint32_t _ebss;
 
-struct thread main_thread;
-uint8_t main_thread_stack[MDX_THREAD_STACK_SIZE] __aligned(16);
-
 static const struct nvic_intr_entry nvic_intr_map[NVIC_NINTRS] = {
 	[27] = { stm32f4_timer_intr, &timer_sc },
 }; 
@@ -213,10 +210,4 @@ board_init(void)
 
 	otm8009a_init(&dsi_dev, OTM_FMT_RGB888,
 	    OTM_ORIENTATION_PORTRAIT);
-
-	td = &main_thread;
-	td->td_stack = (uint8_t *)main_thread_stack;
-	td->td_stack_size = MDX_THREAD_STACK_SIZE;
-	mdx_thread_setup(td, "main", 1, USEC_TO_TICKS(10000), main, NULL);
-	mdx_sched_add(td);
 }
