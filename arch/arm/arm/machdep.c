@@ -132,7 +132,6 @@ md_init(int cpuid)
 
 #ifdef MDX_SCHED
 	mdx_sched_cpu_add(pcpup);
-	mdx_sched_cpu_avail(pcpup, true);
 #endif
 
 #ifdef MDX_THREAD
