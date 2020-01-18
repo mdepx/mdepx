@@ -33,22 +33,29 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-static const struct nvic_intr_entry *map;
+static struct nvic_intr_entry intr_map[MDX_ARM_NVIC_NINTRS];
 
-void
-arm_nvic_install_intr_map(struct arm_nvic_softc *sc,
-    const struct nvic_intr_entry *m)
+int
+arm_nvic_route_intr(struct arm_nvic_softc *sc, int irq,
+    void (*handler) (void *arg, struct trapframe *frame, int irq),
+    void *arg)
 {
 
-	map = m;
+	if (irq >= MDX_ARM_NVIC_NINTRS)
+		return (-1);
+
+	intr_map[irq].handler = handler;
+	intr_map[irq].arg = arg;
+
+	return (0);
 }
 
 void
 arm_nvic_intr(uint32_t irq, struct trapframe *frame)
 {
 
-	if (map[irq].handler != NULL)
-		map[irq].handler(map[irq].arg, frame, irq);
+	if (intr_map[irq].handler != NULL)
+		intr_map[irq].handler(intr_map[irq].arg, frame, irq);
 	else
 		printf("%s: spurious intr %d\n", __func__, irq);
 }

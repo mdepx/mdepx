@@ -28,7 +28,6 @@
 #define	_SRC_BOARD_H_
 
 #define	BOARD_OSC_FREQ		8000000	/* 8 MHz */
-#define	NVIC_NINTRS		128
 #define	FONT_ADDR		0x081b0000
 #define	FB_BASE			0xC0000000
 #define	DISPLAY_WIDTH		480

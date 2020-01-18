@@ -62,10 +62,6 @@ extern uint32_t _edata;
 extern uint32_t _sbss;
 extern uint32_t _ebss;
 
-static const struct nvic_intr_entry nvic_intr_map[NVIC_NINTRS] = {
-	[27] = { stm32f4_timer_intr, &timer_sc },
-}; 
-
 static const struct sdram sdram_entry = {
 	.sdrtr = 1385,
 	.nrfs = 7,
@@ -182,7 +178,8 @@ board_init(void)
 	/* (168/4) * 2 = 84MHz / 1 PSC = 84 */
 	stm32f4_timer_init(&timer_sc, TIM1_BASE, (84000000 * 2));
 	arm_nvic_init(&nvic_sc, NVIC_BASE);
-	arm_nvic_install_intr_map(&nvic_sc, nvic_intr_map);
+
+	arm_nvic_route_intr(&nvic_sc, 27, stm32f4_timer_intr, &timer_sc);
 	arm_nvic_enable_intr(&nvic_sc, 27);
 
 	sdram_memtest();
