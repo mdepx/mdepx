@@ -55,11 +55,6 @@ static struct uart_16550_softc uart_sc;
 #define	DEFAULT_BAUDRATE	115200
 #define	MIPS_DEFAULT_FREQ	1000000
 
-#ifndef MDX_THREAD_DYNAMIC_ALLOC
-extern struct thread main_thread;
-extern uint8_t main_thread_stack[MDX_THREAD_STACK_SIZE];
-#endif
-
 void cpu_reset(void);
 
 static void
@@ -175,23 +170,4 @@ board_init(void)
 	status |= MIPS_SR_KX;
 	status |= MIPS_SR_SX;
 	mips_wr_status(status);
-
-	/* Create the main thread. */
-
-#ifdef MDX_SCHED
-	struct thread *td;
-
-#ifdef MDX_THREAD_DYNAMIC_ALLOC
-	td = mdx_thread_create("main", 1, USEC_TO_TICKS(500000),
-	    MDX_THREAD_STACK_SIZE, main, NULL);
-	if (td == NULL)
-		panic("can't create the main thread\n");
-#else
-	td = &main_thread;
-	td->td_stack = (uint8_t *)main_thread_stack;
-	td->td_stack_size = MDX_THREAD_STACK_SIZE;
-	mdx_thread_setup(td, "main", 1, USEC_TO_TICKS(500000), main, NULL);
-#endif
-	mdx_sched_add(td);
-#endif
 }

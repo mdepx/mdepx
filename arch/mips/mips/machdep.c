@@ -144,16 +144,11 @@ md_init(int cpuid)
 	mdx_sched_init();
 #endif
 
-	/*
-	 * Let the app to register a timer, malloc and create a main thread
-	 * if required (everything is optional).
-	 */
+	/* Initialize the board (register timer and/or malloc if required). */
 	board_init();
 
-#ifdef MDX_SCHED
-	mdx_sched_enter();
-#else
-	main();
+#ifdef MDX_THREAD
+	mdx_thread_main();
 #endif
 
 	panic("md_init returned");

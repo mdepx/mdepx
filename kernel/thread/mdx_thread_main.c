@@ -25,86 +25,38 @@
  */
 
 #include <sys/cdefs.h>
-#include <sys/console.h>
-#include <sys/systm.h>
 #include <sys/thread.h>
-#include <sys/spinlock.h>
-#include <sys/malloc.h>
-#include <sys/mutex.h>
-#include <sys/sem.h>
-#include <sys/list.h>
-#include <sys/smp.h>
+#include <sys/systm.h>
 
-#include <riscv/sifive/e300g_clint.h>
-#include <riscv/sifive/e300g_uart.h>
+#include <machine/pcpu.h>
 
-#include "board.h"
-
-#define	CLINT_BASE		0x02000000
-#define	UART_BASE		0x10000000
-#define	UART_CLOCK_RATE		3686400
-#define	DEFAULT_BAUDRATE	115200
-
-#include <dev/uart/uart_16550.h>
-
-extern uint8_t __riscv_boot_ap[MDX_CPU_MAX];
-
-static struct uart_16550_softc uart_sc;
-static struct clint_softc clint_sc;
-
-static void
-uart_putchar(int c, void *arg)
-{
-	struct uart_16550_softc *sc;
-
-	sc = arg;
-
-	if (sc == NULL)
-		return;
-
-	if (c == '\n')
-		uart_16550_putc(sc, '\r');
-
-	uart_16550_putc(sc, c);
-}
-
-char
-uart_getchar(void)
-{
-	char a;
-
-	a = uart_16550_getc(&uart_sc);
-
-	return (a);
-}
+#if defined(MDX_SCHED) && !defined(MDX_THREAD_DYNAMIC_ALLOC)
+static struct thread main_thread;
+static uint8_t main_thread_stack[MDX_THREAD_STACK_SIZE]
+    __aligned(MDX_THREAD_STACK_ALIGN);
+#endif
 
 void
-board_init(void)
+mdx_thread_main(void)
 {
+#ifdef MDX_SCHED
+	struct thread *td;
 
-	/* Initialize malloc */
-
-	malloc_init();
-	malloc_add_region(0x80800000, 0x7800000);
-
-	/* Register UART */
-
-	uart_16550_init(&uart_sc, UART_BASE,
-	    UART_CLOCK_RATE, DEFAULT_BAUDRATE, 0);
-	mdx_console_register(uart_putchar, (void *)&uart_sc);
-
-	/* Timer */
-
-	e300g_clint_init(&clint_sc, CLINT_BASE);
-
-	/* Release secondary core(s) */
-
-#ifdef MDX_SCHED_SMP
-	int j;
-
-	printf("Releasing CPUs...\n");
-
-	for (j = 0; j < MDX_CPU_MAX; j++)
-		__riscv_boot_ap[j] = 1;
+#ifdef MDX_THREAD_DYNAMIC_ALLOC
+	td = mdx_thread_create("main", MDX_THREAD_PRIO,
+	    MDX_THREAD_QUANTUM, MDX_THREAD_STACK_SIZE, main, NULL);
+	if (td == NULL)
+		panic("can't create the main thread\n");
+#else
+	td = &main_thread;
+	td->td_stack = (uint8_t *)main_thread_stack;
+	td->td_stack_size = MDX_THREAD_STACK_SIZE;
+	mdx_thread_setup(td, "main", MDX_THREAD_PRIO,
+	    MDX_THREAD_QUANTUM, main, NULL);
+#endif
+	mdx_sched_add(td);
+	mdx_sched_enter();
+#else
+	main();
 #endif
 }

@@ -60,9 +60,6 @@ extern uint32_t _ebss;
 uint8_t mp_release __section(".data") = 0;
 #endif
 
-static struct thread main_thread;
-static uint8_t main_thread_stack[MDX_THREAD_STACK_SIZE] __aligned(16);
-
 static void
 uart_putchar(int c, void *arg)
 {
@@ -97,17 +94,5 @@ board_init(void)
 	printf("Releasing CPUs...\n");
 	for (j = 2; j < 5; j++)
 		__riscv_boot_ap[j] = 1;
-#endif
-
-#ifdef MDX_SCHED
-	struct thread *td;
-
-	td = &main_thread;
-	td->td_stack = (uint8_t *)main_thread_stack;
-	td->td_stack_size = MDX_THREAD_STACK_SIZE;
-	mdx_thread_setup(td, "main", 1 /* prio */,
-	    USEC_TO_TICKS(10000), main, NULL);
-
-	mdx_sched_add(td);
 #endif
 }

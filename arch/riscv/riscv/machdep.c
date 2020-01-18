@@ -168,21 +168,18 @@ md_init(int hart)
 	/* Enable supervisor interrupts. */
 	csr_set(mie, MIE_MSIE);
 
-	/*
-	 * Let the app to register a timer, malloc and create a main thread
-	 * if required (everything is optional).
-	 */
+	/* Initialize the board (register timer and/or malloc if required). */
 	board_init();
 
 #ifdef MDX_SCHED
 	mdx_sched_cpu_add(pcpup);
 	mdx_sched_cpu_avail(pcpup, true);
+#endif
 
 	intr_enable();
-	mdx_sched_enter();
-#else
-	intr_enable();
-	main();
+
+#ifdef MDX_THREAD
+	mdx_thread_main();
 #endif
 
 	panic("md_init returned");

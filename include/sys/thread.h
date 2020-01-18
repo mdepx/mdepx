@@ -63,6 +63,8 @@ struct thread {
 };
 
 void mdx_thread_init(int cpuid);
+void mdx_thread_main(void);
+
 struct thread *mdx_thread_create(const char *name, int prio,
     uint32_t quantum, uint32_t stack_size,
     void *entry, void *arg);
