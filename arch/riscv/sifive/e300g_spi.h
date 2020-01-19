@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2017 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2017-2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,8 @@
 
 #ifndef _SYS_RISCV_SIFIVE_E300G_SPI_H_
 #define _SYS_RISCV_SIFIVE_E300G_SPI_H_
+
+#include <dev/spi/spi.h>
 
 #define	SPI_SCKDIV		0x000	/* Serial clock divisor */
 #define	SPI_SCKMODE		0x004	/* Serial clock mode */
@@ -69,11 +71,11 @@
 
 struct spi_softc {
 	uint32_t base;
-	uint8_t cs;
+	int cs;
 };
 
-int e300g_spi_init(struct spi_softc *sc, spi_device_t *dev,
-    uint32_t base, uint8_t cs);
+int e300g_spi_init(struct spi_softc *sc, uint32_t base);
+int e300g_spi_setup(struct spi_softc *sc, struct spi_device *dev, uint8_t cs);
 void e300g_spi_poll_txwm(struct spi_device *dev);
 
 #endif /* !_SYS_RISCV_SIFIVE_E300G_SPI_H_ */

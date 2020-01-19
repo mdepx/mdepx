@@ -77,14 +77,12 @@ e300g_spi_poll_txwm(struct spi_device *dev)
 }
 
 int
-e300g_spi_init(struct spi_softc *sc, struct spi_device *dev,
-    uint32_t base, uint8_t cs)
+e300g_spi_setup(struct spi_softc *sc, struct spi_device *dev,
+    uint8_t cs)
 {
 	uint32_t reg;
 
-	sc->base = base;
-	sc->cs = cs;
-
+	sc->cs = cs;	/* Chip Select. */
 	dev->sc = sc;
 	dev->transfer = e300g_spi_transfer;
 
@@ -104,6 +102,15 @@ e300g_spi_init(struct spi_softc *sc, struct spi_device *dev,
 	WR4(sc, SPI_FMT, reg);
 
 	WR4(sc, SPI_TXMARK, 1);
+
+	return (0);
+}
+
+int
+e300g_spi_init(struct spi_softc *sc, uint32_t base)
+{
+
+	sc->base = base;
 
 	return (0);
 }
