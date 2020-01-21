@@ -120,6 +120,7 @@ md_init_secondary(int hart)
 	pcpup->pc_cpuid = hart;
 	pcpup->pc_stack = (uintptr_t)&intr_stack[hart] +
 	    MDX_RISCV_INTR_STACK_SIZE;
+	list_init(&pcpup->pc_avail);
 	__asm __volatile("mv gp, %0" :: "r"(pcpup));
 	csr_write(mscratch, pcpup->pc_stack);
 
@@ -150,6 +151,7 @@ md_init(int hart)
 	pcpup->pc_cpuid = hart;
 	pcpup->pc_stack = (uintptr_t)&intr_stack[hart] +
 	    MDX_RISCV_INTR_STACK_SIZE;
+	list_init(&pcpup->pc_avail);
 	__asm __volatile("mv gp, %0" :: "r"(pcpup));
 	csr_write(mscratch, pcpup->pc_stack);
 #endif

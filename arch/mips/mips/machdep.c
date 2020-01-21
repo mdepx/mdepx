@@ -133,6 +133,7 @@ md_init(int cpuid)
 
 	pcpup = &__pcpu[cpuid];
 	pcpup->pc_cpuid = cpuid;
+	list_init(&pcpup->pc_avail);
 	__asm __volatile("move $28, %0" :: "r"(pcpup));
 #endif
 

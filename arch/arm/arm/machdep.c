@@ -117,6 +117,7 @@ md_init(int cpuid)
 
 	pcpup = &__pcpu[cpuid];
 	pcpup->pc_cpuid = cpuid;
+	list_init(&pcpup->pc_avail);
 #endif
 
 #ifdef MDX_THREAD
