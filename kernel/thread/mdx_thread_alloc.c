@@ -44,7 +44,6 @@ struct thread *
 mdx_thread_alloc(uint32_t stack_size)
 {
 	struct thread *td;
-	uintptr_t new_stack;
 
 	td = zalloc(sizeof(struct thread));
 	if (td == NULL)
@@ -56,14 +55,6 @@ mdx_thread_alloc(uint32_t stack_size)
 	}
 
 	td->td_stack_size = stack_size;
-
-	new_stack = (uintptr_t)td->td_stack + stack_size;
-
-	/* (TODO) Align the stack as CHERI CPU required. */
-	while (new_stack & 0xf)
-		new_stack--;
-
-	td->td_stack_top = (uint8_t *)new_stack;
 	td->td_flags = TD_FLAGS_DYN_ALLOC_SP | TD_FLAGS_DYN_ALLOC_TD;
 
 	return (td);
