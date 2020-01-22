@@ -51,6 +51,8 @@
 static struct thread intr_thread[MDX_CPU_MAX];
 #endif
 
+static struct mips_intr_entry mips_intr_map[MIPS_NINTRS];
+
 void MipsTLBMissException(void);
 
 static void
@@ -92,32 +94,19 @@ dump_frame(struct trapframe *tf)
 	printf("tf->tf_pc == %zx\n", tf->tf_pc);
 }
 
-
-static void
-default_handler(void *arg, struct trapframe *frame, int i)
+int
+mips_setup_intr(int irq,
+    void (*handler) (void *arg, struct trapframe *frame, int irq),
+    void *arg)
 {
 
-	printf("Interrupt handler is missing for int %d\n", i);
-}
+	if (irq >= MIPS_NINTRS)
+		return (-1);
 
-static const struct mips_intr_entry default_intr_map[MIPS_N_INTR] = {
-	[0] = { default_handler, NULL },
-	[1] = { default_handler, NULL },
-	[2] = { default_handler, NULL },
-	[3] = { default_handler, NULL },
-	[4] = { default_handler, NULL },
-	[5] = { default_handler, NULL },
-	[6] = { default_handler, NULL },
-	[7] = { default_handler, NULL },
-};
+	mips_intr_map[irq].handler = handler;
+	mips_intr_map[irq].arg = arg;
 
-static const struct mips_intr_entry *mips_intr_map = default_intr_map;
-
-void
-mips_install_intr_map(const struct mips_intr_entry *m)
-{
-
-	mips_intr_map = m;
+	return (0);
 }
 
 static void
@@ -125,7 +114,7 @@ mips_handle_intr(int cause)
 {
 	int i;
 
-	for (i = 0; i < MIPS_N_INTR; i++)
+	for (i = 0; i < MIPS_NINTRS; i++)
 		if (cause & MIPS_CR_IP(i)) {
 			if (mips_intr_map[i].handler != NULL)
 				mips_intr_map[i].handler(mips_intr_map[i].arg,

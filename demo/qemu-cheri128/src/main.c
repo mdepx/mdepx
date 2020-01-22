@@ -87,17 +87,6 @@ hardintr(void *arg, struct trapframe *frame, int i)
 {
 }
 
-static const struct mips_intr_entry mips_intr_map[MIPS_N_INTR] = {
-	[0] = { softintr, NULL },
-	[1] = { softintr, NULL },
-	[2] = { hardintr, NULL },
-	[3] = { hardintr_unknown, NULL },
-	[4] = { hardintr_unknown, NULL },
-	[5] = { hardintr_unknown, NULL },
-	[6] = { hardintr_unknown, NULL },
-	[7] = { mips_timer_intr, (void *)&timer_sc },
-};
-
 static void
 uart_putchar(int c, void *arg)
 {
@@ -178,15 +167,23 @@ mips_install_vectors(void)
 #endif
 }
 
-int
-app_init(void)
+void
+board_init(void)
 {
 	uint64_t malloc_base;
 	uint32_t status;
 	int malloc_size;
 
 	mips_install_vectors();
-	mips_install_intr_map(mips_intr_map);
+
+	mips_setup_intr(0, softintr, NULL);
+	mips_setup_intr(1, softintr, NULL);
+	mips_setup_intr(2, hardintr, NULL);
+	mips_setup_intr(3, hardintr_unknown, NULL);
+	mips_setup_intr(4, hardintr_unknown, NULL);
+	mips_setup_intr(5, hardintr_unknown, NULL);
+	mips_setup_intr(6, hardintr_unknown, NULL);
+	mips_setup_intr(7, mips_timer_intr, &timer_sc);
 
 	malloc_init();
 	malloc_base = BASE_ADDR + 0x01000000;
@@ -210,8 +207,6 @@ app_init(void)
 	    USEC_TO_TICKS(1));
 
 	CHERI_PRINT_PTR(cheri_getpcc());
-
-	return (0);
 }
 
 static void
