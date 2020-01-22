@@ -179,7 +179,7 @@ board_init(void)
 	stm32f4_timer_init(&timer_sc, TIM1_BASE, (84000000 * 2));
 	arm_nvic_init(&nvic_sc, NVIC_BASE);
 
-	arm_nvic_route_intr(&nvic_sc, 27, stm32f4_timer_intr, &timer_sc);
+	arm_nvic_setup_intr(&nvic_sc, 27, stm32f4_timer_intr, &timer_sc);
 	arm_nvic_enable_intr(&nvic_sc, 27);
 
 	sdram_memtest();

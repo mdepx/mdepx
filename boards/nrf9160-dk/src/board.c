@@ -72,8 +72,8 @@ board_init(void)
 
 	arm_nvic_init(&nvic_sc, BASE_SCS);
 
-	arm_nvic_route_intr(&nvic_sc, ID_UARTE0, nrf_uarte_intr, &uarte_sc);
-	arm_nvic_route_intr(&nvic_sc, ID_TIMER0, nrf_timer_intr, &timer0_sc);
+	arm_nvic_setup_intr(&nvic_sc, ID_UARTE0, nrf_uarte_intr, &uarte_sc);
+	arm_nvic_setup_intr(&nvic_sc, ID_TIMER0, nrf_timer_intr, &timer0_sc);
 
 	arm_nvic_set_prio(&nvic_sc, ID_IPC, 6);
 

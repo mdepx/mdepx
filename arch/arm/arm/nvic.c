@@ -36,7 +36,7 @@
 static struct nvic_intr_entry intr_map[MDX_ARM_NVIC_NINTRS];
 
 int
-arm_nvic_route_intr(struct arm_nvic_softc *sc, int irq,
+arm_nvic_setup_intr(struct arm_nvic_softc *sc, int irq,
     void (*handler) (void *arg, struct trapframe *frame, int irq),
     void *arg)
 {

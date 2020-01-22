@@ -61,7 +61,7 @@ void arm_nvic_set_pending(struct arm_nvic_softc *sc, uint32_t n);
 void arm_nvic_clear_pending(struct arm_nvic_softc *sc, uint32_t n);
 void arm_nvic_target_ns(struct arm_nvic_softc *sc, uint32_t n, int secure);
 void arm_nvic_set_prio(struct arm_nvic_softc *sc, uint32_t n, int prio);
-int arm_nvic_route_intr(struct arm_nvic_softc *sc, int irq,
+int arm_nvic_setup_intr(struct arm_nvic_softc *sc, int irq,
     void (*handler) (void *arg, struct trapframe *frame, int irq),
     void *arg);
 
