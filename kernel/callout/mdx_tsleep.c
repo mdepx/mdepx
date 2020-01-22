@@ -68,8 +68,8 @@ mdx_tsleep(uint32_t ticks)
 
 #ifdef MDX_MIPS_QEMU
 	/*
-	 * Interrupts has to be enabled before entering wait
-	 * in qemu/mips, otherwise it never wakesup.
+	 * Interrupts have to be left enabled before entering wait
+	 * state in qemu/mips, otherwise CPU will never wakeup.
 	 */
 	while (c.state != CALLOUT_STATE_FIRED)
 		cpu_idle();
