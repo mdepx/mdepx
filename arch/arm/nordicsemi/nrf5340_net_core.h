@@ -41,14 +41,14 @@
 #include <arm/nordicsemi/nrf9160_spis.h>
 #include <arm/nordicsemi/nrf9160_spu.h>
 #include <arm/nordicsemi/nrf9160_timer.h>
-#include <arm/nordicsemi/nrf9160_twim.h>
-#include <arm/nordicsemi/nrf9160_twis.h>
 #include <arm/nordicsemi/nrf9160_uicr.h>
 #include <arm/nordicsemi/nrf9160_wdt.h>
 #include <arm/nordicsemi/nrf_gpio.h>
 #include <arm/nordicsemi/nrf_ipc.h>
 #include <arm/nordicsemi/nrf_reset.h>
 #include <arm/nordicsemi/nrf_rtc.h>
+#include <arm/nordicsemi/nrf_twim.h>
+#include <arm/nordicsemi/nrf_twis.h>
 #include <arm/nordicsemi/nrf_uarte.h>
 
 #define	NRF_DCNF	0x41000000 /* Domain configuration */

@@ -24,8 +24,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ARM_NORDICSEMI_NRF9160_TWIS_H_
-#define _ARM_NORDICSEMI_NRF9160_TWIS_H_
+#ifndef _ARM_NORDICSEMI_NRF_TWIS_H_
+#define _ARM_NORDICSEMI_NRF_TWIS_H_
 
 #define	TWIS_TASKS_STOP		0x014	/* Stop TWI transaction */
 #define	TWIS_TASKS_SUSPEND	0x01C	/* Suspend TWI transaction */
@@ -72,4 +72,4 @@ struct nrf_twis_softc {
 	size_t base;
 };
 
-#endif /* !_ARM_NORDICSEMI_NRF9160_TWIS_H_ */
+#endif /* !_ARM_NORDICSEMI_NRF_TWIS_H_ */

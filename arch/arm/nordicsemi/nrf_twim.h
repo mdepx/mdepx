@@ -24,8 +24,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ARM_NORDICSEMI_NRF9160_TWIM_H_
-#define _ARM_NORDICSEMI_NRF9160_TWIM_H_
+#ifndef _ARM_NORDICSEMI_NRF_TWIM_H_
+#define _ARM_NORDICSEMI_NRF_TWIM_H_
 
 #define	TWIM_TASKS_STARTRX	0x000	/* Start TWI receive sequence */
 #define	TWIM_TASKS_STARTTX	0x008	/* Start TWI transmit sequence */
@@ -74,4 +74,6 @@ struct nrf_twim_softc {
 	size_t base;
 };
 
-#endif /* !_ARM_NORDICSEMI_NRF9160_TWIM_H_ */
+void nrf_twim_init(struct nrf_twim_softc *sc, uint32_t base);
+
+#endif /* !_ARM_NORDICSEMI_NRF_TWIM_H_ */
