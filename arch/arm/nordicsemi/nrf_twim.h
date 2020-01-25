@@ -27,6 +27,10 @@
 #ifndef _ARM_NORDICSEMI_NRF_TWIM_H_
 #define _ARM_NORDICSEMI_NRF_TWIM_H_
 
+#include <sys/sem.h>
+
+#include <dev/i2c/i2c.h>
+
 #define	TWIM_TASKS_STARTRX	0x000	/* Start TWI receive sequence */
 #define	TWIM_TASKS_STARTTX	0x008	/* Start TWI transmit sequence */
 #define	TWIM_TASKS_STOP		0x014	/* Stop TWI transaction. Must be issued while the TWI master is not suspended. */
@@ -53,13 +57,26 @@
 #define	TWIM_PUBLISH_LASTTX	0x1E0	/* Publish configuration for event LASTTX */
 #define	TWIM_SHORTS		0x200	/* Shortcuts between local events and tasks */
 #define	TWIM_INTEN		0x300	/* Enable or disable interrupt */
+#define	 INTEN_STOPPED		(1 << 1)
+#define	 INTEN_ERROR		(1 << 9)
+#define	 INTEN_SUSPENDED	(1 << 18)
+#define	 INTEN_RXSTARTED	(1 << 19)
+#define	 INTEN_TXSTARTED	(1 << 20)
+#define	 INTEN_LASTRX		(1 << 23)
+#define	 INTEN_LASTTX		(1 << 24)
 #define	TWIM_INTENSET		0x304	/* Enable interrupt */
 #define	TWIM_INTENCLR		0x308	/* Disable interrupt */
 #define	TWIM_ERRORSRC		0x4C4	/* Error source */
 #define	TWIM_ENABLE		0x500	/* Enable TWIM */
+#define	 TWIM_ENABLE_EN		6
 #define	TWIM_PSEL_SCL		0x508	/* Pin select for SCL signal */
 #define	TWIM_PSEL_SDA		0x50C	/* Pin select for SDA signal */
 #define	TWIM_FREQUENCY		0x524	/* TWI frequency. Accuracy depends on the HFCLK source selected. */
+#define	 TWIM_FREQ_K100		0x01980000	/* 100 kbps */
+#define	 TWIM_FREQ_K250		0x04000000	/* 250 kbps */
+#define	 TWIM_FREQ_K400		0x06400000	/* 400 kbps */
+#define	 TWIM_FREQ_K1000	0x0FF00000	/* 1000 kbps */
+
 #define	TWIM_RXD_PTR		0x534	/* Data pointer */
 #define	TWIM_RXD_MAXCNT		0x538	/* Maximum number of bytes in receive buffer */
 #define	TWIM_RXD_AMOUNT		0x53C	/* Number of bytes transferred in the last transaction */
@@ -72,8 +89,20 @@
 
 struct nrf_twim_softc {
 	size_t base;
+	mdx_sem_t sem_tx;
+	mdx_sem_t sem_rx;
+	mdx_sem_t sem_stop;
 };
 
+struct nrf_twim_conf {
+	uint32_t freq;
+	uint8_t pin_scl;
+	uint8_t pin_sda;
+};
+
+void nrf_twim_setup(struct nrf_twim_softc *sc, struct nrf_twim_conf *conf);
 void nrf_twim_init(struct nrf_twim_softc *sc, uint32_t base);
+void nrf_twim_intr(void *arg, struct trapframe *tf, int irq);
+void nrf_twim_xfer(struct nrf_twim_softc *sc, struct i2c_msg *msgs, int len);
 
 #endif /* !_ARM_NORDICSEMI_NRF_TWIM_H_ */

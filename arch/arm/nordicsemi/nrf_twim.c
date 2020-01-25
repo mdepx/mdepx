@@ -27,12 +27,86 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 
+#include <dev/i2c/i2c.h>
+
+#include <machine/frame.h>
+
 #include "nrf_twim.h"
 
 #define	RD4(_sc, _reg)		\
 	*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+
+void
+nrf_twim_intr(void *arg, struct trapframe *tf, int irq)
+{
+	struct nrf_twim_softc *sc;
+
+	sc = arg;
+
+	if (RD4(sc, TWIM_EVENTS_LASTTX)) {
+		WR4(sc, TWIM_EVENTS_LASTTX, 0);
+		mdx_sem_post(&sc->sem_tx);
+	}
+
+	if (RD4(sc, TWIM_EVENTS_LASTRX)) {
+		WR4(sc, TWIM_EVENTS_LASTRX, 0);
+		mdx_sem_post(&sc->sem_rx);
+	}
+
+	if (RD4(sc, TWIM_EVENTS_STOPPED)) {
+		WR4(sc, TWIM_EVENTS_STOPPED, 0);
+		mdx_sem_post(&sc->sem_stop);
+	}
+}
+
+void
+nrf_twim_xfer(struct nrf_twim_softc *sc, struct i2c_msg *msgs, int len)
+{
+	struct i2c_msg *msg;
+	int i;
+
+	for (i = 0; i < len; i++) {
+		msg = &msgs[i];
+
+		WR4(sc, TWIM_ADDRESS, msg->slave);
+
+		if (msg->flags & IIC_M_RD) {
+			WR4(sc, TWIM_RXD_MAXCNT, msg->len);
+			WR4(sc, TWIM_RXD_PTR, (uint32_t)msg->buf);
+
+			mdx_sem_init(&sc->sem_rx, 0);
+			WR4(sc, TWIM_TASKS_STARTRX, 1);
+			mdx_sem_wait(&sc->sem_rx);
+
+		} else {
+			WR4(sc, TWIM_TXD_MAXCNT, msg->len);
+			WR4(sc, TWIM_TXD_PTR, (uint32_t)msg->buf);
+
+			mdx_sem_init(&sc->sem_tx, 0);
+			WR4(sc, TWIM_TASKS_STARTTX, 1);
+			mdx_sem_wait(&sc->sem_tx);
+		}
+
+		if ((msg->flags & IIC_M_NOSTOP) == 0) {
+			mdx_sem_init(&sc->sem_stop, 0);
+			WR4(sc, TWIM_TASKS_STOP, 1);
+			mdx_sem_wait(&sc->sem_stop);
+		}
+	}
+}
+
+void
+nrf_twim_setup(struct nrf_twim_softc *sc, struct nrf_twim_conf *conf)
+{
+
+	WR4(sc, TWIM_FREQUENCY, conf->freq);
+	WR4(sc, TWIM_PSEL_SCL, conf->pin_scl);
+	WR4(sc, TWIM_PSEL_SDA, conf->pin_sda);
+	WR4(sc, TWIM_INTEN, INTEN_LASTTX | INTEN_LASTRX | INTEN_STOPPED);
+	WR4(sc, TWIM_ENABLE, TWIM_ENABLE_EN);
+}
 
 void
 nrf_twim_init(struct nrf_twim_softc *sc, uint32_t base)
