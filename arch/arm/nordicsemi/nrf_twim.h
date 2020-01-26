@@ -103,6 +103,6 @@ struct nrf_twim_conf {
 void nrf_twim_setup(struct nrf_twim_softc *sc, struct nrf_twim_conf *conf);
 void nrf_twim_init(struct nrf_twim_softc *sc, uint32_t base);
 void nrf_twim_intr(void *arg, struct trapframe *tf, int irq);
-void nrf_twim_xfer(struct nrf_twim_softc *sc, struct i2c_msg *msgs, int len);
+int nrf_twim_xfer(void *arg, struct i2c_msg *msgs, int len);
 
 #endif /* !_ARM_NORDICSEMI_NRF_TWIM_H_ */

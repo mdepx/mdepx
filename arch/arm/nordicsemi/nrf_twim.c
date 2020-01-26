@@ -61,11 +61,16 @@ nrf_twim_intr(void *arg, struct trapframe *tf, int irq)
 	}
 }
 
-void
-nrf_twim_xfer(struct nrf_twim_softc *sc, struct i2c_msg *msgs, int len)
+int
+nrf_twim_xfer(void *arg, struct i2c_msg *msgs, int len)
 {
+	struct nrf_twim_softc *sc;
 	struct i2c_msg *msg;
 	int i;
+
+	sc = arg;
+
+	/* TODO: handle errors. */
 
 	for (i = 0; i < len; i++) {
 		msg = &msgs[i];
@@ -95,6 +100,8 @@ nrf_twim_xfer(struct nrf_twim_softc *sc, struct i2c_msg *msgs, int len)
 			mdx_sem_wait(&sc->sem_stop);
 		}
 	}
+
+	return (0);
 }
 
 void
