@@ -38,4 +38,9 @@ struct i2c_msg {
 	uint8_t		*buf;
 };
 
+struct i2c_bus {
+	int (*xfer)(void *arg, struct i2c_msg *msgs, int len);
+	void *arg;
+};
+
 #endif /* !_DEV_I2C_I2C_H_ */
