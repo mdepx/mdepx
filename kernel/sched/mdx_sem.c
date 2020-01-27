@@ -131,7 +131,9 @@ mdx_sem_timedwait(mdx_sem_t *sem, int ticks)
 		 * 1. sem_post added us to the sched run queue
 		 * 2. sem_cb added us to the sched run queue
 		 *
-		 * td_c is cancelled here
+		 * td_c (mdx_sem_cb) is cancelled here;
+		 * td_c (mdx_sched_cb) could be re-configured
+		 * by the scheduler here.
 		 */
 
 		if (ticks && t.timeout)
