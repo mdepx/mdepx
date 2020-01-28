@@ -17,7 +17,9 @@ Config file syntax is heavily inspired by libucl and nginx configuration file an
 * Same key could be presented many times, and all its values are appended to a list by order of parsing.
 * A context leaf inherits properties (options / compile flags) from its parent.
 
-### Basic structure
+### Example
+
+A config file:
 
     key value;
 
@@ -40,7 +42,7 @@ Config file syntax is heavily inspired by libucl and nginx configuration file an
         };
     };
 
-It will be converted to JSON as:
+will be presented in JSON as:
 
     {
         'key': ['value'],
@@ -65,6 +67,24 @@ In your application directory create a Makefile:
 
     all:
         @python3 -B mdepx/tools/emitter.py -d mdepx.conf
+
+## Environment variables
+
+While these settings could be described in the config file using corresponding directives, it is possible to pass them as environment variables (for instance from a Makefile):
+
+ * CROSS_COMPILE
+
+Sets a path to a toolchain triple that will be used for compiling and linking.
+
+ * CC
+ * LD
+
+Sets a compiler and a linker path individually.
+
+ * CFLAGS
+ * AFLAGS
+
+C and Assembler flags to pass to the compiler.
 
 ## Configuration file directives
 
