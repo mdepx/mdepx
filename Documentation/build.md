@@ -4,7 +4,7 @@
 
 mdepx's build system is a set of python3 scripts located in mdepx/tools/ directory.
 
-It compiles your application and OS, links all together to an ELF executable.
+It compiles your application and OS, links all together to the ELF executable.
 
 Files to build, compile flags and macroses to define are described in a config file.
 
@@ -13,10 +13,53 @@ Config file syntax is heavily inspired by libucl and nginx configuration file an
 #### Main principles of configuration file
 
 * Everything in the config is 'key value' terminated with a colon ';'.
-* Same key could be presented many times, and all its values are appended to a list by order of parsing. A value is always a list after converting to json.
+* Value is a list of strings or a dict (a context leaf).
+* Same key could be presented many times, and all its values are appended to a list by order of parsing.
 * A context leaf inherits properties (options / compile flags) from its parent.
 
-#### Invoking build
+### Basic structure
+
+    key value;
+
+    value {
+        key val1 val2;
+        key val3;
+
+        # comment
+        param 3;
+
+        val1 {
+            k v;
+        };
+
+        val2 {
+            key value;
+            value {
+                    a b;
+            };
+        };
+    };
+
+It will be converted to JSON as:
+
+    {
+        'key': ['value'],
+        'value': {
+            'key': ['val1', 'val2', 'val3'],
+            'param': ['3'],
+            'val1': {
+                'k': ['v']
+            },
+            'val2': {
+                'key': ['value'],
+                'value': {
+                    'a': ['b']
+                }
+            }
+        }
+    }
+
+#### Invoking a build
 
 In your application directory create a Makefile:
 
