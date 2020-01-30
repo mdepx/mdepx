@@ -31,10 +31,6 @@
 
 #include <machine/pcpu.h>
 
-#ifndef MDX_SCHED
-#error "Invalid configuration"
-#endif
-
 static void
 mdx_tsleep_cb(void *arg)
 {

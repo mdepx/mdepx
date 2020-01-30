@@ -31,10 +31,6 @@
 
 #include <machine/pcpu.h>
 
-#ifdef MDX_SCHED
-#error "Invalid configuration"
-#endif
-
 static void
 mdx_tsleep_cb(void *arg)
 {
@@ -49,8 +45,12 @@ mdx_tsleep_cb(void *arg)
 
 /*
  * Sleep given amount of ticks in single-threaded environment.
+ *
+ * This function has weak keyword which means it could be replaced
+ * by the linker with the function provided by the scheduler
+ * (if scheduler is enabled).
  */
-void
+void __attribute__((weak))
 mdx_tsleep(uint32_t ticks)
 {
 	struct thread *td;
