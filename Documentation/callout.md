@@ -65,6 +65,6 @@ The current counting value must be provided by this call.
 
 An argument arg that will be passed to start(), stop() and count() functions. Usually a driver software context.
 
-    uint32_t width;
+    uint32_t maxcnt;
 
 The driver must set the maximum counting value supported by the device. A 32-bit timer should set 0xffffffff.

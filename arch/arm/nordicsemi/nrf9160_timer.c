@@ -120,7 +120,7 @@ nrf_timer_init(struct nrf_timer_softc *sc, uint32_t base)
 	sc->mt.start = nrf_timer_start;
 	sc->mt.stop = nrf_timer_stop;
 	sc->mt.count = nrf_timer_count;
-	sc->mt.width = 0xffffffff;
+	sc->mt.maxcnt = 0xffffffff;
 	sc->mt.arg = sc;
 	mdx_callout_register(&sc->mt);
 }

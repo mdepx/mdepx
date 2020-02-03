@@ -56,7 +56,7 @@ struct mi_timer {
 	uint32_t (*count)(void *arg);
 	void *arg;
 	uint32_t count_saved[MDX_CPU_MAX];
-	uint32_t width;
+	uint32_t maxcnt;
 	int state[MDX_CPU_MAX];
 #define	MI_TIMER_READY		0
 #define	MI_TIMER_RUNNING	1

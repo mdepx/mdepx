@@ -162,7 +162,7 @@ stm32f4_timer_init(struct stm32f4_timer_softc *sc,
 	sc->mt.start = stm32f4_timer_start;
 	sc->mt.stop = stm32f4_timer_stop;
 	sc->mt.count = stm32f4_timer_count;
-	sc->mt.width = 0x0000ffff;
+	sc->mt.maxcnt = 0x0000ffff;
 	sc->mt.arg = sc;
 	mdx_callout_register(&sc->mt);
 

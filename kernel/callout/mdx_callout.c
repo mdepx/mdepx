@@ -96,8 +96,8 @@ static void
 mi_tmr_start(uint32_t ticks)
 {
 
-	if (ticks > mi_tmr->width)
-		mi_tmr->start(mi_tmr->arg, mi_tmr->width);
+	if (ticks > mi_tmr->maxcnt)
+		mi_tmr->start(mi_tmr->arg, mi_tmr->maxcnt);
 	else
 		mi_tmr->start(mi_tmr->arg, ticks);
 }
@@ -126,7 +126,7 @@ get_elapsed(uint32_t *count_saved)
 	if (count > saved)
 		elapsed = (count - saved);
 	else
-		elapsed = (mi_tmr->width - saved + count);
+		elapsed = (mi_tmr->maxcnt - saved + count);
 
 	if (count_saved != NULL)
 		*count_saved = count;
@@ -330,7 +330,7 @@ mdx_callout_register(struct mi_timer *mt)
 	if (mi_tmr != NULL)
 		return (MDX_EXIST);
 
-	if (mt->width == 0 ||
+	if (mt->maxcnt == 0 ||
 	    mt->start == NULL ||
 	    mt->stop == NULL ||
 	    mt->count == NULL) {
