@@ -26,7 +26,7 @@
 
 from flags import collect_flags
 from builder import build
-from parser import proc0
+from parser import to_json
 import argparse
 import copy
 import sys
@@ -108,7 +108,7 @@ def process_directives(root, context, data):
 				#print('options %s' % opt)
 				if opt in context:
 					node = context[opt]
-					proc1(root, node, data)
+					find_directives(root, node, data)
 		elif x in ['module']:
 			for m in args:
 				#print('process_dmodule %s' % m)
@@ -119,10 +119,10 @@ def process_directives(root, context, data):
 							node['root'][0])
 					else:
 						p = os.path.join(root, m)
-					proc1(p, node, data)
+					find_directives(p, node, data)
 
-def proc1(root, context, data):
-	#print("proc1 '%s'" % context)
+def find_directives(root, context, data):
+	#print("directives '%s'" % context)
 
 	data1 = copy.deepcopy(data)
 	collect_nested_directives(root, context, data1)
@@ -155,7 +155,7 @@ def open_modules(root, context):
 					continue
 				with open(p1) as f:
 					data = f.read()
-					proc0(context, data)
+					to_json(context, data)
 
 	# Now open modules of contexts
 	ky = context.copy()
@@ -187,7 +187,7 @@ if __name__ == '__main__':
 		data = f.read()
 
 	config = {}
-	proc0(config, data)
+	to_json(config, data)
 
 	# Merge-in module's configuration files into the main config
 	open_modules('', config)
@@ -196,7 +196,7 @@ if __name__ == '__main__':
 	flags = {}
 	vars = {}
 
-	proc1('', config, {})
+	find_directives('', config, {})
 
 	# Compile and link the app
 	if not build(resobj, flags, vars, debug=args.d):

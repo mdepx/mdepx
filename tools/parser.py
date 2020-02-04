@@ -42,9 +42,9 @@ def merge(a, b, path = None):
 	return a
 
 #
-# Process the value
+# Process the key value pair
 #
-def proc(d, key, val):
+def process_kv(d, key, val):
 	k = key.strip()
 	v = val.strip()
 
@@ -52,7 +52,7 @@ def proc(d, key, val):
 
 	if v.startswith('{'):
 		f = {}
-		proc0(f, v.strip("{}"))
+		to_json(f, v.strip("{}"))
 		if k in d:
 			merge(d[k], f)
 			#for k1 in f:
@@ -79,17 +79,17 @@ def proc(d, key, val):
 
 
 #
-# Find the key value pair
+# Finds the key value pair and passes it to process_kv().
 # First word is key, everything else until ';' is value
 #
-def proc0(d, data):
+def to_json(d, data):
 	i = 0
 	tmp = ''
 	key = ''
 	val = ''
 	depth = 0
 
-	#print("proc0 %s\n" % data)
+	#print("to_json %s\n" % data)
 
 	while i < len(data):
 		c = data[i]
@@ -110,7 +110,7 @@ def proc0(d, data):
 				val = tmp
 				tmp = ''
 			if key:
-				proc(d, key, val)
+				process_kv(d, key, val)
 				key = ''
 				val = ''
 			i += 1
