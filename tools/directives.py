@@ -28,10 +28,6 @@ from flags import collect_flags
 import copy
 import os
 
-resobj = {}
-flags = {}
-vars = {}
-
 def collect_nested_directives(root, context, data):
 
 	# Replace root if provided in the context
@@ -74,18 +70,19 @@ def collect_nested_directives(root, context, data):
 	if 'prefix' in context:
 		data['prefix'] = [root, context['prefix']]
 
-def process_directives(root, context, data):
-
+def process_directives(root, context, data, r):
 	for x in data:
 		if x in ['prefix']:
 			l = root.replace(data[x][0], data[x][1][0])
 			l = l.replace("/", "_")
 			#print(l)
+			flags = r['flags']
 			flags[l] = ''
 			collect_flags(flags, l, context, False)
 
 	for x in context:
 		args = context[x]
+		vars = r['vars']
 		if x in ['link']:
 			if (len(args) % 2) != 0:
 				print("Error: link directive accepts "
@@ -97,6 +94,7 @@ def process_directives(root, context, data):
 		elif x in ['objects']:
 			for obj in args:
 				o = os.path.join(root, obj)
+				resobj = r['resobj']
 				if not o in resobj:
 					resobj[o] = {}
 				for key in data:
@@ -108,7 +106,7 @@ def process_directives(root, context, data):
 				#print('options %s' % opt)
 				if opt in context:
 					node = context[opt]
-					find_directives(root, node, data)
+					find_directives(root, node, data, r)
 		elif x in ['module']:
 			for m in args:
 				#print('process_dmodule %s' % m)
@@ -119,18 +117,20 @@ def process_directives(root, context, data):
 							node['root'][0])
 					else:
 						p = os.path.join(root, m)
-					find_directives(p, node, data)
+					find_directives(p, node, data, r)
 
-def find_directives(root, context, data):
+def find_directives(root, context, data, result):
 	#print("directives '%s'" % context)
-
 	data1 = copy.deepcopy(data)
 	collect_nested_directives(root, context, data1)
-	process_directives(root, context, data1)
-
-	return resobj
+	process_directives(root, context, data1, result)
 
 def proc_directives(root, context):
+
 	tmp = {}
-	find_directives(root, context, tmp)
-	return (resobj, flags, vars)
+	result = {'resobj': {},
+		  'flags': {},
+		  'vars': {}}
+	find_directives(root, context, tmp, result)
+
+	return result

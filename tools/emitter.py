@@ -94,8 +94,8 @@ if __name__ == '__main__':
 	root = ''
 	open_modules(root, config)
 
-	(resobj, flags, vars) = proc_directives('', config)
+	result = proc_directives('', config)
 
 	# Compile and link the app
-	if not build(resobj, flags, vars, debug=args.d):
+	if not build(result, debug=args.d):
 		sys.exit(3)

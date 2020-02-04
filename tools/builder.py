@@ -62,7 +62,7 @@ def run(cmd, args):
 	t = os.waitpid(pid, 0)
 	return t[1]
 
-def compile(resobj, flags, vars, link_objs, debug):
+def compile(r, link_objs, debug):
 
 	cc = os.environ.get('CC', '')
 	if cc:
@@ -80,6 +80,7 @@ def compile(resobj, flags, vars, link_objs, debug):
 	env_aflags = os.environ.get('AFLAGS', '').split()
 
 	defs = []
+	flags = r['flags']
 	for key in flags:
 		t = '-D%s' % key.upper()
 		if flags[key]:
@@ -88,6 +89,8 @@ def compile(resobj, flags, vars, link_objs, debug):
 
 	archive_objs = []
 
+	vars = r['vars']
+	resobj = r['resobj']
 	for obj in resobj:
 		obj_cflags = list(env_cflags)
 		obj_cflags += resobj[obj].get('build-flags', [])
@@ -181,13 +184,13 @@ def link(vars, link_objs, debug):
 
 	return True
 
-def build(resobj, flags, vars, debug=False):
+def build(result, debug=False):
 	objs = []
 
-	if not compile(resobj, flags, vars, objs, debug):
+	if not compile(result, objs, debug):
 		return False
 
-	if not link(vars, objs, debug):
+	if not link(result['vars'], objs, debug):
 		return False
 
 	return True
