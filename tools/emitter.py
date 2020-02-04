@@ -94,11 +94,6 @@ def process_directives(root, context, data):
 			vars[x] = args
 		elif x in ['machine']:
 			vars[x] = os.path.join(root, args[0])
-		elif x in ['ldadd']:
-			if not x in vars:
-				vars[x] = []
-			for l in args:
-				vars[x].append(os.path.join(root, l))
 		elif x in ['objects']:
 			for obj in args:
 				o = os.path.join(root, obj)

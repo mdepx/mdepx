@@ -86,6 +86,8 @@ def compile(resobj, flags, vars, link_objs, debug):
 			t += '=%s' % flags[key].upper()
 		defs.append(t)
 
+	archive_objs = []
+
 	for obj in resobj:
 		obj_cflags = list(env_cflags)
 		obj_cflags += resobj[obj].get('build-flags', [])
@@ -107,7 +109,7 @@ def compile(resobj, flags, vars, link_objs, debug):
 		if obj.endswith('.a'):
 			pcmd = "  AA      %s" % obj
 			print(pcmd)
-			link_objs.append(obj)
+			archive_objs.append(obj)
 			continue
 
 		o = None
@@ -137,6 +139,9 @@ def compile(resobj, flags, vars, link_objs, debug):
 		if run(compiler_fp, cmd) != 0:
 			return False
 
+	# Add all the archives to the tail
+	link_objs += archive_objs
+
 	return True
 
 def link(vars, link_objs, debug):
@@ -150,9 +155,6 @@ def link(vars, link_objs, debug):
 		print("Error: link directive must have even number of "
 			"arguments: pairs of ldscript and output filename.")
 		return False
-
-	if 'ldadd' in vars:
-		link_objs += vars['ldadd']
 
 	ld = os.environ.get('LD', '')
 	if ld:

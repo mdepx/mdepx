@@ -133,7 +133,7 @@ Replaces search-path inherited from parent context with -Ipath [-Ipath1].
 * * *
 Syntax: **objects** obj.o [obj1.o ..];
 
-Includes objects to the build (compilation and linking stages). Object names must end with '.o'. The corresponsing '.c' or '.S' file will be passed to a compiler.
+Includes objects to the build (compilation and linking stages). Object names must end with '.o' or '.a'. The corresponsing '.c' or '.S' file for the object '.o' will be passed to a compiler. Archives '.a' will be added to the tail of the objects list to link.
 
 * * *
 Syntax: **link** ldscript filename;

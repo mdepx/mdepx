@@ -46,7 +46,6 @@ def collect_flags(result, m, d, deep):
 			'append-search-path',
 			'append-cflags',
 			'machine',
-			'ldadd',
 			'ldscript',
 			'prefix',
 			'module']:
