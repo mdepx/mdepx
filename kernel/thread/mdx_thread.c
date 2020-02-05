@@ -68,7 +68,7 @@ mdx_thread_terminate_cleanup(struct thread *td)
 }
 
 /*
- * Used by thread to terminate itself.
+ * Used by a thread to terminate itself.
  */
 static void
 mdx_thread_terminate(void)
