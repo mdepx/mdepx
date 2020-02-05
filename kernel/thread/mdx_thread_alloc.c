@@ -48,14 +48,19 @@ mdx_thread_alloc(uint32_t stack_size)
 	td = zalloc(sizeof(struct thread));
 	if (td == NULL)
 		return (NULL);
+
+	td->td_flags = TD_FLAGS_DYN_ALLOC_TD;
+
+	if (stack_size == 0)
+		return (td);
+
 	td->td_stack = zalloc(stack_size);
 	if (td->td_stack == NULL) {
 		free(td);
 		return (NULL);
 	}
-
+	td->td_flags = TD_FLAGS_DYN_ALLOC_SP;
 	td->td_stack_size = stack_size;
-	td->td_flags = TD_FLAGS_DYN_ALLOC_SP | TD_FLAGS_DYN_ALLOC_TD;
 
 	return (td);
 }
