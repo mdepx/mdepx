@@ -154,6 +154,10 @@ mdx_sched_ack(struct thread *td, struct trapframe *tf)
 	td->td_tf = tf;
 
 	switch (td->td_state) {
+	case TD_STATE_TERMINATING:
+		/* This thread has finished work. */
+		mdx_thread_terminate_cleanup(td);
+		return (1);
 	case TD_STATE_SEM_WAIT:
 	case TD_STATE_SLEEPING:
 		td->td_state = TD_STATE_ACK;

@@ -121,19 +121,14 @@ riscv_exception(struct trapframe *tf)
 
 	/*
 	 * Check if this thread went to sleep and release it from this CPU.
-	 * Note that tf can not be used after this call since this thread
-	 * could be added back to run queue by another CPU in
+	 * Note that td and tf can not be used after this call since this
+	 * thread could be added back to the run queue by another CPU in
 	 * mdx_mutex_unlock() or by this cpu in riscv_intr().
 	 */
 	released = mdx_sched_ack(td, tf);
 
 	if (intr)
 		riscv_intr(irq);
-
-	if (td->td_state == TD_STATE_TERMINATING) {
-		mdx_thread_terminate_cleanup(td);
-		released = true;
-	}
 
 	/* Check if this thread has no more CPU time. */
 	if (!released)

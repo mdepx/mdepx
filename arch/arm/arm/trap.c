@@ -114,11 +114,6 @@ arm_exception(struct trapframe *tf, int exc_code)
 	if (intr)
 		arm_nvic_intr(irq, tf);
 
-	if (td->td_state == TD_STATE_TERMINATING) {
-		mdx_thread_terminate_cleanup(td);
-		released = true;
-	}
-
 	if (!released)
 		released = mdx_sched_park(td);
 	if (released)
