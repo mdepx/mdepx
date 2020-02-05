@@ -46,7 +46,7 @@
 #endif
 
 /*
- * Called by exception handler to release thread's resources
+ * Called at the exception time to release thread's resources
  * in case of thread termination.
  */
 void
@@ -56,7 +56,7 @@ mdx_thread_terminate_cleanup(struct thread *td)
 	dprintf("%s: %s\n", __func__, td->td_name);
 
 	KASSERT(td->td_state == TD_STATE_TERMINATING,
-		("thread is not in terminating state"));
+	    ("thread is not in terminating state"));
 
 #ifdef MDX_THREAD_DYNAMIC_ALLOC
 	if (td->td_flags & TD_FLAGS_DYN_ALLOC_SP)
