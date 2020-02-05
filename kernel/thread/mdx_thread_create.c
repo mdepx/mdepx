@@ -65,6 +65,19 @@ mdx_thread_alloc(uint32_t stack_size)
 	return (td);
 }
 
+void
+mdx_thread_free(struct thread *td)
+{
+
+#ifdef MDX_THREAD_DYNAMIC_ALLOC
+	if (td->td_flags & TD_FLAGS_DYN_ALLOC_SP)
+		free(td->td_stack);
+
+	if (td->td_flags & TD_FLAGS_DYN_ALLOC_TD)
+		free(td);
+#endif
+}
+
 struct thread *
 mdx_thread_create(const char *name, int prio, uint32_t quantum,
     uint32_t stack_size, void *entry, void *arg)

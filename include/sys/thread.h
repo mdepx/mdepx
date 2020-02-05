@@ -69,6 +69,7 @@ struct thread *mdx_thread_create(const char *name, int prio,
     uint32_t quantum, uint32_t stack_size,
     void *entry, void *arg);
 struct thread * mdx_thread_alloc(uint32_t stack_size);
+void mdx_thread_free(struct thread *td);
 int mdx_thread_setup(struct thread *td, const char *name,
     int prio, uint32_t quantum, void *entry, void *arg);
 void mdx_thread_terminate_cleanup(struct thread *td);
