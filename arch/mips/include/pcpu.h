@@ -29,6 +29,10 @@
 
 #include <sys/pcpu.h>
 
+#ifdef MDX_SCHED_SMP
+#error SMP is not supported on mips
+#endif
+
 static inline struct pcpu *
 get_pcpu(void)
 {
