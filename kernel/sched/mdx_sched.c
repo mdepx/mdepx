@@ -53,10 +53,10 @@
 CTASSERT(MDX_SCHED_NPRIO > 1);
 
 static struct entry runq[MDX_SCHED_NPRIO];
-static struct entry pcpu_list = LIST_INIT_STATIC(&pcpu_list);
-struct entry pcpu_all = LIST_INIT_STATIC(&pcpu_all);
 
 #ifdef MDX_SCHED_SMP
+static struct entry pcpu_list = LIST_INIT_STATIC(&pcpu_list);
+struct entry pcpu_all = LIST_INIT_STATIC(&pcpu_all);
 static struct spinlock l;
 #define	mdx_sched_lock()	sl_lock(&l)
 #define	mdx_sched_unlock()	sl_unlock(&l)
@@ -190,17 +190,18 @@ struct thread *
 mdx_sched_next(void)
 {
 	struct thread *td;
-	struct pcpu *p;
 
 	KASSERT(curthread->td_critnest > 0,
 	    ("%s: Not in critical section.", __func__));
 
-	p = curpcpu;
-
 	mdx_sched_lock();
 	td = mdx_sched_pick();
+
+#ifdef MDX_SCHED_SMP
 	if (td->td_idle)
-		list_append(&pcpu_list, &p->pc_avail);
+		list_append(&pcpu_list, &curpcpu->pc_avail);
+#endif
+
 	mdx_sched_unlock();
 
 	if (!td->td_idle)
@@ -247,6 +248,7 @@ mdx_sched_enter(void)
 		cpu_idle();
 }
 
+#ifdef MDX_SCHED_SMP
 void
 mdx_sched_cpu_avail(struct pcpu *pcpup, bool available)
 {
@@ -271,6 +273,7 @@ mdx_sched_cpu_add(struct pcpu *pcpup)
 	mdx_sched_unlock();
 	critical_exit();
 }
+#endif
 
 void
 mdx_sched_init(void)

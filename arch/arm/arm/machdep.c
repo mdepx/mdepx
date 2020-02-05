@@ -131,7 +131,7 @@ md_init(int cpuid)
 	/* Initialize the board (register timer and/or malloc if required). */
 	board_init();
 
-#ifdef MDX_SCHED
+#ifdef MDX_SCHED_SMP
 	mdx_sched_cpu_add(pcpup);
 #endif
 
