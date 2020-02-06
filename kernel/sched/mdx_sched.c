@@ -227,19 +227,6 @@ mdx_sched_next(void)
 }
 
 void
-mdx_sched_yield(void)
-{
-	struct thread *td;
-
-	td = curthread;
-	td->td_state = TD_STATE_YIELDING;
-
-	/* Interrupt could happen here. */
-
-	md_thread_yield();
-}
-
-void
 mdx_sched_enter(void)
 {
 

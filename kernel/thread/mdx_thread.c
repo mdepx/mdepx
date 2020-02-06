@@ -86,6 +86,23 @@ mdx_thread_terminate(void)
 	panic("md_thread_terminate() returned\n");
 }
 
+/*
+ * Used by a thread to leave the CPU.
+ * Only effective if thread's quantum is 0.
+ */
+void
+mdx_thread_yield(void)
+{
+	struct thread *td;
+
+	td = curthread;
+	td->td_state = TD_STATE_YIELDING;
+
+	/* Interrupt could happen here. */
+
+	md_thread_yield();
+}
+
 int
 mdx_thread_setup(struct thread *td, const char *name,
     int prio, uint32_t quantum, void *entry, void *arg)

@@ -73,6 +73,7 @@ void mdx_thread_free(struct thread *td);
 int mdx_thread_setup(struct thread *td, const char *name,
     int prio, uint32_t quantum, void *entry, void *arg);
 void mdx_thread_terminate_cleanup(struct thread *td);
+void mdx_thread_yield(void);
 
 void cpu_idle(void);
 
@@ -85,7 +86,6 @@ int mdx_sched_ack(struct thread *td, struct trapframe *tf);
 int mdx_sched_park(struct thread *td);
 void mdx_sched_cpu_add(struct pcpu *pcpup);
 void mdx_sched_cpu_avail(struct pcpu *pcpup, bool available);
-void mdx_sched_yield(void);
 
 /* Thread MD part */
 void md_init(int cpuid);
