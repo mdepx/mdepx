@@ -69,13 +69,11 @@ void
 mdx_thread_free(struct thread *td)
 {
 
-#ifdef MDX_THREAD_DYNAMIC_ALLOC
 	if (td->td_flags & TD_FLAGS_DYN_ALLOC_SP)
 		free(td->td_stack);
 
 	if (td->td_flags & TD_FLAGS_DYN_ALLOC_TD)
 		free(td);
-#endif
 }
 
 struct thread *
