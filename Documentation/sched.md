@@ -2,11 +2,21 @@
 
 The MDX scheduler manages CPU resources and decides which task will be run at any particular time.
 
+## Algorithm
+
 Round-robin priority-based scheduling algorithm is used.
+
+Threads with highest priority run first.
+
+The maximum number of priorities specified by nprio (*MDX_SCHED_NPRIO*) config macro.
+
+The highest priority is 0 and could only be set to idle threads.
+
+## Multitasking
 
 Threads could be fully-preemptive (quantum > 0) and cooperative (quantum = 0).
 
-The scheduler is tick-less, which means there is no periodic timer interrupt configured and the timer set to a thread deadline only. In case of cooperative threads the timer is not set at all and a thread must leave the cpu voluntarily.
+The scheduler is tick-less, which means there is no periodic timer interrupt configured and the timer set to a thread's deadline only. In case of cooperative threads the timer is not set at all and a thread must leave the cpu voluntarily.
 
 Regardless of the multitasking style threads could block on sleep, IO or semaphore waiting. An involuntarily context switch will be held in that case.
 
