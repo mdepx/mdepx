@@ -249,7 +249,7 @@ main(void)
 
 	while (1) {
 		printf("Hello world\n");
-		mdx_tsleep(USEC_TO_TICKS(1000000));
+		mdx_usleep(1000000);
 	}
 
 	return (0);
