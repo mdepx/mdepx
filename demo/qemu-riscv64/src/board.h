@@ -29,6 +29,7 @@
 
 char uart_getchar(void);
 
-#define	USEC_TO_TICKS(n)	(10 * (n))
+#define	BOARD_CPU_FREQ		(10000000)
+#define	USEC_TO_TICKS(n)	((BOARD_CPU_FREQ / 1000000) * (n))
 
 #endif /* !_SRC_BOARD_H_ */

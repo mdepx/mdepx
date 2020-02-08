@@ -236,7 +236,8 @@ clint_get_cpu_freq(struct clint_softc *sc, uint32_t osc_freq)
 }
 
 int
-e300g_clint_init(struct clint_softc *sc, uint32_t base)
+e300g_clint_init(struct clint_softc *sc, uint32_t base,
+    uint32_t frequency)
 {
 
 	clint_sc = sc;
@@ -246,7 +247,7 @@ e300g_clint_init(struct clint_softc *sc, uint32_t base)
 	sc->mt.stop = clint_stop;
 	sc->mt.count = clint_mtime;
 	sc->mt.maxcnt = 0xffffffff;
-	sc->mt.frequency = 32768;
+	sc->mt.frequency = frequency;
 	sc->mt.usec_to_ticks = mdx_callout_usec_to_ticks;
 	sc->mt.arg = sc;
 
