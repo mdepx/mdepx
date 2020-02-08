@@ -49,7 +49,7 @@
  *     grep mdx_callout_register arch/ -R
  */
 
-static struct mi_timer *mi_tmr;
+struct mi_timer *mi_tmr;
 static struct entry callouts_list[MDX_CPU_MAX];
 
 /*
@@ -333,6 +333,8 @@ mdx_callout_register(struct mi_timer *mt)
 	if (mt->maxcnt == 0 ||
 	    mt->start == NULL ||
 	    mt->stop == NULL ||
+	    mt->frequency == 0 ||
+	    mt->usec_to_ticks == NULL ||
 	    mt->count == NULL) {
 		printf("%s: can't register timer\n", __func__);
 		return (MDX_ERROR);

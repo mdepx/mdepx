@@ -79,7 +79,7 @@ main(void)
 
 	while (1) {
 		printf("Hello world\n");
-		mdx_tsleep(USEC_TO_TICKS(100000));
+		mdx_usleep(100000);
 	}
 
 	return (0);

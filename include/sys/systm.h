@@ -31,6 +31,7 @@ void udelay(uint32_t usec);		/* Microseconds polling delay. */
 void usleep(uint32_t usec);		/* Microseconds sleep. */
 void msleep(uint32_t msec);		/* Milliseconds sleep. */
 void mdx_tsleep(uint32_t ticks);	/* Raw timer ticks sleep. */
+void mdx_usleep(uint32_t usec);		/* Microseconds sleep. */
 
 void critical_enter(void);
 void critical_exit(void);

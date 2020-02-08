@@ -24,10 +24,20 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _SRC_BOARD_H_
-#define	_SRC_BOARD_H_
+#include <sys/cdefs.h>
+#include <sys/callout.h>
 
-#define	MIPS_CPU_FREQ		100000000	/* 100MHz clock. */
-#define	USEC_TO_TICKS(n)	((MIPS_CPU_FREQ / 1000000) * (n))
+uint32_t
+mdx_callout_usec_to_ticks(uint32_t freq, uint32_t usec)
+{
+	uint64_t ticks;
 
-#endif /* !_SRC_BOARD_H_ */
+	ticks =	freq;
+
+	ticks <<= 32;
+	ticks /= 1000000;
+	ticks *= usec;
+	ticks >>= 32;
+
+	return (ticks);
+}

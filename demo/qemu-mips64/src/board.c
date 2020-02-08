@@ -53,7 +53,6 @@ static struct uart_16550_softc uart_sc;
 #define	UART_BASE		0x180003f8
 #define	UART_CLOCK_RATE		3686400
 #define	DEFAULT_BAUDRATE	115200
-#define	MIPS_DEFAULT_FREQ	1000000
 
 void cpu_reset(void);
 
@@ -150,8 +149,7 @@ board_init(void)
 	mips_setup_intr(6, hardintr_unknown, NULL);
 	mips_setup_intr(7, mips_timer_intr, &timer_sc);
 
-	mips_timer_init(&timer_sc, MIPS_DEFAULT_FREQ,
-	    USEC_TO_TICKS(1));
+	mips_timer_init(&timer_sc, MIPS_CPU_FREQ, USEC_TO_TICKS(1));
 
 	malloc_init();
 	malloc_base = BASE_ADDR + 0x01000000;
