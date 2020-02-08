@@ -94,19 +94,19 @@ struct trapframe *
 riscv_exception(struct trapframe *tf)
 {
 	struct thread *td;
-	struct pcpu *p;
 	bool released;
 	bool intr;
 	int irq;
 
 	td = curthread;
-	p = curpcpu;
 	released = false;
 	intr = false;
 
+#ifdef MDX_SCHED_SMP
 	/* This CPU could not pick up new threads for a moment. */
 	if (td->td_idle)
-		mdx_sched_cpu_avail(p, false);
+		mdx_sched_cpu_avail(curpcpu, false);
+#endif
 
 	/* Switch to the interrupt thread. */
 	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);

@@ -52,7 +52,7 @@
 
 static struct clint_softc *clint_sc;
 
-#ifdef MDX_SCHED
+#ifdef MDX_SCHED_SMP
 extern struct entry pcpu_all;
 
 void
@@ -73,9 +73,7 @@ send_ipi(int cpumask, int ipi)
 			break;
 	}
 }
-#endif
 
-#ifdef MDX_SCHED_SMP
 void
 clint_intr_software(void)
 {
