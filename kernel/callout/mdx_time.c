@@ -28,7 +28,7 @@
 #include <sys/callout.h>
 
 uint32_t
-mdx_callout_usec_to_ticks(uint32_t freq, uint32_t usec)
+mdx_time_usec_to_ticks(uint32_t freq, uint32_t usec)
 {
 	uint64_t ticks;
 

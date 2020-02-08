@@ -49,7 +49,7 @@
  *     grep mdx_callout_register arch/ -R
  */
 
-struct mi_timer *mi_tmr;
+static struct mi_timer *mi_tmr;
 static struct entry callouts_list[MDX_CPU_MAX];
 
 /*
@@ -320,6 +320,16 @@ mdx_callout_callback(struct mi_timer *mt)
 	callout_unlock(cpuid);
 
 	return (MDX_OK);
+}
+
+uint32_t
+mdx_callout_usec_to_ticks(uint32_t usec)
+{
+	uint32_t ticks;
+
+	ticks = mi_tmr->usec_to_ticks(mi_tmr->frequency, usec);
+
+	return (ticks);
 }
 
 int

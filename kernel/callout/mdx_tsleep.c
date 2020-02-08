@@ -31,8 +31,6 @@
 
 #include <machine/pcpu.h>
 
-extern struct mi_timer *mi_tmr;
-
 static void
 mdx_tsleep_cb(void *arg)
 {
@@ -93,7 +91,7 @@ mdx_usleep(uint32_t usec)
 {
 	uint32_t ticks;
 
-	ticks = mi_tmr->usec_to_ticks(mi_tmr->frequency, usec);
+	ticks = mdx_callout_usec_to_ticks(usec);
 
 	mdx_tsleep(ticks);
 }

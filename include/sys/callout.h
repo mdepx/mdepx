@@ -74,6 +74,7 @@ int mdx_callout_callback(struct mi_timer *);
 int mdx_callout_register(struct mi_timer *);
 int mdx_callout_cancel(struct mdx_callout *c);
 
-uint32_t mdx_callout_usec_to_ticks(uint32_t freq, uint32_t usec);
+uint32_t mdx_time_usec_to_ticks(uint32_t freq, uint32_t usec);
+uint32_t mdx_callout_usec_to_ticks(uint32_t usec);
 
 #endif /* _SYS_CALLOUT_H_ */
