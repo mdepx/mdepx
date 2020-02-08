@@ -73,7 +73,7 @@ board_init(void)
 {
 	uint32_t cpu_freq;
 
-	e300g_clint_init(&clint_sc, CLINT_BASE);
+	e300g_clint_init(&clint_sc, CLINT_BASE, BOARD_OSC_FREQ);
 	e300g_aon_init(&aon_sc, AON_BASE);
 	e300g_prci_init(&prci_sc, PRCI_BASE);
 	e300g_spi_init(&spi1_sc, SPI1_BASE);

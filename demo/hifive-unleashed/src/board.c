@@ -87,7 +87,7 @@ board_init(void)
 	    500000000, DEFAULT_BAUDRATE);
 	mdx_console_register(uart_putchar, (void *)&uart_sc);
 
-	e300g_clint_init(&clint_sc, CLINT_BASE);
+	e300g_clint_init(&clint_sc, CLINT_BASE, BOARD_TIMER_FREQ);
 
 #ifdef MDX_SCHED_SMP
 	int j;

@@ -27,6 +27,7 @@
 #ifndef _SRC_BOARD_H_
 #define	_SRC_BOARD_H_
 
-#define	USEC_TO_TICKS(n)	(10 * (n))
+#define	BOARD_TIMER_FREQ	(10000000)
+#define	USEC_TO_TICKS(n)	((BOARD_TIMER_FREQ / 1000000) * (n))
 
 #endif /* !_SRC_BOARD_H_ */
