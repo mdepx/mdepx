@@ -130,6 +130,16 @@ test_m2(void *arg)
 #endif
 
 static void __unused
+cb1(void *arg)
+{
+	mdx_sem_t *sem;
+
+	sem = arg;
+
+	mdx_sem_post(sem);
+}
+
+static void __unused
 cb(void *arg)
 {
 	struct mdx_callout *c;
@@ -243,6 +253,19 @@ main(void)
 			smp_rendezvous_cpus(0xf, hello, NULL);
 			critical_exit();
 		}
+	}
+#endif
+
+#ifndef MDX_SCHED
+	mdx_sem_t sem;
+	int ret;
+
+	mdx_sem_init(&sem, 1);
+
+	while (1) {
+		mdx_callout_set(&c1[0], 25000, cb1, (void *)&sem);
+		ret = mdx_sem_timedwait(&sem, 25000);
+		printf("Hello world, %d\n", ret);
 	}
 #endif
 
