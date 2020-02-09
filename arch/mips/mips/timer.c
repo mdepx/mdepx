@@ -205,7 +205,6 @@ mips_timer_init(struct mips_timer_softc *sc, uint32_t freq,
 	sc->mt.count = timer_count;
 	sc->mt.maxcnt = 0xffffffff;
 	sc->mt.frequency = freq;
-	sc->mt.usec_to_ticks = mdx_time_usec_to_ticks;
 	sc->mt.arg = sc;
 
 	mips_wr_compare(-1);

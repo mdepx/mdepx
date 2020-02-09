@@ -108,7 +108,8 @@ nrf_timer_start(void *arg, uint32_t ticks)
 }
 
 void
-nrf_timer_init(struct nrf_timer_softc *sc, uint32_t base)
+nrf_timer_init(struct nrf_timer_softc *sc, uint32_t base,
+    uint32_t frequency)
 {
 
 	sc->base = base;
@@ -117,12 +118,12 @@ nrf_timer_init(struct nrf_timer_softc *sc, uint32_t base)
 	WR4(sc, TIMER_BITMODE, BITMODE_32);
 	WR4(sc, TIMER_INTENSET, INTENSET_COMPARE(sc->cc_idx));
 
+	bzero(&sc->mt, sizeof(struct mi_timer));
 	sc->mt.start = nrf_timer_start;
 	sc->mt.stop = nrf_timer_stop;
 	sc->mt.count = nrf_timer_count;
 	sc->mt.maxcnt = 0xffffffff;
-	sc->mt.frequency = 1000000;
-	sc->mt.usec_to_ticks = mdx_time_usec_to_ticks;
+	sc->mt.frequency = frequency;
 	sc->mt.arg = sc;
 	mdx_callout_register(&sc->mt);
 }

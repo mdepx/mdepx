@@ -332,6 +332,32 @@ mdx_callout_usec_to_ticks(uint32_t usec)
 	return (ticks);
 }
 
+static int
+mdx_callout_setup(struct mi_timer *mt)
+{
+
+	if (mt->usec_to_ticks) {
+		/* Already provided by a driver. */
+		return (MDX_OK);
+	}
+
+#ifdef MDX_CALLOUT_USEC_TO_TICKS_1MHZ
+	if (mt->frequency == 1000000) {
+		mt->usec_to_ticks = mdx_time_usec_to_ticks_1mhz;
+		return (MDX_OK);
+	}
+#endif
+
+#ifdef MDX_CALLOUT_USEC_TO_TICKS
+	if (mt->frequency != 1000000) {
+		mt->usec_to_ticks = mdx_time_usec_to_ticks;
+		return (MDX_OK);
+	}
+#endif
+
+	return (MDX_ERROR);
+}
+
 int
 mdx_callout_register(struct mi_timer *mt)
 {
@@ -344,9 +370,14 @@ mdx_callout_register(struct mi_timer *mt)
 	    mt->start == NULL ||
 	    mt->stop == NULL ||
 	    mt->frequency == 0 ||
-	    mt->usec_to_ticks == NULL ||
 	    mt->count == NULL) {
 		printf("%s: can't register timer\n", __func__);
+		return (MDX_ERROR);
+	}
+
+	if (mdx_callout_setup(mt) != MDX_OK) {
+		printf("%s: could not register the timer: "
+		    "usec_to_ticks() is not set.\n", __func__);
 		return (MDX_ERROR);
 	}
 

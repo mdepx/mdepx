@@ -248,7 +248,6 @@ e300g_clint_init(struct clint_softc *sc, uint32_t base,
 	sc->mt.count = clint_mtime;
 	sc->mt.maxcnt = 0xffffffff;
 	sc->mt.frequency = frequency;
-	sc->mt.usec_to_ticks = mdx_time_usec_to_ticks;
 	sc->mt.arg = sc;
 
 	mdx_callout_register(&sc->mt);

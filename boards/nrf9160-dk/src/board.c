@@ -68,7 +68,7 @@ board_init(void)
 	mdx_fl_add_region(0x20030000, 0x10000);
 
 	nrf_power_init(&power_sc, BASE_POWER);
-	nrf_timer_init(&timer0_sc, BASE_TIMER0);
+	nrf_timer_init(&timer0_sc, BASE_TIMER0, 1000000);
 
 	arm_nvic_init(&nvic_sc, BASE_SCS);
 

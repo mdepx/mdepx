@@ -164,7 +164,6 @@ stm32f4_timer_init(struct stm32f4_timer_softc *sc,
 	sc->mt.count = stm32f4_timer_count;
 	sc->mt.maxcnt = 0x0000ffff;
 	sc->mt.frequency = 10000;
-	sc->mt.usec_to_ticks = mdx_time_usec_to_ticks;
 	sc->mt.arg = sc;
 	mdx_callout_register(&sc->mt);
 
