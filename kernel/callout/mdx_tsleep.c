@@ -58,8 +58,8 @@ mdx_tsleep(uint32_t ticks)
 
 	td = curthread;
 
-	KASSERT(td->td_idle == 1,
-	    ("%s: sleeping from unknown thread.", __func__));
+	KASSERT(td->td_idle == 0,
+	    ("%s: called from idle thread.", __func__));
 	KASSERT(td->td_critnest == 0,
 	    ("%s: sleeping in critical section is not allowed", __func__));
 

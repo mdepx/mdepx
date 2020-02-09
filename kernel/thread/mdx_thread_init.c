@@ -42,7 +42,12 @@ mdx_thread_init(int cpuid)
 	td->td_name = "idle";
 	td->td_quantum = 0;
 	td->td_prio = 0;
+#ifdef MDX_SCHED
 	td->td_idle = 1;
+#else
+	/* This is a main thread in a single-threaded environment. */
+	td->td_idle = 0;
+#endif
 	td->td_state = TD_STATE_READY;
 
 	PCPU_SET(curthread, td);
