@@ -41,7 +41,6 @@ extern char MipsException[], MipsExceptionEnd[];
 extern char MipsTLBMiss[], MipsTLBMissEnd[];
 extern char MipsCache[], MipsCacheEnd[];
 
-#define	USEC_TO_TICKS(n)	(100 * (n))	/* 100MHz clock. */
 #define	UART_BASE		0x180003f8
 #define	UART_CLOCK_RATE		3686400
 #define	DEFAULT_BAUDRATE	115200

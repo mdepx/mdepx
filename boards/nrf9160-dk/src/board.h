@@ -30,6 +30,5 @@
 #define	UART_PIN_TX		29
 #define	UART_PIN_RX		28
 #define	UART_BAUDRATE		115200
-#define	USEC_TO_TICKS(n)	(n)
 
 #endif /* !_SRC_BOARD_H_ */

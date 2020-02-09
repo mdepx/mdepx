@@ -186,10 +186,11 @@ timer_start(void *arg, uint32_t ticks)
 
 }
 
-void
-mips_timer_init(struct mips_timer_softc *sc, uint32_t freq,
-    uint32_t minticks)
+int
+mips_timer_init(struct mips_timer_softc *sc, uint32_t freq)
 {
+	int error;
+
 #ifndef MDX_MIPS_QEMU
 	uint32_t reg;
 
@@ -198,7 +199,6 @@ mips_timer_init(struct mips_timer_softc *sc, uint32_t freq,
 		printf("%s: can't initialize timer\n", __func__);
 #endif
 
-	sc->minticks = minticks;
 	sc->frequency = freq;
 	sc->mt.start = timer_start;
 	sc->mt.stop = timer_stop;
@@ -209,5 +209,16 @@ mips_timer_init(struct mips_timer_softc *sc, uint32_t freq,
 
 	mips_wr_compare(-1);
 
-	mdx_callout_register(&sc->mt);
+	error = mdx_callout_register(&sc->mt);
+	if (error != MDX_OK)
+		return (error);
+
+	/*
+	 * MIPS timer is not stoppable, so provide the minimum amount
+	 * of ticks that we need between reading current val and scheduling
+	 * new val.
+	 */
+	sc->minticks = mdx_callout_usec_to_ticks(1);
+
+	return (MDX_OK);
 }

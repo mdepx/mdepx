@@ -28,6 +28,5 @@
 #define	_SRC_BOARD_H_
 
 #define	MIPS_CPU_FREQ		100000000	/* 100MHz clock. */
-#define	USEC_TO_TICKS(n)	((MIPS_CPU_FREQ / 1000000) * (n))
 
 #endif /* !_SRC_BOARD_H_ */

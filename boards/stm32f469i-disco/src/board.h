@@ -32,6 +32,5 @@
 #define	FB_BASE			0xC0000000
 #define	DISPLAY_WIDTH		480
 #define	DISPLAY_HEIGHT		800
-#define	USEC_TO_TICKS(n)	((n) / 100)
 
 #endif /* !_SRC_BOARD_H_ */
