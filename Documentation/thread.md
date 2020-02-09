@@ -7,10 +7,10 @@ Thread API manages a struct thread. Threads are used by the scheduler.
 ## Methods
 
 * * *
-    mdx_thread_create(const char *name, int prio, uint32_t quantum,
+    mdx_thread_create(const char *name, int prio, uint32_t quantum_usec,
         uint32_t stack_size, void *entry, void *arg);
 
-Dynamicaly allocates a thread and a stack space for it. Stack size provided in bytes, quantum in raw timer ticks. Thread's priority *prio*, name *name*, entry point *entry* and a user argument *arg* should also be provided.
+Dynamicaly allocates a thread and a stack space for it. Stack size provided in bytes, quantum in microseconds (usecs). Thread's priority *prio*, name *name*, entry point *entry* and a user argument *arg* should also be provided.
 
 Note that the quantum could be specified as 0, the cooperative scheduling mode is used in that case.
 
@@ -20,9 +20,9 @@ Successfully allocated thread can be added to the scheduler using *mdx_sched_add
 
 * * *
     mdx_thread_setup(struct thread *td, const char *name,
-        int prio, uint32_t quantum, void *entry, void *arg);
+        int prio, uint32_t quantum_usec, void *entry, void *arg);
 
-Used to configure a statically allocated thread *td* with name *name*, priority *prio*, entry point *entry* and argument for the entry point *arg*. Thread quantum specified in raw timer ticks.
+Used to configure a statically allocated thread *td* with name *name*, priority *prio*, entry point *entry* and argument for the entry point *arg*. Thread quantum specified in microseconds and then converted to raw timer ticks by *mdx_thread_setup()*.
 
 A thread must have *td->td_stack* allocated and *td->td_stack_size* set before calling this function.
 

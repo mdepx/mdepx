@@ -68,7 +68,7 @@ main(void)
 
 	for (i = 1; i < 5000; i++) {
 		printf("Creating thread %d\n", i);
-		td = mdx_thread_create("test", 1, (USEC_TO_TICKS(1000) * i),
+		td = mdx_thread_create("test", 1, 1000 * i,
 		    4096, test_thr, (void *)i);
 		if (td == NULL)
 			break;

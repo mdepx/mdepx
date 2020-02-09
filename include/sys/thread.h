@@ -42,7 +42,7 @@ struct thread {
 	uint32_t		td_stack_size;	/* Size of the stack. */
 	struct entry		td_node;	/* Entry in runq or mutex q */
 	struct mdx_callout	td_c;		/* Thread deadline callout. */
-	uint32_t		td_quantum;	/* Time slice. */
+	uint32_t		td_quantum;	/* Time slice in raw ticks. */
 	uint8_t			td_idle;	/* This is an idle thread. */
 	uint32_t		td_index;	/* For debugging only. */
 	int			td_prio;	/* Priority. 0 for idle. */
@@ -66,12 +66,12 @@ void mdx_thread_init(int cpuid);
 void mdx_thread_main(void);
 
 struct thread *mdx_thread_create(const char *name, int prio,
-    uint32_t quantum, uint32_t stack_size,
+    uint32_t quantum_usec, uint32_t stack_size,
     void *entry, void *arg);
 struct thread * mdx_thread_alloc(uint32_t stack_size);
 void mdx_thread_free(struct thread *td);
 int mdx_thread_setup(struct thread *td, const char *name,
-    int prio, uint32_t quantum, void *entry, void *arg);
+    int prio, uint32_t quantum_usec, void *entry, void *arg);
 void mdx_thread_terminate_cleanup(struct thread *td);
 void mdx_thread_yield(void);
 

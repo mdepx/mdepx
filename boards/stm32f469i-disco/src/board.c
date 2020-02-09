@@ -100,7 +100,7 @@ void
 usleep(uint32_t usec)
 {
 
-	mdx_tsleep(USEC_TO_TICKS(usec));
+	mdx_usleep(usec);
 }
 
 static void

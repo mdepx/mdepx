@@ -107,7 +107,7 @@ mdx_thread_yield(void)
 
 int
 mdx_thread_setup(struct thread *td, const char *name,
-    int prio, uint32_t quantum, void *entry, void *arg)
+    int prio, uint32_t quantum_usec, void *entry, void *arg)
 {
 	uintptr_t stack_top;
 
@@ -129,7 +129,8 @@ mdx_thread_setup(struct thread *td, const char *name,
 	td->td_stack_top = (uint8_t *)stack_top;
 
 	td->td_name = name;
-	td->td_quantum = quantum;
+	td->td_quantum = quantum_usec ?
+		mdx_callout_usec_to_ticks(quantum_usec) : 0;
 	td->td_state = TD_STATE_READY;
 	td->td_tf = (struct trapframe *)((uint8_t *)td->td_stack_top
 	    - sizeof(struct trapframe));

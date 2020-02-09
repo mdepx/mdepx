@@ -63,6 +63,7 @@ fiber_start(char *stack, unsigned stack_size, nano_fiber_entry_t entry,
 	td->td_stack_size = stack_size;
 	td->td_flags = TD_FLAGS_DYN_ALLOC_TD | TD_FLAGS_DYN_ALLOC_SP;
 
+	/* Cooperative scheduling used, so set quantum to 0. */
 	quantum = 0;
 
 	mdx_thread_setup(td, "fiber", prio, quantum, entry, (void *)arg1);

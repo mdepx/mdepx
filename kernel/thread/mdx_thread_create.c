@@ -77,7 +77,7 @@ mdx_thread_free(struct thread *td)
 }
 
 struct thread *
-mdx_thread_create(const char *name, int prio, uint32_t quantum,
+mdx_thread_create(const char *name, int prio, uint32_t quantum_usec,
     uint32_t stack_size, void *entry, void *arg)
 {
 	struct thread *td;
@@ -87,7 +87,7 @@ mdx_thread_create(const char *name, int prio, uint32_t quantum,
 	if (td == NULL)
 		return (NULL);
 
-	ret = mdx_thread_setup(td, name, prio, quantum, entry, arg);
+	ret = mdx_thread_setup(td, name, prio, quantum_usec, entry, arg);
 	if (ret != 0) {
 		free(td->td_stack);
 		free(td);
