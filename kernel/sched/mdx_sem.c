@@ -179,10 +179,9 @@ mdx_sem_post(mdx_sem_t *sem)
 	critical_enter();
 	sl_lock(&sem->l);
 
-	sem->sem_count += 1;
-
 	if (list_empty(&sem->td_list)) {
 		/* No threads to wakeup. */
+		sem->sem_count += 1;
 		sl_unlock(&sem->l);
 		critical_exit();
 		return (1);
@@ -194,9 +193,6 @@ mdx_sem_post(mdx_sem_t *sem)
 
 	/* Ensure td left CPU. */
 	while (td->td_state != TD_STATE_ACK);
-
-	/* Reserve a lock immediately. */
-	sem->sem_count -= 1;
 
 	/*
 	 * Ensure sem_cb will not pick up this thread just
