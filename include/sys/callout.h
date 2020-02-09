@@ -66,10 +66,17 @@ struct mi_timer {
 };
 
 void mdx_callout_init(struct mdx_callout *c);
-int mdx_callout_set_locked(struct mdx_callout *c, uint32_t ticks,
+
+int mdx_callout_set_ticks_locked(struct mdx_callout *c, uint32_t ticks,
     void (*func)(void *arg), void *arg);
-int mdx_callout_set(struct mdx_callout *c, uint32_t ticks,
+int mdx_callout_set_locked(struct mdx_callout *c, uint32_t usec,
     void (*func)(void *arg), void *arg);
+
+int mdx_callout_set_ticks(struct mdx_callout *c, uint32_t ticks,
+    void (*func)(void *arg), void *arg);
+int mdx_callout_set(struct mdx_callout *c, uint32_t usec,
+    void (*func)(void *arg), void *arg);
+
 int mdx_callout_callback(struct mi_timer *);
 int mdx_callout_register(struct mi_timer *);
 int mdx_callout_cancel(struct mdx_callout *c);

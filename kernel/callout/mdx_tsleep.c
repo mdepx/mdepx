@@ -64,7 +64,7 @@ mdx_tsleep(uint32_t ticks)
 	    ("%s: sleeping in critical section is not allowed", __func__));
 
 	mdx_callout_init(&c);
-	mdx_callout_set(&c, ticks, mdx_tsleep_cb, td);
+	mdx_callout_set_ticks(&c, ticks, mdx_tsleep_cb, td);
 
 #ifdef MDX_MIPS_QEMU
 	/*

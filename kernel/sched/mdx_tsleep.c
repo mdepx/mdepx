@@ -68,7 +68,7 @@ mdx_tsleep(uint32_t ticks)
 	critical_enter();
 	td->td_state = TD_STATE_SLEEPING;
 	mdx_callout_cancel(&td->td_c);
-	mdx_callout_set(&c, ticks, mdx_tsleep_cb, td);
+	mdx_callout_set_ticks(&c, ticks, mdx_tsleep_cb, td);
 	critical_exit();
 
 	md_thread_yield();

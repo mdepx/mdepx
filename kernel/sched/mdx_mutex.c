@@ -39,11 +39,11 @@ mdx_mutex_init(mdx_mutex_t *m)
 }
 
 int
-mdx_mutex_timedlock(mdx_mutex_t *m, int ticks)
+mdx_mutex_timedlock(mdx_mutex_t *m, int usec)
 {
 	int ret;
 
-	ret = mdx_sem_timedwait(&m->sem, ticks);
+	ret = mdx_sem_timedwait(&m->sem, usec);
 	if (ret)
 		m->td = curthread;
 

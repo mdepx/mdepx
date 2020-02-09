@@ -136,7 +136,7 @@ cb(void *arg)
 	ticks = c->ticks_orig;
 	ticks /= 2;
 	printf("ticks %d\n", ticks);
-	mdx_callout_set_locked(c, ticks, cb, (void *)c);
+	mdx_callout_set_ticks_locked(c, ticks, cb, (void *)c);
 }
 
 static void __unused
@@ -224,8 +224,7 @@ main(void)
 
 #if 1
 	for (j = 0; j < 100; j++)
-		mdx_callout_set(&c1[j], USEC_TO_TICKS(100000) * j, cb,
-		    (void *)&c1[j]);
+		mdx_callout_set(&c1[j], 100000 * j, cb, (void *)&c1[j]);
 #endif
 
 	while (1) {

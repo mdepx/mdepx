@@ -215,7 +215,8 @@ mdx_sched_next(void)
 		KASSERT(td->td_idle == 0, ("idle thread has quantum"));
 
 		mdx_callout_init(&td->td_c);
-		mdx_callout_set(&td->td_c, td->td_quantum, mdx_sched_cb, td);
+		mdx_callout_set_ticks(&td->td_c, td->td_quantum,
+		    mdx_sched_cb, td);
 	}
 
 	dprintf("%s\n", td->td_name);

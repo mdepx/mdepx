@@ -182,7 +182,7 @@ mdx_callout_set_one(struct mdx_callout *c0)
 }
 
 int
-mdx_callout_set_locked(struct mdx_callout *c, uint32_t ticks,
+mdx_callout_set_ticks_locked(struct mdx_callout *c, uint32_t ticks,
     void (*func)(void *arg), void *arg)
 {
 
@@ -211,7 +211,20 @@ mdx_callout_set_locked(struct mdx_callout *c, uint32_t ticks,
 }
 
 int
-mdx_callout_set(struct mdx_callout *c, uint32_t ticks,
+mdx_callout_set_locked(struct mdx_callout *c, uint32_t usec,
+    void (*func)(void *arg), void *arg)
+{
+	uint32_t ticks;
+	int error;
+
+	ticks = mdx_callout_usec_to_ticks(usec);
+	error = mdx_callout_set_ticks_locked(c, ticks, func, arg);
+
+	return (error);
+}
+
+int
+mdx_callout_set_ticks(struct mdx_callout *c, uint32_t ticks,
     void (*func)(void *arg), void *arg)
 {
 	int cpuid;
@@ -222,10 +235,23 @@ mdx_callout_set(struct mdx_callout *c, uint32_t ticks,
 	cpuid = PCPU_GET(cpuid);
 
 	callout_lock(cpuid);
-	error = mdx_callout_set_locked(c, ticks, func, arg);
+	error = mdx_callout_set_ticks_locked(c, ticks, func, arg);
 	callout_unlock(cpuid);
 
 	critical_exit();
+
+	return (error);
+}
+
+int
+mdx_callout_set(struct mdx_callout *c, uint32_t usec,
+    void (*func)(void *arg), void *arg)
+{
+	uint32_t ticks;
+	int error;
+
+	ticks = mdx_callout_usec_to_ticks(usec);
+	error = mdx_callout_set_ticks(c, ticks, func, arg);
 
 	return (error);
 }

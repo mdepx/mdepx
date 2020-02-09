@@ -86,7 +86,7 @@ mdx_sem_cb(void *arg)
 }
 
 int
-mdx_sem_timedwait(mdx_sem_t *sem, int ticks)
+mdx_sem_timedwait(mdx_sem_t *sem, int usec)
 {
 	struct token t;
 	struct thread *td;
@@ -109,12 +109,12 @@ mdx_sem_timedwait(mdx_sem_t *sem, int ticks)
 
 		/* Lock is owned by another thread, sleep. */
 		mdx_callout_cancel(&td->td_c);
-		if (ticks) {
+		if (usec) {
 			t.td = td;
 			t.sem = sem;
 			t.timeout = false;
 			mdx_callout_init(&td->td_c);
-			mdx_callout_set(&td->td_c, ticks, mdx_sem_cb, &t);
+			mdx_callout_set(&td->td_c, usec, mdx_sem_cb, &t);
 		}
 
 		td->td_state = TD_STATE_SEM_WAIT;
@@ -136,7 +136,7 @@ mdx_sem_timedwait(mdx_sem_t *sem, int ticks)
 		 * by the scheduler here.
 		 */
 
-		if (ticks && t.timeout)
+		if (usec && t.timeout)
 			return (MDX_OK);
 	}
 

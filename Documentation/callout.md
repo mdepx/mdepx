@@ -20,10 +20,10 @@ Callout framework is lock-free, except in the SMP (Symmetric Multi Processing) c
 Used to initialize a callout.
 
 * * *
-    int mdx_callout_set(struct mdx_callout *c, uint32_t ticks,
+    int mdx_callout_set(struct mdx_callout *c, uint32_t usec,
         void (*func)(void *arg), void *arg);
 
-Used to schedule a function invocation for a callout c. The time interval is provided in raw timer ticks. The same argument arg given to *mdx_callout_set()* will be passed to the invoked function func.
+Used to schedule a function invocation for a callout c. The time interval is provided in microseconds. The same argument arg given to *mdx_callout_set()* will be passed to the invoked function *func*.
 
 * * *
     int mdx_callout_cancel(struct mdx_callout *c);
