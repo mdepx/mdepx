@@ -96,51 +96,51 @@ mdx_sem_timedwait(mdx_sem_t *sem, int usec)
 	KASSERT(td->td_idle == 0,
 	    ("Can't lock mutex/sem from the idle thread"));
 
-	for (;;) {
-		critical_enter();
-		sl_lock(&sem->l);
-		if (sem->sem_count > 0) {
-			sem->sem_count--;
-			/* Lock acquired. */
-			sl_unlock(&sem->l);
-			critical_exit();
-			break;
-		}
-
-		/* Lock is owned by another thread, sleep. */
-		mdx_callout_cancel(&td->td_c);
-		if (usec) {
-			t.td = td;
-			t.sem = sem;
-			t.timeout = false;
-			mdx_callout_init(&td->td_c);
-			mdx_callout_set(&td->td_c, usec, mdx_sem_cb, &t);
-		}
-
-		td->td_state = TD_STATE_SEM_WAIT;
-
-		list_append(&sem->td_list, &td->td_node);
-
+	critical_enter();
+	sl_lock(&sem->l);
+	if (sem->sem_count > 0) {
+		sem->sem_count--;
 		sl_unlock(&sem->l);
 		critical_exit();
-
-		md_thread_yield();
-
-		/*
-		 * We are here by one of the reasons:
-		 * 1. sem_post added us to the sched run queue
-		 * 2. sem_cb added us to the sched run queue
-		 *
-		 * td_c (mdx_sem_cb) is cancelled here;
-		 * td_c (mdx_sched_cb) could be re-configured
-		 * by the scheduler here.
-		 */
-
-		if (usec && t.timeout)
-			return (MDX_OK);
+		
+		/* Lock acquired. */
+		return (1);
 	}
 
-	return (MDX_ERROR);
+	/* Lock is owned by another thread, sleep. */
+	mdx_callout_cancel(&td->td_c);
+	if (usec) {
+		t.td = td;
+		t.sem = sem;
+		t.timeout = false;
+		mdx_callout_init(&td->td_c);
+		mdx_callout_set(&td->td_c, usec, mdx_sem_cb, &t);
+	}
+
+	td->td_state = TD_STATE_SEM_WAIT;
+
+	list_append(&sem->td_list, &td->td_node);
+
+	sl_unlock(&sem->l);
+	critical_exit();
+
+	md_thread_yield();
+
+	/*
+	 * We are here by one of the reasons:
+	 * 1. mdx_sem_post() added us to the sched run queue
+	 * 2. mdx_sem_cb() added us to the sched run queue
+	 *
+	 * td_c (mdx_sem_cb) is cancelled here;
+	 * td_c (mdx_sched_cb) could be re-configured by the scheduler here.
+	 */
+
+	if (usec && t.timeout)
+		return (0);
+
+	/* Lock has been acquired for us by mdx_sem_post(). */
+
+	return (1);
 }
 
 void
@@ -181,48 +181,55 @@ mdx_sem_post(mdx_sem_t *sem)
 
 	sem->sem_count += 1;
 
-	if (!list_empty(&sem->td_list)) {
-		/* Someone is waiting for the semaphore. */
-		td = CONTAINER_OF(sem->td_list.next, struct thread, td_node);
-		list_remove(&td->td_node);
+	if (list_empty(&sem->td_list)) {
+		/* No threads to wakeup. */
+		sl_unlock(&sem->l);
+		critical_exit();
+		return (1);
+	}
 
-		/* Ensure td left CPU. */
-		while (td->td_state != TD_STATE_ACK);
+	/* Someone is waiting for the semaphore. */
+	td = CONTAINER_OF(sem->td_list.next, struct thread, td_node);
+	list_remove(&td->td_node);
 
+	/* Ensure td left CPU. */
+	while (td->td_state != TD_STATE_ACK);
+
+	/* Reserve a lock immediately. */
+	sem->sem_count -= 1;
+
+	/*
+	 * Ensure sem_cb will not pick up this thread just
+	 * after sl_unlock() and before callout_cancel().
+	 */
+	td->td_state = TD_STATE_SEM_UNLOCK;
+	sl_unlock(&sem->l);
+
+	/* mdx_sem_cb could be called here by another CPU. */
+
+	error = mdx_callout_cancel(&td->td_c);
+	if (error) {
 		/*
-		 * Ensure sem_cb will not pick up this thread just
-		 * after sl_unlock() and before callout_cancel().
+		 * We are here by one of the reasons:
+		 * 1. It could be that callout was not configured
+		 *    (timeout == 0), in that case the td state
+		 *    must not change (TD_STATE_SEM_UNLOCK).
+		 * 2. sem_cb is already called by another CPU.
+		 *    In that case td state must be changed to
+		 *    TD_STATE_SEM_UNLOCK_ACK by sem_cb().
+		 * 
+		 * There is nothing to do here in either case.
 		 */
-		td->td_state = TD_STATE_SEM_UNLOCK;
-		sl_unlock(&sem->l);
+	}
 
-		/* mdx_sem_cb could be called here by another CPU. */
+	KASSERT(td->td_state == TD_STATE_SEM_UNLOCK ||
+		td->td_state == TD_STATE_SEM_UNLOCK_ACK,
+	    ("%s: wrong state %d\n", __func__, td->td_state));
+	KASSERT(td != curthread, ("td is curthread"));
 
-		error = mdx_callout_cancel(&td->td_c);
-		if (error) {
-			/*
-			 * We are here by one of the reasons:
-			 * 1. It could be that callout was not configured
-			 *    (timeout == 0), in that case the td state
-			 *    must not change (TD_STATE_SEM_UNLOCK).
-			 * 2. sem_cb is already called by another CPU.
-			 *    In that case td state must be changed to
-			 *    TD_STATE_SEM_UNLOCK_ACK by sem_cb().
-			 * 
-			 * There is nothing to do here in either case.
-			 */
-		}
+	td->td_state = TD_STATE_WAKEUP;
 
-		KASSERT(td->td_state == TD_STATE_SEM_UNLOCK ||
-			td->td_state == TD_STATE_SEM_UNLOCK_ACK,
-		    ("%s: wrong state %d\n", __func__, td->td_state));
-		KASSERT(td != curthread, ("td is curthread"));
-
-		td->td_state = TD_STATE_WAKEUP;
-
-		mdx_sched_add(td);
-	} else
-		sl_unlock(&sem->l);
+	mdx_sched_add(td);
 
 	critical_exit();
 
