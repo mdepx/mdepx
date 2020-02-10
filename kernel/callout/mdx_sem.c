@@ -33,6 +33,10 @@
 #include <machine/pcpu.h>
 #include <machine/atomic.h>
 
+#ifdef MDX_SCHED
+#error Invalid configuration
+#endif
+
 /*
  * A single-threaded (scheduler disabled) implementation of MDX semaphores.
  * Required for a peripheral device drivers compatibility.
