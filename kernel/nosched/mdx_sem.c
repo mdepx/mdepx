@@ -89,41 +89,32 @@ mdx_sem_timedwait(mdx_sem_t *sem, int usec)
 		critical_enter();
 		if (sem->sem_count > 0) {
 			sem->sem_count--;
-
 			/* The callout is no longer required. */
 			if (callout_configured)
 				mdx_callout_cancel(&td->td_c);
-
 			critical_exit();
-
 			/* Lock acquired. */
-
-			return (1);
+			break;
 		}
 
-		if (usec && !callout_configured) {
-			t.td = td;
-			t.sem = sem;
-			t.timeout = false;
-			mdx_callout_init(&td->td_c);
-			mdx_callout_set(&td->td_c, usec, mdx_sem_cb, &t);
-			callout_configured = true;
+		if (usec) {
+			if (!callout_configured) {
+				t.td = td;
+				t.sem = sem;
+				t.timeout = false;
+				mdx_callout_init(&td->td_c);
+				mdx_callout_set(&td->td_c, usec,
+				    mdx_sem_cb, &t);
+				callout_configured = true;
+			} else if (t.timeout) {
+				critical_exit();
+				return (0);
+			}
 		}
-
 		cpu_idle();
 		critical_exit();
 
 		/* We will be interrupted right here. */
-
-		critical_enter();
-		if (usec && t.timeout == true) {
-			critical_exit();
-			/* Timeout. */
-			return (0);
-		}
-		critical_exit();
-
-		/* Now check the sem_count again. */
 	}
 	
 	return (1);
