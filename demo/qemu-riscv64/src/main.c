@@ -171,7 +171,6 @@ hello(void *arg)
 int
 main(void)
 {
-	int j;
 
 	printf("cpu%d: pcpu size %d\n", PCPU_GET(cpuid), sizeof(struct pcpu));
 
@@ -240,6 +239,7 @@ main(void)
 #endif
 
 #if 1
+	int j;
 	for (j = 0; j < 100; j++)
 		mdx_callout_set(&c1[j], 100000 * j, cb, (void *)&c1[j]);
 #endif
@@ -260,11 +260,17 @@ main(void)
 	mdx_sem_t sem;
 	int ret;
 
-	mdx_sem_init(&sem, 1);
+	mdx_sem_init(&sem, 0);
 
 	while (1) {
-		mdx_callout_set(&c1[0], 25000, cb1, (void *)&sem);
-		ret = mdx_sem_timedwait(&sem, 25000);
+		mdx_callout_set(&c1[0], 60000, cb1, (void *)&sem);
+		ret = mdx_sem_timedwait(&sem, 40000);
+
+		critical_enter();
+		if (ret == 0)
+			mdx_callout_cancel(&c1[0]);
+		critical_exit();
+
 		printf("Hello world, %d\n", ret);
 	}
 #endif
