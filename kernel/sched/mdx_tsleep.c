@@ -73,3 +73,13 @@ mdx_tsleep(uint32_t ticks)
 
 	md_thread_yield();
 }
+
+void
+mdx_usleep(uint32_t usec)
+{
+	uint32_t ticks;
+
+	ticks = mdx_callout_usec_to_ticks(usec);
+
+	mdx_tsleep(ticks);
+}
