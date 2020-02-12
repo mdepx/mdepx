@@ -7,9 +7,9 @@ net - network (RADIO) core code
 A typical build config entry could look like:
 
 mdepx {
-	module boards;
+	module board;
 
-	boards {
+	board {
 		module nrf5340-dk;
 
 		nrf5340-dk {
