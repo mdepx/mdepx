@@ -10,7 +10,9 @@ Threads with highest priority run first.
 
 The maximum number of priorities specified by nprio (*MDX_SCHED_NPRIO*) config macro.
 
-The highest priority is 0 and could only be set to idle threads.
+The highest priority is 0 and could be set to the idle threads only.
+
+An idle thread (one per each CPU) is created by the OS initialization.
 
 ## Multitasking
 
