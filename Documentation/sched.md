@@ -31,6 +31,7 @@ The SMP feature is currently supported on RISC-V architecture only.
 ## Methods
 
 * * *
-    void mdx_sched_add(struct thread *td);
+    void
+    mdx_sched_add(struct thread *td);
 
 Adds a thread *td* to the scheduler run queue.

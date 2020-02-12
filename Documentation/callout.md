@@ -15,18 +15,21 @@ Callout framework is lock-free, except in the SMP (Symmetric Multi Processing) c
 ## Methods
 
 * * *
-    void mdx_callout_init(struct mdx_callout *c);
+    void
+    mdx_callout_init(struct mdx_callout *c);
 
 Used to initialize a callout.
 
 * * *
-    int mdx_callout_set(struct mdx_callout *c, uint32_t usec,
+    int
+    mdx_callout_set(struct mdx_callout *c, uint32_t usec,
         void (*func)(void *arg), void *arg);
 
 Used to schedule a function invocation for a callout c. The time interval is provided in microseconds. The same argument arg given to *mdx_callout_set()* will be passed to the invoked function *func*.
 
 * * *
-    int mdx_callout_cancel(struct mdx_callout *c);
+    int
+    mdx_callout_cancel(struct mdx_callout *c);
 
 Used to cancel a callout c.
 
@@ -35,12 +38,14 @@ Used to cancel a callout c.
 The framework requires a hardware timer. A timer device must be free running, upcounting with automatic value reloading.
 
 * * *
-    int mdx_callout_register(struct mi_timer *mt);
+    int
+    mdx_callout_register(struct mi_timer *mt);
 
 Used to register a hardware timer that will drive the callout framework.
 
 * * *
-    int mdx_callout_callback(struct mi_timer *mt);
+    int
+    mdx_callout_callback(struct mi_timer *mt);
 
 The callback function that must be called in the interrupt handler of a timer device.
 
