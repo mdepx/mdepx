@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "platform.h"
 #include "primitives.h"
 
+bool softfloat_isNaNF128M( const uint32_t *aWPtr );
+
 /*----------------------------------------------------------------------------
 *----------------------------------------------------------------------------*/
 bool softfloat_isNaNF128M( const uint32_t *aWPtr )

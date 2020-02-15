@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdint.h>
 #include "platform.h"
 
+uint64_t softfloat_shiftRightJam64( uint64_t a, uint_fast32_t dist );
+
 #ifndef softfloat_shiftRightJam64
 
 uint64_t softfloat_shiftRightJam64( uint64_t a, uint_fast32_t dist )

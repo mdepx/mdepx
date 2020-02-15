@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "platform.h"
 #include "primitiveTypes.h"
 
+void softfloat_mul64To128M( uint64_t a, uint64_t b, uint32_t *zPtr );
+
 #ifndef softfloat_mul64To128M
 
 void softfloat_mul64To128M( uint64_t a, uint64_t b, uint32_t *zPtr )

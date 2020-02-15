@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdint.h>
 #include "platform.h"
 
+uint32_t softfloat_approxRecip32_1( uint32_t a );
+
 #ifndef softfloat_approxRecip32_1
 
 extern const uint16_t softfloat_approxRecip_1k0s[16];

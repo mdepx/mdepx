@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdint.h>
 #include "platform.h"
 
+uint32_t softfloat_shiftRightJam32( uint32_t a, uint_fast16_t dist );
+
 #ifndef softfloat_shiftRightJam32
 
 uint32_t softfloat_shiftRightJam32( uint32_t a, uint_fast16_t dist )

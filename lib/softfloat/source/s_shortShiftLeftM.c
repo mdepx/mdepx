@@ -38,6 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "platform.h"
 #include "primitiveTypes.h"
 
+void softfloat_shortShiftLeftM( uint_fast8_t size_words,
+    const uint32_t *aPtr, uint_fast8_t dist, uint32_t *zPtr );
+
 #ifndef softfloat_shortShiftLeftM
 
 void
