@@ -50,6 +50,9 @@ typedef	__uint32_t		__vm_offset_t;
 typedef	__uint32_t		__vm_size_t;
 typedef	__uint32_t		__time_t;
 
+#define	INT64_C(c)		(c ## LL)
+#define	UINT64_C(c)		(c ## UL)
+
 #define	NBBY			8
 
 #endif /* !_MACHINE_TYPES_H_ */
