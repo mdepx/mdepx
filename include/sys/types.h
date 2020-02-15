@@ -115,4 +115,17 @@ typedef	__uint64_t	vaddr_t;
 #endif
 #endif
 
+/* Floating point */
+typedef	__uint8_t	uint_fast8_t;
+typedef	__uint16_t	uint_fast16_t;
+typedef	__uint32_t	uint_fast32_t;
+typedef	__uint64_t	uint_fast64_t;
+
+typedef	__int8_t	int_fast8_t;
+typedef	__int16_t	int_fast16_t;
+typedef	__int32_t	int_fast32_t;
+typedef	__int64_t	int_fast64_t;
+
+typedef	__uint8_t	uint_least8_t;
+
 #endif /* !_SYS_TYPES_H_ */
