@@ -26,7 +26,7 @@
 
 from directives import proc_directives
 from builder import build
-from parser import to_json
+from parser import to_json, merge
 import argparse
 import sys
 import os
@@ -70,6 +70,21 @@ def open_modules(root, context):
 			p = os.path.join(root, p)
 			open_modules(p, v)
 
+def handle_options(root, context):
+	ky = context.copy()
+	for k in ky:
+		v = ky[k]
+		if type(v) == dict:
+			p = os.path.join(root, k)
+			handle_options(p, v)
+
+		if k == 'options':
+			for opt in v:
+				if opt in ky:
+					if not type(ky[opt]) == dict:
+						continue
+					merge(context, ky[opt])
+
 if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser()
@@ -93,6 +108,9 @@ if __name__ == '__main__':
 	# Merge-in module's configuration files into the main config
 	root = ''
 	open_modules(root, config)
+
+	# Process options directive
+	handle_options(root, config)
 
 	result = proc_directives('', config)
 

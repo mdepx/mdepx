@@ -101,12 +101,6 @@ def process_directives(root, context, data, r):
 					resobj[o][key] = []
 					for el in data[key]:
 						resobj[o][key].append(el)
-		elif x in ['options']:
-			for opt in args:
-				#print('options %s' % opt)
-				if opt in context:
-					node = context[opt]
-					find_directives(root, node, data, r)
 		elif x in ['module']:
 			for m in args:
 				#print('process_dmodule %s' % m)
