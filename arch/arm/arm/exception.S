@@ -84,6 +84,7 @@ __start:
 
 	/* NOT REACHED */
 
+#ifdef MDX_ARM_VFP
 	.globl save_fpu_context
 	.text
 	.thumb_func
@@ -103,3 +104,4 @@ restore_fpu_context:
 	ldr	r1, [r0]		/* Load FPSCR. */
 	vmsr	fpscr, r1		/* Restore FPSCR. */
 	bx	lr
+#endif
