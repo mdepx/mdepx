@@ -55,4 +55,7 @@ typedef	__uint32_t		__time_t;
 
 #define	NBBY			8
 
+typedef	double	__double_t;
+typedef	float	__float_t;
+
 #endif /* !_MACHINE_TYPES_H_ */

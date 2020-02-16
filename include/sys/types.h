@@ -128,4 +128,7 @@ typedef	__int64_t	int_fast64_t;
 
 typedef	__uint8_t	uint_least8_t;
 
+typedef	__double_t	double_t;
+typedef	__float_t	float_t;
+
 #endif /* !_SYS_TYPES_H_ */

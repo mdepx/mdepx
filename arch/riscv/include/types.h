@@ -72,4 +72,7 @@ typedef	__uint8_t		__u_char_t;
 
 #define	NBBY			8
 
+typedef	double	__double_t;
+typedef	float	__float_t;
+
 #endif /* !_MACHINE_TYPES_H_ */
