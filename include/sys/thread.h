@@ -31,6 +31,7 @@
 
 #include <machine/pcpu.h>
 #include <machine/thread.h>
+#include <machine/pcb.h>
 
 struct thread {
 	const char *		td_name;	/* Name of the thread. */
@@ -60,6 +61,7 @@ struct thread {
 #define	TD_STATE_SEM_UNLOCK	7
 #define	TD_STATE_SEM_UNLOCK_ACK	8
 #define	TD_STATE_YIELDING	9
+	struct pcb		td_pcb;
 };
 
 void mdx_thread_init(int cpuid);
