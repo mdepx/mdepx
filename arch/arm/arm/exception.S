@@ -81,3 +81,25 @@ __start:
 
 	mov	r0, 0	/* cpuid */
 	bl	md_init
+
+	/* NOT REACHED */
+
+	.globl save_fpu_context
+	.text
+	.thumb_func
+	.type save_fpu_context, function
+save_fpu_context:
+	vstmia  r0!, {s0-s31}		/* Save FPU registers. */
+	vmrs	r1, fpscr		/* Read FPSCR. */
+	str	r1, [r0]		/* Save FPSCR. */
+	bx	lr
+
+	.globl restore_fpu_context
+	.text
+	.thumb_func
+	.type restore_fpu_context, function
+restore_fpu_context:
+	vldmia  r0!, {s0-s31}		/* Restore FPU registers. */
+	ldr	r1, [r0]		/* Load FPSCR. */
+	vmsr	fpscr, r1		/* Restore FPSCR. */
+	bx	lr
