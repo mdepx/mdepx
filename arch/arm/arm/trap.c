@@ -31,6 +31,8 @@
 #include <machine/pcpu.h>
 #include <machine/cpuregs.h>
 #include <machine/frame.h>
+#include <machine/scs.h>
+#include <machine/vfp.h>
 
 #include <arm/arm/nvic.h>
 
@@ -40,7 +42,14 @@ struct trapframe *arm_exception(struct trapframe *tf, int irq);
 static struct thread intr_thread[MDX_CPU_MAX];
 #endif
 
+#ifdef MDX_SCHED_SMP
+#error Add support
+#endif
+
 size_t intr_stack[MDX_CPU_MAX][MDX_ARM_INTR_STACK_SIZE];
+
+void save_fpu_context(struct vfp_state *vfp);
+void restore_fpu_context(struct vfp_state *vfp);
 
 static void
 dump_frame(struct trapframe *tf)
@@ -69,13 +78,34 @@ dump_frame(struct trapframe *tf)
 static void
 handle_exception(struct trapframe *tf, int exc_code)
 {
+	uint32_t reg;
+	uint16_t ufsr;
+#ifdef MDX_ARM_VFP
+	struct pcb *pcb;
+#endif
 
 	switch (exc_code) {
 	case EXCP_SVCALL:
 		break;
 	case EXCP_HARD_FAULT:
+		reg = SCS_RD4(SCB_HFSR);
+		if (reg & HFSR_FORCED) {
+			ufsr = SCS_RD2(SCB_UFSR);
+			if (ufsr & UFSR_NOCP) {
+#ifdef MDX_ARM_VFP
+				pcb = &curthread->td_pcb;
+				if ((pcb->pcb_flags & PCB_FLAGS_FPU) == 0) {
+					vfp_control(true);
+					pcb->pcb_flags |= PCB_FLAGS_FPU;
+					break;
+				}
+#else
+				printf("VFP is not available\n");
+#endif
+			}
+		}
 		dump_frame(tf);
-		panic("Hardfault");
+		panic("Hardfault (HFSR %x)", reg);
 	default:
 		dump_frame(tf);
 		panic("unhandled exception %d", exc_code);
@@ -91,23 +121,38 @@ arm_exception(struct trapframe *tf, int exc_code)
 	uint32_t irq;
 	bool released;
 	bool intr;
+#ifdef MDX_ARM_VFP
+	struct pcb *pcb;
+	bool fpu_enabled;
+#endif
 
 	td = curthread;
-
 	released = false;
 	intr = false;
 
-	/* TODO: compare thread's stack base and tf. */
+#ifdef MDX_ARM_VFP
+	pcb = &td->td_pcb;
+	fpu_enabled = false;
+	if (pcb->pcb_flags & PCB_FLAGS_FPU) {
+		fpu_enabled = true;
+		save_fpu_context(&pcb->pcb_vfp);
+	}
+#endif
 
-	/* Switch to the interrupt thread */
-	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
-	curthread->td_critnest++;
+	/* TODO: compare thread's stack base and tf. */
 
 	if (exc_code >= 16) {
 		irq = exc_code - 16;
 		intr = true;
 	} else
 		handle_exception(tf, exc_code);
+
+	/*
+	 * Switch to the interrupt thread for the case if the
+	 * current thread will be released from this cpu.
+	 */
+	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
+	curthread->td_critnest++;
 
 	released = mdx_sched_ack(td, tf);
 
@@ -116,8 +161,20 @@ arm_exception(struct trapframe *tf, int exc_code)
 
 	if (!released)
 		released = mdx_sched_park(td);
-	if (released)
+	if (released) {
+		/* We don't have a thread to run. Pick a next one. */
 		td = mdx_sched_next();
+#ifdef MDX_ARM_VFP
+		pcb = &td->td_pcb;
+		if (pcb->pcb_flags & PCB_FLAGS_FPU) {
+			if (fpu_enabled == false)
+				vfp_control(true);
+			restore_fpu_context(&pcb->pcb_vfp);
+		} else
+			if (fpu_enabled == true)
+				vfp_control(false);
+#endif
+	}
 
 	/* Switch to the new thread. */
 	curthread->td_critnest--;
