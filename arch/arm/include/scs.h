@@ -27,6 +27,8 @@
 #ifndef _ARM_ARM_SCS_H_
 #define _ARM_ARM_SCS_H_
 
+#define	BASE_SCS	0xE000E000
+
 /* System Timer */
 #define	SYST_CSR	0x010	/* SysTick Control and Status Register */
 #define	SYST_RVR	0x014	/* SysTick Reload Value Register */
@@ -54,9 +56,21 @@
 
 /* Floating Point Unit */
 #define FPU_CPACR	0xD88	/* Coprocessor Access Control Register */
+#define	 CPACR_CP11_S	22	/* Access for the floating-point */
+#define	 CPACR_CP11_M		(0x3 << CPACR_CP11_S)
+#define	 CPACR_CP11_NOCP	(0x0 << CPACR_CP11_S) /* NOCP UsageFault. */
+#define	 CPACR_CP11_UNPRIV	(0x1 << CPACR_CP11_S) /* Unprivileged accesses*/
+#define	 CPACR_CP11_FULL	(0x3 << CPACR_CP11_S) /* Full access to the FP*/
+#define	 CPACR_CP10_S	20	/* Access for the floating-point */
+#define	 CPACR_CP10_M		(0x3 << CPACR_CP10_S)
+#define	 CPACR_CP10_NOCP	(0x0 << CPACR_CP10_S) /* NOCP UsageFault. */
+#define	 CPACR_CP10_UNPRIV	(0x1 << CPACR_CP10_S) /* Unprivileged accesses*/
+#define	 CPACR_CP10_FULL	(0x3 << CPACR_CP10_S) /* Full access to the FP*/
 #define FPU_FPCCR	0xF34	/* Floating-point Context Control Register */
+#define	 FPCCR_ASPEN	(1 << 31) /* Automatic saving feature */
+#define	 FPCCR_LSPEN	(1 << 30) /* Lazy stacking feature */
 #define FPU_FPCAR	0xF38	/* Floating-point Context Address Register */
-#define FPU_FPDSCR	0xF3C	/* Floating-point Default Status Control Register */
+#define FPU_FPDSCR	0xF3C	/* Floating-point Default Status Control Reg.*/
 
 /* Cache maintenance operations */
 #define	CM_ICIALLU	0xF50	/* Instruction cache invalidate all to the Point of Unification (PoU) */
@@ -80,6 +94,13 @@
 
 /* System Control Block */
 #define	SCB_ACTLR	0x008	/* Auxiliary Control Register */
+#define	 ACTLR_DISFPCA	(1 << 9) /* Disables lazy stacking of FPU context */
+#define	 ACTLR_DISOOFP	(1 << 8) /* Disables FPU completing out of order  */
+#define	 ACTLR_DISFOLD	(1 << 2) /* Disables folding of IT instructions */
+#define	 ACTLR_DISDEFWBUF	(1 << 1) /* Disables write buffer use during default memory map accesses. */
+#define	 ACTLR_DISMCYCINT	(1 << 0) /* Disables interruption of multi-cycle instructions. */
+#define	 ACTLR_
+#define	 ACTLR_
 #define	SCB_CPUID	0xD00	/* CPUID Base Register */
 #define	SCB_ICSR	0xD04	/* Interrupt Control State Register */
 #define	 ICSR_PENDSWSET	(1 << 28) /* Set pending pendSV bit */
@@ -101,7 +122,16 @@
 #define	SCB_MMSR	0xD28	/* MemManage Fault Status Register */
 #define	SCB_BFSR	0xD29	/* BusFault Status Register */
 #define	SCB_UFSR	0xD2A	/* UsageFault Status Register */
+#define	 UFSR_UNDEFINSTR	(1 << 0) /* Undefined instruction */
+#define	 UFSR_INVSTATE		(1 << 1) /* Invalid state */
+#define	 UFSR_INVPC		(1 << 2) /* Invalid PC load */
+#define	 UFSR_NOCP		(1 << 3) /* No coprocessor */
+#define	 UFSR_UNALIGNED		(1 << 8) /* Unaligned access */
+#define	 UFSR_DIVBYZERO		(1 << 9) /* Divide by zero */
 #define	SCB_HFSR	0xD2C	/* HardFault Status Register */
+#define	 HFSR_VECTTBL	(1 << 1)	/* BusFault on vector table read */
+#define	 HFSR_FORCED	(1 << 30)	/* Forced HardFault */
+#define	 HFSR_DEBUGEVT	(1 << 31)	/* Reserved for Debug use */
 #define	SCB_MMAR	0xD34	/* MemManage Fault Address Register */
 #define	SCB_BFAR	0xD38	/* BusFault Address Register */
 #define	SCB_AFSR	0xD3C	/* Auxiliary Fault Status Register */
