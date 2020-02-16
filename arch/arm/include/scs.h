@@ -29,6 +29,11 @@
 
 #define	BASE_SCS	0xE000E000
 
+#define	SCS_RD2(_reg)		*(volatile uint16_t *)(BASE_SCS + _reg)
+#define	SCS_WR2(_reg, _val)	*(volatile uint16_t *)(BASE_SCS + _reg) = _val
+#define	SCS_RD4(_reg)		*(volatile uint32_t *)(BASE_SCS + _reg)
+#define	SCS_WR4(_reg, _val)	*(volatile uint32_t *)(BASE_SCS + _reg) = _val
+
 /* System Timer */
 #define	SYST_CSR	0x010	/* SysTick Control and Status Register */
 #define	SYST_RVR	0x014	/* SysTick Reload Value Register */
