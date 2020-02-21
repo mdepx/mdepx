@@ -1,4 +1,9 @@
-A demo for Sipeed MAIX DOCK board.
+This is a UART demo for Kendryte K210 -- a dual-core RISC-V CPU
+used in SiPEED MAIX DOCK board.
 
-Program to SRAM using kflash tool:
-kflash -n -p /dev/ttyUSB0 -s -t -b 115200 -B dan obj/k210.bin
+Build and program this demo to SRAM using kflash[1] tool:
+
+$ make
+$ kflash -n -p /dev/ttyUSB0 -s -t -b 115200 -B dan obj/k210.bin
+
+1. https://github.com/kendryte/kflash.py
