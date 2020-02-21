@@ -24,34 +24,38 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _RISCV_KENDRYTE_K210_UARTHS_H_
-#define _RISCV_KENDRYTE_K210_UARTHS_H_
+#include <sys/cdefs.h>
 
-#define	K210_UARTHS_TXFIFO	0x00
-#define	 UARTHS_TXFIFO_DATA_S	0
-#define	 UARTHS_TXFIFO_DATA_M	(0xff << UARTHS_TXFIFO_DATA_S)
-#define	 UARTHS_TXFIFO_FULL	(1 << 31)
-#define	K210_UARTHS_RXFIFO	0x04
-#define	K210_UARTHS_TXCTRL	0x08
-#define	 UARTHS_TXCTRL_TXEN	(1 << 0)
-#define	 UARTHS_TXCTRL_TXWM_S	16
-#define	 UARTHS_TXCTRL_TXWM_M	(0xffff << UARTHS_TXCTRL_TXWM_S)
-#define	K210_UARTHS_RXCTRL	0x0c
-#define	 UARTHS_RXCTRL_RXEN	(1 << 0)
-#define	 UARTHS_RXCTRL_RXWM_S	16
-#define	 UARTHS_RXCTRL_RXWM_M	(0xffff << UARTHS_RXCTRL_RXWM_S)
-#define	K210_UARTHS_IE		0x10
-#define	K210_UARTHS_IP		0x14
-#define	 UARTHS_IP_TXWM		(1 << 0)
-#define	 UARTHS_IP_RXWM		(1 << 1)
-#define	K210_UARTHS_DIV		0x18
+#include <riscv/kendryte/k210_uarths.h>
 
-struct k210_uarths_softc {
-	size_t base;
-};
+#define	RD4(_sc, _reg)		\
+	*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	\
+	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-void k210_uarths_init(struct k210_uarths_softc *sc, uint32_t base,
-    uint32_t input_freq, uint32_t baud_rate);
-void k210_uarths_putc(struct k210_uarths_softc *sc, char c);
+void
+k210_uarths_putc(struct k210_uarths_softc *sc, char c)
+{
+	uint32_t reg;
 
-#endif /* !_RISCV_KENDRYTE_K210_UARTHS_H_ */
+	do
+		reg = RD4(sc, K210_UARTHS_TXFIFO);
+	while (reg & UARTHS_TXFIFO_FULL);
+
+	WR4(sc, K210_UARTHS_TXFIFO, c);
+}
+
+void
+k210_uarths_init(struct k210_uarths_softc *sc, uint32_t base,
+    uint32_t input_freq, uint32_t baud_rate)
+{
+	uint16_t div;
+
+	sc->base = base;
+
+	div = input_freq / baud_rate - 1;
+
+	WR4(sc, K210_UARTHS_DIV, div);
+	WR4(sc, K210_UARTHS_TXCTRL, UARTHS_TXCTRL_TXEN);
+	WR4(sc, K210_UARTHS_RXCTRL, UARTHS_RXCTRL_RXEN);
+}
