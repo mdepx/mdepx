@@ -43,14 +43,16 @@
 
 static struct thread test_thr;
 uint8_t test_thr_stack[8192];
+static mdx_mutex_t mtx;
 
 static void
 test(void *arg)
 {
 
 	while (1) {
+		mdx_mutex_lock(&mtx);
 		printf("ok\n");
-		mdx_usleep(100000);
+		mdx_mutex_unlock(&mtx);
 	}
 }
 
@@ -60,6 +62,7 @@ main(void)
 	struct thread *td;
 	int error;
 
+	mdx_mutex_init(&mtx);
 	td = &test_thr;
 	td->td_stack = test_thr_stack;
 	td->td_stack_size = 8192;
@@ -71,8 +74,9 @@ main(void)
 	mdx_sched_add(&test_thr);
 
 	while (1) {
+		mdx_mutex_lock(&mtx);
 		printf("Hello World!\n");
-		mdx_usleep(100000);
+		mdx_mutex_unlock(&mtx);
 	}
 
 	return (0);

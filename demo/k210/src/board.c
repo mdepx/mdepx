@@ -112,7 +112,8 @@ board_init(void)
 	mdx_console_register(uart_putchar, (void *)&uarths_sc);
 
 #ifdef MDX_SCHED_SMP
-	printf("Releasing CPUs...\n");
+	printf("Releasing CPU 1...\n");
 	__riscv_boot_ap[1] = 1;
+	clint_set_sip(1);
 #endif
 }
