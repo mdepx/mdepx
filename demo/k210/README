@@ -1,0 +1,4 @@
+A demo for Sipeed MAIX DOCK board.
+
+Program to SRAM using kflash tool:
+kflash -n -p /dev/ttyUSB0 -s -t -b 115200 -B dan obj/k210.bin
