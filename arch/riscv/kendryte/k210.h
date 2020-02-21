@@ -27,6 +27,11 @@
 #ifndef _RISCV_KENDRYTE_K210_H_
 #define _RISCV_KENDRYTE_K210_H_
 
+#include <riscv/kendryte/k210_fpioa.h>
+#include <riscv/kendryte/k210_uarths.h>
+#include <riscv/kendryte/k210_sysctl.h>
+#include <riscv/kendryte/k210_gpio.h>
+
 #define	BASE_GPIO	0x50200000
 
 #define	BASE_UART1	0x50210000
@@ -44,6 +49,7 @@
 #define	BASE_I2S0	0x50250000
 #define	BASE_I2S1	0x50260000
 #define	BASE_I2S2	0x50270000
+#define	BASE_FPIOA	0x502B0000
 
 #define	BASE_SPI0	0x52000000
 #define	BASE_SPI1	0x53000000
