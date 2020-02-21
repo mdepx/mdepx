@@ -51,7 +51,7 @@ test(void *arg)
 
 	while (1) {
 		mdx_mutex_lock(&mtx);
-		printf("ok\n");
+		printf("cpu%d: ok\n", PCPU_GET(cpuid));
 		mdx_mutex_unlock(&mtx);
 	}
 }
@@ -75,7 +75,7 @@ main(void)
 
 	while (1) {
 		mdx_mutex_lock(&mtx);
-		printf("Hello World!\n");
+		printf("cpu%d: Hello World!\n", PCPU_GET(cpuid));
 		mdx_mutex_unlock(&mtx);
 	}
 
