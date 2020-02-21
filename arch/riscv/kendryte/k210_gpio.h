@@ -61,4 +61,10 @@
 #define	GPIO_ID_CODE		0x64
 #define	GPIO_INT_BOTHEDGE	0x68
 
+struct k210_gpio_softc {
+	size_t base;
+};
+
+void k210_gpio_init(struct k210_gpio_softc *sc, uint32_t base);
+
 #endif /* !_RISCV_KENDRYTE_K210_GPIO_H_ */
