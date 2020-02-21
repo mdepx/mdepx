@@ -39,6 +39,7 @@
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
 
+#include <riscv/sifive/e300g_clint.h>
 #include <riscv/kendryte/k210.h>
 
 #include "board.h"
@@ -52,6 +53,7 @@ static struct k210_fpioa_softc fpioa_sc;
 static struct k210_sysctl_softc sysctl_sc;
 static struct k210_uarths_softc uarths_sc;
 static struct k210_gpio_softc gpio_sc;
+static struct clint_softc clint_sc;
 
 extern uint8_t __riscv_boot_ap[2];
 extern uint32_t _sbss;
@@ -102,6 +104,7 @@ board_init(void)
 	k210_sysctl_init(&sysctl_sc, BASE_SYSCTL);
 	k210_fpioa_init(&fpioa_sc, BASE_FPIOA);
 	k210_gpio_init(&gpio_sc, BASE_GPIO);
+	e300g_clint_init(&clint_sc, BASE_CLINT, 8000000);
 
 	pins_configure();
 

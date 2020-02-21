@@ -41,12 +41,39 @@
 
 #include "board.h"
 
+static struct thread test_thr;
+uint8_t test_thr_stack[8192];
+
+static void
+test(void *arg)
+{
+
+	while (1) {
+		printf("ok\n");
+		mdx_usleep(100000);
+	}
+}
+
 int
 main(void)
 {
+	struct thread *td;
+	int error;
 
-	while (1)
+	td = &test_thr;
+	td->td_stack = test_thr_stack;
+	td->td_stack_size = 8192;
+
+	error = mdx_thread_setup(td, "test", 1, 10000, test, NULL);
+	if (error)
+		panic("Can't setup thread.\n");
+
+	mdx_sched_add(&test_thr);
+
+	while (1) {
 		printf("Hello World!\n");
+		mdx_usleep(100000);
+	}
 
 	return (0);
 }
