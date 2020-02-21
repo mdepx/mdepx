@@ -353,6 +353,8 @@ mdx_callout_usec_to_ticks(uint32_t usec)
 {
 	uint32_t ticks;
 
+	KASSERT(mi_tmr != NULL, ("mi timer is not registered."));
+
 	ticks = mi_tmr->usec_to_ticks(mi_tmr->frequency, usec);
 
 	return (ticks);
