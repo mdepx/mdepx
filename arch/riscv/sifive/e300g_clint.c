@@ -38,8 +38,12 @@
 
 #define	RD4(_sc, _reg)		\
 	*(volatile uint32_t *)((_sc)->base + _reg)
+#define	RD8(_sc, _reg)		\
+	*(volatile uint64_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+#define	WR8(_sc, _reg, _val)	\
+	*(volatile uint64_t *)((_sc)->base + _reg) = _val
 
 #define	CLINT_DEBUG
 #undef	CLINT_DEBUG
@@ -126,8 +130,6 @@ static void
 clint_start(void *arg, uint32_t ticks)
 {
 	struct clint_softc *sc;
-	uint32_t low, high;
-	uint32_t new;
 	int cpuid;
 
 	sc = arg;
@@ -136,12 +138,17 @@ clint_start(void *arg, uint32_t ticks)
 
 	dprintf("%s: ticks %u\n", __func__, ticks);
 	dprintf("%s%d: ticks %u\n", __func__, cpuid, ticks);
-#if 0
-	if (ticks > 4094967295)
-		panic("ticks %u\n", ticks);
-	if (ticks == 0)
-		panic("ticks %u\n", ticks);
-#endif
+
+#if __riscv_xlen == 64
+	uint64_t val;
+	uint64_t new;
+
+	val = RD8(sc, MTIME);
+	new = val + ticks;
+	WR8(sc, MTIMECMP(cpuid), new);
+#else
+	uint32_t low, high;
+	uint32_t new;
 
 	low = RD4(sc, MTIME);
 	high = RD4(sc, MTIME + 0x4);
@@ -152,6 +159,7 @@ clint_start(void *arg, uint32_t ticks)
 		high += 1;
 	WR4(sc, MTIMECMP(cpuid) + 0x4, high);
 	WR4(sc, MTIMECMP(cpuid), new);
+#endif
 
 	csr_set(mie, MIE_MTIE);
 }
