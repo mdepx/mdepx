@@ -24,15 +24,10 @@
  * SUCH DAMAGE.
  */
 
-.cpu cortex-m4
-.syntax		unified
+.syntax	unified
 .thumb
 
-#ifndef MDX_THREAD_STACK_SIZE
-#error Invalid configuration
-#endif
-
-.word	idle_thread_stack + MDX_THREAD_STACK_SIZE	/* Stack top address */
+.word	idle_thread_stack + MDX_THREAD_STACK_SIZE /* Stack top address */
 .word	__start		/* Reset */
 .word	exception	/* NMI */
 .word	exception	/* Hard Fault */
