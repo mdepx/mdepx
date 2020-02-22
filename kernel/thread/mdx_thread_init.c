@@ -29,6 +29,11 @@
 
 #include <machine/pcpu.h>
 
+/*
+ * Note we are booting on an idle thread that becomes a main thread
+ * in a single-threaded environment.
+ */
+
 static struct thread idle_thread[MDX_CPU_MAX];
 uint8_t idle_thread_stack[MDX_CPU_MAX][MDX_THREAD_STACK_SIZE];
 
