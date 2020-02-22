@@ -47,6 +47,7 @@ struct snprintf_arg {
 
 static void  snprintf_func(int ch, void *arg);
 
+#ifdef MDX_SYSTM_CONSOLE
 extern struct kernel_console kern_console;
 
 int
@@ -69,6 +70,23 @@ printf(const char *fmt, ...)
 
 	return (retval);
 }
+
+#else /* !MDX_SYSTM_CONSOLE */
+
+int
+vprintf(const char *fmt, va_list ap)
+{
+
+	return (0);
+}
+
+int
+printf(const char *fmt, ...)
+{
+
+	return (0);
+}
+#endif
 
 /*
  * Scaled down version of sprintf(3).
