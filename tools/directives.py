@@ -80,9 +80,12 @@ def process_directives(root, context, data, r):
 			flags[l] = ''
 			collect_flags(flags, l, context, False)
 
+	# vars dictionary is for global directives,
+	# which are 'link' and 'machine' only.
+	vars = r['vars']
+
 	for x in context:
 		args = context[x]
-		vars = r['vars']
 		if x in ['link']:
 			if (len(args) % 2) != 0:
 				print("Error: link directive accepts "
@@ -97,6 +100,9 @@ def process_directives(root, context, data, r):
 				resobj = r['resobj']
 				if not o in resobj:
 					resobj[o] = {}
+
+				# Now we apply all the nested directives
+				# to this particular object
 				for key in data:
 					resobj[o][key] = []
 					for el in data[key]:
