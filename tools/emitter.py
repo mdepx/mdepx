@@ -1,5 +1,5 @@
 #-
-# Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
+# Copyright (c) 2019-2020 Ruslan Bukin <br@bsdpad.com>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@ def open_modules(root, context):
 	ky = context.copy()
 	for k in ky:
 		v = ky[k]
-		if k in ['module', 'include']:
+		if k in ['module',]:
 			for el in list(set(v)):
 				#print("opening %s %s, root %s" % (k, el, root))
 				if el in context and 'root' in context[el]:
@@ -45,18 +45,16 @@ def open_modules(root, context):
 					p = el
 				p = os.path.join(root, p)
 				p = os.path.expanduser(p)
-				if k == 'module':
-					filename = 'module.conf'
-				else:
-					filename = 'mdepx.conf'
 				if not os.path.exists(p):
-					print('directory not found %s' % p)
-				p1 = os.path.join(p, filename)
+					print('Directory not found %s' % p)
+				p1 = os.path.join(p, 'module.conf')
 				if not os.path.exists(p1):
 					continue
 				with open(p1) as f:
 					data = f.read()
-					to_json(context, data)
+					if not el in context:
+						context[el] = {}
+					to_json(context[el], data)
 
 	# Now open modules of contexts
 	ky = context.copy()
