@@ -14,6 +14,10 @@ mdepx {
 
 		nrf5340-dk {
 			module app;
+
+			app {
+				module default;
+			};
 		};
 	};
 };
