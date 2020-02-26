@@ -19,7 +19,7 @@ Mdepx is an operating system for embedded applications.
 - RISC-V rv32, rv64
 
 ## Generic demo applications
-  * QEMU/RISC-V rv64ima (SMP)
+  * QEMU/RISC-V rv64gc (SMP)
   * QEMU/MIPS64
   * QEMU/CHERI128
   * HiFive Unleashed (SMP)

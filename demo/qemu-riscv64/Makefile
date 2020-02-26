@@ -2,7 +2,7 @@ APP = qemu-riscv64
 
 OSDIR = ../../
 
-export CFLAGS = -march=rv64imac -mabi=lp64 -mcmodel=medany		\
+export CFLAGS = -march=rv64gc -mabi=lp64 -mcmodel=medany		\
 	-nostdinc -fno-builtin-printf -ffreestanding -Wall		\
 	-Wredundant-decls -Wnested-externs -Wstrict-prototypes		\
 	-Wmissing-prototypes -Wpointer-arith -Winline -Wcast-qual	\

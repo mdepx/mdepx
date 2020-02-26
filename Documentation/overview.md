@@ -22,7 +22,7 @@ MDEPX features a build system written in Python.
 - CHERI128
 
 ## Generic demo applications
-  * QEMU/RISC-V rv64ima (SMP)
+  * QEMU/RISC-V rv64gc (SMP)
   * QEMU/MIPS64
   * QEMU/CHERI128
   * HiFive Unleashed (SMP)
