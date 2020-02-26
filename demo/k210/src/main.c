@@ -40,42 +40,86 @@
 #include <machine/cpufunc.h>
 
 #include "board.h"
+#include "ftoa.h"
 
 static struct thread test_thr;
 uint8_t test_thr_stack[8192];
+
+static struct thread test_thr1;
+uint8_t test_thr1_stack[8192];
+
 static mdx_mutex_t mtx;
 
 static void
 test(void *arg)
 {
+	char buf[100];
+	float a;
+	float b;
+	int i;
 
 	while (1) {
+		b = 0;
+		a = 0.1;
+		for (i = 0; i < 1000000; i++)
+			b += a;
+
+		ftoa(b, buf, 10);
+
 		mdx_mutex_lock(&mtx);
-		printf("cpu%d: ok\n", PCPU_GET(cpuid));
+		printf("cpu%d: result0 %s\n", PCPU_GET(cpuid), buf);
 		mdx_mutex_unlock(&mtx);
 	}
+}
+
+static void
+test1(void *arg)
+{
+
+	while (1);
 }
 
 int
 main(void)
 {
+	char buf[128];
 	struct thread *td;
 	int error;
+	float a;
+	float b;
+	int i;
 
 	mdx_mutex_init(&mtx);
 	td = &test_thr;
 	td->td_stack = test_thr_stack;
 	td->td_stack_size = 8192;
-
 	error = mdx_thread_setup(td, "test", 1, 10000, test, NULL);
 	if (error)
 		panic("Can't setup thread.\n");
-
 	mdx_sched_add(&test_thr);
 
+	/*
+	 * Add a 3rd thread to avoid the situation when first two
+	 * threads take a core each.
+	 */
+	td = &test_thr1;
+	td->td_stack = test_thr1_stack;
+	td->td_stack_size = 8192;
+	error = mdx_thread_setup(td, "test1", 1, 10000, test1, NULL);
+	if (error)
+		panic("Can't setup thread.\n");
+	mdx_sched_add(&test_thr1);
+
 	while (1) {
+		b = 0;
+		a = 0.5;
+		for (i = 0; i < 1000000; i++)
+			b += a;
+
+		ftoa(b, buf, 10);
+
 		mdx_mutex_lock(&mtx);
-		printf("cpu%d: Hello World!\n", PCPU_GET(cpuid));
+		printf("cpu%d: result1 %s\n", PCPU_GET(cpuid), buf);
 		mdx_mutex_unlock(&mtx);
 	}
 
