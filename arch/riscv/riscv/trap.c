@@ -48,6 +48,12 @@
 static struct thread intr_thread[MDX_CPU_MAX];
 #endif
 
+#ifdef MDX_RISCV_FPE
+void fpe_state_clear(void);
+void fpe_state_save(uint64_t *);
+void fpe_state_restore(uint64_t *);
+#endif
+
 static void
 dump_frame(struct trapframe *tf)
 {
@@ -74,12 +80,25 @@ dump_frame(struct trapframe *tf)
 static void
 handle_exception(struct trapframe *tf)
 {
+#ifdef MDX_RISCV_FPE
+	struct pcb *pcb;
+#endif
 
 	switch (tf->tf_mcause) {
 	case EXCP_MACHINE_ECALL:
 		tf->tf_mepc += 4;
 		break;
 	case EXCP_ILLEGAL_INSTRUCTION:
+#ifdef MDX_RISCV_FPE
+		pcb = &curthread->td_pcb;
+		if ((pcb->pcb_flags & PCB_FLAGS_FPE_ENABLED) == 0) {
+			fpe_state_clear();
+			tf->tf_mstatus &= ~MSTATUS_FS_MASK;
+			tf->tf_mstatus |= MSTATUS_FS_CLEAN;
+			pcb->pcb_flags |= PCB_FLAGS_FPE_ENABLED;
+			break;
+		}
+#endif
 		printf("%s: illegal instruction at %zx\n",
 		    __func__, tf->tf_mepc);
 	default:
@@ -97,6 +116,9 @@ riscv_exception(struct trapframe *tf)
 	bool released;
 	bool intr;
 	int irq;
+#ifdef MDX_RISCV_FPE
+	struct pcb *pcb;
+#endif
 
 	td = curthread;
 	released = false;
@@ -108,9 +130,11 @@ riscv_exception(struct trapframe *tf)
 		mdx_sched_cpu_avail(curpcpu, false);
 #endif
 
-	/* Switch to the interrupt thread. */
-	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
-	critical_enter();
+#ifdef MDX_RISCV_FPE
+	pcb = &td->td_pcb;
+	if (pcb->pcb_flags & PCB_FLAGS_FPE_ENABLED)
+		fpe_state_save(&pcb->pcb_x[0][0]);
+#endif
 
 	/* Check the trapframe first before we release this thread. */
 	if (tf->tf_mcause & EXCP_INTR) {
@@ -118,6 +142,10 @@ riscv_exception(struct trapframe *tf)
 		intr = true;
 	} else
 		handle_exception(tf);
+
+	/* Switch to the interrupt thread. */
+	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
+	critical_enter();
 
 	/*
 	 * Check if this thread went to sleep and release it from this CPU.
@@ -135,8 +163,14 @@ riscv_exception(struct trapframe *tf)
 		released = mdx_sched_park(td);
 
 	/* Pickup new thread if we don't have one anymore. */
-	if (released)
+	if (released) {
 		td = mdx_sched_next();
+#ifdef MDX_RISCV_FPE
+		pcb = &td->td_pcb;
+		if (pcb->pcb_flags & PCB_FLAGS_FPE_ENABLED)
+			fpe_state_restore(&pcb->pcb_x[0][0]);
+#endif
+	}
 
 	/* Switch to the new thread. */
 	critical_exit();

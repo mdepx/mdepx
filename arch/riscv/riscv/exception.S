@@ -25,6 +25,7 @@
  */
 
 #include <machine/asm.h>
+#include <machine/cpuregs.h>
 
 .macro save_registers el
 	addi	sp, sp, -(35 * REG_SIZE)
@@ -126,3 +127,146 @@ ASM_ENTRY(cpu_exception_handler)
 	load_registers 1
 	mret
 END(cpu_exception_handler)
+
+#ifdef MDX_RISCV_FPE
+/*
+ * void fpe_state_clear(void);
+ */
+	.align 2
+ASM_ENTRY(fpe_state_clear)
+	/* Enable FPE */
+	li	t0, MSTATUS_FS_INITIAL
+	csrs	mstatus, t0
+
+	fscsr	zero
+	fcvt.d.l f0, zero
+	fcvt.d.l f1, zero
+	fcvt.d.l f2, zero
+	fcvt.d.l f3, zero
+	fcvt.d.l f4, zero
+	fcvt.d.l f5, zero
+	fcvt.d.l f6, zero
+	fcvt.d.l f7, zero
+	fcvt.d.l f8, zero
+	fcvt.d.l f9, zero
+	fcvt.d.l f10, zero
+	fcvt.d.l f11, zero
+	fcvt.d.l f12, zero
+	fcvt.d.l f13, zero
+	fcvt.d.l f14, zero
+	fcvt.d.l f15, zero
+	fcvt.d.l f16, zero
+	fcvt.d.l f17, zero
+	fcvt.d.l f18, zero
+	fcvt.d.l f19, zero
+	fcvt.d.l f20, zero
+	fcvt.d.l f21, zero
+	fcvt.d.l f22, zero
+	fcvt.d.l f23, zero
+	fcvt.d.l f24, zero
+	fcvt.d.l f25, zero
+	fcvt.d.l f26, zero
+	fcvt.d.l f27, zero
+	fcvt.d.l f28, zero
+	fcvt.d.l f29, zero
+	fcvt.d.l f30, zero
+	fcvt.d.l f31, zero
+
+	/* Disable FPE */
+	li	t0, MSTATUS_FS_MASK
+	csrc	mstatus, t0
+	ret
+END(fpe_state_clear)
+
+/*
+ * void fpe_state_save(uint64_t *regs);
+ */
+	.align 2
+ASM_ENTRY(fpe_state_save)
+	fsd	f0, (0 * 16)(a0)
+	fsd	f1, (1 * 16)(a0)
+	fsd	f2, (2 * 16)(a0)
+	fsd	f3, (3 * 16)(a0)
+	fsd	f4, (4 * 16)(a0)
+	fsd	f5, (5 * 16)(a0)
+	fsd	f6, (6 * 16)(a0)
+	fsd	f7, (7 * 16)(a0)
+	fsd	f8, (8 * 16)(a0)
+	fsd	f9, (9 * 16)(a0)
+	fsd	f10, (10 * 16)(a0)
+	fsd	f11, (11 * 16)(a0)
+	fsd	f12, (12 * 16)(a0)
+	fsd	f13, (13 * 16)(a0)
+	fsd	f14, (14 * 16)(a0)
+	fsd	f15, (15 * 16)(a0)
+	fsd	f16, (16 * 16)(a0)
+	fsd	f17, (17 * 16)(a0)
+	fsd	f18, (18 * 16)(a0)
+	fsd	f19, (19 * 16)(a0)
+	fsd	f20, (20 * 16)(a0)
+	fsd	f21, (21 * 16)(a0)
+	fsd	f22, (22 * 16)(a0)
+	fsd	f23, (23 * 16)(a0)
+	fsd	f24, (24 * 16)(a0)
+	fsd	f25, (25 * 16)(a0)
+	fsd	f26, (26 * 16)(a0)
+	fsd	f27, (27 * 16)(a0)
+	fsd	f28, (28 * 16)(a0)
+	fsd	f29, (29 * 16)(a0)
+	fsd	f30, (30 * 16)(a0)
+	fsd	f31, (31 * 16)(a0)
+	frcsr	t0
+	sd	t0, (32 * 16)(a0)
+	ret
+END(fpe_state_save)
+
+/*
+ * void fpe_state_restore(uint64_t *regs);
+ */
+	.align 2
+ASM_ENTRY(fpe_state_restore)
+	/* Enable FPE */
+	li	t0, MSTATUS_FS_INITIAL
+	csrs	mstatus, t0
+
+	ld	t0, (32 * 16)(a0)
+	fscsr	t0
+	fld	f0, (0 * 16)(a0)
+	fld	f1, (1 * 16)(a0)
+	fld	f2, (2 * 16)(a0)
+	fld	f3, (3 * 16)(a0)
+	fld	f4, (4 * 16)(a0)
+	fld	f5, (5 * 16)(a0)
+	fld	f6, (6 * 16)(a0)
+	fld	f7, (7 * 16)(a0)
+	fld	f8, (8 * 16)(a0)
+	fld	f9, (9 * 16)(a0)
+	fld	f10, (10 * 16)(a0)
+	fld	f11, (11 * 16)(a0)
+	fld	f12, (12 * 16)(a0)
+	fld	f13, (13 * 16)(a0)
+	fld	f14, (14 * 16)(a0)
+	fld	f15, (15 * 16)(a0)
+	fld	f16, (16 * 16)(a0)
+	fld	f17, (17 * 16)(a0)
+	fld	f18, (18 * 16)(a0)
+	fld	f19, (19 * 16)(a0)
+	fld	f20, (20 * 16)(a0)
+	fld	f21, (21 * 16)(a0)
+	fld	f22, (22 * 16)(a0)
+	fld	f23, (23 * 16)(a0)
+	fld	f24, (24 * 16)(a0)
+	fld	f25, (25 * 16)(a0)
+	fld	f26, (26 * 16)(a0)
+	fld	f27, (27 * 16)(a0)
+	fld	f28, (28 * 16)(a0)
+	fld	f29, (29 * 16)(a0)
+	fld	f30, (30 * 16)(a0)
+	fld	f31, (31 * 16)(a0)
+
+	/* Disable FPE */
+	li	t0, MSTATUS_FS_MASK
+	csrc	mstatus, t0
+	ret
+END(fpe_state_restore)
+#endif /* !MDX_RISCV_FPE */

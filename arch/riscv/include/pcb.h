@@ -28,7 +28,12 @@
 #define	_MACHINE_PCB_H_
 
 struct pcb {
-	int			pcb_flags;
+#ifdef MDX_RISCV_FPE
+	uint64_t		pcb_x[32][2];	/* Floating point registers */
+	uint64_t		pcb_fcsr;	/* Floating point control */
+#endif
+	uint64_t		pcb_flags;
+#define	PCB_FLAGS_FPE_ENABLED	(1 << 0)	/* Floating point enabled */
 };
 
 #endif /* !_MACHINE_PCB_H_ */
