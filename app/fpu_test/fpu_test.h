@@ -24,17 +24,9 @@
  * SUCH DAMAGE.
  */
 
-#include <stdio.h>
+#ifndef _FPU_TEST_H_
+#define	_FPU_TEST_H_
 
-#include <app/fpu_test/fpu_test.h>
+void fpu_test(void);
 
-int
-main(void)
-{
-
-	printf("Hello world!\n");
-
-	fpu_test();
-
-	return (0);
-}
+#endif /* !_FPU_TEST_H_ */
