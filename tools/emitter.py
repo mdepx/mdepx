@@ -36,7 +36,7 @@ def open_modules(root, context):
 	ky = context.copy()
 	for k in ky:
 		v = ky[k]
-		if k in ['module',]:
+		if k in ['modules',]:
 			for el in list(set(v)):
 				#print("opening %s %s, root %s" % (k, el, root))
 				if el in context and 'root' in context[el]:

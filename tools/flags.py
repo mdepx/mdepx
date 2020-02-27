@@ -48,7 +48,7 @@ def collect_flags(result, m, d, deep):
 			'machine',
 			'ldscript',
 			'prefix',
-			'module']:
+			'modules']:
 			continue
 
 		# Process everything else

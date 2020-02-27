@@ -107,7 +107,7 @@ def process_directives(root, context, data, r):
 					resobj[o][key] = []
 					for el in data[key]:
 						resobj[o][key].append(el)
-		elif x in ['module']:
+		elif x in ['modules']:
 			for m in args:
 				#print('process_dmodule %s' % m)
 				if m in context:
