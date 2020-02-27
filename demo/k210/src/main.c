@@ -25,29 +25,16 @@
  */
 
 #include <sys/cdefs.h>
-#include <sys/console.h>
-#include <sys/systm.h>
-#include <sys/thread.h>
-#include <sys/spinlock.h>
-#include <sys/malloc.h>
 #include <sys/mutex.h>
-#include <sys/sem.h>
-#include <sys/list.h>
-#include <sys/smp.h>
 
 #include <machine/pcpu.h>
-#include <machine/cpuregs.h>
-#include <machine/cpufunc.h>
 
-#include "board.h"
 #include "ftoa.h"
 
 static struct thread test_thr;
-uint8_t test_thr_stack[8192];
-
 static struct thread test_thr1;
-uint8_t test_thr1_stack[8192];
-
+static uint8_t test_thr_stack[4096];
+static uint8_t test_thr1_stack[4096];
 static mdx_mutex_t mtx;
 
 static void
@@ -99,8 +86,8 @@ main(void)
 	mdx_sched_add(&test_thr);
 
 	/*
-	 * Add a 3rd thread to avoid the situation when first two
-	 * threads take a core each.
+	 * Add a 3rd thread to avoid the situation when in a dual-core system
+	 * first two threads take a core each.
 	 */
 	td = &test_thr1;
 	td->td_stack = test_thr1_stack;
