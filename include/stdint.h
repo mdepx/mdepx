@@ -31,5 +31,6 @@
 
 #define	UINT16_MAX	0xffff
 #define	UINT32_MAX	0xffffffff
+#define	INT32_MAX	0x7fffffff
 
 #endif /* !_STDINT_H_ */
