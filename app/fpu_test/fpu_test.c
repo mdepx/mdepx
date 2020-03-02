@@ -29,8 +29,9 @@
 
 #include <machine/pcpu.h>
 
+#include <ftoa/ftoa.h>
+
 #include "fpu_test.h"
-#include "ftoa.h"
 
 static struct thread test_thr;
 static struct thread test_thr1;
