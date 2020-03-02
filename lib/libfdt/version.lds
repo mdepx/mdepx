@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-2-Clause) */
 LIBFDT_1.2 {
 	global:
 		fdt_next_node;
@@ -19,6 +20,7 @@ LIBFDT_1.2 {
 		fdt_get_alias_namelen;
 		fdt_get_alias;
 		fdt_get_path;
+                fdt_header_size;
 		fdt_supernode_atdepth_offset;
 		fdt_node_depth;
 		fdt_parent_offset;
@@ -74,6 +76,7 @@ LIBFDT_1.2 {
 		fdt_header_size_;
 		fdt_appendprop_addrrange;
 		fdt_setprop_inplace_namelen_partial;
+		fdt_create_with_flags;
 	local:
 		*;
 };
