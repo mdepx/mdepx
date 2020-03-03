@@ -42,7 +42,6 @@ static mdx_mutex_t mtx;
 static void
 test(void *arg)
 {
-	char buf[100];
 	float a;
 	float b;
 	int i;
@@ -53,10 +52,8 @@ test(void *arg)
 		for (i = 0; i < 1000000; i++)
 			b += a;
 
-		ftoa(b, buf, 10);
-
 		mdx_mutex_lock(&mtx);
-		printf("cpu%d: result0 %s\n", PCPU_GET(cpuid), buf);
+		printf("cpu%d: result0 %.10f\n", PCPU_GET(cpuid), b);
 		mdx_mutex_unlock(&mtx);
 	}
 }
@@ -71,7 +68,6 @@ test1(void *arg)
 void
 fpu_test(void)
 {
-	char buf[128];
 	struct thread *td;
 	int error;
 	float a;
@@ -105,10 +101,8 @@ fpu_test(void)
 		for (i = 0; i < 1000000; i++)
 			b += a;
 
-		ftoa(b, buf, 10);
-
 		mdx_mutex_lock(&mtx);
-		printf("cpu%d: result1 %s\n", PCPU_GET(cpuid), buf);
+		printf("cpu%d: result1 %.10f\n", PCPU_GET(cpuid), b);
 		mdx_mutex_unlock(&mtx);
 	}
 }
