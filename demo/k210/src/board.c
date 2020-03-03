@@ -106,6 +106,9 @@ board_init(void)
 	k210_gpio_init(&gpio_sc, BASE_GPIO);
 	e300g_clint_init(&clint_sc, BASE_CLINT, 8000000);
 
+	malloc_init();
+	malloc_add_region(0x40000000, 6 * 1024 * 1024);
+
 	pins_configure();
 
 	k210_uarths_init(&uarths_sc, BASE_UARTHS, CPU_FREQ, DEFAULT_BAUDRATE);
