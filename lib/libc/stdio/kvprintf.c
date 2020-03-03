@@ -1,6 +1,7 @@
 /*-
  * SPDX-License-Identifier: BSD-3-Clause
  *
+ * Copyright (c) 2020 Ruslan Bukin <br@bsdpad.com>
  * Copyright (c) 1986, 1988, 1991, 1993
  *	The Regents of the University of California.  All rights reserved.
  * (c) UNIX System Laboratories, Inc.
@@ -41,6 +42,8 @@
 #include <sys/libkern.h>
 
 #include <stddef.h>
+
+#include <ftoa/ftoa.h>
 
 /* Max number conversion buffer length: a u_quad_t in base 2, plus NUL byte. */
 #define MAXNBUF	(sizeof(intmax_t) * NBBY + 1)
@@ -120,6 +123,10 @@ kvprintf(char const *fmt, void (*func)(int, void*), void *arg, int radix, va_lis
 	int bconv, dwidth, upper;
 	char padc;
 	int stop = 0, retval = 0;
+#if defined(MDX_FTOA)
+	char fbuf[MDX_FTOA_MAXFBUF];
+	int i;
+#endif
 
 	num = 0;
 	if (!func)
@@ -226,6 +233,13 @@ reswitch:	switch (ch = (u_char)*fmt++) {
 			base = 10;
 			sign = 1;
 			goto handle_sign;
+#if defined(MDX_FTOA)
+		case 'f':
+			ftoa(va_arg(ap, double), fbuf, dwidth);
+			for (i = 0; i < strlen(fbuf); i++)
+				PCHAR(fbuf[i]);
+			break;
+#endif
 		case 'h':
 			if (hflag) {
 				hflag = 0;
