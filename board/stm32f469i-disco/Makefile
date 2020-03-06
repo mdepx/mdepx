@@ -1,5 +1,4 @@
 APP =		stm32f469i-disco-dsi
-MACHINE =	arm
 
 CC =		${CROSS_COMPILE}gcc
 LD =		${CROSS_COMPILE}ld
