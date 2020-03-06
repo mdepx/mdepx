@@ -13,8 +13,6 @@ UART baud rate: 115200
 ### Build under Linux/FreeBSD
 
     $ export CROSS_COMPILE=arm-none-eabi-
-    $ git clone --recursive https://github.com/machdep/stm32f469i-disco-dsi
-    $ cd stm32f469i-disco-dsi
     $ make
 
 ### Program font
@@ -23,4 +21,4 @@ UART baud rate: 115200
 ### Program mdepx
     $ sudo openocd -s /path/to/openocd/tcl -f interface/stlink-v2-1.cfg -f target/stm32f4x.cfg -c 'program obj/stm32f469i-disco-dsi.bin reset 0x08000000 exit'
 
-![alt text](https://raw.githubusercontent.com/machdep/stm32f469i-disco-dsi/master/images/stm32f469i-disco-dsi.jpg)
+![alt text](https://raw.githubusercontent.com/machdep/mdepx/master/board/stm32f469i-disco/images/stm32f469i-disco-dsi.jpg)
