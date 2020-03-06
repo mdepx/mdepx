@@ -1,4 +1,7 @@
-This is a board code for nRF5340 dual-core ARM Cortex-M33.
+This is an initialization code for nRF5340 dual-core ARM Cortex-M33.
+
+A complete Bluetooth demo application for this CPU could be found here:
+https://github.com/machdep/nrf5340
 
 The initialization code split between two directories:
 app - application core code
@@ -14,10 +17,6 @@ mdepx {
 
 		nrf5340-dk {
 			module app;
-
-			app {
-				module default;
-			};
 		};
 	};
 };
