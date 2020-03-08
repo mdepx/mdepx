@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2019-2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * This software was developed by SRI International and the University of
@@ -39,11 +39,11 @@
 #include <machine/pcpu.h>
 
 /*
- * A hardware timer must be:
- * (1) upcouning
- * (2) free running with automatic reloading
+ * A hardware timer must be configured by a driver as:
+ * (1) upcouning;
+ * (2) free-running with automatic value reloading.
  *
- * One shot timers are not supported.
+ * One-shot timers are not supported.
  *
  * Example drivers see at:
  *     grep mdx_callout_register arch/ -R
