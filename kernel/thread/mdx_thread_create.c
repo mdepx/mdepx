@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2019-2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,15 +31,18 @@
 
 #include <machine/frame.h>
 
-#define	THREAD_DEBUG
-#undef	THREAD_DEBUG
+#define	MDX_THREAD_DEBUG
+#undef	MDX_THREAD_DEBUG
 
-#ifdef	THREAD_DEBUG
+#ifdef	MDX_THREAD_DEBUG
 #define	dprintf(fmt, ...)	printf(fmt, ##__VA_ARGS__)
 #else
 #define	dprintf(fmt, ...)
 #endif
 
+/*
+ * Dynamically allocate a thread.
+ */
 struct thread *
 mdx_thread_alloc(uint32_t stack_size)
 {
@@ -49,6 +52,10 @@ mdx_thread_alloc(uint32_t stack_size)
 	if (td == NULL)
 		return (NULL);
 
+	/*
+	 * Set the allocation flag so we know how
+	 * to deallocate the thread later.
+	 */
 	td->td_flags = TD_FLAGS_DYN_ALLOC_TD;
 
 	if (stack_size == 0)
