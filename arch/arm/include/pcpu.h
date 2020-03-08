@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2019-2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,8 +26,6 @@
 
 #ifndef	_MACHINE_PCPU_H_
 #define	_MACHINE_PCPU_H_
-
-#include <sys/pcpu.h>
 
 #ifdef MDX_SCHED_SMP
 #error SMP is not supported on arm

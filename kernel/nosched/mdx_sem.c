@@ -25,12 +25,12 @@
  */
 
 #include <sys/cdefs.h>
-#include <sys/systm.h>
-#include <sys/thread.h>
+#include <sys/pcpu.h>
 #include <sys/sem.h>
 #include <sys/spinlock.h>
+#include <sys/systm.h>
+#include <sys/thread.h>
 
-#include <machine/pcpu.h>
 #include <machine/atomic.h>
 
 #ifdef MDX_SCHED

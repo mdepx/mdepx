@@ -25,9 +25,8 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/pcpu.h>
 #include <sys/thread.h>
-
-#include <machine/pcpu.h>
 
 /*
  * Note we are booting on an idle thread that becomes a main thread

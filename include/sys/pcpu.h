@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2019-2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,5 +39,7 @@ struct pcpu {
 };
 
 extern struct pcpu __pcpu[MDX_CPU_MAX];
+
+#include <machine/pcpu.h>
 
 #endif /* !_SYS_PCPU_H_ */

@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2019-2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,8 +28,8 @@
 #define	_SYS_THREAD_H_
 
 #include <sys/callout.h>
+#include <sys/pcpu.h>
 
-#include <machine/pcpu.h>
 #include <machine/thread.h>
 #include <machine/pcb.h>
 

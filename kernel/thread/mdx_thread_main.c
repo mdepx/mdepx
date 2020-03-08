@@ -25,10 +25,9 @@
  */
 
 #include <sys/cdefs.h>
-#include <sys/thread.h>
+#include <sys/pcpu.h>
 #include <sys/systm.h>
-
-#include <machine/pcpu.h>
+#include <sys/thread.h>
 
 #if defined(MDX_SCHED) && !defined(MDX_THREAD_DYNAMIC_ALLOC)
 static struct thread main_thread;

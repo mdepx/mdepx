@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2019-2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * This software was developed by SRI International and the University of
@@ -32,13 +32,13 @@
 /* Round-Robin scheduler */
 
 #include <sys/cdefs.h>
+#include <sys/mutex.h>
+#include <sys/pcpu.h>
+#include <sys/smp.h>
+#include <sys/spinlock.h>
 #include <sys/systm.h>
 #include <sys/thread.h>
-#include <sys/mutex.h>
-#include <sys/spinlock.h>
-#include <sys/smp.h>
 
-#include <machine/pcpu.h>
 #include <machine/frame.h>
 
 #define	MDX_SCHED_DEBUG

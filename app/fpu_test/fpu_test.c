@@ -26,8 +26,7 @@
 
 #include <sys/cdefs.h>
 #include <sys/mutex.h>
-
-#include <machine/pcpu.h>
+#include <sys/pcpu.h>
 
 #include <ftoa/ftoa.h>
 

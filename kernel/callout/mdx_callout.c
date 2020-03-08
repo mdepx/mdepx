@@ -30,13 +30,12 @@
  */
 
 #include <sys/cdefs.h>
-#include <sys/systm.h>
-#include <sys/errno.h>
 #include <sys/callout.h>
-#include <sys/thread.h>
+#include <sys/errno.h>
+#include <sys/pcpu.h>
 #include <sys/spinlock.h>
-
-#include <machine/pcpu.h>
+#include <sys/systm.h>
+#include <sys/thread.h>
 
 /*
  * A hardware timer must be configured by a driver as:

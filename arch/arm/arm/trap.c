@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2018-2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,10 +25,10 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/pcpu.h>
 #include <sys/systm.h>
 #include <sys/thread.h>
 
-#include <machine/pcpu.h>
 #include <machine/cpuregs.h>
 #include <machine/frame.h>
 #include <machine/scs.h>
