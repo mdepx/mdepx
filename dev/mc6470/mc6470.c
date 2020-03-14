@@ -24,42 +24,80 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_DEV_MC6470_MC6470_H_
-#define	_DEV_MC6470_MC6470_H_
+#include <sys/cdefs.h>
+#include <sys/console.h>
+#include <sys/callout.h>
+#include <sys/systm.h>
+#include <sys/malloc.h>
+#include <sys/thread.h>
 
-#define	MC6470_SR		0x03
-#define	MC6470_OPSTAT		0x04
-#define	MC6470_INTEN		0x06
-#define	MC6470_MODE		0x07
-#define	MC6470_SRTFR		0x08
-#define	MC6470_TAPEN		0x09
-#define	MC6470_TTTRX		0x0A
-#define	MC6470_TTTRY		0x0B
-#define	MC6470_TTTRZ		0x0C
-#define	MC6470_XOUT_EX_L	0x0D
-#define	MC6470_XOUT_EX_H	0x0E
-#define	MC6470_YOUT_EX_L	0x0F
-#define	MC6470_YOUT_EX_H	0x10
-#define	MC6470_ZOUT_EX_L	0x11
-#define	MC6470_ZOUT_EX_H	0x12
-#define	MC6470_OUTCFG		0x20
-#define	MC6470_XOFFL		0x21
-#define	MC6470_XOFFH		0x22
-#define	MC6470_YOFFL		0x23
-#define	MC6470_YOFFH		0x24
-#define	MC6470_ZOFFL		0x25
-#define	MC6470_ZOFFH		0x26
-#define	MC6470_XGAIN		0x27
-#define	MC6470_YGAIN		0x28
-#define	MC6470_ZGAIN		0x29
-#define	MC6470_PCODE		0x3B
+#include <dev/i2c/i2c.h>
+#include <dev/mc6470/mc6470.h>
 
-struct mc6470_dev {
+#define	MC6470_DEVID	0x4c
+
+int
+mc6470_read_reg(struct mc6470_dev *dev, uint8_t reg, uint8_t *val)
+{
+	struct i2c_msg msgs[2];
 	struct i2c_bus *i2cb;
-};
+	uint8_t dev_id;
+	int err;
 
-int mc6470_read_reg(struct mc6470_dev *dev, uint8_t reg, uint8_t *val);
-int mc6470_write_reg(struct mc6470_dev *dev, uint8_t reg, uint8_t val);
-int mc6470_set_freq(struct mc6470_dev *dev, uint8_t val);
+	i2cb = dev->i2cb;
 
-#endif /* !_DEV_MC6470_MC6470_H_ */
+	dev_id = MC6470_DEVID;
+
+	/* Write register */
+	msgs[0].slave = dev_id;
+	msgs[0].buf = &reg;
+	msgs[0].len = 1;
+	msgs[0].flags = 0;
+
+        /* Read data */
+	msgs[1].slave = dev_id;
+	msgs[1].buf = val;
+	msgs[1].len = 1;
+	msgs[1].flags = IIC_M_RD;
+
+	err = i2cb->xfer(i2cb->arg, msgs, 2);
+
+	return (err);
+}
+
+int
+mc6470_write_reg(struct mc6470_dev *dev, uint8_t reg, uint8_t val)
+{
+	struct i2c_msg msgs[1];
+	struct i2c_bus *i2cb;
+	uint8_t data[2];
+	uint8_t dev_id;
+	int err;
+
+	i2cb = dev->i2cb;
+
+	dev_id = MC6470_DEVID;
+
+	data[0] = reg;
+	data[1] = val;
+
+	/* Write register and data. */
+	msgs[0].slave = dev_id;
+	msgs[0].buf = data;
+	msgs[0].len = 2;
+	msgs[0].flags = 0;
+
+	err = i2cb->xfer(i2cb->arg, msgs, 1);
+
+	return (err);
+}
+
+int
+mc6470_set_freq(struct mc6470_dev *dev, uint8_t val)
+{
+	int err;
+
+	err = mc6470_write_reg(dev, MC6470_SRTFR, val);
+
+	return (err);
+}
