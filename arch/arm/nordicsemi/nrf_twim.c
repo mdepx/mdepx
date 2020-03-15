@@ -38,6 +38,8 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
+#define	TWIM_TIMEOUT	10000	/* usec */
+
 void
 nrf_twim_intr(void *arg, struct trapframe *tf, int irq)
 {
@@ -66,6 +68,7 @@ nrf_twim_xfer(void *arg, struct i2c_msg *msgs, int len)
 {
 	struct nrf_twim_softc *sc;
 	struct i2c_msg *msg;
+	int err;
 	int i;
 
 	sc = arg;
@@ -83,7 +86,9 @@ nrf_twim_xfer(void *arg, struct i2c_msg *msgs, int len)
 
 			mdx_sem_init(&sc->sem_rx, 0);
 			WR4(sc, TWIM_TASKS_STARTRX, 1);
-			mdx_sem_wait(&sc->sem_rx);
+			err = mdx_sem_timedwait(&sc->sem_rx, TWIM_TIMEOUT);
+			if (err == 0)
+				return (-1);
 
 		} else {
 			WR4(sc, TWIM_TXD_MAXCNT, msg->len);
@@ -91,13 +96,17 @@ nrf_twim_xfer(void *arg, struct i2c_msg *msgs, int len)
 
 			mdx_sem_init(&sc->sem_tx, 0);
 			WR4(sc, TWIM_TASKS_STARTTX, 1);
-			mdx_sem_wait(&sc->sem_tx);
+			err = mdx_sem_timedwait(&sc->sem_tx, TWIM_TIMEOUT);
+			if (err == 0)
+				return (-1);
 		}
 
 		if ((msg->flags & IIC_M_NOSTOP) == 0) {
 			mdx_sem_init(&sc->sem_stop, 0);
 			WR4(sc, TWIM_TASKS_STOP, 1);
-			mdx_sem_wait(&sc->sem_stop);
+			err = mdx_sem_timedwait(&sc->sem_stop, TWIM_TIMEOUT);
+			if (err == 0)
+				return (-1);
 		}
 	}
 
