@@ -31,8 +31,33 @@
 #define	MC6470_OPSTAT		0x04
 #define	MC6470_INTEN		0x06
 #define	MC6470_MODE		0x07
+#define	 MODE_OPCON_S		0
+#define	 MODE_OPCON_M		(0x3 << MODE_OPCON_S)
+#define	 MODE_OPCON_STANDBY	(0x0 << MODE_OPCON_S)
+#define	 MODE_OPCON_WAKE	(0x1 << MODE_OPCON_S)
 #define	MC6470_SRTFR		0x08
+#define	 SRTFR_RATE_S		0
+#define	 SRTFR_RATE_M		(0xf << SRTFR_RATE_S)
+#define	 SRTFR_RATE_32HZ	(0x0 << SRTFR_RATE_S)
+#define	 SRTFR_RATE_16HZ	(0x1 << SRTFR_RATE_S)
+#define	 SRTFR_RATE_8HZ		(0x2 << SRTFR_RATE_S)
+#define	 SRTFR_RATE_4HZ		(0x3 << SRTFR_RATE_S)
+#define	 SRTFR_RATE_2HZ		(0x4 << SRTFR_RATE_S)
+#define	 SRTFR_RATE_1HZ		(0x5 << SRTFR_RATE_S)
+#define	 SRTFR_RATE_05HZ	(0x6 << SRTFR_RATE_S)
+#define	 SRTFR_RATE_025HZ	(0x7 << SRTFR_RATE_S)
+#define	 SRTFR_RATE_64HZ	(0x8 << SRTFR_RATE_S)
+#define	 SRTFR_RATE_128HZ	(0x9 << SRTFR_RATE_S)
+#define	 SRTFR_RATE_256HZ	(0xa << SRTFR_RATE_S)
 #define	MC6470_TAPEN		0x09
+#define	 TAPEN_TAPXPEN		(1 << 0)
+#define	 TAPEN_TAPXNEN		(1 << 1)
+#define	 TAPEN_TAPYPEN		(1 << 2)
+#define	 TAPEN_TAPYNEN		(1 << 3)
+#define	 TAPEN_TAPZPEN		(1 << 4)
+#define	 TAPEN_TAPZNEN		(1 << 5)
+#define	 TAPEN_THRDUR		(1 << 6)
+#define	 TAPEN_TAP_EN		(1 << 7)
 #define	MC6470_TTTRX		0x0A
 #define	MC6470_TTTRY		0x0B
 #define	MC6470_TTTRZ		0x0C
@@ -43,6 +68,12 @@
 #define	MC6470_ZOUT_EX_L	0x11
 #define	MC6470_ZOUT_EX_H	0x12
 #define	MC6470_OUTCFG		0x20
+#define	 OUTCFG_RANGE_S		4
+#define	 OUTCFG_RANGE_M		(0xf << OUTCFG_RANGE_S)
+#define	 OUTCFG_RANGE_2G	(0x0 << OUTCFG_RANGE_S)
+#define	 OUTCFG_RANGE_4G	(0x1 << OUTCFG_RANGE_S)
+#define	 OUTCFG_RANGE_8G	(0x2 << OUTCFG_RANGE_S)
+#define	 OUTCFG_RANGE_16G	(0x3 << OUTCFG_RANGE_S)
 #define	MC6470_XOFFL		0x21
 #define	MC6470_XOFFH		0x22
 #define	MC6470_YOFFL		0x23
