@@ -30,6 +30,12 @@
 #define	MC6470_SR		0x03
 #define	MC6470_OPSTAT		0x04
 #define	MC6470_INTEN		0x06
+#define	 INTEN_TIXPEN		(1 << 0) /* Positive X-axis TAP interrupt en */
+#define	 INTEN_TIXNEN		(1 << 1) /* Negative X-axis TAP interrupt en */
+#define	 INTEN_TIYPEN		(1 << 2) /* Positive Y-axis TAP interrupt en */
+#define	 INTEN_TIYNEN		(1 << 3) /* Negative Y-axis TAP interrupt en */
+#define	 INTEN_TIZPEN		(1 << 4) /* Positive Z-axis TAP interrupt en */
+#define	 INTEN_TIZNEN		(1 << 5) /* Negative Z-axis TAP interrupt en */
 #define	MC6470_MODE		0x07
 #define	 MODE_OPCON_S		0
 #define	 MODE_OPCON_M		(0x3 << MODE_OPCON_S)
