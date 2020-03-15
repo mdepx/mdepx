@@ -59,4 +59,6 @@ struct nrf_gpiote_softc {
 	size_t base;
 };
 
+void nrf_gpiote_init(struct nrf_gpiote_softc *sc, uint32_t base);
+
 #endif /* !_ARM_NORDICSEMI_NRF9160_GPIOTE_H_ */
