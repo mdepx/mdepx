@@ -47,6 +47,7 @@
 #define	 CONFIG_MODE_TASK	(3 << CONFIG_MODE_S) /* Task mode */
 #define	 CONFIG_PSEL_S		8 /* GPIO number associated with SET[n], CLR[n] and OUT[n] tasks and IN[n] event */
 #define	 CONFIG_PSEL_M		(0x1f << CONFIG_PSEL_S)
+#define	 CONFIG_PSEL(n)		((n) << CONFIG_PSEL_S)
 #define	 CONFIG_POLARITY_S	16
 #define	 CONFIG_POLARITY_M	(0x3 << CONFIG_POLARITY_S)
 #define	 CONFIG_POLARITY_NONE	(0x0 << CONFIG_POLARITY_S)
@@ -55,10 +56,43 @@
 #define	 CONFIG_POLARITY_TOGGLE	(0x3 << CONFIG_POLARITY_S)
 #define	 CONFIG_OUTINIT		(1 << 20) /* Initial value of the output */
 
+#define	NRF_GPIOTE_NCONFIGS	8
+
+enum gpiote_polarity {
+	GPIOTE_POLARITY_LOTOHI,
+	GPIOTE_POLARITY_HITOLO,
+	GPIOTE_POLARITY_TOGGLE,
+};
+
+enum gpiote_mode {
+	GPIOTE_MODE_TASK,
+	GPIOTE_MODE_EVENT,
+};
+
+struct nrf_gpiote_conf {
+	enum gpiote_polarity pol;
+	enum gpiote_mode mode;
+	uint8_t pin;
+};
+
+struct nrf_gpiote_intr {
+	void (*handler) (void *arg, struct trapframe *frame, int irq);
+	void *arg;
+};
+
 struct nrf_gpiote_softc {
 	size_t base;
+	struct nrf_gpiote_intr intr[NRF_GPIOTE_NCONFIGS];
 };
 
 void nrf_gpiote_init(struct nrf_gpiote_softc *sc, uint32_t base);
+void nrf_gpiote_intr(void *arg, struct trapframe *tf, int irq);
+void nrf_gpiote_config(struct nrf_gpiote_softc *sc, uint8_t config_id,
+    struct nrf_gpiote_conf *conf);
+int nrf_gpiote_setup_intr(struct nrf_gpiote_softc *sc, int irq,
+    void (*handler) (void *arg, struct trapframe *frame, int irq),
+    void *arg);
+void nrf_gpiote_intctl(struct nrf_gpiote_softc *sc,
+    uint8_t config_id, bool enable);
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_GPIOTE_H_ */
