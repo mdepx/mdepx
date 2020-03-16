@@ -18,25 +18,19 @@ Mdepx is an operating system for embedded applications.
 - MIPS32, MIPS64
 - RISC-V rv32, rv64
 
-## Generic demo applications
+## Emulators support
   * QEMU/RISC-V rv64gc (SMP)
   * QEMU/MIPS64
   * QEMU/CHERI128
-  * HiFive Unleashed (SMP)
-  * HiFive Unleashed Monitor Core
 
 ## Featured applications (external)
   * [LTE 4G Link with nRF9160](https://github.com/machdep/nrf9160)
   * [Bluetooth LE with nRF5340](https://github.com/machdep/nrf5340)
   * CTSRD CHERI [device-model](https://github.com/CTSRD-CHERI/device-model)
-  * [Driving MIPI DSI Display with STM32F469I-DISCO](https://github.com/machdep/stm32f469i-disco-dsi)
-  * [Driving OLED display on HiFive1 board](https://github.com/machdep/hifive1-oled)
-  * GFE (Government Furnished Equipment) [Bluespec Piccolo demo](https://github.com/CTSRD-CHERI/piccolo-demo)
-  * [Driving IPS Display with PIC32MZDA Starter Kit](https://github.com/osfive/pic32mzdask-ips)
 
 # Getting started
 
-Mdepx has a python3-based build system. You have to construct a configuration file for your application. See [demo applications](https://github.com/machdep/mdepx/tree/master/demo).
+See [documentation](https://machdep.uk).
 
 # Contributing
 
