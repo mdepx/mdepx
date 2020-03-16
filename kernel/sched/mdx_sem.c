@@ -191,7 +191,7 @@ mdx_sem_post(mdx_sem_t *sem)
 	td = CONTAINER_OF(sem->td_list.next, struct thread, td_node);
 	list_remove(&td->td_node);
 
-	/* Ensure td left CPU. */
+	/* Ensure td left CPU after adding itself to the td_list. */
 	while (td->td_state != TD_STATE_ACK);
 
 	/*
