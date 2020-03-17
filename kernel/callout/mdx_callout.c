@@ -40,7 +40,8 @@
 /*
  * A hardware timer must be configured by a driver as:
  * (1) upcouning;
- * (2) free-running with automatic value reloading.
+ * (2) free-running with automatic value reloading;
+ * (3) in the SMP case it must be per-cpu timer.
  *
  * One-shot timers are not supported.
  *
@@ -109,6 +110,10 @@ mdx_callout_init(struct mdx_callout *c)
 	c->flags = 0;
 }
 
+/*
+ * Calculates amount of ticks elapsed on the timer of a current CPU
+ * since it was last configured.
+ */
 static uint32_t
 get_elapsed(uint32_t *count_saved)
 {
@@ -116,6 +121,10 @@ get_elapsed(uint32_t *count_saved)
 	uint32_t count;
 	uint32_t saved;
 	int cpuid;
+
+	KASSERT(curthread != NULL, ("curthread is NULL"));
+	KASSERT(curthread->td_critnest > 0,
+	    ("%s: Not in critical section.", __func__));
 
 	cpuid = PCPU_GET(cpuid);
 
@@ -132,6 +141,56 @@ get_elapsed(uint32_t *count_saved)
 
 	return (elapsed);
 }
+
+#ifndef MDX_SCHED_SMP
+/*
+ * Calculates amount of ticks left to run for the given callout c0.
+ * Could only be run on the same CPU where callout c0 was configured.
+ */
+uint32_t
+mdx_callout_ticks(struct mdx_callout *c0)
+{
+	uint32_t ticks_elapsed;
+	mdx_callout_t *c;
+	int cpuid;
+	int val;
+
+	critical_enter();
+
+	if ((c0->flags & CALLOUT_FLAG_ACTIVE) == 0) {
+		critical_exit();
+		return (0);
+	}
+
+	ticks_elapsed = get_elapsed(NULL);
+
+	val = 0;
+
+	cpuid = PCPU_GET(cpuid);
+
+	KASSERT(cpuid == c0->cpuid, ("Called from a wrong CPU."));
+
+	for (c = first(cpuid); c != NULL; c = next(cpuid, c)) {
+		if (ticks_elapsed >= c->ticks) {
+			if (c == c0)
+				break;
+			else {
+				ticks_elapsed -= c->ticks;
+				continue;
+			}
+		} else {
+			val += c->ticks - ticks_elapsed;
+			ticks_elapsed = 0;
+
+			if (c == c0)
+				break;
+		}
+	}
+	critical_exit();
+
+	return (val);
+}
+#endif
 
 static void
 mdx_callout_set_one(struct mdx_callout *c0)

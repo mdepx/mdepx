@@ -63,6 +63,8 @@ struct mi_timer {
 #define	MI_TIMER_EXCP		2
 };
 
+typedef struct mdx_callout mdx_callout_t;
+
 void mdx_callout_init(struct mdx_callout *c);
 
 int mdx_callout_set_ticks_locked(struct mdx_callout *c, uint32_t ticks,
@@ -83,5 +85,6 @@ uint32_t mdx_time_usec_to_ticks(uint32_t freq, uint32_t usec);
 
 uint32_t mdx_callout_usec_to_ticks(uint32_t usec);
 uint32_t mdx_time_usec_to_ticks_1mhz(uint32_t freq, uint32_t usec);
+uint32_t mdx_callout_ticks(struct mdx_callout *c);
 
 #endif /* _SYS_CALLOUT_H_ */
