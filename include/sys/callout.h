@@ -57,6 +57,7 @@ struct mi_timer {
 	uint32_t maxcnt;
 	uint32_t frequency;
 	uint32_t (*usec_to_ticks)(uint32_t freq, uint32_t usec);
+	uint32_t (*ticks_to_usec)(uint32_t freq, uint32_t ticks);
 	int state[MDX_CPU_MAX];
 #define	MI_TIMER_READY		0
 #define	MI_TIMER_RUNNING	1
@@ -84,7 +85,10 @@ int mdx_callout_cancel(struct mdx_callout *c);
 uint32_t mdx_time_usec_to_ticks(uint32_t freq, uint32_t usec);
 
 uint32_t mdx_callout_usec_to_ticks(uint32_t usec);
+uint32_t mdx_callout_ticks_to_usec(uint32_t usec);
 uint32_t mdx_time_usec_to_ticks_1mhz(uint32_t freq, uint32_t usec);
+uint32_t mdx_time_ticks_to_usec_1mhz(uint32_t freq, uint32_t ticks);
 uint32_t mdx_callout_ticks(struct mdx_callout *c);
+uint32_t mdx_callout_usec(struct mdx_callout *c);
 
 #endif /* _SYS_CALLOUT_H_ */

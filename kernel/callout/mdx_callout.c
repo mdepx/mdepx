@@ -190,6 +190,18 @@ mdx_callout_ticks(struct mdx_callout *c0)
 
 	return (val);
 }
+
+uint32_t
+mdx_callout_usec(struct mdx_callout *c0)
+{
+	uint32_t ticks;
+	uint32_t usec;
+
+	ticks = mdx_callout_ticks(c0);
+	usec = mdx_callout_ticks_to_usec(ticks);
+
+	return (usec);
+}
 #endif
 
 static void
@@ -412,10 +424,26 @@ mdx_callout_usec_to_ticks(uint32_t usec)
 	uint32_t ticks;
 
 	KASSERT(mi_tmr != NULL, ("mi timer is not registered."));
+	KASSERT(mi_tmr->usec_to_ticks != NULL,
+	    ("usec_to_ticks() is not provided"));
 
 	ticks = mi_tmr->usec_to_ticks(mi_tmr->frequency, usec);
 
 	return (ticks);
+}
+
+uint32_t
+mdx_callout_ticks_to_usec(uint32_t ticks)
+{
+	uint32_t usec;
+
+	KASSERT(mi_tmr != NULL, ("mi timer is not registered."));
+	KASSERT(mi_tmr->ticks_to_usec != NULL,
+	    ("ticks_to_usec() is not provided"));
+
+	usec = mi_tmr->ticks_to_usec(mi_tmr->frequency, ticks);
+
+	return (usec);
 }
 
 static int
@@ -430,6 +458,7 @@ mdx_callout_setup(struct mi_timer *mt)
 #ifdef MDX_CALLOUT_USEC_TO_TICKS_1MHZ
 	if (mt->frequency == 1000000) {
 		mt->usec_to_ticks = mdx_time_usec_to_ticks_1mhz;
+		mt->ticks_to_usec = mdx_time_ticks_to_usec_1mhz;
 		return (MDX_OK);
 	}
 #endif
@@ -437,6 +466,7 @@ mdx_callout_setup(struct mi_timer *mt)
 #ifdef MDX_CALLOUT_USEC_TO_TICKS
 	if (mt->frequency != 1000000) {
 		mt->usec_to_ticks = mdx_time_usec_to_ticks;
+		mt->ticks_to_usec = NULL; /* TODO */
 		return (MDX_OK);
 	}
 #endif

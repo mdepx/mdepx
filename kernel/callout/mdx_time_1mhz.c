@@ -39,3 +39,15 @@ mdx_time_usec_to_ticks_1mhz(uint32_t freq, uint32_t usec)
 
 	return (ticks);
 }
+
+uint32_t
+mdx_time_ticks_to_usec_1mhz(uint32_t freq, uint32_t ticks)
+{
+	uint32_t usec;
+
+	KASSERT(freq == 1000000, ("Invalid frequency"));
+
+	usec = ticks;
+
+	return (usec);
+}
