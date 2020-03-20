@@ -57,6 +57,8 @@
 #define	FLAG_USER		(1 << 7)
 
 /* Connect return byte 1 */
+#define	CONNECT_ACK_FLAG_S	0
+#define	CONNECT_ACK_FLAG_M	(0x1 << CONNECT_ACK_FLAG_S)
 #define	CONNECT_ACK_FLAG_SP	(1 << 0) /* Session Present */
 
 /* Connect return byte 2 */
@@ -75,4 +77,9 @@ struct mqtt_network {
 	int (*write) (struct mqtt_network *, uint8_t *, int);
 };
 
+struct mqtt_client {
+	struct mqtt_network net;
+};
+
 int mqtt_connect(struct mqtt_network *net);
+int mqtt_init(struct mqtt_client *c);
