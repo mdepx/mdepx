@@ -28,6 +28,7 @@
 #define	_LIB_MQTT_MQTT_H_
 
 #include <sys/sem.h>
+#include <sys/callout.h>
 
 /* Fixed header */
 #define	MQTT_CONTROL_S		4
@@ -83,10 +84,14 @@ struct mqtt_network {
 };
 
 struct mqtt_client {
+	struct thread *td_ping;
+	struct thread *td_recv;
 	struct mqtt_network net;
-	struct thread *td;
 	mdx_sem_t sem_sendrecv;
 	mdx_sem_t sem_connect;
+	mdx_sem_t sem_ping_req;
+	mdx_sem_t sem_ping_ack;
+	mdx_callout_t c_ping_req;
 	int connected;
 };
 
