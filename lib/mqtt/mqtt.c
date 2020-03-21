@@ -187,7 +187,10 @@ mqtt_connect(struct mqtt_client *c)
 	if (err)
 		return (-1);
 
-	/* Connect sent. Now wait the status. */
+	/*
+	 * Connect message sent.
+	 * Now wait for the connection status change.
+	 */
 
 	err = mdx_sem_timedwait(&c->sem_connect, 5000000);
 	if (err) {
