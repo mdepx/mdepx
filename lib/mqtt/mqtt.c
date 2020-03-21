@@ -165,6 +165,63 @@ handle_connack(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 	return (0);
 }
 
+static int
+handle_suback(struct mqtt_client *c, uint8_t *data, uint32_t len)
+{
+	int packet_id;
+	int n_topics;
+	int status, rem_size_expected;
+	int rem;
+	int err;
+
+	printf("sub ack received\n");
+
+	/* Read remaining */
+	err = mqtt_recv(&c->net, &data[1], 1);
+	if (err != 1) {
+		printf("%s: rem is not received\n", __func__);
+		return (-1);
+	}
+
+	rem = data[1];
+
+	n_topics = 1;
+	rem_size_expected = 2 + n_topics;
+
+	if (rem_size_expected != rem) {
+		printf("%s: invalid rem\n", __func__);
+		return (-1);
+	}
+
+	err = mqtt_recv(&c->net, &data[2], rem);
+	if (err != rem) {
+		printf("%s: invalid read\n", __func__);
+		return (-1);
+	}
+
+	packet_id = data[2] << 8;
+	packet_id |= data[3];
+	printf("%s: packet_id %d\n", __func__, packet_id);
+
+	status = data[4]; /* Status for the 1st topic */
+
+	switch (status) {
+	case 0x00:
+	case 0x01:
+	case 0x02:
+		printf("Subscribed successfully, status %x\n", status);
+		mdx_sem_post(&c->sem_subscribe);
+		return (0);
+	case 0x80:
+		return (-1);
+	default:
+		printf("invalid status: 0x%x\n", status);
+		return (-1);
+	}
+
+	return (0);
+}
+
 static void
 handle_recv(struct mqtt_client *c, uint8_t *data, uint32_t len)
 {
@@ -179,6 +236,9 @@ handle_recv(struct mqtt_client *c, uint8_t *data, uint32_t len)
 		break;
 	case CONTROL_PINGRESP:
 		handle_pingresp(c, data, len);
+		break;
+	case CONTROL_SUBACK:
+		handle_suback(c, data, len);
 		break;
 	default:
 		printf("Unknown packet received: %d\n", ctl);
@@ -233,7 +293,9 @@ mqtt_connect(struct mqtt_client *c)
 	*ptr++ = 'b';
 	*ptr++ = 'c';
 
+	mdx_sem_wait(&c->sem_sendrecv);
 	err = mqtt_send(net, data, 17);
+	mdx_sem_post(&c->sem_sendrecv);
 	if (err)
 		return (-1);
 
@@ -257,6 +319,47 @@ mqtt_connect(struct mqtt_client *c)
 	printf("%s: Timeout\n", __func__);
 
 	return (-3);
+}
+
+int
+mqtt_subscribe(struct mqtt_client *c)
+{
+	struct mqtt_network *net;
+	uint8_t data[128];
+	int err;
+
+	net = &c->net;
+
+	/* Fixed header */
+	data[0] = CONTROL_SUBSCRIBE | FLAGS_SUBSCRIBE;
+	data[1] = 8;		/* Remaining Length */
+
+	/* Variable header */
+	data[2] = 0;
+	data[3] = 10;
+
+	/* Payload */
+	data[4] = 0;
+	data[5] = 3;
+	data[6] = 'a';
+	data[7] = '/';
+	data[8] = 'b';
+	data[9] = 0;	/* QoS */
+
+	mdx_sem_wait(&c->sem_sendrecv);
+	err = mqtt_send(net, data, 10);
+	mdx_sem_post(&c->sem_sendrecv);
+
+	if (err)
+		return (-1);
+
+	err = mdx_sem_timedwait(&c->sem_subscribe, 5000000);
+	if (err) {
+		printf("%s: subscribed\n", __func__);
+		return (0);
+	}
+
+	return (-1);
 }
 
 static void
@@ -330,6 +433,7 @@ mqtt_init(struct mqtt_client *c)
 
 	mdx_sem_init(&c->sem_sendrecv, 1);
 	mdx_sem_init(&c->sem_connect, 0);
+	mdx_sem_init(&c->sem_subscribe, 0);
 	mdx_sem_init(&c->sem_ping_req, 0);
 	mdx_sem_init(&c->sem_ping_ack, 0);
 
