@@ -24,6 +24,11 @@
  * SUCH DAMAGE.
  */
 
+#ifndef	_LIB_MQTT_MQTT_H_
+#define	_LIB_MQTT_MQTT_H_
+
+#include <sys/sem.h>
+
 /* Fixed header */
 #define	MQTT_CONTROL_S		4
 #define	MQTT_CONTROL_M		(0xf << MQTT_CONTROL_S)
@@ -79,7 +84,13 @@ struct mqtt_network {
 
 struct mqtt_client {
 	struct mqtt_network net;
+	struct thread *td;
+	mdx_sem_t sem_sendrecv;
+	mdx_sem_t sem_connect;
+	int connected;
 };
 
-int mqtt_connect(struct mqtt_network *net);
+int mqtt_connect(struct mqtt_client *c);
 int mqtt_init(struct mqtt_client *c);
+
+#endif /* !_LIB_MQTT_MQTT_H_ */
