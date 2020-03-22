@@ -33,6 +33,13 @@
 /* Fixed header */
 #define	MQTT_FLAGS_S		0
 #define	 FLAGS_SUBSCRIBE	(2 << MQTT_FLAGS_S)
+#define	 FLAGS_PUBLISH_DUP	(1 << 3) /* re-delivery */
+#define	 FLAGS_PUBLISH_QOS_S	1
+#define	 FLAGS_PUBLISH_QOS(n)	((n) << FLAGS_PUBLISH_QOS_S)
+#define	 FLAGS_PUBLISH_QOS_MO	(0 << FLAGS_PUBLISH_QOS_S) /* At most once */
+#define	 FLAGS_PUBLISH_QOS_LO	(1 << FLAGS_PUBLISH_QOS_S) /* At least once */
+#define	 FLAGS_PUBLISH_QOS_EO	(2 << FLAGS_PUBLISH_QOS_S) /* Exactly once */
+#define	 FLAGS_PUBLISH_RETAIN	(1 << 0)
 #define	MQTT_CONTROL_S		4
 #define	MQTT_CONTROL_M		(0xf << MQTT_CONTROL_S)
 #define	 CONTROL_RESERVED0	(0 << MQTT_CONTROL_S)
@@ -101,5 +108,6 @@ struct mqtt_client {
 int mqtt_init(struct mqtt_client *c);
 int mqtt_connect(struct mqtt_client *c);
 int mqtt_subscribe(struct mqtt_client *c);
+int mqtt_publish(struct mqtt_client *c);
 
 #endif /* !_LIB_MQTT_MQTT_H_ */

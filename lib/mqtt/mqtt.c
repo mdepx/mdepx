@@ -166,6 +166,40 @@ handle_connack(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 }
 
 static int
+handle_publish(struct mqtt_client *c, uint8_t *data, uint32_t len)
+{
+	int err;
+	int rem;
+
+	printf("publish received, data %x\n", data[0]);
+
+	/* Read remaining */
+	err = mqtt_recv(&c->net, &data[1], 1);
+	if (err != 1) {
+		printf("%s: rem is not received\n", __func__);
+		return (-1);
+	}
+
+	rem = data[1];
+	printf("publish rem %d\n", rem);
+
+	/* Read remaining */
+	err = mqtt_recv(&c->net, &data[1], rem);
+	if (err != rem) {
+		printf("%s: rem is not received\n", __func__);
+		return (-1);
+	}
+
+#if 0
+	int i;
+	for (i = 0; i < rem + 2; i++)
+		printf("%s: data[%d] == %x\n", __func__, i, data[i]);
+#endif
+
+	return (0);
+}
+
+static int
 handle_suback(struct mqtt_client *c, uint8_t *data, uint32_t len)
 {
 	int packet_id;
@@ -240,8 +274,14 @@ handle_recv(struct mqtt_client *c, uint8_t *data, uint32_t len)
 	case CONTROL_SUBACK:
 		handle_suback(c, data, len);
 		break;
+	case CONTROL_PUBLISH:
+		handle_publish(c, data, len);
+		break;
+	case CONTROL_PUBREL:
+		printf("PUBREL received\n");
+		break;
 	default:
-		printf("Unknown packet received: %d\n", ctl);
+		printf("Unknown packet received: 0x%x\n", ctl);
 		break;
 	}
 }
@@ -360,6 +400,44 @@ mqtt_subscribe(struct mqtt_client *c)
 	}
 
 	return (-1);
+}
+
+int
+mqtt_publish(struct mqtt_client *c)
+{
+	uint8_t data[128];
+	int err;
+
+	/* Fixed header */
+	data[0] = CONTROL_PUBLISH | FLAGS_PUBLISH_QOS(0);
+	data[1] = 12;		/* Remaining Length */
+
+	/* Variable header: Topic Name */
+	data[2] = 0;
+	data[3] = 3;
+	data[4] = 'a';
+	data[5] = '/';
+	data[6] = 'b';
+
+	/* Variable header: Packet Identifier */
+	data[7] = 0;
+	data[8] = 10;
+
+	/* Payload */
+	data[9] = 'h';
+	data[10] = 'e';
+	data[11] = 'l';
+	data[12] = 'l';
+	data[13] = 'o';
+
+	mdx_sem_wait(&c->sem_sendrecv);
+	err = mqtt_send(&c->net, data, 14);
+	mdx_sem_post(&c->sem_sendrecv);
+
+	if (err)
+		return (-1);
+
+	return (0);
 }
 
 static void
