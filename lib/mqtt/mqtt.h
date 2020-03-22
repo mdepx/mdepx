@@ -113,6 +113,7 @@ struct mqtt_client {
 
 enum mqtt_msg_state {
 	MSG_STATE_PUBLISH,
+	MSG_STATE_PUBACK,
 	MSG_STATE_PUBREC,
 	MSG_STATE_PUBREL,
 	MSG_STATE_PUBCOMP,
@@ -126,7 +127,7 @@ struct mqtt_message {
 	int qos;
 	struct entry node;
 	int packet_id;
-	int state;
+	enum mqtt_msg_state state;
 	mdx_sem_t complete;
 };
 
