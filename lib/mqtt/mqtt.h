@@ -37,6 +37,7 @@
 #define	 FLAGS_SUBSCRIBE	(2 << MQTT_FLAGS_S)
 #define	 FLAGS_PUBLISH_DUP	(1 << 3) /* re-delivery */
 #define	 FLAGS_PUBLISH_QOS_S	1
+#define	 FLAGS_PUBLISH_QOS_M	(0x3 << FLAGS_PUBLISH_QOS_S)
 #define	 FLAGS_PUBLISH_QOS(n)	((n) << FLAGS_PUBLISH_QOS_S)
 #define	 FLAGS_PUBLISH_QOS_MO	(0 << FLAGS_PUBLISH_QOS_S) /* At most once */
 #define	 FLAGS_PUBLISH_QOS_LO	(1 << FLAGS_PUBLISH_QOS_S) /* At least once */
