@@ -323,7 +323,9 @@ handle_connack(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 static int
 handle_publish(struct mqtt_client *c, uint8_t *data, uint32_t len)
 {
+	struct mqtt_request m;
 	int flags;
+	int pos;
 	int qos;
 	int err;
 	int rem;
@@ -349,17 +351,25 @@ handle_publish(struct mqtt_client *c, uint8_t *data, uint32_t len)
 	printf("publish rem %d\n", rem);
 
 	/* Read remaining */
-	err = mqtt_recv(&c->net, &data[1], rem);
+	err = mqtt_recv(&c->net, &data[2], rem);
 	if (err != rem) {
 		printf("%s: rem is not received\n", __func__);
 		return (-1);
 	}
 
-#if 0
-	int i;
-	for (i = 0; i < rem + 2; i++)
-		printf("%s: data[%d] == %x\n", __func__, i, data[i]);
-#endif
+	if (c->cb) {
+		m.topic_len = data[2] << 8 | data[3];
+		m.topic = &data[4];
+		pos = 4 + m.topic_len;
+		if (qos == 1 || qos == 2) {
+			m.packet_id = data[pos++] << 8;
+			m.packet_id |= data[pos++];
+		} else
+			m.packet_id = 0;
+		m.data = &data[pos];
+		m.data_len = rem - m.topic_len - 4;
+		c->cb(c, &m);
+	}
 
 	return (0);
 }

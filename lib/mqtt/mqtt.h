@@ -95,22 +95,6 @@ struct mqtt_network {
 	int (*write) (struct mqtt_network *, uint8_t *, int);
 };
 
-struct mqtt_client {
-	struct thread *td_ping;
-	struct thread *td_recv;
-	struct mqtt_network net;
-	mdx_sem_t sem_sendrecv;
-	mdx_sem_t sem_connect;
-	mdx_sem_t sem_ping_req;
-	mdx_sem_t sem_ping_ack;
-	mdx_callout_t c_ping_req;
-	int connected;
-
-	struct mdx_mutex msg_mtx;
-	struct entry msg_list;
-	int next_id;
-};
-
 enum mqtt_msg_state {
 	MSG_STATE_PUBLISH,
 	MSG_STATE_PUBACK,
@@ -137,6 +121,22 @@ struct mqtt_request {
 	int type;
 #define	REQUEST_TYPE_SUBSCRIBE	0
 #define	REQUEST_TYPE_PUBLISH	1
+};
+
+struct mqtt_client {
+	struct thread *td_ping;
+	struct thread *td_recv;
+	struct mqtt_network net;
+	mdx_sem_t sem_sendrecv;
+	mdx_sem_t sem_connect;
+	mdx_sem_t sem_ping_req;
+	mdx_sem_t sem_ping_ack;
+	mdx_callout_t c_ping_req;
+	int connected;
+	void (*cb)(struct mqtt_client *c, struct mqtt_request *m);
+	struct mdx_mutex msg_mtx;
+	struct entry msg_list;
+	int next_id;
 };
 
 int mqtt_init(struct mqtt_client *c);
