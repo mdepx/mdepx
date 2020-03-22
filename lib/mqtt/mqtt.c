@@ -447,40 +447,45 @@ handle_suback(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 	return (0);
 }
 
-static void
+static int
 handle_recv(struct mqtt_client *c, uint8_t *data, uint32_t len)
 {
 	uint8_t ctl;
+	int err;
 
 	ctl = data[0] & MQTT_CONTROL_M;
 	/* TODO: verify lsb */
 
+	err = 0;
+
 	switch (ctl) {
 	case CONTROL_CONNACK:
-		handle_connack(c, data, len);
+		err = handle_connack(c, data, len);
 		break;
 	case CONTROL_PINGRESP:
-		handle_pingresp(c, data, len);
+		err = handle_pingresp(c, data, len);
 		break;
 	case CONTROL_SUBACK:
-		handle_suback(c, data, len);
+		err = handle_suback(c, data, len);
 		break;
 	case CONTROL_PUBLISH:
-		handle_publish(c, data, len);
+		err = handle_publish(c, data, len);
 		break;
 	case CONTROL_PUBACK:
-		handle_puback(c, data, len);
+		err = handle_puback(c, data, len);
 		break;
 	case CONTROL_PUBREC:
-		handle_pubrec(c, data, len);
+		err = handle_pubrec(c, data, len);
 		break;
 	case CONTROL_PUBCOMP:
-		handle_pubcomp(c, data, len);
+		err = handle_pubcomp(c, data, len);
 		break;
 	default:
 		printf("Unknown packet received: 0x%x\n", ctl);
 		break;
 	}
+
+	return (err);
 }
 
 static uint8_t *
@@ -601,6 +606,7 @@ mqtt_subscribe(struct mqtt_client *c, struct mqtt_request *s)
 	mdx_sem_post(&c->sem_sendrecv);
 
 	if (err) {
+		/* TODO: close connection */
 		mdx_mutex_lock(&c->msg_mtx);
 		list_remove(&s->node);
 		mdx_mutex_unlock(&c->msg_mtx);
@@ -624,6 +630,7 @@ mqtt_subscribe(struct mqtt_client *c, struct mqtt_request *s)
 		};
 	} else {
 		/* Timeout */
+		/* TODO: close connection */
 		retval = -1;
 	}
 
@@ -689,6 +696,7 @@ mqtt_publish(struct mqtt_client *c, struct mqtt_request *m)
 	mdx_sem_post(&c->sem_sendrecv);
 	if (err) {
 		/* Could not send packet */
+		/* TODO: close connection */
 		if (m->qos == 1 || m->qos == 2) {
 			mdx_mutex_lock(&c->msg_mtx);
 			list_remove(&m->node);
@@ -707,6 +715,7 @@ mqtt_publish(struct mqtt_client *c, struct mqtt_request *m)
 		retval = 0;
 	} else {
 		/* Timeout. */
+		/* TODO: close connection */
 		retval = -1;
 	}
 
@@ -775,11 +784,15 @@ mqtt_thread_recv(void *arg)
 			break;
 		}
 		if (err == 1) {
-			handle_recv(c, data, 128);
+			err = handle_recv(c, data, 128);
+			if (err)
+				break;
 			mqtt_resched_ping(c);
 		}
 		mdx_usleep(1000000);
 	}
+
+	/* TODO: close connection here */
 }
 
 int
