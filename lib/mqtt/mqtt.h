@@ -29,6 +29,8 @@
 
 #include <sys/sem.h>
 #include <sys/callout.h>
+#include <sys/mutex.h>
+#include <sys/list.h>
 
 /* Fixed header */
 #define	MQTT_FLAGS_S		0
@@ -103,11 +105,34 @@ struct mqtt_client {
 	mdx_sem_t sem_ping_ack;
 	mdx_callout_t c_ping_req;
 	int connected;
+
+	struct mdx_mutex msg_mtx;
+	struct entry msg_list;
+	int next_id;
+};
+
+enum mqtt_msg_state {
+	MSG_STATE_PUBLISH,
+	MSG_STATE_PUBREC,
+	MSG_STATE_PUBREL,
+	MSG_STATE_PUBCOMP,
+	MSG_STATE_SUBSCRIBE,
+	MSG_STATE_SUBACK,
+};
+
+struct mqtt_message {
+	void *msg;
+	int len;
+	int qos;
+	struct entry node;
+	int packet_id;
+	int state;
+	mdx_sem_t complete;
 };
 
 int mqtt_init(struct mqtt_client *c);
 int mqtt_connect(struct mqtt_client *c);
 int mqtt_subscribe(struct mqtt_client *c);
-int mqtt_publish(struct mqtt_client *c);
+int mqtt_publish(struct mqtt_client *c, struct mqtt_message *m);
 
 #endif /* !_LIB_MQTT_MQTT_H_ */

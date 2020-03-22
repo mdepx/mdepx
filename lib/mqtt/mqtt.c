@@ -30,6 +30,32 @@
 
 #include "mqtt.h"
 
+static struct mqtt_message *
+first(struct mqtt_client *c)
+{
+	struct mqtt_message *m;
+
+	if (list_empty(&c->msg_list))
+		return (NULL);
+
+	m = CONTAINER_OF(c->msg_list.next, struct mqtt_message, node);
+
+	return (m);
+}
+
+static struct mqtt_message *
+next(struct mqtt_client *c, struct mqtt_message *m0)
+{
+	struct mqtt_message *m;
+
+	if (m0->node.next == &c->msg_list)
+		return (NULL);
+
+	m = CONTAINER_OF(m0->node.next, struct mqtt_message, node);
+
+	return (m);
+}
+
 static void
 mqtt_ping_req(void *arg)
 {
@@ -46,7 +72,7 @@ mqtt_resched_ping(struct mqtt_client *c)
 
 	critical_enter();
 	mdx_callout_cancel(&c->c_ping_req);
-	mdx_callout_set(&c->c_ping_req, 5000000, mqtt_ping_req, c);
+	mdx_callout_set(&c->c_ping_req, 20000000, mqtt_ping_req, c);
 	critical_exit();
 }
 
@@ -103,6 +129,57 @@ handle_pingresp(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 	}
 
 	mdx_sem_post(&c->sem_ping_ack);
+
+	return (0);
+}
+
+static int
+handle_puback(struct mqtt_client *c, uint8_t *buf, uint32_t len)
+{
+	struct mqtt_network *net;
+	int ret, rem;
+	int err;
+
+	net = &c->net;
+
+	printf("pub ack received\n");
+
+	/* Read remaining */
+	err = mqtt_recv(net, &buf[1], 1);
+	if (err != 1) {
+		printf("%s: rem is not received\n", __func__);
+		return (-1);
+	}
+
+	rem = buf[1];
+	if (rem != 2) {
+		printf("%s: invalid puback received\n", __func__);
+		return (-1);
+	}
+
+	/* Read the rest */
+	ret = net->read(net, &buf[2], 2);
+	if (ret != 2) {
+		printf("%s: invalid read\n", __func__);
+		return (-1);
+	}
+
+	struct mqtt_message *m;
+	int packet_id;
+
+	packet_id = buf[2] << 8 | buf[3];
+	mdx_mutex_lock(&c->msg_mtx);
+	for (m = first(c); m != NULL; m = next(c, m)) {
+		if (m->packet_id == packet_id) {
+			/* Found */
+			if (m->state == 0 && m->qos == 1) {
+				m->state = 1;
+				mdx_sem_post(&m->complete);
+				break;
+			}
+		}
+	}
+	mdx_mutex_unlock(&c->msg_mtx);
 
 	return (0);
 }
@@ -277,8 +354,14 @@ handle_recv(struct mqtt_client *c, uint8_t *data, uint32_t len)
 	case CONTROL_PUBLISH:
 		handle_publish(c, data, len);
 		break;
-	case CONTROL_PUBREL:
-		printf("PUBREL received\n");
+	case CONTROL_PUBACK:
+		handle_puback(c, data, len);
+		break;
+	case CONTROL_PUBREC:
+		printf("PUBREC received\n");
+		break;
+	case CONTROL_PUBCOMP:
+		printf("PUBCOMP received\n");
 		break;
 	default:
 		printf("Unknown packet received: 0x%x\n", ctl);
@@ -403,13 +486,18 @@ mqtt_subscribe(struct mqtt_client *c)
 }
 
 int
-mqtt_publish(struct mqtt_client *c)
+mqtt_publish(struct mqtt_client *c, struct mqtt_message *m)
 {
 	uint8_t data[128];
+	int retval;
 	int err;
 
+	mdx_sem_init(&m->complete, 0);
+
+	/* TODO: verify QoS */
+
 	/* Fixed header */
-	data[0] = CONTROL_PUBLISH | FLAGS_PUBLISH_QOS(0);
+	data[0] = CONTROL_PUBLISH | FLAGS_PUBLISH_QOS(m->qos);
 	data[1] = 12;		/* Remaining Length */
 
 	/* Variable header: Topic Name */
@@ -420,8 +508,20 @@ mqtt_publish(struct mqtt_client *c)
 	data[6] = 'b';
 
 	/* Variable header: Packet Identifier */
-	data[7] = 0;
-	data[8] = 10;
+	switch (m->qos) {
+	case 0:
+		data[7] = 0;
+		data[8] = 0; /* must not be used if qos == 0 */
+		break;
+	case 1:
+	case 2:
+		m->packet_id = c->next_id++;
+		data[7] = m->packet_id >> 8;
+		data[8] = m->packet_id & 0xff;
+		break;
+	default:
+		return (-1);
+	};
 
 	/* Payload */
 	data[9] = 'h';
@@ -430,14 +530,44 @@ mqtt_publish(struct mqtt_client *c)
 	data[12] = 'l';
 	data[13] = 'o';
 
+	if (m->qos == 1 || m->qos == 2) {
+		m->state = 0;
+		mdx_mutex_lock(&c->msg_mtx);
+		list_append(&c->msg_list, &m->node);
+		mdx_mutex_unlock(&c->msg_mtx);
+	};
+
 	mdx_sem_wait(&c->sem_sendrecv);
 	err = mqtt_send(&c->net, data, 14);
 	mdx_sem_post(&c->sem_sendrecv);
-
-	if (err)
+	if (err) {
+		/* Could not send packet */
+		if (m->qos == 1 || m->qos == 2) {
+			mdx_mutex_lock(&c->msg_mtx);
+			list_remove(&m->node);
+			mdx_mutex_unlock(&c->msg_mtx);
+		}
 		return (-1);
+	}
 
-	return (0);
+	/* Packet sent */
+	if (m->qos == 0)
+		return (0);
+
+	err = mdx_sem_timedwait(&m->complete, 5000000);
+	if (err) {
+		/* Message sent successfully. */
+		retval = 0;
+	} else {
+		/* Timeout. */
+		retval = -1;
+	}
+
+	mdx_mutex_lock(&c->msg_mtx);
+	list_remove(&m->node);
+	mdx_mutex_unlock(&c->msg_mtx);
+
+	return (retval);
 }
 
 static void
@@ -517,6 +647,10 @@ mqtt_init(struct mqtt_client *c)
 
 	mdx_callout_init(&c->c_ping_req);
 
+	mdx_mutex_init(&c->msg_mtx);
+	list_init(&c->msg_list);
+
+	c->next_id = 1;
 	c->connected = 0;
 	c->td_recv = mdx_thread_create("mqtt recv", 1, 0, 8192,
 	    mqtt_thread_recv, c);
