@@ -122,6 +122,15 @@ enum mqtt_msg_state {
 	MSG_STATE_SUBACK,
 };
 
+struct mqtt_subscribe {
+	void *topic;
+	int topic_len;
+	int qos;
+
+	/* Private */
+	struct entry node;
+};
+
 struct mqtt_message {
 	void *data;
 	int data_len;
@@ -136,9 +145,21 @@ struct mqtt_message {
 	mdx_sem_t complete;
 };
 
+struct mqtt_request {
+	int type;
+	struct entry node;
+	int packet_id;
+	enum mqtt_msg_state state;
+	mdx_sem_t complete;
+#define	REQUEST_TYPE_SUBSCRIBE	0
+#define	REQUEST_TYPE_PUBLISH	1
+	struct mqtt_subscribe *s;
+	struct mqtt_message *m;
+};
+
 int mqtt_init(struct mqtt_client *c);
 int mqtt_connect(struct mqtt_client *c);
-int mqtt_subscribe(struct mqtt_client *c);
+int mqtt_subscribe(struct mqtt_client *c, struct mqtt_subscribe *s);
 int mqtt_publish(struct mqtt_client *c, struct mqtt_message *m);
 
 #endif /* !_LIB_MQTT_MQTT_H_ */

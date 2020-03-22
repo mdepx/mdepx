@@ -516,32 +516,32 @@ mqtt_connect(struct mqtt_client *c)
 }
 
 int
-mqtt_subscribe(struct mqtt_client *c)
+mqtt_subscribe(struct mqtt_client *c, struct mqtt_subscribe *s)
 {
 	struct mqtt_network *net;
 	uint8_t data[128];
+	int pos;
 	int err;
 
 	net = &c->net;
-
-	/* Fixed header */
-	data[0] = CONTROL_SUBSCRIBE | FLAGS_SUBSCRIBE;
-	data[1] = 8;		/* Remaining Length */
 
 	/* Variable header */
 	data[2] = 0;
 	data[3] = 10;
 
 	/* Payload */
-	data[4] = 0;
-	data[5] = 3;
-	data[6] = 'a';
-	data[7] = '/';
-	data[8] = 'b';
-	data[9] = 0;	/* QoS */
+	data[4] = s->topic_len >> 8;
+	data[5] = s->topic_len & 0xff;
+	memcpy(&data[6], s->topic, s->topic_len);
+	pos = 6 + s->topic_len;
+	data[pos++] = s->qos;
+
+	/* Fixed header */
+	data[0] = CONTROL_SUBSCRIBE | FLAGS_SUBSCRIBE;
+	data[1] = (pos - 2);	/* Remaining Length */
 
 	mdx_sem_wait(&c->sem_sendrecv);
-	err = mqtt_send(net, data, 10);
+	err = mqtt_send(net, data, pos);
 	mdx_sem_post(&c->sem_sendrecv);
 
 	if (err)
