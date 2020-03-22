@@ -323,10 +323,20 @@ handle_connack(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 static int
 handle_publish(struct mqtt_client *c, uint8_t *data, uint32_t len)
 {
+	int flags;
+	int qos;
 	int err;
 	int rem;
 
-	printf("publish received, data %x\n", data[0]);
+	flags = data[0] & 0xf;
+	if (flags & FLAGS_PUBLISH_DUP)
+		printf("DUP flag set\n");
+	if (flags & FLAGS_PUBLISH_RETAIN)
+		printf("RETAIN flag set\n");
+
+	qos = (flags & FLAGS_PUBLISH_QOS_M) >> FLAGS_PUBLISH_QOS_S;
+
+	printf("publish received, qos %d\n", qos);
 
 	/* Read remaining len */
 	err = mqtt_recv(&c->net, &data[1], 1);
@@ -588,9 +598,8 @@ mqtt_publish(struct mqtt_client *c, struct mqtt_message *m)
 	data[0] = CONTROL_PUBLISH | FLAGS_PUBLISH_QOS(m->qos);
 	data[1] = (pos - 2);	/* Remaining Length */
 
-	mdx_sem_init(&m->complete, 0);
-
 	if (m->qos == 1 || m->qos == 2) {
+		mdx_sem_init(&m->complete, 0);
 		m->state = MSG_STATE_PUBLISH;
 		mdx_mutex_lock(&c->msg_mtx);
 		list_append(&c->msg_list, &m->node);
