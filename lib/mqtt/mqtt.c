@@ -746,7 +746,6 @@ mqtt_init(struct mqtt_client *c)
 
 	mdx_sem_init(&c->sem_sendrecv, 1);
 	mdx_sem_init(&c->sem_connect, 0);
-	mdx_sem_init(&c->sem_subscribe, 0);
 	mdx_sem_init(&c->sem_ping_req, 0);
 	mdx_sem_init(&c->sem_ping_ack, 0);
 

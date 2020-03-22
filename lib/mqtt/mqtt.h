@@ -101,7 +101,6 @@ struct mqtt_client {
 	struct mqtt_network net;
 	mdx_sem_t sem_sendrecv;
 	mdx_sem_t sem_connect;
-	mdx_sem_t sem_subscribe;
 	mdx_sem_t sem_ping_req;
 	mdx_sem_t sem_ping_ack;
 	mdx_callout_t c_ping_req;
