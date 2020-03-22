@@ -118,9 +118,6 @@ struct mqtt_request {
 	int packet_id;
 	enum mqtt_msg_state state;
 	mdx_sem_t complete;
-	int type;
-#define	REQUEST_TYPE_SUBSCRIBE	0
-#define	REQUEST_TYPE_PUBLISH	1
 };
 
 struct mqtt_client {

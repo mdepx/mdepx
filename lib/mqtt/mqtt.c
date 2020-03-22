@@ -223,6 +223,31 @@ mqtt_send_pubrel(struct mqtt_client *c, struct mqtt_request *m)
 }
 
 static int
+mqtt_send_puback(struct mqtt_client *c, struct mqtt_request *m)
+{
+	uint8_t data[128];
+	int err;
+
+	printf("%s\n", __func__);
+
+	data[0] = CONTROL_PUBACK;
+	data[1] = 2;		/* Remaining Length */
+
+	/* Variable header */
+	data[2] = m->packet_id >> 8;
+	data[3] = m->packet_id & 0xff;
+
+	mdx_sem_wait(&c->sem_sendrecv);
+	err = mqtt_send(&c->net, data, 4);
+	mdx_sem_post(&c->sem_sendrecv);
+
+	if (err)
+		return (-1);
+
+	return (0);
+}
+
+static int
 handle_pubrec(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 {
 	struct mqtt_request *m;
@@ -357,18 +382,25 @@ handle_publish(struct mqtt_client *c, uint8_t *data, uint32_t len)
 		return (-1);
 	}
 
-	if (c->cb) {
-		m.topic_len = data[2] << 8 | data[3];
-		m.topic = &data[4];
-		pos = 4 + m.topic_len;
-		if (qos == 1 || qos == 2) {
-			m.packet_id = data[pos++] << 8;
-			m.packet_id |= data[pos++];
-		} else
-			m.packet_id = 0;
-		m.data = &data[pos];
-		m.data_len = rem - m.topic_len - 4;
+	m.topic_len = data[2] << 8 | data[3];
+	m.topic = &data[4];
+	pos = 4 + m.topic_len;
+	if (qos == 1 || qos == 2) {
+		m.packet_id = data[pos++] << 8;
+		m.packet_id |= data[pos++];
+	} else
+		m.packet_id = 0;
+	m.data = &data[pos];
+	m.data_len = rem - m.topic_len - 4;
+
+	if (c->cb)
 		c->cb(c, &m);
+
+	if (qos == 1)
+		mqtt_send_puback(c, &m);
+
+	if (qos == 2) {
+		/* No support */
 	}
 
 	return (0);
@@ -537,7 +569,9 @@ mqtt_subscribe(struct mqtt_client *c, struct mqtt_request *s)
 
 	net = &c->net;
 
-	s->type = REQUEST_TYPE_SUBSCRIBE;
+	if (s->qos != 0 && s->qos != 1)
+		return (-1);
+
 	s->packet_id = c->next_id++; /* Use atomics ? */
 
 	/* Variable header */
@@ -611,8 +645,6 @@ mqtt_publish(struct mqtt_client *c, struct mqtt_request *m)
 	if (m->topic == NULL || m->topic_len == 0 ||
 	    m->data == NULL || m->data_len == 0)
 		return (-1);
-
-	m->type = REQUEST_TYPE_PUBLISH;
 
 	/* Variable header: Topic details */
 	data[2] = m->topic_len >> 8;
