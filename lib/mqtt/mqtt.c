@@ -30,28 +30,28 @@
 
 #include "mqtt.h"
 
-static struct mqtt_message *
+static struct mqtt_request *
 msg_first(struct mqtt_client *c)
 {
-	struct mqtt_message *m;
+	struct mqtt_request *m;
 
 	if (list_empty(&c->msg_list))
 		return (NULL);
 
-	m = CONTAINER_OF(c->msg_list.next, struct mqtt_message, node);
+	m = CONTAINER_OF(c->msg_list.next, struct mqtt_request, node);
 
 	return (m);
 }
 
-static struct mqtt_message *
-msg_next(struct mqtt_client *c, struct mqtt_message *m0)
+static struct mqtt_request *
+msg_next(struct mqtt_client *c, struct mqtt_request *m0)
 {
-	struct mqtt_message *m;
+	struct mqtt_request *m;
 
 	if (m0->node.next == &c->msg_list)
 		return (NULL);
 
-	m = CONTAINER_OF(m0->node.next, struct mqtt_message, node);
+	m = CONTAINER_OF(m0->node.next, struct mqtt_request, node);
 
 	return (m);
 }
@@ -169,7 +169,7 @@ read_msg(struct mqtt_client *c, uint8_t *buf, uint32_t len,
 static int
 handle_puback(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 {
-	struct mqtt_message *m;
+	struct mqtt_request *m;
 	int packet_id;
 	int err;
 
@@ -198,7 +198,7 @@ handle_puback(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 }
 
 static int
-mqtt_send_pubrel(struct mqtt_client *c, struct mqtt_message *m)
+mqtt_send_pubrel(struct mqtt_client *c, struct mqtt_request *m)
 {
 	uint8_t data[128];
 	int err;
@@ -225,7 +225,7 @@ mqtt_send_pubrel(struct mqtt_client *c, struct mqtt_message *m)
 static int
 handle_pubrec(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 {
-	struct mqtt_message *m;
+	struct mqtt_request *m;
 	int packet_id;
 	int err;
 
@@ -255,7 +255,7 @@ handle_pubrec(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 static int
 handle_pubcomp(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 {
-	struct mqtt_message *m;
+	struct mqtt_request *m;
 	int packet_id;
 	int err;
 
@@ -367,6 +367,7 @@ handle_publish(struct mqtt_client *c, uint8_t *data, uint32_t len)
 static int
 handle_suback(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 {
+	struct mqtt_request *m;
 	int packet_id;
 	int n_topics;
 	int status, rem_size_expected;
@@ -385,21 +386,21 @@ handle_suback(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 	packet_id |= buf[3];
 	printf("%s: packet_id %d\n", __func__, packet_id);
 
-	status = buf[4]; /* Status for the 1st topic */
+	status = buf[4]; /* Subscription result of the 1st topic. */
 
-	switch (status) {
-	case 0x00:
-	case 0x01:
-	case 0x02:
-		printf("Subscribed successfully, status %x\n", status);
-		mdx_sem_post(&c->sem_subscribe);
-		return (0);
-	case 0x80:
-		return (-1);
-	default:
-		printf("invalid status: 0x%x\n", status);
-		return (-1);
+	mdx_mutex_lock(&c->msg_mtx);
+	for (m = msg_first(c); m != NULL; m = msg_next(c, m)) {
+		if (m->packet_id == packet_id) {
+			/* Found */
+			if (m->state == MSG_STATE_SUBSCRIBE) {
+				m->state = MSG_STATE_SUBACK;
+				m->error = status;
+				mdx_sem_post(&m->complete);
+				break;
+			}
+		}
 	}
+	mdx_mutex_unlock(&c->msg_mtx);
 
 	return (0);
 }
@@ -516,18 +517,22 @@ mqtt_connect(struct mqtt_client *c)
 }
 
 int
-mqtt_subscribe(struct mqtt_client *c, struct mqtt_subscribe *s)
+mqtt_subscribe(struct mqtt_client *c, struct mqtt_request *s)
 {
 	struct mqtt_network *net;
 	uint8_t data[128];
+	int retval;
 	int pos;
 	int err;
 
 	net = &c->net;
 
+	s->type = REQUEST_TYPE_SUBSCRIBE;
+	s->packet_id = c->next_id++; /* Use atomics ? */
+
 	/* Variable header */
-	data[2] = 0;
-	data[3] = 10;
+	data[2] = s->packet_id >> 8;
+	data[3] = s->packet_id & 0xff;
 
 	/* Payload */
 	data[4] = s->topic_len >> 8;
@@ -540,24 +545,53 @@ mqtt_subscribe(struct mqtt_client *c, struct mqtt_subscribe *s)
 	data[0] = CONTROL_SUBSCRIBE | FLAGS_SUBSCRIBE;
 	data[1] = (pos - 2);	/* Remaining Length */
 
+	mdx_sem_init(&s->complete, 0);
+
+	s->state = MSG_STATE_SUBSCRIBE;
+	mdx_mutex_lock(&c->msg_mtx);
+	list_append(&c->msg_list, &s->node);
+	mdx_mutex_unlock(&c->msg_mtx);
+
 	mdx_sem_wait(&c->sem_sendrecv);
 	err = mqtt_send(net, data, pos);
 	mdx_sem_post(&c->sem_sendrecv);
 
-	if (err)
-		return (-1);
-
-	err = mdx_sem_timedwait(&c->sem_subscribe, 5000000);
 	if (err) {
-		printf("%s: subscribed\n", __func__);
-		return (0);
+		mdx_mutex_lock(&c->msg_mtx);
+		list_remove(&s->node);
+		mdx_mutex_unlock(&c->msg_mtx);
+		return (-1);
 	}
 
-	return (-1);
+	err = mdx_sem_timedwait(&s->complete, 5000000);
+	if (err) {
+		switch (s->error) {
+		case 0x00:
+		case 0x01:
+		case 0x02:
+			printf("Subscribed successfully\n");
+			retval = 0;
+			break;
+		case 0x80:
+			retval = -2;
+			break;
+		default:
+			retval = -1;
+		};
+	} else {
+		/* Timeout */
+		retval = -1;
+	}
+
+	mdx_mutex_lock(&c->msg_mtx);
+	list_remove(&s->node);
+	mdx_mutex_unlock(&c->msg_mtx);
+
+	return (retval);
 }
 
 int
-mqtt_publish(struct mqtt_client *c, struct mqtt_message *m)
+mqtt_publish(struct mqtt_client *c, struct mqtt_request *m)
 {
 	uint8_t data[128];
 	int retval;
@@ -567,6 +601,8 @@ mqtt_publish(struct mqtt_client *c, struct mqtt_message *m)
 	if (m->topic == NULL || m->topic_len == 0 ||
 	    m->data == NULL || m->data_len == 0)
 		return (-1);
+
+	m->type = REQUEST_TYPE_PUBLISH;
 
 	/* Variable header: Topic details */
 	data[2] = m->topic_len >> 8;
