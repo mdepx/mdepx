@@ -185,6 +185,133 @@ handle_puback(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 }
 
 static int
+mqtt_send_pubrel(struct mqtt_client *c, struct mqtt_message *m)
+{
+	uint8_t data[128];
+	int err;
+
+	printf("%s\n", __func__);
+
+	data[0] = CONTROL_PUBREL | 2;
+	data[1] = 2;		/* Remaining Length */
+
+	/* Variable header */
+	data[2] = m->packet_id >> 8;
+	data[3] = m->packet_id & 0xff;
+
+	mdx_sem_wait(&c->sem_sendrecv);
+	err = mqtt_send(&c->net, data, 4);
+	mdx_sem_post(&c->sem_sendrecv);
+
+	if (err)
+		return (-1);
+
+	return (0);
+}
+
+static int
+handle_pubrec(struct mqtt_client *c, uint8_t *buf, uint32_t len)
+{
+	struct mqtt_network *net;
+	int ret, rem;
+	int err;
+
+	net = &c->net;
+
+	printf("pub rec received\n");
+
+	/* Read remaining */
+	err = mqtt_recv(net, &buf[1], 1);
+	if (err != 1) {
+		printf("%s: rem is not received\n", __func__);
+		return (-1);
+	}
+
+	rem = buf[1];
+	if (rem != 2) {
+		printf("%s: invalid pubrec received\n", __func__);
+		return (-1);
+	}
+
+	/* Read the rest */
+	ret = net->read(net, &buf[2], 2);
+	if (ret != 2) {
+		printf("%s: invalid read\n", __func__);
+		return (-1);
+	}
+
+	struct mqtt_message *m;
+	int packet_id;
+
+	packet_id = buf[2] << 8 | buf[3];
+	mdx_mutex_lock(&c->msg_mtx);
+	for (m = first(c); m != NULL; m = next(c, m)) {
+		if (m->packet_id == packet_id) {
+			/* Found */
+			if (m->state == 0 && m->qos == 2) {
+				m->state = 1;
+				mqtt_send_pubrel(c, m);
+				break;
+			}
+		}
+	}
+	mdx_mutex_unlock(&c->msg_mtx);
+
+	return (0);
+}
+
+static int
+handle_pubcomp(struct mqtt_client *c, uint8_t *buf, uint32_t len)
+{
+	struct mqtt_network *net;
+	int ret, rem;
+	int err;
+
+	net = &c->net;
+
+	printf("pub comp received\n");
+
+	/* Read remaining */
+	err = mqtt_recv(net, &buf[1], 1);
+	if (err != 1) {
+		printf("%s: rem is not received\n", __func__);
+		return (-1);
+	}
+
+	rem = buf[1];
+	if (rem != 2) {
+		printf("%s: invalid pubrec received\n", __func__);
+		return (-1);
+	}
+
+	/* Read the rest */
+	ret = net->read(net, &buf[2], 2);
+	if (ret != 2) {
+		printf("%s: invalid read\n", __func__);
+		return (-1);
+	}
+
+	struct mqtt_message *m;
+	int packet_id;
+
+	packet_id = buf[2] << 8 | buf[3];
+	mdx_mutex_lock(&c->msg_mtx);
+	for (m = first(c); m != NULL; m = next(c, m)) {
+		if (m->packet_id == packet_id) {
+			/* Found */
+			if (m->state == 1 && m->qos == 2) {
+				m->state = 2;
+				mdx_sem_post(&m->complete);
+				break;
+			}
+		}
+	}
+	mdx_mutex_unlock(&c->msg_mtx);
+
+	return (0);
+}
+
+static int
 handle_connack(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 {
 	struct mqtt_network *net;
@@ -358,10 +485,10 @@ handle_recv(struct mqtt_client *c, uint8_t *data, uint32_t len)
 		handle_puback(c, data, len);
 		break;
 	case CONTROL_PUBREC:
-		printf("PUBREC received\n");
+		handle_pubrec(c, data, len);
 		break;
 	case CONTROL_PUBCOMP:
-		printf("PUBCOMP received\n");
+		handle_pubcomp(c, data, len);
 		break;
 	default:
 		printf("Unknown packet received: 0x%x\n", ctl);
@@ -621,6 +748,7 @@ mqtt_thread_recv(void *arg)
 	while (1) {
 		mdx_sem_wait(&c->sem_sendrecv);
 		err = mqtt_recv(net, data, 1);
+		mdx_sem_post(&c->sem_sendrecv);
 		if (err == -2) {
 			/* Connection closed. */
 			c->connected = 0;
@@ -630,7 +758,6 @@ mqtt_thread_recv(void *arg)
 			handle_recv(c, data, 128);
 			mqtt_resched_ping(c);
 		}
-		mdx_sem_post(&c->sem_sendrecv);
 		mdx_usleep(1000000);
 	}
 }
