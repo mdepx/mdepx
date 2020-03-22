@@ -552,44 +552,43 @@ mqtt_publish(struct mqtt_client *c, struct mqtt_message *m)
 	uint8_t data[128];
 	int retval;
 	int err;
+	int pos;
 
-	mdx_sem_init(&m->complete, 0);
+	if (m->topic == NULL || m->topic_len == 0 ||
+	    m->data == NULL || m->data_len == 0)
+		return (-1);
 
-	/* TODO: verify QoS */
-
-	/* Fixed header */
-	data[0] = CONTROL_PUBLISH | FLAGS_PUBLISH_QOS(m->qos);
-	data[1] = 12;		/* Remaining Length */
-
-	/* Variable header: Topic Name */
-	data[2] = 0;
-	data[3] = 3;
-	data[4] = 'a';
-	data[5] = '/';
-	data[6] = 'b';
+	/* Variable header: Topic details */
+	data[2] = m->topic_len >> 8;
+	data[3] = m->topic_len & 0xff;
+	memcpy(&data[4], m->topic, m->topic_len);
+	pos = 4 + m->topic_len;
 
 	/* Variable header: Packet Identifier */
 	switch (m->qos) {
 	case 0:
-		data[7] = 0;
-		data[8] = 0; /* must not be used if qos == 0 */
+		data[pos++] = 0;
+		data[pos++] = 0; /* must not be used if qos == 0 */
 		break;
 	case 1:
 	case 2:
 		m->packet_id = c->next_id++;
-		data[7] = m->packet_id >> 8;
-		data[8] = m->packet_id & 0xff;
+		data[pos++] = m->packet_id >> 8;
+		data[pos++] = m->packet_id & 0xff;
 		break;
 	default:
 		return (-1);
 	};
 
 	/* Payload */
-	data[9] = 'h';
-	data[10] = 'e';
-	data[11] = 'l';
-	data[12] = 'l';
-	data[13] = 'o';
+	memcpy(&data[pos], m->data, m->data_len);
+	pos += m->data_len;
+
+	/* Fixed header */
+	data[0] = CONTROL_PUBLISH | FLAGS_PUBLISH_QOS(m->qos);
+	data[1] = (pos - 2);	/* Remaining Length */
+
+	mdx_sem_init(&m->complete, 0);
 
 	if (m->qos == 1 || m->qos == 2) {
 		m->state = MSG_STATE_PUBLISH;
@@ -599,7 +598,7 @@ mqtt_publish(struct mqtt_client *c, struct mqtt_message *m)
 	};
 
 	mdx_sem_wait(&c->sem_sendrecv);
-	err = mqtt_send(&c->net, data, 14);
+	err = mqtt_send(&c->net, data, pos);
 	mdx_sem_post(&c->sem_sendrecv);
 	if (err) {
 		/* Could not send packet */

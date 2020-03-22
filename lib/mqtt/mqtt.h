@@ -122,9 +122,13 @@ enum mqtt_msg_state {
 };
 
 struct mqtt_message {
-	void *msg;
-	int len;
+	void *data;
+	int data_len;
+	void *topic;
+	int topic_len;
 	int qos;
+
+	/* Private */
 	struct entry node;
 	int packet_id;
 	enum mqtt_msg_state state;
