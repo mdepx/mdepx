@@ -114,15 +114,12 @@ mqtt_recv(struct mqtt_network *net, uint8_t *buf, int len)
 static int
 handle_pingresp(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 {
-	struct mqtt_network *net;
 	int err;
-
-	net = &c->net;
 
 	printf("pingresp received\n");
 
 	/* Read remaining */
-	err = mqtt_recv(net, &buf[1], 1);
+	err = mqtt_recv(&c->net, &buf[1], 1);
 	if (err != 1) {
 		printf("%s: rem is not received\n", __func__);
 		return (-1);
@@ -137,14 +134,11 @@ static int
 read_msg(struct mqtt_client *c, uint8_t *buf, uint32_t len,
     uint32_t size_expected)
 {
-	struct mqtt_network *net;
-	int ret, rem;
+	int rem;
 	int err;
 
-	net = &c->net;
-
 	/* Read remaining */
-	err = mqtt_recv(net, &buf[1], 1);
+	err = mqtt_recv(&c->net, &buf[1], 1);
 	if (err != 1) {
 		printf("%s: rem is not received\n", __func__);
 		return (-1);
@@ -157,8 +151,8 @@ read_msg(struct mqtt_client *c, uint8_t *buf, uint32_t len,
 	}
 
 	/* Read the rest */
-	ret = net->read(net, &buf[2], rem);
-	if (ret != rem) {
+	err = mqtt_recv(&c->net, &buf[2], rem);
+	if (err != rem) {
 		printf("%s: invalid read\n", __func__);
 		return (-1);
 	}
@@ -532,14 +526,11 @@ mqtt_disconnect(struct mqtt_client *c)
 int
 mqtt_connect(struct mqtt_client *c)
 {
-	struct mqtt_network *net;
 	uint8_t data[128];
 	uint8_t *ptr;
 	uint8_t flags;
 	uint16_t keepalive;
 	int err;
-
-	net = &c->net;
 
 	/* Fixed header */
 	data[0] = CONTROL_CONNECT;
@@ -557,7 +548,7 @@ mqtt_connect(struct mqtt_client *c)
 	*ptr++ = 'c';
 
 	mdx_sem_wait(&c->sem_sendrecv);
-	err = mqtt_send(net, data, 17);
+	err = mqtt_send(&c->net, data, 17);
 	mdx_sem_post(&c->sem_sendrecv);
 	if (err)
 		return (-1);
@@ -587,13 +578,10 @@ mqtt_connect(struct mqtt_client *c)
 int
 mqtt_subscribe(struct mqtt_client *c, struct mqtt_request *s)
 {
-	struct mqtt_network *net;
 	uint8_t data[128];
 	int retval;
 	int pos;
 	int err;
-
-	net = &c->net;
 
 	if (s->qos != 0 && s->qos != 1)
 		return (-1);
@@ -623,7 +611,7 @@ mqtt_subscribe(struct mqtt_client *c, struct mqtt_request *s)
 	mdx_mutex_unlock(&c->msg_mtx);
 
 	mdx_sem_wait(&c->sem_sendrecv);
-	err = mqtt_send(net, data, pos);
+	err = mqtt_send(&c->net, data, pos);
 	mdx_sem_post(&c->sem_sendrecv);
 
 	if (err) {
@@ -750,14 +738,12 @@ mqtt_publish(struct mqtt_client *c, struct mqtt_request *m)
 static void
 mqtt_thread_ping(void *arg)
 {
-	struct mqtt_network *net;
 	struct mqtt_client *c;
 	uint8_t data[128];
 	int retry;
 	int err;
 
 	c = arg;
-	net = &c->net;
 
 	data[0] = CONTROL_PINGREQ;
 	data[1] = 0;		/* Remaining Length */
@@ -768,7 +754,7 @@ mqtt_thread_ping(void *arg)
 		mdx_sem_wait(&c->sem_ping_req);
 
 		mdx_sem_wait(&c->sem_sendrecv);
-		err = mqtt_send(net, data, 2);
+		err = mqtt_send(&c->net, data, 2);
 		mdx_sem_post(&c->sem_sendrecv);
 
 		if (err) {
@@ -797,16 +783,14 @@ static void
 mqtt_thread_recv(void *arg)
 {
 	uint8_t data[128];
-	struct mqtt_network *net;
 	struct mqtt_client *c;
 	int err;
 
 	c = arg;
-	net = &c->net;
 
 	while (1) {
 		mdx_sem_wait(&c->sem_sendrecv);
-		err = mqtt_recv(net, data, 1);
+		err = mqtt_recv(&c->net, data, 1);
 		mdx_sem_post(&c->sem_sendrecv);
 		if (err == -2) {
 			/* Connection closed. */
