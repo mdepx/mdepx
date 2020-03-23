@@ -61,7 +61,10 @@ mqtt_close(struct mqtt_client *c)
 {
 
 	printf("%s\n", __func__);
+
 	c->connected = 0;
+	if (c->disconnect)
+		c->disconnect(c);
 }
 
 static void

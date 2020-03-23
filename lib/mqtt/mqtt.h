@@ -91,8 +91,8 @@ enum connect_return_errno {
 
 struct mqtt_network {
 	int fd;
-	int (*read) (struct mqtt_network *, uint8_t *, int);
-	int (*write) (struct mqtt_network *, uint8_t *, int);
+	int (*read)(struct mqtt_network *, uint8_t *, int);
+	int (*write)(struct mqtt_network *, uint8_t *, int);
 };
 
 enum mqtt_msg_state {
@@ -131,6 +131,7 @@ struct mqtt_client {
 	mdx_callout_t c_ping_req;
 	int connected;
 	void (*cb)(struct mqtt_client *c, struct mqtt_request *m);
+	void (*disconnect)(struct mqtt_client *c);
 	struct mdx_mutex msg_mtx;
 	struct entry msg_list;
 	int next_id;
