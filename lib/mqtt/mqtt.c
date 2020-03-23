@@ -57,6 +57,14 @@ msg_next(struct mqtt_client *c, struct mqtt_request *m0)
 }
 
 static void
+mqtt_close(struct mqtt_client *c)
+{
+
+	printf("%s\n", __func__);
+	c->connected = 0;
+}
+
+static void
 mqtt_ping_req(void *arg)
 {
 	struct mqtt_client *c;
@@ -615,10 +623,10 @@ mqtt_subscribe(struct mqtt_client *c, struct mqtt_request *s)
 	mdx_sem_post(&c->sem_sendrecv);
 
 	if (err) {
-		/* TODO: close connection */
 		mdx_mutex_lock(&c->msg_mtx);
 		list_remove(&s->node);
 		mdx_mutex_unlock(&c->msg_mtx);
+		mqtt_close(c);
 		return (-1);
 	}
 
@@ -638,8 +646,7 @@ mqtt_subscribe(struct mqtt_client *c, struct mqtt_request *s)
 			retval = -1;
 		};
 	} else {
-		/* Timeout */
-		/* TODO: close connection */
+		/* No reply received. */
 		retval = -1;
 	}
 
@@ -705,12 +712,12 @@ mqtt_publish(struct mqtt_client *c, struct mqtt_request *m)
 	mdx_sem_post(&c->sem_sendrecv);
 	if (err) {
 		/* Could not send packet */
-		/* TODO: close connection */
 		if (m->qos == 1 || m->qos == 2) {
 			mdx_mutex_lock(&c->msg_mtx);
 			list_remove(&m->node);
 			mdx_mutex_unlock(&c->msg_mtx);
 		}
+		mqtt_close(c);
 		return (-1);
 	}
 
@@ -724,7 +731,6 @@ mqtt_publish(struct mqtt_client *c, struct mqtt_request *m)
 		retval = 0;
 	} else {
 		/* Timeout. */
-		/* TODO: close connection */
 		retval = -1;
 	}
 
@@ -770,8 +776,7 @@ mqtt_thread_ping(void *arg)
 			retry++;
 
 			if (retry == 10) {
-				/* TODO: close connection */
-				c->connected = 0;
+				mqtt_close(c);
 				break;
 			}
 		} else
@@ -792,7 +797,7 @@ mqtt_thread_recv(void *arg)
 		mdx_sem_wait(&c->sem_sendrecv);
 		err = mqtt_recv(&c->net, data, 1);
 		mdx_sem_post(&c->sem_sendrecv);
-		if (err == -2) {
+		if (err == 0) {
 			/* Connection closed. */
 			c->connected = 0;
 			break;
@@ -806,7 +811,8 @@ mqtt_thread_recv(void *arg)
 		mdx_usleep(1000000);
 	}
 
-	/* TODO: close connection here */
+	printf("%s: connection closed\n", __func__);
+	mqtt_close(c);
 }
 
 int
