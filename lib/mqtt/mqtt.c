@@ -509,6 +509,27 @@ mqtt_variable_header(uint8_t *ptr, uint8_t flags,
 }
 
 int
+mqtt_disconnect(struct mqtt_client *c)
+{
+	uint8_t data[2];
+	int err;
+
+	/* Fixed header */
+	data[0] = CONTROL_DISCONNECT;
+	data[1] = 0;
+
+	mdx_sem_wait(&c->sem_sendrecv);
+	err = mqtt_send(&c->net, data, 2);
+	mdx_sem_post(&c->sem_sendrecv);
+	if (err)
+		return (-1);
+
+	c->connected = 0;
+
+	return (err);
+}
+
+int
 mqtt_connect(struct mqtt_client *c)
 {
 	struct mqtt_network *net;
@@ -732,6 +753,7 @@ mqtt_thread_ping(void *arg)
 	struct mqtt_network *net;
 	struct mqtt_client *c;
 	uint8_t data[128];
+	int retry;
 	int err;
 
 	c = arg;
@@ -739,6 +761,8 @@ mqtt_thread_ping(void *arg)
 
 	data[0] = CONTROL_PINGREQ;
 	data[1] = 0;		/* Remaining Length */
+
+	retry = 0;
 
 	while (1) {
 		mdx_sem_wait(&c->sem_ping_req);
@@ -757,9 +781,15 @@ mqtt_thread_ping(void *arg)
 		err = mdx_sem_timedwait(&c->sem_ping_ack, 5000000);
 		if (err == 0) {
 			printf("no ping reply received\n");
-			c->connected = 0;
-			break;
-		}
+			retry++;
+
+			if (retry == 10) {
+				/* TODO: close connection */
+				c->connected = 0;
+				break;
+			}
+		} else
+			retry = 0;
 	}
 }
 

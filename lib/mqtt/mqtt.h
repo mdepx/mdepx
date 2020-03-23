@@ -140,5 +140,6 @@ int mqtt_init(struct mqtt_client *c);
 int mqtt_connect(struct mqtt_client *c);
 int mqtt_subscribe(struct mqtt_client *c, struct mqtt_request *r);
 int mqtt_publish(struct mqtt_client *c, struct mqtt_request *r);
+int mqtt_disconnect(struct mqtt_client *c);
 
 #endif /* !_LIB_MQTT_MQTT_H_ */
