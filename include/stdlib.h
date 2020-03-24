@@ -38,5 +38,8 @@ void qsort(void *base, size_t nmemb, size_t size,
 int atoi(const char *nptr);
 void * bsearch(const void *key, const void *base, size_t nmemb, size_t size,
     int (*compar) (const void *, const void *));
+double strtod(const char *nptr, char **endptr);
+quad_t strtoq(const char *nptr, char **endptr, int base);
+u_quad_t strtouq(const char *nptr, char **endptr, int base);
 
 #endif /* !_STDLIB_H_ */
