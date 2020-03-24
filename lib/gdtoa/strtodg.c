@@ -35,6 +35,8 @@ THIS SOFTWARE.
 #include "locale.h"
 #endif
 
+#define	__DECONST(type, var)	((type)(__uintptr_t)(const void *)(var))
+
  static CONST int
 fivesbits[] = {	 0,  3,  5,  7, 10, 12, 14, 17, 19, 21,
 		24, 26, 28, 31, 33, 35, 38, 40, 42, 45,
@@ -1054,7 +1056,7 @@ strtodg_l
 			}
 		}
 	if (se)
-		*se = (char *)s;
+		*se = __DECONST(char *, s);
 	if (sign)
 		irv |= STRTOG_Neg;
 	if (rvb) {

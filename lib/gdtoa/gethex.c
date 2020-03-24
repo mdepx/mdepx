@@ -147,9 +147,9 @@ gethex( CONST char **sp, FPI *fpi, Long *exp, Bigint **bp, int sign)
 			e1 = -e1;
 		e += e1;
 	  }
-	*sp = (char*)s;
+	*sp = (CONST char*)s;
 	if (!havedig)
-		*sp = (char*)s0 - 1;
+		*sp = (CONST char*)s0 - 1;
 	if (zret)
 		return STRTOG_Zero;
 	if (big) {

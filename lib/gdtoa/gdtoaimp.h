@@ -662,6 +662,7 @@ extern void memcpy_D2A ANSI((void*, const void*, size_t));
  extern double strtod ANSI((const char *s00, char **se));
 #endif
  extern double strtod_l ANSI((const char *s00, char **se, locale_t));
+ extern float strtof_l ANSI((CONST char *s, char **sp, locale_t loc));
  extern int strtopQ ANSI((CONST char *, char **, Void *));
  extern int strtopf ANSI((CONST char *, char **, float *));
  extern int strtopd ANSI((CONST char *, char **, double *));
