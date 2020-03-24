@@ -1,0 +1,1 @@
+double fabs(double x);
