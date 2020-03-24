@@ -28,6 +28,8 @@
 #include <sys/thread.h>
 #include <sys/sem.h>
 
+#include <machine/atomic.h>
+
 #include "mqtt.h"
 
 static struct mqtt_request *
@@ -59,32 +61,13 @@ msg_next(struct mqtt_client *c, struct mqtt_request *m0)
 static void
 mqtt_close(struct mqtt_client *c)
 {
+	int prev;
 
 	printf("%s\n", __func__);
 
-	c->connected = 0;
-	if (c->disconnect)
+	prev = atomic_readandclear_32(&c->connected);
+	if (prev == 1)
 		c->disconnect(c);
-}
-
-static void
-mqtt_ping_req(void *arg)
-{
-	struct mqtt_client *c;
-
-	c = arg;
-
-	mdx_sem_post(&c->sem_ping_req);
-}
-
-static void
-mqtt_resched_ping(struct mqtt_client *c)
-{
-
-	critical_enter();
-	mdx_callout_cancel(&c->c_ping_req);
-	mdx_callout_set(&c->c_ping_req, 20000000, mqtt_ping_req, c);
-	critical_exit();
 }
 
 static int
@@ -135,8 +118,6 @@ handle_pingresp(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 		printf("%s: rem is not received\n", __func__);
 		return (-1);
 	}
-
-	mdx_sem_post(&c->sem_ping_ack);
 
 	return (0);
 }
@@ -744,78 +725,59 @@ mqtt_publish(struct mqtt_client *c, struct mqtt_request *m)
 	return (retval);
 }
 
-static void
-mqtt_thread_ping(void *arg)
+static int
+mqtt_ping(struct mqtt_client *c)
 {
-	struct mqtt_client *c;
-	uint8_t data[128];
-	int retry;
+	uint8_t data[2];
 	int err;
 
-	c = arg;
-
 	data[0] = CONTROL_PINGREQ;
-	data[1] = 0;		/* Remaining Length */
+	data[1] = 0;	/* Remaining Length */
 
-	retry = 0;
+	mdx_sem_wait(&c->sem_sendrecv);
+	err = mqtt_send(&c->net, data, 2);
+	mdx_sem_post(&c->sem_sendrecv);
 
-	while (1) {
-		mdx_sem_wait(&c->sem_ping_req);
+	if (err)
+		return (-1);
 
-		mdx_sem_wait(&c->sem_sendrecv);
-		err = mqtt_send(&c->net, data, 2);
-		mdx_sem_post(&c->sem_sendrecv);
-
-		if (err) {
-			printf("can't send ping packet\n");
-			c->connected = 0;
-			break;
-		}
-
-		/* Wait reply. */
-		err = mdx_sem_timedwait(&c->sem_ping_ack, 5000000);
-		if (err == 0) {
-			printf("no ping reply received\n");
-			retry++;
-
-			if (retry == 10) {
-				mqtt_close(c);
-				break;
-			}
-		} else
-			retry = 0;
-	}
+	return (0);
 }
 
+/*
+ * This function requires a non-blocking socket to operate.
+ */
 static void
 mqtt_thread_recv(void *arg)
 {
 	uint8_t data[128];
 	struct mqtt_client *c;
+	int keepalive;
 	int err;
 
 	c = arg;
+
+	keepalive = 0;
 
 	while (1) {
 		mdx_sem_wait(&c->sem_sendrecv);
 		err = mqtt_recv(&c->net, data, 1);
 		mdx_sem_post(&c->sem_sendrecv);
-		if (err == 0) {
-			/* Connection closed. */
-			c->connected = 0;
-			break;
-		}
-		if (err == 1) {
+		if (err == 0)
+			mqtt_close(c);
+		else if (err == 1) {
 			err = handle_recv(c, data, 128);
 			if (err)
-				break;
-			mqtt_resched_ping(c);
+				mqtt_close(c);
+			keepalive = 0;
+		} else if (c->connected && keepalive++ > 100) {
+			if (mqtt_ping(c))
+				mqtt_close(c);
+			keepalive = 0;
 		}
+
 		mdx_usleep(1000000);
 	}
-
-	printf("%s: connection closed\n", __func__);
-	mqtt_close(c);
 }
 
 int
@@ -824,10 +786,6 @@ mqtt_init(struct mqtt_client *c)
 
 	mdx_sem_init(&c->sem_sendrecv, 1);
 	mdx_sem_init(&c->sem_connect, 0);
-	mdx_sem_init(&c->sem_ping_req, 0);
-	mdx_sem_init(&c->sem_ping_ack, 0);
-
-	mdx_callout_init(&c->c_ping_req);
 
 	mdx_mutex_init(&c->msg_mtx);
 	list_init(&c->msg_list);
@@ -839,13 +797,16 @@ mqtt_init(struct mqtt_client *c)
 	if (c->td_recv == NULL)
 		return (-1);
 
-	c->td_ping = mdx_thread_create("mqtt ping", 1, 0, 8192,
-	    mqtt_thread_ping, c);
-	if (c->td_ping == NULL)
-		return (-1);
-
 	mdx_sched_add(c->td_recv);
-	mdx_sched_add(c->td_ping);
+
+	return (0);
+}
+
+int
+mqtt_deinit(struct mqtt_client *c)
+{
+
+	/* TODO: terminate the recv thread here */
 
 	return (0);
 }

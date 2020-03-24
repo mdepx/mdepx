@@ -126,10 +126,7 @@ struct mqtt_client {
 	struct mqtt_network net;
 	mdx_sem_t sem_sendrecv;
 	mdx_sem_t sem_connect;
-	mdx_sem_t sem_ping_req;
-	mdx_sem_t sem_ping_ack;
-	mdx_callout_t c_ping_req;
-	int connected;
+	uint32_t connected;
 	void (*cb)(struct mqtt_client *c, struct mqtt_request *m);
 	void (*disconnect)(struct mqtt_client *c);
 	struct mdx_mutex msg_mtx;
@@ -138,9 +135,10 @@ struct mqtt_client {
 };
 
 int mqtt_init(struct mqtt_client *c);
+int mqtt_deinit(struct mqtt_client *c);
 int mqtt_connect(struct mqtt_client *c);
-int mqtt_subscribe(struct mqtt_client *c, struct mqtt_request *r);
-int mqtt_publish(struct mqtt_client *c, struct mqtt_request *r);
 int mqtt_disconnect(struct mqtt_client *c);
+int mqtt_publish(struct mqtt_client *c, struct mqtt_request *r);
+int mqtt_subscribe(struct mqtt_client *c, struct mqtt_request *r);
 
 #endif /* !_LIB_MQTT_MQTT_H_ */
