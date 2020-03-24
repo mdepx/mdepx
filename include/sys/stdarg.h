@@ -53,4 +53,7 @@ typedef	__builtin_va_list	va_list;
 #define	va_end(ap) \
 	__builtin_va_end(ap)
 
+int vscanf(const char *format, va_list ap);
+int vsscanf(const char *str, const char *format, va_list ap);
+
 #endif /* !_SYS_STDARG_H_ */

@@ -41,6 +41,8 @@ int kvprintf(char const *fmt, void (*func)(int, void*), void *arg, int radix,
 int sprintf(char *buf, const char *cfmt, ...);
 int puts(const char *str);
 
+int sscanf(const char *str, const char *format, ...);
+
 #define	stdin	0
 #define	stdout	1
 #define	EOF	(-1)
