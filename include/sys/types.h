@@ -115,6 +115,8 @@ typedef	__uint64_t	vaddr_t;
 #endif
 #endif
 
+typedef	__ptrdiff_t	ptrdiff_t;
+
 /* Floating point */
 typedef	__uint8_t	uint_fast8_t;
 typedef	__uint16_t	uint_fast16_t;
@@ -130,5 +132,8 @@ typedef	__uint8_t	uint_least8_t;
 
 typedef	__double_t	double_t;
 typedef	__float_t	float_t;
+
+/* stub */
+typedef	int		locale_t;
 
 #endif /* !_SYS_TYPES_H_ */

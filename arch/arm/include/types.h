@@ -53,6 +53,8 @@ typedef	__uint32_t		__time_t;
 #define	INT64_C(c)		(c ## LL)
 #define	UINT64_C(c)		(c ## UL)
 
+typedef	__int32_t		__ptrdiff_t;
+
 #define	NBBY			8
 
 typedef	double	__double_t;
