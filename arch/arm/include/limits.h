@@ -31,14 +31,23 @@
 #define	__INT_MAX	0x7fffffff
 #define	__USHRT_MAX	0xffff
 
+#define	__INT_MIN	(-0x7fffffff - 1)
+
 #define	__ULONG_MAX	0xffffffff
 #define	__SIZE_T_MAX	__UINT_MAX
 #define	__LONG_BIT	32
+
+#define	__LLONG_MIN	(-0x7fffffffffffffffLL - 1)
+#define	__LLONG_MAX	0x7fffffffffffffffLL
+#define	__ULLONG_MAX	0xffffffffffffffffULL
 
 #define	__LONG_MAX	0x7fffffff
 #define	__LONG_MIN	(-0x7fffffff - 1)
 #define	__UCHAR_MAX	0xff
 
 #define	__CHAR_BIT	8
+#define	__UQUAD_MAX	__ULLONG_MAX
+#define	__QUAD_MIN	__LLONG_MIN
+#define	__QUAD_MAX	__LLONG_MAX
 
 #endif	/* !_MACHINE_LIMITS_H_ */
