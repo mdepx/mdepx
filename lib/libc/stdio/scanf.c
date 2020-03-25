@@ -48,7 +48,7 @@
  * Note that stdarg.h and the ANSI style va_start macro is used for both
  * ANSI and traditional C compilers.
  */
-//#include <machine/stdarg.h>
+#include <stdarg.h>
 
 #define	BUF		32 	/* Maximum length of numeric string. */
 
@@ -87,9 +87,13 @@
 #define	CT_CCL		1	/* %[...] conversion */
 #define	CT_STRING	2	/* %s conversion */
 #define	CT_INT		3	/* integer, i.e., strtoq or strtouq */
+#define	CT_FLOAT	4	/* %[efgEFG] conversion */
+
 typedef u_quad_t (*ccfntype)(const char *, char **, int);
 
 static const u_char *__sccl(char *, const u_char *);
+
+static int parsefloat(const char *start, char *buf, char *end, locale_t loc);
 
 int
 sscanf(const char *ibuf, const char *fmt, ...)
@@ -121,6 +125,7 @@ vsscanf(const char *inp, char const *fmt0, va_list ap)
 	ccfntype ccfn;		/* conversion function (strtoq/strtouq) */
 	char ccltab[256];	/* character class table for %[...] */
 	char buf[BUF];		/* buffer for numeric conversions */
+	int nr;			/* characters read by the current conversion */
 
 	/* `basefix' is used to avoid `if' tests in the integer scanner */
 	static short basefix[17] =
@@ -233,6 +238,12 @@ literal:
 			ccfn = strtouq;
 			base = 16;
 			break;
+#ifndef NO_FLOATING_POINT
+		case 'A': case 'E': case 'F': case 'G':
+		case 'a': case 'e': case 'f': case 'g':
+			c = CT_FLOAT;
+			break;
+#endif
 
 		case 's':
 			c = CT_STRING;
@@ -564,7 +575,28 @@ literal:
 			nread += p - buf;
 			nconversions++;
 			break;
-
+#ifndef NO_FLOATING_POINT
+		case CT_FLOAT:
+			/* scan a floating point number as if by strtod */
+			if (width == 0 || width > sizeof(buf) - 1)
+				width = sizeof(buf) - 1;
+			nr = parsefloat(inp, buf, buf + width, 0);
+			if (nr == 0)
+				goto match_failure;
+			if ((flags & SUPPRESS) == 0) {
+				if (flags & QUAD) {
+					quad_t res = strtoq(buf, NULL, 10);
+					*va_arg(ap, quad_t *) = res;
+				} else if (flags & LONG) {
+					double res = strtod(buf, NULL);
+					*va_arg(ap, double *) = res;
+				} else {
+					float res = strtof(buf, NULL);
+					*va_arg(ap, float *) = res;
+				}
+			}
+			break;
+#endif /* !NO_FLOATING_POINT */
 		}
 	}
 input_failure:
@@ -665,3 +697,172 @@ doswitch:
 	/* NOTREACHED */
 }
 
+#define isalnum(ch)     (isalpha(ch) || isdigit(ch))
+
+#ifndef NO_FLOATING_POINT
+static int
+parsefloat(const char *start, char *buf, char *end, locale_t locale)
+{
+	char *commit, *p;
+	int infnanpos = 0, decptpos = 0;
+	enum {
+		S_START, S_GOTSIGN, S_INF, S_NAN, S_DONE, S_MAYBEHEX,
+		S_DIGITS, S_DECPT, S_FRAC, S_EXP, S_EXPDIGITS
+	} state = S_START;
+	unsigned char c;
+	const char *decpt = ".";
+	_Bool gotmantdig = 0, ishex = 0;
+
+	/*
+	 * We set commit = p whenever the string we have read so far
+	 * constitutes a valid representation of a floating point
+	 * number by itself.  At some point, the parse will complete
+	 * or fail, and we will ungetc() back to the last commit point.
+	 * To ensure that the file offset gets updated properly, it is
+	 * always necessary to read at least one character that doesn't
+	 * match; thus, we can't short-circuit "infinity" or "nan(...)".
+	 */
+	commit = buf - 1;
+	for (p = buf; p < end; ) {
+		c = *start;
+		if (c == '\0')
+			break;
+reswitch:
+		switch (state) {
+		case S_START:
+			state = S_GOTSIGN;
+			if (c == '-' || c == '+')
+				break;
+			else
+				goto reswitch;
+		case S_GOTSIGN:
+			switch (c) {
+			case '0':
+				state = S_MAYBEHEX;
+				commit = p;
+				break;
+			case 'I':
+			case 'i':
+				state = S_INF;
+				break;
+			case 'N':
+			case 'n':
+				state = S_NAN;
+				break;
+			default:
+				state = S_DIGITS;
+				goto reswitch;
+			}
+			break;
+		case S_INF:
+			if (infnanpos > 6 ||
+			    (c != "nfinity"[infnanpos] &&
+			     c != "NFINITY"[infnanpos]))
+				goto parsedone;
+			if (infnanpos == 1 || infnanpos == 6)
+				commit = p;	/* inf or infinity */
+			infnanpos++;
+			break;
+		case S_NAN:
+			switch (infnanpos) {
+			case 0:
+				if (c != 'A' && c != 'a')
+					goto parsedone;
+				break;
+			case 1:
+				if (c != 'N' && c != 'n')
+					goto parsedone;
+				else
+					commit = p;
+				break;
+			case 2:
+				if (c != '(')
+					goto parsedone;
+				break;
+			default:
+				if (c == ')') {
+					commit = p;
+					state = S_DONE;
+				} else if (!isalnum(c) && c != '_')
+					goto parsedone;
+				break;
+			}
+			infnanpos++;
+			break;
+		case S_DONE:
+			goto parsedone;
+		case S_MAYBEHEX:
+			state = S_DIGITS;
+			if (c == 'X' || c == 'x') {
+				ishex = 1;
+				break;
+			} else {	/* we saw a '0', but no 'x' */
+				gotmantdig = 1;
+				goto reswitch;
+			}
+		case S_DIGITS:
+			if ((ishex && isxdigit(c)) || isdigit(c)) {
+				gotmantdig = 1;
+				commit = p;
+				break;
+			} else {
+				state = S_DECPT;
+				goto reswitch;
+			}
+		case S_DECPT:
+			if (c == decpt[decptpos]) {
+				if (decpt[++decptpos] == '\0') {
+					/* We read the complete decpt seq. */
+					state = S_FRAC;
+					if (gotmantdig)
+						commit = p;
+				}
+				break;
+			} else if (!decptpos) {
+				/* We didn't read any decpt characters. */
+				state = S_FRAC;
+				goto reswitch;
+			} else {
+				/*
+				 * We read part of a multibyte decimal point,
+				 * but the rest is invalid, so bail.
+				 */
+				goto parsedone;
+			}
+		case S_FRAC:
+			if (((c == 'E' || c == 'e') && !ishex) ||
+			    ((c == 'P' || c == 'p') && ishex)) {
+				if (!gotmantdig)
+					goto parsedone;
+				else
+					state = S_EXP;
+			} else if ((ishex && isxdigit(c)) || isdigit(c)) {
+				commit = p;
+				gotmantdig = 1;
+			} else
+				goto parsedone;
+			break;
+		case S_EXP:
+			state = S_EXPDIGITS;
+			if (c == '-' || c == '+')
+				break;
+			else
+				goto reswitch;
+		case S_EXPDIGITS:
+			if (isdigit(c))
+				commit = p;
+			else
+				goto parsedone;
+			break;
+		default:
+			panic("unhandled");
+		}
+		*p++ = c;
+		start++;
+	}
+
+parsedone:
+	*++commit = '\0';
+	return (commit - buf);
+}
+#endif
