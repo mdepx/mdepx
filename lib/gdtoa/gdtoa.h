@@ -108,8 +108,8 @@ extern char* dtoa  ANSI((double d, int mode, int ndigits, int *decpt,
 extern char* gdtoa ANSI((FPI *fpi, int be, ULong *bits, int *kindp,
 			int mode, int ndigits, int *decpt, char **rve));
 extern void freedtoa ANSI((char*));
-extern float  strtof ANSI((CONST char *, char **));
 #if 0
+extern float  strtof ANSI((CONST char *, char **));
 extern double strtod ANSI((CONST char *, char **));
 #endif
 extern int strtodg ANSI((CONST char*, char**, FPI*, Long*, ULong*));
