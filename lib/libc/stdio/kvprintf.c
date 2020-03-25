@@ -235,6 +235,7 @@ reswitch:	switch (ch = (u_char)*fmt++) {
 			goto handle_sign;
 #if defined(MDX_FTOA)
 		case 'f':
+		case 'g':
 			ftoa(va_arg(ap, double), fbuf, dwidth);
 			for (i = 0; i < strlen(fbuf); i++)
 				PCHAR(fbuf[i]);
