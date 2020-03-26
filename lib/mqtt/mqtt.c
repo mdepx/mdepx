@@ -27,8 +27,7 @@
 #include <sys/cdefs.h>
 #include <sys/thread.h>
 #include <sys/sem.h>
-
-#include <machine/atomic.h>
+#include <sys/mutex.h>
 
 #include "mqtt.h"
 
@@ -56,18 +55,6 @@ msg_next(struct mqtt_client *c, struct mqtt_request *m0)
 	m = CONTAINER_OF(m0->node.next, struct mqtt_request, node);
 
 	return (m);
-}
-
-static void
-mqtt_close(struct mqtt_client *c)
-{
-	int prev;
-
-	printf("%s\n", __func__);
-
-	prev = atomic_readandclear_32(&c->connected);
-	if (prev == 1)
-		c->disconnect(c);
 }
 
 static int
@@ -248,6 +235,7 @@ handle_pubrec(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 		return (err);
 
 	packet_id = buf[2] << 8 | buf[3];
+
 	mdx_mutex_lock(&c->msg_mtx);
 	for (m = msg_first(c); m != NULL; m = msg_next(c, m)) {
 		if (m->packet_id == packet_id) {
@@ -283,7 +271,7 @@ handle_pubcomp(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 		if (m->packet_id == packet_id) {
 			/* Found */
 			if (m->state == MSG_STATE_PUBREC && m->qos == 2) {
-				m->state = MSG_STATE_PUBREL;
+				m->state = MSG_STATE_PUBCOMP;
 				mdx_sem_post(&m->complete);
 				break;
 			}
@@ -294,9 +282,36 @@ handle_pubcomp(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 	return (0);
 }
 
+static void
+mqtt_event(struct mqtt_client *c, enum mqtt_connection_event ev)
+{
+
+	mdx_mutex_lock(&c->mtx);
+	if (ev == MQTT_EVENT_CONNECTED) {
+		if (c->connected == 1) {
+			mdx_mutex_unlock(&c->mtx);
+			return;
+		}
+		c->connected = 1;
+	}
+
+	if (ev == MQTT_EVENT_DISCONNECTED) {
+		if (c->connected == 0) {
+			mdx_mutex_unlock(&c->mtx);
+			return;
+		}
+		c->connected = 0;
+	}
+	mdx_mutex_unlock(&c->mtx);
+
+	if (c->event)
+		c->event(c, ev);
+}
+
 static int
 handle_connack(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 {
+	struct mqtt_request *m;
 	int flags, error;
 	int err;
 
@@ -309,25 +324,20 @@ handle_connack(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 	flags = buf[2];
 	error = buf[3];
 
-	printf("flags %d error %d\n", flags, error);
+	printf("%s: flags %d error %d\n", __func__, flags, error);
 
-	switch (error) {
-	case ERR_ACCEPTED:
-		mdx_sem_post(&c->sem_connect);
-		KASSERT(c->connected == 0, ("Already connected\n"));
-		c->connected = 1;
-		break;
-	case ERR_REFUSED_PROTOCOL_VERSION:
-	case ERR_REFUSED_ID_REJECTED:
-	case ERR_REFUSED_SERVER_UNAVAILABLE:
-	case ERR_REFUSED_AUTHENTICATION:
-	case ERR_REFUSED_AUTHORIZATION:
-		c->connected = 0;
-		break;
-	default:
-		/* Invalid error code */
-		break;
+	/* Find our connection request in the queue. */
+
+	mdx_mutex_lock(&c->msg_mtx);
+	for (m = msg_first(c); m != NULL; m = msg_next(c, m)) {
+		if (m->state == MSG_STATE_CONNECT) {
+			m->state = MSG_STATE_CONNACK;
+			m->status = error;
+			mdx_sem_post(&m->complete);
+			break;
+		}
 	}
+	mdx_mutex_unlock(&c->msg_mtx);
 
 	return (0);
 }
@@ -356,6 +366,7 @@ handle_publish(struct mqtt_client *c, uint8_t *data, uint32_t len)
 	err = mqtt_recv(&c->net, &data[1], 1);
 	if (err != 1) {
 		printf("%s: rem is not received\n", __func__);
+		mqtt_event(c, MQTT_EVENT_DISCONNECTED);
 		return (MQTT_ERR_CONN);
 	}
 
@@ -366,6 +377,7 @@ handle_publish(struct mqtt_client *c, uint8_t *data, uint32_t len)
 	err = mqtt_recv(&c->net, &data[2], rem);
 	if (err != rem) {
 		printf("%s: rem is not received\n", __func__);
+		mqtt_event(c, MQTT_EVENT_DISCONNECTED);
 		return (MQTT_ERR_CONN);
 	}
 
@@ -380,8 +392,8 @@ handle_publish(struct mqtt_client *c, uint8_t *data, uint32_t len)
 	m.data = &data[pos];
 	m.data_len = rem - m.topic_len - 4;
 
-	if (c->cb)
-		c->cb(c, &m);
+	if (c->msgcb)
+		c->msgcb(c, &m);
 
 	if (qos == 1)
 		mqtt_send_puback(c, &m);
@@ -509,7 +521,7 @@ mqtt_disconnect(struct mqtt_client *c)
 	if (err)
 		return (MQTT_ERR_CONN);
 
-	c->connected = 0;
+	mqtt_event(c, MQTT_EVENT_DISCONNECTED);
 
 	return (err);
 }
@@ -517,10 +529,12 @@ mqtt_disconnect(struct mqtt_client *c)
 int
 mqtt_connect(struct mqtt_client *c)
 {
+	struct mqtt_request req;
 	uint8_t data[128];
 	uint8_t *ptr;
 	uint8_t flags;
 	uint16_t keepalive;
+	int retval;
 	int err;
 
 	/* Fixed header */
@@ -538,30 +552,64 @@ mqtt_connect(struct mqtt_client *c)
 	*ptr++ = 'b';
 	*ptr++ = 'c';
 
+	req.state = MSG_STATE_CONNECT;
+	mdx_sem_init(&req.complete, 0);
+
+	mdx_mutex_lock(&c->msg_mtx);
+	/* TODO: ensure here that there is no connect messages in the queue */
+	list_append(&c->msg_list, &req.node);
+	mdx_mutex_unlock(&c->msg_mtx);
+
 	err = mqtt_send(c, data, 17);
-	if (err)
+	if (err) {
+		mdx_mutex_lock(&c->msg_mtx);
+		list_remove(&req.node);
+		mdx_mutex_unlock(&c->msg_mtx);
+
+		mqtt_event(c, MQTT_EVENT_DISCONNECTED);
 		return (MQTT_ERR_CONN);
+	}
 
 	/*
 	 * Connect message sent.
 	 * Now wait for the connection status change.
 	 */
+	err = mdx_sem_timedwait(&req.complete, 5000000);
 
-	err = mdx_sem_timedwait(&c->sem_connect, 5000000);
-	if (err) {
-		/* Connack received. Let's check status. */
-		if (c->connected) {
-			printf("Connection established\n");
-			return (0);
-		} else {
-			printf("Failed to connect\n");
-			return (MQTT_ERR_UNKNOWN);
-		}
+	/*
+	 * Connection could still be established right here.
+	 * We will have to check req.status after removing
+	 * req from the queue.
+	 */
+
+	mdx_mutex_lock(&c->msg_mtx);
+	list_remove(&req.node);
+	mdx_mutex_unlock(&c->msg_mtx);
+
+	if (req.state == MSG_STATE_CONNACK) {
+		switch (req.status) {
+		case ERR_ACCEPTED:
+			printf("%s: connected\n", __func__);
+			mqtt_event(c, MQTT_EVENT_CONNECTED);
+			retval = MQTT_ERR_OK;
+			break;
+		case ERR_REFUSED_PROTOCOL_VERSION:
+		case ERR_REFUSED_ID_REJECTED:
+		case ERR_REFUSED_SERVER_UNAVAILABLE:
+		case ERR_REFUSED_AUTHENTICATION:
+		case ERR_REFUSED_AUTHORIZATION:
+			retval = MQTT_ERR_UNKNOWN;
+			break;
+		default:
+			/* Invalid error code */
+			break;
+		};
+	} else {
+		printf("%s: Timeout\n", __func__);
+		retval = MQTT_ERR_TIMEOUT;
 	}
 
-	printf("%s: Timeout\n", __func__);
-
-	return (MQTT_ERR_TIMEOUT);
+	return (retval);
 }
 
 int
@@ -604,11 +652,17 @@ mqtt_subscribe(struct mqtt_client *c, struct mqtt_request *s)
 		mdx_mutex_lock(&c->msg_mtx);
 		list_remove(&s->node);
 		mdx_mutex_unlock(&c->msg_mtx);
+		mqtt_event(c, MQTT_EVENT_DISCONNECTED);
 		return (MQTT_ERR_CONN);
 	}
 
 	err = mdx_sem_timedwait(&s->complete, 5000000);
-	if (err) {
+
+	mdx_mutex_lock(&c->msg_mtx);
+	list_remove(&s->node);
+	mdx_mutex_unlock(&c->msg_mtx);
+
+	if (s->state == MSG_STATE_SUBACK) {
 		switch (s->error) {
 		case 0x00:
 		case 0x01:
@@ -624,10 +678,6 @@ mqtt_subscribe(struct mqtt_client *c, struct mqtt_request *s)
 		/* No reply received. */
 		retval = MQTT_ERR_TIMEOUT;
 	}
-
-	mdx_mutex_lock(&c->msg_mtx);
-	list_remove(&s->node);
-	mdx_mutex_unlock(&c->msg_mtx);
 
 	return (retval);
 }
@@ -690,6 +740,7 @@ mqtt_publish(struct mqtt_client *c, struct mqtt_request *m)
 			list_remove(&m->node);
 			mdx_mutex_unlock(&c->msg_mtx);
 		}
+		mqtt_event(c, MQTT_EVENT_DISCONNECTED);
 		return (MQTT_ERR_CONN);
 	}
 
@@ -698,17 +749,21 @@ mqtt_publish(struct mqtt_client *c, struct mqtt_request *m)
 		return (0);
 
 	err = mdx_sem_timedwait(&m->complete, 5000000);
-	if (err) {
-		/* Message sent successfully. */
+
+	mdx_mutex_lock(&c->msg_mtx);
+	list_remove(&m->node);
+	mdx_mutex_unlock(&c->msg_mtx);
+
+	if (m->state == MSG_STATE_PUBACK && m->qos == 1) {
+		/* puback received */
+		retval = 0;
+	} else if (m->state == MSG_STATE_PUBCOMP && m->qos == 2) {
+		/* pubcomp received */
 		retval = 0;
 	} else {
 		/* Timeout. */
 		retval = -1;
 	}
-
-	mdx_mutex_lock(&c->msg_mtx);
-	list_remove(&m->node);
-	mdx_mutex_unlock(&c->msg_mtx);
 
 	return (retval);
 }
@@ -746,17 +801,22 @@ mqtt_thread_recv(void *arg)
 
 	while (1) {
 		err = mqtt_recv(&c->net, data, 1);
-		if (err == 0)
-			mqtt_close(c);
-		else if (err == 1) {
+		if (err == 0) {
+			printf("close 1\n");
+			mqtt_event(c, MQTT_EVENT_DISCONNECTED);
+		} else if (err == 1) {
 			err = handle_recv(c, data, 128);
-			if (err == MQTT_ERR_CONN)
-				mqtt_close(c);
+			if (err == MQTT_ERR_CONN) {
+				printf("close 2\n");
+				mqtt_event(c, MQTT_EVENT_DISCONNECTED);
+			}
 			keepalive = 0;
 		} else if (c->connected && keepalive++ > 50) {
 			err = mqtt_ping(c);
-			if (err == MQTT_ERR_CONN)
-				mqtt_close(c);
+			if (err == MQTT_ERR_CONN) {
+				printf("close 3\n");
+				mqtt_event(c, MQTT_EVENT_DISCONNECTED);
+			}
 			keepalive = 0;
 		}
 
@@ -768,8 +828,8 @@ int
 mqtt_init(struct mqtt_client *c)
 {
 
+	mdx_mutex_init(&c->mtx);
 	mdx_sem_init(&c->sem_send, 1);
-	mdx_sem_init(&c->sem_connect, 0);
 
 	mdx_mutex_init(&c->msg_mtx);
 	list_init(&c->msg_list);

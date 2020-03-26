@@ -96,6 +96,8 @@ struct mqtt_network {
 };
 
 enum mqtt_msg_state {
+	MSG_STATE_CONNECT,
+	MSG_STATE_CONNACK,
 	MSG_STATE_PUBLISH,
 	MSG_STATE_PUBACK,
 	MSG_STATE_PUBREC,
@@ -117,21 +119,27 @@ struct mqtt_request {
 	struct entry node;
 	int packet_id;
 	enum mqtt_msg_state state;
-	mdx_sem_t complete;
+	mdx_sem_t complete;		/* Request completed */
+	int status;			/* Connect status */
+};
+
+enum mqtt_connection_event {
+	MQTT_EVENT_CONNECTED,
+	MQTT_EVENT_DISCONNECTED,
 };
 
 struct mqtt_client {
-	struct thread *td_ping;
 	struct thread *td_recv;
 	struct mqtt_network net;
 	mdx_sem_t sem_send;
-	mdx_sem_t sem_connect;
-	uint32_t connected;
-	void (*cb)(struct mqtt_client *c, struct mqtt_request *m);
-	void (*disconnect)(struct mqtt_client *c);
+	void (*event)(struct mqtt_client *c, enum mqtt_connection_event);
+	void (*msgcb)(struct mqtt_client *c, struct mqtt_request *m);
 	struct mdx_mutex msg_mtx;
 	struct entry msg_list;
-	int next_id;
+	uint16_t next_id;
+
+	mdx_mutex_t mtx;
+	uint32_t connected;
 };
 
 #define	MQTT_ERR_OK		0
