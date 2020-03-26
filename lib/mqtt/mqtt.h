@@ -124,7 +124,7 @@ struct mqtt_client {
 	struct thread *td_ping;
 	struct thread *td_recv;
 	struct mqtt_network net;
-	mdx_sem_t sem_sendrecv;
+	mdx_sem_t sem_send;
 	mdx_sem_t sem_connect;
 	uint32_t connected;
 	void (*cb)(struct mqtt_client *c, struct mqtt_request *m);
@@ -133,6 +133,12 @@ struct mqtt_client {
 	struct entry msg_list;
 	int next_id;
 };
+
+#define	MQTT_ERR_OK		0
+#define	MQTT_ERR_REQ		-1
+#define	MQTT_ERR_TIMEOUT	-2
+#define	MQTT_ERR_CONN		-3
+#define	MQTT_ERR_UNKNOWN	-4
 
 int mqtt_init(struct mqtt_client *c);
 int mqtt_deinit(struct mqtt_client *c);
