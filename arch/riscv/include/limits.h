@@ -40,6 +40,9 @@
 #define	__SIZE_T_MAX	__ULONG_MAX
 #define	__OFF_MAX	__LONG_MAX
 #define	__OFF_MIN	__LONG_MIN
+#define	__QUAD_MAX	__LONG_MAX
+#define	__QUAD_MIN	__LONG_MIN
+#define	__UQUAD_MAX	__ULONG_MAX
 #else
 #define	__ULONG_MAX	0xffffffff
 #define	__SIZE_T_MAX	__UINT_MAX

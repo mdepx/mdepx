@@ -93,7 +93,9 @@ typedef u_quad_t (*ccfntype)(const char *, char **, int);
 
 static const u_char *__sccl(char *, const u_char *);
 
+#ifdef MDX_GDTOA
 static int parsefloat(const char *start, char *buf, char *end, locale_t loc);
+#endif
 
 int
 sscanf(const char *ibuf, const char *fmt, ...)
@@ -125,7 +127,9 @@ vsscanf(const char *inp, char const *fmt0, va_list ap)
 	ccfntype ccfn;		/* conversion function (strtoq/strtouq) */
 	char ccltab[256];	/* character class table for %[...] */
 	char buf[BUF];		/* buffer for numeric conversions */
+#ifdef MDX_GDTOA
 	int nr;			/* characters read by the current conversion */
+#endif
 
 	/* `basefix' is used to avoid `if' tests in the integer scanner */
 	static short basefix[17] =
@@ -238,7 +242,7 @@ literal:
 			ccfn = strtouq;
 			base = 16;
 			break;
-#ifndef NO_FLOATING_POINT
+#ifdef MDX_GDTOA
 		case 'A': case 'E': case 'F': case 'G':
 		case 'a': case 'e': case 'f': case 'g':
 			c = CT_FLOAT;
@@ -575,7 +579,7 @@ literal:
 			nread += p - buf;
 			nconversions++;
 			break;
-#ifndef NO_FLOATING_POINT
+#ifdef MDX_GDTOA
 		case CT_FLOAT:
 			/* scan a floating point number as if by strtod */
 			if (width == 0 || width > sizeof(buf) - 1)
@@ -596,7 +600,7 @@ literal:
 				}
 			}
 			break;
-#endif /* !NO_FLOATING_POINT */
+#endif /* !MDX_GDTOA */
 		}
 	}
 input_failure:
@@ -699,7 +703,7 @@ doswitch:
 
 #define isalnum(ch)     (isalpha(ch) || isdigit(ch))
 
-#ifndef NO_FLOATING_POINT
+#ifdef MDX_GDTOA
 static int
 parsefloat(const char *start, char *buf, char *end, locale_t locale)
 {
