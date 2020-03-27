@@ -17,11 +17,26 @@
  *  This file is part of mbed TLS (https://tls.mbed.org)
  */
 
+#include <sys/cdefs.h>
+
 #ifndef MBEDTLS_CONFIG_H
 #define MBEDTLS_CONFIG_H
 
-#define	MBEDTLS_MD_C		1
-#define	MBEDTLS_ASN1_PARSE_C	1
+#define	MBEDTLS_MD_C
+#define	MBEDTLS_ASN1_PARSE_C
+
+#define	MBEDTLS_X509_USE_C
+#define	MBEDTLS_BIGNUM_C
+#define	MBEDTLS_OID_C
+#define	MBEDTLS_PK_PARSE_C
+#define	MBEDTLS_PK_C
+#define	MBEDTLS_RSA_C
+#define	MBEDTLS_PKCS1_V21
+#define	MBEDTLS_X509_CRT_PARSE_C
+#define	MBEDTLS_SSL_TLS_C
+#define	MBEDTLS_CIPHER_C
+#define	MBEDTLS_SSL_PROTO_TLS1_2
+#define	MBEDTLS_SHA256_C
 
 #include "check_config.h"
 
