@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,14 +24,9 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_STDINT_H_
-#define	_STDINT_H_
+#ifndef	_SYS_STDINT_H_
+#define	_SYS_STDINT_H_
 
-#include <sys/types.h>
-#include <sys/stdint.h>
+#include <machine/stdint.h>
 
-#define	UINT16_MAX	0xffff
-#define	UINT32_MAX	0xffffffff
-#define	INT32_MAX	0x7fffffff
-
-#endif /* !_STDINT_H_ */
+#endif /* !_SYS_STDINT_H_ */
