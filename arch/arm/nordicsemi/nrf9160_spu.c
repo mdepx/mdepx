@@ -91,6 +91,58 @@ nrf_spu_sram_set_perm(struct nrf_spu_softc *sc, int region_id,
 	WR4(sc, SPU_RAMREGION_PERM(region_id), reg);
 }
 
+/* Configure Non-Secure Callable (NSC) flash region. */
+void
+nrf_spu_flashnsc(struct nrf_spu_softc *sc, int nsc_region,
+    int flash_region, int size, bool lock)
+{
+	uint32_t reg;
+
+	/* Configure REGION */
+	reg = (flash_region << FLASHNSC_REGION_REGION_S);
+	if (lock)
+		reg |= (FLASHNSC_REGION_LOCK);
+	printf("Writing %x\n", reg);
+	WR4(sc, SPU_FLASHNSC_REGION(nsc_region), reg);
+
+	/* Configure SIZE */
+	reg = 0;
+	switch (size) {
+	case 32:
+		reg |= FLASHNSC_SIZE_SIZE_32;
+		break;
+	case 64:
+		reg |= FLASHNSC_SIZE_SIZE_64;
+		break;
+	case 128:
+		reg |= FLASHNSC_SIZE_SIZE_128;
+		break;
+	case 256:
+		reg |= FLASHNSC_SIZE_SIZE_256;
+		break;
+	case 512:
+		reg |= FLASHNSC_SIZE_SIZE_512;
+		break;
+	case 1024:
+		reg |= FLASHNSC_SIZE_SIZE_1024;
+		break;
+	case 2048:
+		reg |= FLASHNSC_SIZE_SIZE_2048;
+		break;
+	case 4096:
+		reg |= FLASHNSC_SIZE_SIZE_4096;
+		break;
+	default:
+		/* Disabled */
+		reg |= FLASHNSC_SIZE_DISABLED;
+		break;
+	}
+	if (lock)
+		reg |= (FLASHNSC_SIZE_LOCK);
+	printf("Writing %x\n", reg);
+	WR4(sc, SPU_FLASHNSC_SIZE(nsc_region), reg);
+}
+
 void
 nrf_spu_gpio_set_perm(struct nrf_spu_softc *sc, int region_id,
     int perm)

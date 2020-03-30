@@ -50,7 +50,22 @@
 #define	SPU_GPIOPORT_PERM(n)	(0x4C0 + (n) * 0x8)	/* Select between secure and non-secure attribute for pins 0 to 31 of port n. Retained. */
 #define	SPU_GPIOPORT_LOCK(n)	(0x4C4 + (n) * 0x8)	/* Prevent further modification of the corresponding PERM register */
 #define	SPU_FLASHNSC_REGION(n)	(0x500 + (n) * 0x8)	/* Define which flash region can contain the non-secure callable (NSC) region n */
-#define	SPU_FLASHNSC_SIZE(n)	(0x504 + (n) * 0x8)	/* Define the size of the non-secure callable (NSC) region n */
+#define	 FLASHNSC_REGION_REGION_S	0
+#define	 FLASHNSC_REGION_REGION_M	(0x1f << FLASHNSC_REGION_REGION_S)
+#define	 FLASHNSC_REGION_LOCK		(1 << 8) /* can't be changed until rst*/
+#define	SPU_FLASHNSC_SIZE(n)		(0x504 + (n) * 0x8)	/* Define the size of the non-secure callable (NSC) region n */
+#define	 FLASHNSC_SIZE_SIZE_S		0
+#define	 FLASHNSC_SIZE_SIZE_M		(0xf << FLASHNSC_SIZE_SIZE_S)
+#define	 FLASHNSC_SIZE_DISABLED		(0x0 << FLASHNSC_SIZE_SIZE_S)
+#define	 FLASHNSC_SIZE_SIZE_32		(0x1 << FLASHNSC_SIZE_SIZE_S)
+#define	 FLASHNSC_SIZE_SIZE_64		(0x2 << FLASHNSC_SIZE_SIZE_S)
+#define	 FLASHNSC_SIZE_SIZE_128		(0x3 << FLASHNSC_SIZE_SIZE_S)
+#define	 FLASHNSC_SIZE_SIZE_256		(0x4 << FLASHNSC_SIZE_SIZE_S)
+#define	 FLASHNSC_SIZE_SIZE_512		(0x5 << FLASHNSC_SIZE_SIZE_S)
+#define	 FLASHNSC_SIZE_SIZE_1024	(0x6 << FLASHNSC_SIZE_SIZE_S)
+#define	 FLASHNSC_SIZE_SIZE_2048	(0x7 << FLASHNSC_SIZE_SIZE_S)
+#define	 FLASHNSC_SIZE_SIZE_4096	(0x8 << FLASHNSC_SIZE_SIZE_S)
+#define	 FLASHNSC_SIZE_LOCK		(1 << 8) /* can't be changed until rst*/
 #define	SPU_RAMNSC_REGION(n)	(0x540 + (n) * 0x8)	/* Define which RAM region can contain the non-secure callable (NSC) region n */
 #define	SPU_RAMNSC_SIZE(n)	(0x544 + (n) * 0x8)	/* Define the size of the non-secure callable (NSC) region n */
 #define	SPU_FLASHREGION_PERM(n)	(0x600 + (n) * 0x4)	/* Access permissions for flash region n */
@@ -88,5 +103,7 @@ void nrf_spu_sram_set_perm(struct nrf_spu_softc *sc, int region_id,
 void nrf_spu_gpio_set_perm(struct nrf_spu_softc *sc, int region_id,
     int perm);
 void nrf_spu_extdomain(struct nrf_spu_softc *sc, bool secure, bool lock);
+void nrf_spu_flashnsc(struct nrf_spu_softc *sc, int nsc_region,
+    int flash_region, int size, bool lock);
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_SPU_H_ */
