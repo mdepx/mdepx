@@ -49,7 +49,9 @@ void arm_scb_exceptions_target_config(struct arm_scb_softc *sc,
     int secure);
 void arm_scb_sysreset_secure(struct arm_scb_softc *sc,
     int secure_only);
-void arm_sau_configure(struct arm_scb_softc *sc, int enable, int allns);
 void arm_fpu_non_secure(struct arm_scb_softc *sc, int enable);
+
+void arm_sau_configure(struct arm_scb_softc *sc, int enable, int allns);
+int arm_sau_nregions(struct arm_scb_softc *sc);
 
 #endif /* !_ARM_ARM_SCB_H_ */

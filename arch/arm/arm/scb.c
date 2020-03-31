@@ -150,6 +150,16 @@ arm_sau_configure(struct arm_scb_softc *sc, int enable, int allns)
 }
 
 int
+arm_sau_nregions(struct arm_scb_softc *sc)
+{
+	int nreg;
+
+	nreg = RD4(sc, SAU_TYPE);
+
+	return (nreg);
+}
+
+int
 arm_scb_init(struct arm_scb_softc *sc, uint32_t base)
 {
 
