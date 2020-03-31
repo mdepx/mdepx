@@ -102,7 +102,6 @@ nrf_spu_flashnsc(struct nrf_spu_softc *sc, int nsc_region,
 	reg = (flash_region << FLASHNSC_REGION_REGION_S);
 	if (lock)
 		reg |= (FLASHNSC_REGION_LOCK);
-	printf("Writing %x\n", reg);
 	WR4(sc, SPU_FLASHNSC_REGION(nsc_region), reg);
 
 	/* Configure SIZE */
@@ -139,7 +138,6 @@ nrf_spu_flashnsc(struct nrf_spu_softc *sc, int nsc_region,
 	}
 	if (lock)
 		reg |= (FLASHNSC_SIZE_LOCK);
-	printf("Writing %x\n", reg);
 	WR4(sc, SPU_FLASHNSC_SIZE(nsc_region), reg);
 }
 
