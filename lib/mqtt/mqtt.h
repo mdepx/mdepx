@@ -72,7 +72,7 @@
 #define	FLAG_WILL_QOS1		(1 << 4)
 #define	FLAG_WILL_RETAIN	(1 << 5)
 #define	FLAG_PASSWORD		(1 << 6)
-#define	FLAG_USER		(1 << 7)
+#define	FLAG_USERNAME		(1 << 7)
 
 /* Connect return byte 1 */
 #define	CONNECT_ACK_FLAG_S	0
