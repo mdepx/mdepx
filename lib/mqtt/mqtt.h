@@ -68,8 +68,11 @@
 /* Connect Flags */
 #define	FLAG_CLEAN_SESSION	(1 << 1)
 #define	FLAG_WILL		(1 << 2)
-#define	FLAG_WILL_QOS0		(1 << 3)
-#define	FLAG_WILL_QOS1		(1 << 4)
+#define	FLAG_WILL_QOS_S		3
+#define	FLAG_WILL_QOS_M		(0x3 << FLAG_WILL_QOS_S)
+#define	FLAG_WILL_QOS0		(0 << FLAG_WILL_QOS_S)
+#define	FLAG_WILL_QOS1		(1 << FLAG_WILL_QOS_S)
+#define	FLAG_WILL_QOS2		(2 << FLAG_WILL_QOS_S)
 #define	FLAG_WILL_RETAIN	(1 << 5)
 #define	FLAG_PASSWORD		(1 << 6)
 #define	FLAG_USERNAME		(1 << 7)

@@ -487,26 +487,6 @@ handle_recv(struct mqtt_client *c, uint8_t *data, uint32_t len)
 	return (err);
 }
 
-static uint8_t *
-mqtt_variable_header(uint8_t *ptr, uint8_t flags,
-    uint16_t keepalive)
-{
-
-	/* Variable header */
-	*ptr++ = 0x00;
-	*ptr++ = 0x04;
-	*ptr++ = 'M';
-	*ptr++ = 'Q';
-	*ptr++ = 'T';
-	*ptr++ = 'T';
-	*ptr++ = MQTT_VERSION_3_1_1;	/* Protocol Level */
-	*ptr++ = flags;			/* Connect Flags */
-	*ptr++ = keepalive >> 8;	/* Keep Alive MSB */
-	*ptr++ = keepalive & 0xff;	/* Keep Alive LSB */
-
-	return (ptr);
-}
-
 int
 mqtt_disconnect(struct mqtt_client *c)
 {
@@ -531,7 +511,6 @@ mqtt_connect(struct mqtt_client *c)
 {
 	struct mqtt_request req;
 	uint8_t data[128];
-	uint8_t *ptr;
 	uint8_t flags;
 	uint16_t keepalive;
 	int retval;
@@ -539,18 +518,40 @@ mqtt_connect(struct mqtt_client *c)
 
 	/* Fixed header */
 	data[0] = CONTROL_CONNECT;
-	data[1] = 15;			/* Remaining Length */
+	data[1] = 17;			/* Remaining Length */
 
 	flags = FLAG_CLEAN_SESSION;
-	keepalive = 20;
-	ptr = mqtt_variable_header(&data[2], flags, keepalive);
+	keepalive = 120;
+
+	data[2] = 0x00;
+	data[3] = 0x04;
+	data[4] = 'M';
+	data[5] = 'Q';
+	data[6] = 'T';
+	data[7] = 'T';
+	data[8] = MQTT_VERSION_3_1_1;	/* Protocol Level */
+	data[9] = flags;		/* Connect Flags */
+	data[10] = keepalive >> 8;	/* Keep Alive MSB */
+	data[11] = keepalive & 0xff;	/* Keep Alive LSB */
 
 	/* Payload */
-	*ptr++ = 0;			/* Payload len MSB */
-	*ptr++ = 3;			/* Payload len LSB */
-	*ptr++ = 'a';			/* Client ID ... */
-	*ptr++ = 'b';
-	*ptr++ = 'c';
+	data[12] = 0;			/* Client ID len MSB */
+	data[13] = 5;			/* Client ID len LSB */
+	memcpy(&data[14], "md009", 5); /* Client ID ... */
+#if 0
+	data[19] = 0;
+	data[20] = 3;
+	memcpy(&data[21], "a/b", 3);	/* Will topic */
+	data[24] = 0;
+	data[25] = 3;
+	memcpy(&data[26], "aaa", 3);	/* Will message */
+
+	printf("Sending CONNECT message: ");
+	int i;
+	for (i = 0; i < 19; i++)
+		printf("%x ", data[i]);
+	printf("\n");
+#endif
 
 	req.state = MSG_STATE_CONNECT;
 	mdx_sem_init(&req.complete, 0);
@@ -560,7 +561,7 @@ mqtt_connect(struct mqtt_client *c)
 	list_append(&c->msg_list, &req.node);
 	mdx_mutex_unlock(&c->msg_mtx);
 
-	err = mqtt_send(c, data, 17);
+	err = mqtt_send(c, data, 19);
 	if (err) {
 		mdx_mutex_lock(&c->msg_mtx);
 		list_remove(&req.node);
@@ -574,7 +575,7 @@ mqtt_connect(struct mqtt_client *c)
 	 * Connect message sent.
 	 * Now wait for the connection status change.
 	 */
-	err = mdx_sem_timedwait(&req.complete, 5000000);
+	err = mdx_sem_timedwait(&req.complete, 10000000);
 
 	/*
 	 * Connection could still be established right here.
