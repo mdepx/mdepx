@@ -132,7 +132,6 @@ enum mqtt_connection_event {
 };
 
 struct mqtt_client {
-	struct thread *td_recv;
 	struct mqtt_network net;
 	mdx_sem_t sem_send;
 	void (*event)(struct mqtt_client *c, enum mqtt_connection_event);
@@ -157,5 +156,7 @@ int mqtt_connect(struct mqtt_client *c);
 int mqtt_disconnect(struct mqtt_client *c);
 int mqtt_publish(struct mqtt_client *c, struct mqtt_request *r);
 int mqtt_subscribe(struct mqtt_client *c, struct mqtt_request *r);
+int mqtt_ping(struct mqtt_client *c);
+void mqtt_poll(struct mqtt_client *c);
 
 #endif /* !_LIB_MQTT_MQTT_H_ */

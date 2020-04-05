@@ -513,6 +513,7 @@ mqtt_connect(struct mqtt_client *c)
 	uint8_t data[128];
 	uint8_t flags;
 	uint16_t keepalive;
+	int timeout;
 	int retval;
 	int err;
 
@@ -575,8 +576,15 @@ mqtt_connect(struct mqtt_client *c)
 	 * Connect message sent.
 	 * Now wait for the connection status change.
 	 */
-	err = mdx_sem_timedwait(&req.complete, 10000000);
+	timeout = 10;
+	do {
+		mqtt_poll(c);
+		err = mdx_sem_timedwait(&req.complete, 1000000);
+		if (err)
+			break;
+	} while (timeout--);
 
+	printf("%s: timeout %d err %d\n", __func__, timeout, err);
 	/*
 	 * Connection could still be established right here.
 	 * We will have to check req.status after removing
@@ -617,6 +625,7 @@ int
 mqtt_subscribe(struct mqtt_client *c, struct mqtt_request *s)
 {
 	uint8_t data[128];
+	int timeout;
 	int retval;
 	int pos;
 	int err;
@@ -657,7 +666,13 @@ mqtt_subscribe(struct mqtt_client *c, struct mqtt_request *s)
 		return (MQTT_ERR_CONN);
 	}
 
-	err = mdx_sem_timedwait(&s->complete, 5000000);
+	timeout = 10;
+	do {
+		mqtt_poll(c);
+		err = mdx_sem_timedwait(&s->complete, 1000000);
+		if (err)
+			break;
+	} while (timeout--);
 
 	mdx_mutex_lock(&c->msg_mtx);
 	list_remove(&s->node);
@@ -687,6 +702,7 @@ int
 mqtt_publish(struct mqtt_client *c, struct mqtt_request *m)
 {
 	uint8_t data[128];
+	int timeout;
 	int retval;
 	int err;
 	int pos;
@@ -749,7 +765,13 @@ mqtt_publish(struct mqtt_client *c, struct mqtt_request *m)
 	if (m->qos == 0)
 		return (0);
 
-	err = mdx_sem_timedwait(&m->complete, 5000000);
+	timeout = 10;
+	do {
+		mqtt_poll(c);
+		err = mdx_sem_timedwait(&m->complete, 1000000);
+		if (err)
+			break;
+	} while (timeout--);
 
 	mdx_mutex_lock(&c->msg_mtx);
 	list_remove(&m->node);
@@ -769,7 +791,7 @@ mqtt_publish(struct mqtt_client *c, struct mqtt_request *m)
 	return (retval);
 }
 
-static int
+int
 mqtt_ping(struct mqtt_client *c)
 {
 	uint8_t data[2];
@@ -782,46 +804,30 @@ mqtt_ping(struct mqtt_client *c)
 	if (err)
 		return (MQTT_ERR_CONN);
 
+	/* TODO: wait for PINGRESP */
+
 	return (0);
 }
 
 /*
  * This function requires a non-blocking socket to operate.
  */
-static void
-mqtt_thread_recv(void *arg)
+void
+mqtt_poll(struct mqtt_client *c)
 {
 	uint8_t data[128];
-	struct mqtt_client *c;
-	int keepalive;
 	int err;
 
-	c = arg;
-
-	keepalive = 0;
-
-	while (1) {
-		err = mqtt_recv(&c->net, data, 1);
-		if (err == 0) {
-			printf("close 1\n");
+	err = mqtt_recv(&c->net, data, 1);
+	if (err == 0) {
+		printf("close 1\n");
+		mqtt_event(c, MQTT_EVENT_DISCONNECTED);
+	} else if (err == 1) {
+		err = handle_recv(c, data, 128);
+		if (err == MQTT_ERR_CONN) {
+			printf("close 2\n");
 			mqtt_event(c, MQTT_EVENT_DISCONNECTED);
-		} else if (err == 1) {
-			err = handle_recv(c, data, 128);
-			if (err == MQTT_ERR_CONN) {
-				printf("close 2\n");
-				mqtt_event(c, MQTT_EVENT_DISCONNECTED);
-			}
-			keepalive = 0;
-		} else if (c->connected && keepalive++ > 50) {
-			err = mqtt_ping(c);
-			if (err == MQTT_ERR_CONN) {
-				printf("close 3\n");
-				mqtt_event(c, MQTT_EVENT_DISCONNECTED);
-			}
-			keepalive = 0;
 		}
-
-		mdx_usleep(1000000);
 	}
 }
 
@@ -837,12 +843,6 @@ mqtt_init(struct mqtt_client *c)
 
 	c->next_id = 1;
 	c->connected = 0;
-	c->td_recv = mdx_thread_create("mqtt recv", 1, 0, 8192,
-	    mqtt_thread_recv, c);
-	if (c->td_recv == NULL)
-		return (MQTT_ERR_UNKNOWN);
-
-	mdx_sched_add(c->td_recv);
 
 	return (0);
 }
