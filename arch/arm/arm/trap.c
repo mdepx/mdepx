@@ -46,7 +46,7 @@ static struct thread intr_thread[MDX_CPU_MAX];
 #error Add support
 #endif
 
-size_t intr_stack[MDX_CPU_MAX][MDX_ARM_INTR_STACK_SIZE];
+uint8_t intr_stack[MDX_CPU_MAX][MDX_ARM_INTR_STACK_SIZE];
 
 void save_fpu_context(struct vfp_state *vfp);
 void restore_fpu_context(struct vfp_state *vfp);

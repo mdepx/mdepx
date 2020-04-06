@@ -36,7 +36,7 @@
 #include <machine/cpufunc.h>
 
 /* Interrupt stack */
-static size_t intr_stack[MDX_CPU_MAX][MDX_RISCV_INTR_STACK_SIZE];
+static uint8_t intr_stack[MDX_CPU_MAX][MDX_RISCV_INTR_STACK_SIZE];
 uint8_t __riscv_boot_ap[MDX_CPU_MAX];
 
 #ifdef MDX_CPU
