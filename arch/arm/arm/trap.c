@@ -114,6 +114,42 @@ handle_exception(struct trapframe *tf, int exc_code)
 
 #ifdef MDX_SCHED
 
+static bool
+save_fpu(struct thread *td)
+{
+	bool fpu_is_enabled;
+
+	fpu_is_enabled = false;
+
+#ifdef MDX_ARM_VFP
+	struct pcb *pcb;
+	pcb = &td->td_pcb;
+	if (pcb->pcb_flags & PCB_FLAGS_FPU) {
+		fpu_is_enabled = true;
+		save_fpu_context(&pcb->pcb_vfp);
+	}
+#endif
+
+	return (fpu_is_enabled);
+}
+
+static void
+restore_fpu(struct thread *td, bool fpu_was_enabled)
+{
+#ifdef MDX_ARM_VFP
+	struct pcb *pcb;
+
+	pcb = &td->td_pcb;
+	if (pcb->pcb_flags & PCB_FLAGS_FPU) {
+		if (fpu_was_enabled == false)
+			vfp_control(true);
+		restore_fpu_context(&pcb->pcb_vfp);
+	} else
+		if (fpu_was_enabled == true)
+			vfp_control(false);
+#endif
+}
+
 struct trapframe *
 arm_exception(struct trapframe *tf, int exc_code)
 {
@@ -121,64 +157,83 @@ arm_exception(struct trapframe *tf, int exc_code)
 	uint32_t irq;
 	bool released;
 	bool intr;
-#ifdef MDX_ARM_VFP
-	struct pcb *pcb;
-	bool fpu_enabled;
-#endif
+	bool need_release;
+	bool fpu_was_enabled;
 
 	td = curthread;
 	released = false;
 	intr = false;
+	need_release = false;
+	fpu_was_enabled = false;
 
-#ifdef MDX_ARM_VFP
-	pcb = &td->td_pcb;
-	fpu_enabled = false;
-	if (pcb->pcb_flags & PCB_FLAGS_FPU) {
-		fpu_enabled = true;
-		save_fpu_context(&pcb->pcb_vfp);
-	}
-#endif
-
-	/* TODO: compare thread's stack base and tf. */
+	/*
+	 * Save the frame address.
+	 * TODO: compare thread's stack base and tf.
+	 */
+	td->td_tf = tf;
 
 	if (exc_code >= 16) {
+		/* We will handle the interrupt later. */
 		irq = exc_code - 16;
 		intr = true;
 	} else
 		handle_exception(tf, exc_code);
 
-	/*
-	 * Switch to the interrupt thread for the case if the
-	 * current thread will be released from this cpu.
-	 */
-	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
-	curthread->td_critnest++;
+	switch (td->td_state) {
+	case TD_STATE_RUNNING:
+		/* Current thread is still running. Do not switch. */
+		break;
+	case TD_STATE_TERMINATING:
+		/* This thread has finished work. */
+		mdx_thread_terminate_cleanup(td);
+		released = true;
+		break;
+	case TD_STATE_SEM_WAIT:
+	case TD_STATE_SLEEPING:
+		fpu_was_enabled = save_fpu(td);
+		td->td_state = TD_STATE_ACK;
+		/* Note that this thread can now be used by another CPU. */
+		released = true;
+		break;
+	case TD_STATE_YIELDING:
+	case TD_STATE_READY:
+		fpu_was_enabled = save_fpu(td);
+		need_release = true;
+		break;
+	case TD_STATE_WAKEUP:
+	default:
+		panic("unknown state %d, thread name %s",
+		    td->td_state, td->td_name);
+		break;
+	}
 
-	released = mdx_sched_ack(td, tf);
+	/*
+	 * Switch to the interrupt thread if we don't have
+	 * a thread anymore.
+	 */
+	if (intr && released)
+		PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
+
+	curthread->td_critnest++;
 
 	if (intr)
 		arm_nvic_intr(irq, tf);
 
-	if (!released)
-		released = mdx_sched_park(td);
+	if (need_release) {
+		mdx_sched_add(td);
+		released = true;
+	}
+
 	if (released) {
 		/* We don't have a thread to run. Pick a next one. */
 		td = mdx_sched_next();
-#ifdef MDX_ARM_VFP
-		pcb = &td->td_pcb;
-		if (pcb->pcb_flags & PCB_FLAGS_FPU) {
-			if (fpu_enabled == false)
-				vfp_control(true);
-			restore_fpu_context(&pcb->pcb_vfp);
-		} else
-			if (fpu_enabled == true)
-				vfp_control(false);
-#endif
+		restore_fpu(td, fpu_was_enabled);
 	}
 
 	/* Switch to the new thread. */
 	curthread->td_critnest--;
-	PCPU_SET(curthread, td);
+	if (released)
+		PCPU_SET(curthread, td);
 
 	return (td->td_tf);
 }
