@@ -108,6 +108,8 @@ enum mqtt_msg_state {
 	MSG_STATE_PUBCOMP,
 	MSG_STATE_SUBSCRIBE,
 	MSG_STATE_SUBACK,
+	MSG_STATE_PINGREQ,
+	MSG_STATE_PINGRESP,
 };
 
 struct mqtt_request {

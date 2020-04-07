@@ -102,6 +102,7 @@ mqtt_recv(struct mqtt_network *net, uint8_t *buf, int len)
 static int
 handle_pingresp(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 {
+	struct mqtt_request *m;
 	int err;
 
 	printf("pingresp received\n");
@@ -112,6 +113,18 @@ handle_pingresp(struct mqtt_client *c, uint8_t *buf, uint32_t len)
 		printf("%s: rem is not received\n", __func__);
 		return (MQTT_ERR_CONN);
 	}
+
+	mdx_mutex_lock(&c->msg_mtx);
+	for (m = msg_first(c); m != NULL; m = msg_next(c, m)) {
+		if (m->state == MSG_STATE_PINGREQ) {
+			/* Found */
+			printf("%s: ping req found\n", __func__);
+			m->state = MSG_STATE_PINGRESP;
+			mdx_sem_post(&m->complete);
+			break;
+		}
+	}
+	mdx_mutex_unlock(&c->msg_mtx);
 
 	return (0);
 }
@@ -794,24 +807,55 @@ mqtt_publish(struct mqtt_client *c, struct mqtt_request *m)
 int
 mqtt_ping(struct mqtt_client *c)
 {
+	struct mqtt_request req;
 	uint8_t data[2];
+	int timeout;
 	int err;
 
 	data[0] = CONTROL_PINGREQ;
 	data[1] = 0;	/* Remaining Length */
 
+	req.state = MSG_STATE_PINGREQ;
+	mdx_sem_init(&req.complete, 0);
+
+	mdx_mutex_lock(&c->msg_mtx);
+	/* TODO: ensure here that there is no ping messages in the queue */
+	list_append(&c->msg_list, &req.node);
+	mdx_mutex_unlock(&c->msg_mtx);
+
 	err = mqtt_send(c, data, 2);
-	if (err)
+	if (err) {
+		mdx_mutex_lock(&c->msg_mtx);
+		list_remove(&req.node);
+		mdx_mutex_unlock(&c->msg_mtx);
+		mqtt_event(c, MQTT_EVENT_DISCONNECTED);
 		return (MQTT_ERR_CONN);
+	}
 
-	/* TODO: wait for PINGRESP */
+	/*
+	 * Ping message sent.
+	 * Now wait for the ping response.
+	 */
+	timeout = 10;
+	do {
+		mqtt_poll(c);
+		err = mdx_sem_timedwait(&req.complete, 1000000);
+		if (err)
+			break;
+	} while (timeout--);
 
-	return (0);
+	mdx_mutex_lock(&c->msg_mtx);
+	list_remove(&req.node);
+	mdx_mutex_unlock(&c->msg_mtx);
+
+	if (req.state == MSG_STATE_PINGRESP)
+		err = MQTT_ERR_OK;
+	else
+		err = MQTT_ERR_TIMEOUT;
+
+	return (err);
 }
 
-/*
- * This function requires a non-blocking socket to operate.
- */
 void
 mqtt_poll(struct mqtt_client *c)
 {
