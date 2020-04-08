@@ -109,6 +109,19 @@ handle_exception(struct trapframe *tf)
 }
 
 #ifdef MDX_SCHED
+
+#ifdef MDX_RISCV_FPE
+static void
+save_fpu(struct thread *td)
+{
+	struct pcb *pcb;
+
+	pcb = &td->td_pcb;
+	if (pcb->pcb_flags & PCB_FLAGS_FPE_ENABLED)
+		fpe_state_save(&pcb->pcb_x[0][0]);
+}
+#endif
+
 struct trapframe *
 riscv_exception(struct trapframe *tf)
 {
@@ -116,24 +129,17 @@ riscv_exception(struct trapframe *tf)
 	bool released;
 	bool intr;
 	int irq;
-#ifdef MDX_RISCV_FPE
-	struct pcb *pcb;
-#endif
 
 	td = curthread;
 	released = false;
 	intr = false;
 
+	td->td_tf = tf;
+
 #ifdef MDX_SCHED_SMP
 	/* This CPU could not pick up new threads for a moment. */
 	if (td->td_idle)
 		mdx_sched_cpu_avail(curpcpu, false);
-#endif
-
-#ifdef MDX_RISCV_FPE
-	pcb = &td->td_pcb;
-	if (pcb->pcb_flags & PCB_FLAGS_FPE_ENABLED)
-		fpe_state_save(&pcb->pcb_x[0][0]);
 #endif
 
 	/* Check the trapframe first before we release this thread. */
@@ -143,29 +149,60 @@ riscv_exception(struct trapframe *tf)
 	} else
 		handle_exception(tf);
 
-	/* Switch to the interrupt thread. */
-	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
-	critical_enter();
-
 	/*
 	 * Check if this thread went to sleep and release it from this CPU.
 	 * Note that td and tf can not be used after this call since this
 	 * thread could be added back to the run queue by another CPU in
 	 * mdx_mutex_unlock() or by this cpu in riscv_intr().
 	 */
-	released = mdx_sched_ack(td, tf);
+
+	switch (td->td_state) {
+	case TD_STATE_RUNNING:
+		/* Current thread is still running. Do not switch. */
+		break;
+	case TD_STATE_TERMINATING:
+		/* This thread has finished work. */
+		mdx_thread_terminate_cleanup(td);
+		released = true;
+		break;
+	case TD_STATE_SEM_WAIT:
+	case TD_STATE_SLEEPING:
+#ifdef MDX_RISCV_FPE
+		save_fpu(td);
+#endif
+		td->td_state = TD_STATE_ACK;
+		/* Note that this thread can now be used by another CPU. */
+		released = true;
+		break;
+	case TD_STATE_YIELDING:
+	case TD_STATE_READY:
+#ifdef MDX_RISCV_FPE
+		save_fpu(td);
+#endif
+		mdx_sched_add(td);
+		released = true;
+		break;
+	case TD_STATE_WAKEUP:
+	default:
+		panic("unknown state %d, thread name %s",
+		    td->td_state, td->td_name);
+		break;
+	}
+
+	/* Switch to the interrupt thread. */
+	if (released)
+		PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
+
+	critical_enter();
 
 	if (intr)
 		riscv_intr(irq);
-
-	/* Check if this thread has no more CPU time. */
-	if (!released)
-		released = mdx_sched_park(td);
 
 	/* Pickup new thread if we don't have one anymore. */
 	if (released) {
 		td = mdx_sched_next();
 #ifdef MDX_RISCV_FPE
+		struct pcb *pcb;
 		pcb = &td->td_pcb;
 		if (pcb->pcb_flags & PCB_FLAGS_FPE_ENABLED)
 			fpe_state_restore(&pcb->pcb_x[0][0]);
@@ -174,7 +211,9 @@ riscv_exception(struct trapframe *tf)
 
 	/* Switch to the new thread. */
 	critical_exit();
-	PCPU_SET(curthread, td);
+
+	if (released)
+		PCPU_SET(curthread, td);
 
 	return (td->td_tf);
 }
