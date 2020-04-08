@@ -154,17 +154,15 @@ struct trapframe *
 arm_exception(struct trapframe *tf, int exc_code)
 {
 	struct thread *td;
-	uint32_t irq;
+	bool fpu_was_enabled;
 	bool released;
 	bool intr;
-	bool need_release;
-	bool fpu_was_enabled;
+	uint32_t irq;
 
 	td = curthread;
+	fpu_was_enabled = false;
 	released = false;
 	intr = false;
-	need_release = false;
-	fpu_was_enabled = false;
 
 	/*
 	 * Save the frame address.
@@ -172,6 +170,11 @@ arm_exception(struct trapframe *tf, int exc_code)
 	 */
 	td->td_tf = tf;
 
+	/*
+	 * Any thread that is leaving the CPU could be added back to
+	 * the run queue by interrupt handlers, that means we have to
+	 * ACK and release it before processing interrupts.
+	 */
 	if (exc_code >= 16) {
 		/* We will handle the interrupt later. */
 		irq = exc_code - 16;
@@ -197,7 +200,9 @@ arm_exception(struct trapframe *tf, int exc_code)
 		break;
 	case TD_STATE_YIELDING:
 	case TD_STATE_READY:
-		need_release = true;
+		fpu_was_enabled = save_fpu(td);
+		mdx_sched_add(td);
+		released = true;
 		break;
 	case TD_STATE_WAKEUP:
 	default:
@@ -210,19 +215,13 @@ arm_exception(struct trapframe *tf, int exc_code)
 	 * Switch to the interrupt thread if we don't have
 	 * a thread anymore.
 	 */
-	if (released || need_release)
+	if (released)
 		PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
 
 	curthread->td_critnest++;
 
 	if (intr)
 		arm_nvic_intr(irq, NULL);
-
-	if (need_release) {
-		fpu_was_enabled = save_fpu(td);
-		mdx_sched_add(td);
-		released = true;
-	}
 
 	if (released) {
 		/* We don't have a thread to run. Pick a next one. */
