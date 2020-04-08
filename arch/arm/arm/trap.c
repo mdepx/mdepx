@@ -197,7 +197,6 @@ arm_exception(struct trapframe *tf, int exc_code)
 		break;
 	case TD_STATE_YIELDING:
 	case TD_STATE_READY:
-		fpu_was_enabled = save_fpu(td);
 		need_release = true;
 		break;
 	case TD_STATE_WAKEUP:
@@ -211,15 +210,16 @@ arm_exception(struct trapframe *tf, int exc_code)
 	 * Switch to the interrupt thread if we don't have
 	 * a thread anymore.
 	 */
-	if (intr && released)
+	if (released || need_release)
 		PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
 
 	curthread->td_critnest++;
 
 	if (intr)
-		arm_nvic_intr(irq, tf);
+		arm_nvic_intr(irq, NULL);
 
 	if (need_release) {
+		fpu_was_enabled = save_fpu(td);
 		mdx_sched_add(td);
 		released = true;
 	}
@@ -230,8 +230,9 @@ arm_exception(struct trapframe *tf, int exc_code)
 		restore_fpu(td, fpu_was_enabled);
 	}
 
-	/* Switch to the new thread. */
 	curthread->td_critnest--;
+
+	/* Switch to the new thread. */
 	if (released)
 		PCPU_SET(curthread, td);
 
