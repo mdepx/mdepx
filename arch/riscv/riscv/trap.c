@@ -172,7 +172,6 @@ riscv_exception(struct trapframe *tf)
 	if (released) {
 		td = mdx_sched_next();
 #ifdef MDX_RISCV_FPE
-		struct pcb *pcb;
 		pcb = &td->td_pcb;
 		if (pcb->pcb_flags & PCB_FLAGS_FPE_ENABLED)
 			fpe_state_restore(&pcb->pcb_x[0][0]);
