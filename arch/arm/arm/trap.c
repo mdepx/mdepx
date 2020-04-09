@@ -169,9 +169,9 @@ arm_exception(struct trapframe *tf, int exc_code)
 	td->td_tf = tf;
 
 	/*
-	 * Any thread that is leaving the CPU could be added back to
-	 * the run queue by interrupt handlers, that means we have to
-	 * ACK and release it before processing interrupts.
+	 * A thread that is leaving CPU could be added back to the run
+	 * queue by interrupt handlers, which means we have to ACK and
+	 * release it before processing interrupts.
 	 */
 	if (exc_code >= 16) {
 		/* We will handle the interrupt later. */
@@ -205,7 +205,7 @@ arm_exception(struct trapframe *tf, int exc_code)
 		arm_nvic_intr(irq, NULL);
 
 	if (released) {
-		/* We don't have a thread to run. Pick a next one. */
+		/* We don't have a thread to run. Pick the next one. */
 		td = mdx_sched_next();
 #ifdef MDX_ARM_VFP
 		restore_fpu(td, fpu_was_enabled);
@@ -221,7 +221,7 @@ arm_exception(struct trapframe *tf, int exc_code)
 	return (td->td_tf);
 }
 
-#else
+#else /* !MDX_SCHED */
 
 struct trapframe *
 arm_exception(struct trapframe *tf, int exc_code)

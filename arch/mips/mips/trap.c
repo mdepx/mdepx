@@ -212,7 +212,7 @@ mips_exception(struct trapframe *tf)
 	return (td->td_tf);
 }
 
-#else
+#else /* !MDX_SCHED */
 
 struct trapframe *
 mips_exception(struct trapframe *tf)
