@@ -172,14 +172,11 @@ mips_exception(struct trapframe *tf)
 	bool released;
 	bool intr;
 
+	td = curthread;
 	released = false;
 	intr = false;
 
-	td = curthread;
-
-	/* Switch to the interrupt thread. Stack is the same. */
-	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
-	curthread->td_critnest++;
+	td->td_tf = tf;
 
 	cause = mips_rd_cause();
 	exc_code = (cause & MIPS_CR_EXC_CODE_M) >> \
@@ -193,19 +190,24 @@ mips_exception(struct trapframe *tf)
 	else
 		handle_exception(tf, exc_code);
 
-	released = mdx_sched_ack(td, tf);
+	released = mdx_sched_release(td);
+
+	/* Switch to the interrupt thread. Stack is the same. */
+	if (released)
+		PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
+
+	curthread->td_critnest++;
 
 	if (intr)
 		mips_handle_intr(cause);
-
-	if (!released) 
-		released = mdx_sched_park(td);
 
 	if (released)
 		td = mdx_sched_next();
 
 	curthread->td_critnest--;
-	PCPU_SET(curthread, td);
+
+	if (released)
+		PCPU_SET(curthread, td);
 
 	return (td->td_tf);
 }

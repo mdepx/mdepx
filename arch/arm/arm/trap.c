@@ -182,34 +182,17 @@ arm_exception(struct trapframe *tf, int exc_code)
 	} else
 		handle_exception(tf, exc_code);
 
+#ifdef MDX_ARM_VFP
 	switch (td->td_state) {
-	case TD_STATE_RUNNING:
-		/* Current thread is still running. Do not switch. */
-		break;
-	case TD_STATE_TERMINATING:
-		/* This thread has finished work. */
-		mdx_thread_terminate_cleanup(td);
-		released = true;
-		break;
 	case TD_STATE_SEM_WAIT:
 	case TD_STATE_SLEEPING:
-		fpu_was_enabled = save_fpu(td);
-		td->td_state = TD_STATE_ACK;
-		/* Note that this thread can now be used by another CPU. */
-		released = true;
-		break;
 	case TD_STATE_YIELDING:
 	case TD_STATE_READY:
 		fpu_was_enabled = save_fpu(td);
-		mdx_sched_add(td);
-		released = true;
-		break;
-	case TD_STATE_WAKEUP:
-	default:
-		panic("unknown state %d, thread name %s",
-		    td->td_state, td->td_name);
-		break;
 	}
+#endif
+
+	released = mdx_sched_release(td);
 
 	/*
 	 * Switch to the interrupt thread if we don't have

@@ -143,51 +143,44 @@ mdx_sched_add(struct thread *td)
 	critical_exit();
 }
 
-int
-mdx_sched_ack(struct thread *td, struct trapframe *tf)
+/*
+ * Called by the exception handler only.
+ */
+bool
+mdx_sched_release(struct thread *td)
 {
+	bool released;
 
-	KASSERT(curthread->td_critnest > 0,
-	    ("%s: Not in critical section.", __func__));
-
-	/* Save the frame address */
-	td->td_tf = tf;
+	released = false;
 
 	switch (td->td_state) {
+	case TD_STATE_RUNNING:
+		/* Current thread is still running. Do not switch. */
+		break;
 	case TD_STATE_TERMINATING:
 		/* This thread has finished work. */
 		mdx_thread_terminate_cleanup(td);
-		return (1);
+		released = true;
+		break;
 	case TD_STATE_SEM_WAIT:
 	case TD_STATE_SLEEPING:
 		td->td_state = TD_STATE_ACK;
-		return (1);
+		/* Note that this thread can now be used by another CPU. */
+		released = true;
+		break;
+	case TD_STATE_YIELDING:
+	case TD_STATE_READY:
+		mdx_sched_add(td);
+		released = true;
+		break;
+	case TD_STATE_WAKEUP:
 	default:
+		panic("unknown state %d, thread name %s",
+		    td->td_state, td->td_name);
 		break;
 	}
 
-	return (MDX_OK);
-}
-
-int
-mdx_sched_park(struct thread *td)
-{
-
-	KASSERT(curthread->td_critnest > 0,
-	    ("%s: Not in critical section.", __func__));
-
-	switch (td->td_state) {
-	case TD_STATE_WAKEUP:
-		panic("wrong state, thread name %s", td->td_name);
-	case TD_STATE_RUNNING:
-		/* Current thread is still running. Do not switch. */
-		return (MDX_OK);
-	case TD_STATE_YIELDING:
-	default:
-		mdx_sched_add(td);
-
-		return (1);
-	}
+	return (released);
 }
 
 struct thread *
