@@ -114,6 +114,7 @@ handle_exception(struct trapframe *tf, int exc_code)
 
 #ifdef MDX_SCHED
 
+#ifdef MDX_ARM_VFP
 static bool
 save_fpu(struct thread *td)
 {
@@ -121,14 +122,12 @@ save_fpu(struct thread *td)
 
 	fpu_is_enabled = false;
 
-#ifdef MDX_ARM_VFP
 	struct pcb *pcb;
 	pcb = &td->td_pcb;
 	if (pcb->pcb_flags & PCB_FLAGS_FPU) {
 		fpu_is_enabled = true;
 		save_fpu_context(&pcb->pcb_vfp);
 	}
-#endif
 
 	return (fpu_is_enabled);
 }
@@ -136,7 +135,6 @@ save_fpu(struct thread *td)
 static void
 restore_fpu(struct thread *td, bool fpu_was_enabled)
 {
-#ifdef MDX_ARM_VFP
 	struct pcb *pcb;
 
 	pcb = &td->td_pcb;
@@ -147,8 +145,8 @@ restore_fpu(struct thread *td, bool fpu_was_enabled)
 	} else
 		if (fpu_was_enabled == true)
 			vfp_control(false);
-#endif
 }
+#endif
 
 struct trapframe *
 arm_exception(struct trapframe *tf, int exc_code)
@@ -209,7 +207,9 @@ arm_exception(struct trapframe *tf, int exc_code)
 	if (released) {
 		/* We don't have a thread to run. Pick a next one. */
 		td = mdx_sched_next();
+#ifdef MDX_ARM_VFP
 		restore_fpu(td, fpu_was_enabled);
+#endif
 	}
 
 	curthread->td_critnest--;
