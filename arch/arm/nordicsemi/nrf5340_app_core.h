@@ -51,70 +51,70 @@
 #include <arm/nordicsemi/nrf_twis.h>
 #include <arm/nordicsemi/nrf_uarte.h>
 
-#define	NRF_DCNF	0x40000000 /* DCNF Domain configuration */
-#define	NRF_FPU		0x40000000 /* FPU Floating Point unit interrupt control */
-#define	NRF_CACHE	0x50001000 /* CACHE Cache */
-#define	NRF_SPU		0x50003000 /* SPU System protection unit */
-#define	NRF_OSCILLATORS	0x40004000 /* OSCILLATORS Oscillator configuration */
-#define	NRF_REGULATORS	0x40004000 /* REGULATORS Regulator configuration */
-#define	NRF_CLOCK	0x40005000 /* CLOCK Clock control */
-#define	NRF_POWER	0x40005000 /* POWER Power control */
-#define	NRF_RESET	0x40005000 /* RESET Reset control and status */
-#define	NRF_CTRLAPPERI	0x40006000 /* CTRLAPPERI Control access port CPU side */
-#define	NRF_SPIM0	0x40008000 /* SPIM0 SPI master 0 */
-#define	NRF_SPIS0	0x40008000 /* SPIS0 SPI slave 0 */
-#define	NRF_TWIM0	0x40008000 /* TWIM0 Two-wire interface master 0 */
-#define	NRF_TWIS0	0x40008000 /* TWIS0 Two-wire interface slave 0 */
-#define	NRF_UARTE0	0x40008000 /* UARTE0 Universal asynchronous receiver/transmitter with EasyDMA 0 */
-#define	NRF_SPIM1	0x40009000 /* SPIM1 SPI master 1 */
-#define	NRF_SPIS1	0x40009000 /* SPIS1 SPI slave 1 */
-#define	NRF_TWIM1	0x40009000 /* TWIM1 Two-wire interface master 1 */
-#define	NRF_TWIS1	0x40009000 /* TWIS1 Two-wire interface slave 1 */
-#define	NRF_UARTE1	0x40009000 /* UARTE1 Universal asynchronous receiver/transmitter with EasyDMA 1 */
-#define	NRF_SPIM2	0x4000A000 /* SPIM SPI master 2 (high-speed) */
-#define	NRF_GPIOTE0	0x5000D000 /* GPIOTE GPIO tasks and events */
-#define	NRF_SAADC	0x4000E000 /* SAADC Successive approximation analog-to-digital converter */
-#define	NRF_TIMER0	0x4000F000 /* TIMER0 Timer 0 */
-#define	NRF_TIMER1	0x40010000 /* TIMER1 Timer 1 */
-#define	NRF_TIMER2	0x40011000 /* TIMER2 Timer 2 */
-#define	NRF_RTC0	0x40014000 /* RTC0 Real time counter 0 */
-#define	NRF_RTC1	0x40015000 /* RTC1 Real time counter 1 */
-#define	NRF_DPPIC	0x40017000 /* DPPIC DPPI controller */
-#define	NRF_WDT0	0x40018000 /* WDT0 Watchdog timer 0 */
-#define	NRF_WDT1	0x40019000 /* WDT1 Watchdog timer 1 */
-#define	NRF_COMP	0x4001A000 /* COMP Comparator */
-#define	NRF_LPCOMP	0x4001A000 /* LPCOMP Low-power comparator */
-#define	NRF_EGU0	0x4001B000 /* EGU0 Event generator unit 0 */
-#define	NRF_EGU1	0x4001C000 /* EGU1 Event generator unit 1 */
-#define	NRF_EGU2	0x4001D000 /* EGU2 Event generator unit 2 */
-#define	NRF_EGU3	0x4001E000 /* EGU3 Event generator unit 3 */
-#define	NRF_EGU4	0x4001F000 /* EGU4 Event generator unit 4 */
-#define	NRF_EGU5	0x40020000 /* EGU5 Event generator unit 5 */
-#define	NRF_PWM0	0x40021000 /* PWM0 Pulse width modulation unit 0 */
-#define	NRF_PWM1	0x40022000 /* PWM1 Pulse width modulation unit 1 */
-#define	NRF_PWM2	0x40023000 /* PWM2 Pulse width modulation unit 2 */
-#define	NRF_PDM		0x40026000 /* PDM Pulse density modulation (digital microphone) interface */
-#define	NRF_I2S		0x40028000 /* I2S Inter-IC sound interface */
-#define	NRF_IPC		0x4002A000 /* IPC Interprocessor communication */
-#define	NRF_QSPI	0x4002B000 /* QSPI External memory (quad serial peripheral) interface */
-#define	NRF_NFCT	0x4002D000 /* NFCT Near field communication tag */
-#define	NRF_GPIOTE1	0x4002F000 /* GPIOTE GPIO tasks and events */
-#define	NRF_MUTEX	0x40030000 /* MUTEX Mutual exclusive hardware support */
-#define	NRF_QDEC	0x40033000 /* QDEC Quadrature decoder */
-#define	NRF_USBD	0x40036000 /* USBD Universal serial bus device */
-#define	NRF_USBREG	0x40037000 /* USBREG USB regulator control */
-#define	NRF_KMU		0x40039000 /* KMU Key management unit */
-#define	NRF_NVMC	0x40039000 /* NVMC Non-volatile memory controller */
-#define	NRF_GPIO0	0x40842500 /* GPIO0 General purpose input and output, port 0 */
-#define	NRF_GPIO1	0x40842800 /* GPIO1 General purpose input and output, port 1 */
-#define	NRF_CRYPTOCELL	0x50844000 /* CRYPTOCELL CryptoCell subsystem control interface */
-#define	NRF_VMC		0x40081000 /* VMC Volatile memory controller */
-#define	NRF_CACHEDATA	0x00F00000 /* CACHEDATA Cache data */
-#define	NRF_CACHEINFO	0x00F08000 /* CACHEINFO Cache info */
-#define	NRF_FICR	0x00FF0000 /* FICR Factory information configuration registers */
-#define	NRF_UICR	0x00FF8000 /* UICR User information configuration registers */
-#define	NRF_CTI		0xE0042000 /* CTI Cross-trigger interface */
-#define	NRF_TAD		0xE0080000 /* TAD Trace and debug control */
+#define	BASE_DCNF	0x40000000 /* DCNF Domain configuration */
+#define	BASE_FPU	0x40000000 /* FPU Floating Point unit interrupt control */
+#define	BASE_CACHE	0x50001000 /* CACHE Cache */
+#define	BASE_SPU	0x50003000 /* SPU System protection unit */
+#define	BASE_OSCILLATORS	0x40004000 /* OSCILLATORS Oscillator configuration */
+#define	BASE_REGULATORS	0x40004000 /* REGULATORS Regulator configuration */
+#define	BASE_CLOCK	0x40005000 /* CLOCK Clock control */
+#define	BASE_POWER	0x40005000 /* POWER Power control */
+#define	BASE_RESET	0x40005000 /* RESET Reset control and status */
+#define	BASE_CTRLAPPERI	0x40006000 /* CTRLAPPERI Control access port CPU side */
+#define	BASE_SPIM0	0x40008000 /* SPIM0 SPI master 0 */
+#define	BASE_SPIS0	0x40008000 /* SPIS0 SPI slave 0 */
+#define	BASE_TWIM0	0x40008000 /* TWIM0 Two-wire interface master 0 */
+#define	BASE_TWIS0	0x40008000 /* TWIS0 Two-wire interface slave 0 */
+#define	BASE_UARTE0	0x40008000 /* UARTE0 Universal asynchronous receiver/transmitter with EasyDMA 0 */
+#define	BASE_SPIM1	0x40009000 /* SPIM1 SPI master 1 */
+#define	BASE_SPIS1	0x40009000 /* SPIS1 SPI slave 1 */
+#define	BASE_TWIM1	0x40009000 /* TWIM1 Two-wire interface master 1 */
+#define	BASE_TWIS1	0x40009000 /* TWIS1 Two-wire interface slave 1 */
+#define	BASE_UARTE1	0x40009000 /* UARTE1 Universal asynchronous receiver/transmitter with EasyDMA 1 */
+#define	BASE_SPIM2	0x4000A000 /* SPIM SPI master 2 (high-speed) */
+#define	BASE_GPIOTE0	0x5000D000 /* GPIOTE GPIO tasks and events */
+#define	BASE_SAADC	0x4000E000 /* SAADC Successive approximation analog-to-digital converter */
+#define	BASE_TIMER0	0x4000F000 /* TIMER0 Timer 0 */
+#define	BASE_TIMER1	0x40010000 /* TIMER1 Timer 1 */
+#define	BASE_TIMER2	0x40011000 /* TIMER2 Timer 2 */
+#define	BASE_RTC0	0x40014000 /* RTC0 Real time counter 0 */
+#define	BASE_RTC1	0x40015000 /* RTC1 Real time counter 1 */
+#define	BASE_DPPIC	0x40017000 /* DPPIC DPPI controller */
+#define	BASE_WDT0	0x40018000 /* WDT0 Watchdog timer 0 */
+#define	BASE_WDT1	0x40019000 /* WDT1 Watchdog timer 1 */
+#define	BASE_COMP	0x4001A000 /* COMP Comparator */
+#define	BASE_LPCOMP	0x4001A000 /* LPCOMP Low-power comparator */
+#define	BASE_EGU0	0x4001B000 /* EGU0 Event generator unit 0 */
+#define	BASE_EGU1	0x4001C000 /* EGU1 Event generator unit 1 */
+#define	BASE_EGU2	0x4001D000 /* EGU2 Event generator unit 2 */
+#define	BASE_EGU3	0x4001E000 /* EGU3 Event generator unit 3 */
+#define	BASE_EGU4	0x4001F000 /* EGU4 Event generator unit 4 */
+#define	BASE_EGU5	0x40020000 /* EGU5 Event generator unit 5 */
+#define	BASE_PWM0	0x40021000 /* PWM0 Pulse width modulation unit 0 */
+#define	BASE_PWM1	0x40022000 /* PWM1 Pulse width modulation unit 1 */
+#define	BASE_PWM2	0x40023000 /* PWM2 Pulse width modulation unit 2 */
+#define	BASE_PDM	0x40026000 /* PDM Pulse density modulation (digital microphone) interface */
+#define	BASE_I2S	0x40028000 /* I2S Inter-IC sound interface */
+#define	BASE_IPC	0x4002A000 /* IPC Interprocessor communication */
+#define	BASE_QSPI	0x4002B000 /* QSPI External memory (quad serial peripheral) interface */
+#define	BASE_NFCT	0x4002D000 /* NFCT Near field communication tag */
+#define	BASE_GPIOTE1	0x4002F000 /* GPIOTE GPIO tasks and events */
+#define	BASE_MUTEX	0x40030000 /* MUTEX Mutual exclusive hardware support */
+#define	BASE_QDEC	0x40033000 /* QDEC Quadrature decoder */
+#define	BASE_USBD	0x40036000 /* USBD Universal serial bus device */
+#define	BASE_USBREG	0x40037000 /* USBREG USB regulator control */
+#define	BASE_KMU	0x40039000 /* KMU Key management unit */
+#define	BASE_NVMC	0x40039000 /* NVMC Non-volatile memory controller */
+#define	BASE_GPIO0	0x40842500 /* GPIO0 General purpose input and output, port 0 */
+#define	BASE_GPIO1	0x40842800 /* GPIO1 General purpose input and output, port 1 */
+#define	BASE_CRYPTOCELL	0x50844000 /* CRYPTOCELL CryptoCell subsystem control interface */
+#define	BASE_VMC	0x40081000 /* VMC Volatile memory controller */
+#define	BASE_CACHEDATA	0x00F00000 /* CACHEDATA Cache data */
+#define	BASE_CACHEINFO	0x00F08000 /* CACHEINFO Cache info */
+#define	BASE_FICR	0x00FF0000 /* FICR Factory information configuration registers */
+#define	BASE_UICR	0x00FF8000 /* UICR User information configuration registers */
+#define	BASE_CTI	0xE0042000 /* CTI Cross-trigger interface */
+#define	BASE_TAD	0xE0080000 /* TAD Trace and debug control */
 
 #define	BASE_FICR	0x00FF0000 /* Factory information configuration */
 #define	BASE_UICR	0x00FF8000 /* User information configuration */
@@ -124,7 +124,7 @@
 #define	BASE_UICR	0x00FF8000 /* User information configuration */
 #define	BASE_FICR	0x00FF0000 /* Factory information configuration */
 
-#define	NRF_SECURE	(1 << 28)
+#define	NRF_SECURE_ACCESS	(1 << 28)
 
 #define	ID_DCNF		0
 #define	ID_FPU		0

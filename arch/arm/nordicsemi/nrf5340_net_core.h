@@ -51,45 +51,45 @@
 #include <arm/nordicsemi/nrf_twis.h>
 #include <arm/nordicsemi/nrf_uarte.h>
 
-#define	NRF_DCNF	0x41000000 /* Domain configuration */
-#define	NRF_VREQCTRL	0x41004000 /* Voltage request control */
-#define	NRF_CLOCK	0x41005000 /* Clock control */
-#define	NRF_POWER	0x41005000 /* Power control */
-#define	NRF_RESET	0x41005000 /* Reset status */
-#define	NRF_CTRLAP	0x41006000 /* Control access port CPU side */
-#define	NRF_RADIO	0x41008000 /* 2.4 GHz radio */
-#define	NRF_RNG		0x41009000 /* Random number generator */
-#define	NRF_GPIOTE	0x4100A000 /* GPIO tasks and events */
-#define	NRF_WDT		0x4100B000 /* Watchdog timer */
-#define	NRF_TIMER0	0x4100C000 /* Timer 0 */
-#define	NRF_ECB		0x4100D000 /* AES ECB mode encryption */
-#define	NRF_AAR		0x4100E000 /* Accelerated address resolver */
-#define	NRF_CCM		0x4100E000 /* AES CCM mode encryption */
-#define	NRF_DPPIC	0x4100F000 /* DPPI controller */
-#define	NRF_TEMP	0x41010000 /* Temperature sensor */
-#define	NRF_RTC0	0x41011000 /* Real-time counter 0 */
-#define	NRF_IPC		0x41012000 /* Interprocessor communication */
-#define	NRF_SPIM0	0x41013000 /* SPI master 0 */
-#define	NRF_SPIS0	0x41013000 /* SPI slave 0 */
-#define	NRF_TWIM0	0x41013000 /* Two-wire interface master 0 */
-#define	NRF_TWIS0	0x41013000 /* Two-wire interface slave 0 */
-#define	NRF_UARTE0	0x41013000 /* Universal asynchronous receiver/transmitter */
-#define	NRF_EGU0	0x41014000 /* Event generator unit 0 */
-#define	NRF_RTC1	0x41016000 /* Real-time counter 1 */
-#define	NRF_TIMER1	0x41018000 /* Timer 1 */
-#define	NRF_TIMER2	0x41019000 /* Timer 2 */
-#define	NRF_SWI0	0x4101A000 /* Software interrupt 0 */
-#define	NRF_SWI1	0x4101B000 /* Software interrupt 1 */
-#define	NRF_SWI2	0x4101C000 /* Software interrupt 2 */
-#define	NRF_SWI3	0x4101D000 /* Software interrupt 3 */
-#define	NRF_ACL		0x41080000 /* Access control lists */
-#define	NRF_NVMC	0x41080000 /* Non-Volatile Memory Controller */
-#define	NRF_VMC		0x41081000 /* Volatile memory controller */
-#define	NRF_P0		0x418C0500 /* General purpose input and output */
-#define	NRF_P1		0x418C0800 /* General purpose input and output */
-#define	NRF_FICR	0x01FF0000 /* Factory information configuration */
-#define	NRF_UICR	0x01FF8000 /* User information configuration */
-#define	NRF_CTI		0xE0042000 /* Cross-trigger interface */
+#define	BASE_DCNF	0x41000000 /* Domain configuration */
+#define	BASE_VREQCTRL	0x41004000 /* Voltage request control */
+#define	BASE_CLOCK	0x41005000 /* Clock control */
+#define	BASE_POWER	0x41005000 /* Power control */
+#define	BASE_RESET	0x41005000 /* Reset status */
+#define	BASE_CTRLAP	0x41006000 /* Control access port CPU side */
+#define	BASE_RADIO	0x41008000 /* 2.4 GHz radio */
+#define	BASE_RNG	0x41009000 /* Random number generator */
+#define	BASE_GPIOTE	0x4100A000 /* GPIO tasks and events */
+#define	BASE_WDT	0x4100B000 /* Watchdog timer */
+#define	BASE_TIMER0	0x4100C000 /* Timer 0 */
+#define	BASE_ECB	0x4100D000 /* AES ECB mode encryption */
+#define	BASE_AAR	0x4100E000 /* Accelerated address resolver */
+#define	BASE_CCM	0x4100E000 /* AES CCM mode encryption */
+#define	BASE_DPPIC	0x4100F000 /* DPPI controller */
+#define	BASE_TEMP	0x41010000 /* Temperature sensor */
+#define	BASE_RTC0	0x41011000 /* Real-time counter 0 */
+#define	BASE_IPC	0x41012000 /* Interprocessor communication */
+#define	BASE_SPIM0	0x41013000 /* SPI master 0 */
+#define	BASE_SPIS0	0x41013000 /* SPI slave 0 */
+#define	BASE_TWIM0	0x41013000 /* Two-wire interface master 0 */
+#define	BASE_TWIS0	0x41013000 /* Two-wire interface slave 0 */
+#define	BASE_UARTE0	0x41013000 /* Universal asynchronous receiver/transmitter */
+#define	BASE_EGU0	0x41014000 /* Event generator unit 0 */
+#define	BASE_RTC1	0x41016000 /* Real-time counter 1 */
+#define	BASE_TIMER1	0x41018000 /* Timer 1 */
+#define	BASE_TIMER2	0x41019000 /* Timer 2 */
+#define	BASE_SWI0	0x4101A000 /* Software interrupt 0 */
+#define	BASE_SWI1	0x4101B000 /* Software interrupt 1 */
+#define	BASE_SWI2	0x4101C000 /* Software interrupt 2 */
+#define	BASE_SWI3	0x4101D000 /* Software interrupt 3 */
+#define	BASE_ACL	0x41080000 /* Access control lists */
+#define	BASE_NVMC	0x41080000 /* Non-Volatile Memory Controller */
+#define	BASE_VMC	0x41081000 /* Volatile memory controller */
+#define	BASE_P0		0x418C0500 /* General purpose input and output */
+#define	BASE_P1		0x418C0800 /* General purpose input and output */
+#define	BASE_FICR	0x01FF0000 /* Factory information configuration */
+#define	BASE_UICR	0x01FF8000 /* User information configuration */
+#define	BASE_CTI	0xE0042000 /* Cross-trigger interface */
 
 #define	BASE_FICR	0x00FF0000 /* Factory information configuration */
 #define	BASE_UICR	0x00FF8000 /* User information configuration */
