@@ -1,5 +1,5 @@
 #-
-# Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
+# Copyright (c) 2019-2020 Ruslan Bukin <br@bsdpad.com>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -24,6 +24,7 @@
 # SUCH DAMAGE.
 #
 
+import multiprocessing
 import os
 
 DEFAULT_OBJDIR = 'obj'
@@ -40,9 +41,10 @@ def machine(vars, objdir):
 		return False
 
 	dst = os.path.join(objdir, 'machine')
-	if os.path.lexists(dst):
-		os.unlink(dst)
-	os.symlink(m, dst)
+	#if os.path.lexists(dst):
+	#	os.unlink(dst)
+	if not os.path.lexists(dst):
+		os.symlink(m, dst)
 
 	return True
 
@@ -54,15 +56,19 @@ def find_elf(name):
 			return elf
 	return None
 
-def run(cmd, args):
+def run(print_cmd, debug, compiler_fp, cmd):
+	print(print_cmd)
+	if debug:
+		print(" ".join(cmd))
+
 	pid = os.fork()
 	if pid == 0:
-		os.execve(cmd, args, os.environ)
+		os.execve(compiler_fp, (cmd), os.environ)
 
 	t = os.waitpid(pid, 0)
 	return t[1]
 
-def compile(r, link_objs, debug):
+def compile(r, link_objs, debug, parallel):
 
 	cc = os.environ.get('CC', '')
 	if cc:
@@ -89,6 +95,13 @@ def compile(r, link_objs, debug):
 
 	archive_objs = []
 
+	cpu_count = 1
+	if (parallel):
+		cpu_count = multiprocessing.cpu_count()
+
+	pool = multiprocessing.Pool(processes = cpu_count)
+
+	res = []
 	vars = r['vars']
 	resobj = r['resobj']
 	for obj in resobj:
@@ -135,12 +148,15 @@ def compile(r, link_objs, debug):
 		cmd = [compiler] + defs + fl + searchp
 		cmd += [o, '-c', '-o', objfile]
 		pcmd = "  CC      %s" % o
-		print(pcmd)
 		if debug:
 			print(" ".join(cmd))
 
-		if run(compiler_fp, cmd) != 0:
-			return False
+		v = pool.apply_async(run, (pcmd, debug, compiler_fp, cmd))
+		res.append(v)
+
+	# Wait completion
+	for x in res:
+		x.get()
 
 	# Add all the archives to the tail
 	link_objs += archive_objs
@@ -175,19 +191,15 @@ def link(vars, link_objs, debug):
 		os.makedirs(os.path.dirname(elf), exist_ok=True)
 		cmd = [linker, "-T", ldscript] + link_objs + ["-o", elf]
 		pcmd = "  LD      %s" % elf
-		print(pcmd)
-		if debug:
-			print(" ".join(cmd))
-
-		if run(linker_fp, cmd) != 0:
+		if run(pcmd, debug, linker_fp, cmd) != 0:
 			return False
 
 	return True
 
-def build(result, debug=False):
+def build(result, debug=False, parallel=False):
 	objs = []
 
-	if not compile(result, objs, debug):
+	if not compile(result, objs, debug, parallel):
 		return False
 
 	if not link(result['vars'], objs, debug):

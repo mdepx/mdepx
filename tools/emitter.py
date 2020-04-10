@@ -86,7 +86,8 @@ def handle_options(root, context):
 if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser()
-	parser.add_argument("-d", help="enable debugging", action="store_true")
+	parser.add_argument("-d", help="Enable debugging", action="store_true")
+	parser.add_argument("-j", help="Parallel build", action="store_true")
 	parser.add_argument("conf", help="A working config file")
 	args = parser.parse_args()
 
@@ -113,5 +114,5 @@ if __name__ == '__main__':
 	result = proc_directives('', config)
 
 	# Compile and link the app
-	if not build(result, debug=args.d):
+	if not build(result, debug=args.d, parallel=args.j):
 		sys.exit(3)
