@@ -152,13 +152,14 @@ struct trapframe *
 arm_exception(struct trapframe *tf, int exc_code)
 {
 	struct thread *td;
-	bool fpu_was_enabled;
 	bool released;
-	bool intr;
 	uint32_t irq;
+	bool intr;
+#ifdef MDX_ARM_VFP
+	bool fpu_was_enabled;
+#endif
 
 	td = curthread;
-	fpu_was_enabled = false;
 	released = false;
 	intr = false;
 
@@ -187,6 +188,9 @@ arm_exception(struct trapframe *tf, int exc_code)
 	case TD_STATE_YIELDING:
 	case TD_STATE_READY:
 		fpu_was_enabled = save_fpu(td);
+		break;
+	default:
+		fpu_was_enabled = false;
 	}
 #endif
 
