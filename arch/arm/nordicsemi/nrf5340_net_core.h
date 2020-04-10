@@ -91,13 +91,9 @@
 #define	BASE_UICR	0x01FF8000 /* User information configuration */
 #define	BASE_CTI	0xE0042000 /* Cross-trigger interface */
 
-#define	BASE_FICR	0x00FF0000 /* Factory information configuration */
-#define	BASE_UICR	0x00FF8000 /* User information configuration */
 #define	BASE_TAD	0xE0080000 /* Trace and debug control */
 #define	BASE_SCS	0xE000E000 /* System Control Space */
 #define	BASE_SCS_NS	0xE002E000 /* System Control Space Non-Secure */
-#define	BASE_UICR	0x00FF8000 /* User information configuration */
-#define	BASE_FICR	0x00FF0000 /* Factory information configuration */
 
 #define	ID_DCNF		0
 #define	ID_VREQCTRL	4

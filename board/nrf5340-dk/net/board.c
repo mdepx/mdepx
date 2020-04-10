@@ -67,15 +67,15 @@ void
 board_init(void)
 {
 
-	nrf_uarte_init(&uarte_sc, NRF_UARTE0,
+	nrf_uarte_init(&uarte_sc, BASE_UARTE0,
 	    UART_PIN_TX, UART_PIN_RX, UART_BAUDRATE);
 	mdx_console_register(uart_putchar, (void *)&uarte_sc);
 	nrf_uarte_register_callback(&uarte_sc, nrf_input, NULL);
 
 	printf("mdepx initialized\n");
 
-	nrf_timer_init(&timer1_sc, NRF_TIMER1, 1000000);
-	nrf_power_init(&power_sc, NRF_POWER);
+	nrf_timer_init(&timer1_sc, BASE_TIMER1, 1000000);
+	nrf_power_init(&power_sc, BASE_POWER);
 
 	arm_nvic_init(&nvic_sc, BASE_SCS);
 

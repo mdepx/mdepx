@@ -66,7 +66,7 @@ void
 board_init(void)
 {
 
-	nrf_uarte_init(&uarte_sc, NRF_UARTE0,
+	nrf_uarte_init(&uarte_sc, BASE_UARTE0,
 	    UART_PIN_TX, UART_PIN_RX, UART_BAUDRATE);
 	mdx_console_register(uart_putchar, (void *)&uarte_sc);
 	nrf_uarte_register_callback(&uarte_sc, nrf_input, NULL);
@@ -74,8 +74,8 @@ board_init(void)
 	mdx_fl_init();
 	mdx_fl_add_region(0x20021000, 0x1f000);
 
-	nrf_power_init(&power_sc, NRF_POWER);
-	nrf_rtc_init(&rtc_sc, NRF_RTC1, 0 /* prescaler */);
+	nrf_power_init(&power_sc, BASE_POWER);
+	nrf_rtc_init(&rtc_sc, BASE_RTC1, 0 /* prescaler */);
 
 	arm_nvic_init(&nvic_sc, BASE_SCS);
 
@@ -85,7 +85,7 @@ board_init(void)
 
 	arm_nvic_set_prio(&nvic_sc, ID_IPC, 6);
 
-	nrf_timer_init(&timer0_sc, NRF_TIMER0, 1000000);
+	nrf_timer_init(&timer0_sc, BASE_TIMER0, 1000000);
 	arm_nvic_enable_intr(&nvic_sc, ID_TIMER0);
 	arm_nvic_enable_intr(&nvic_sc, ID_UARTE0);
 	arm_nvic_enable_intr(&nvic_sc, ID_IPC);
