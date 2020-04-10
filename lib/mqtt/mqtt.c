@@ -856,7 +856,7 @@ mqtt_ping(struct mqtt_client *c)
 	return (err);
 }
 
-void
+int
 mqtt_poll(struct mqtt_client *c)
 {
 	uint8_t data[128];
@@ -866,13 +866,19 @@ mqtt_poll(struct mqtt_client *c)
 	if (err == 0) {
 		printf("close 1\n");
 		mqtt_event(c, MQTT_EVENT_DISCONNECTED);
-	} else if (err == 1) {
+		return (MQTT_ERR_CONN);
+	}
+
+	if (err == 1) {
 		err = handle_recv(c, data, 128);
-		if (err == MQTT_ERR_CONN) {
+		if (err) {
 			printf("close 2\n");
 			mqtt_event(c, MQTT_EVENT_DISCONNECTED);
+			return (err);
 		}
 	}
+
+	return (0);
 }
 
 int

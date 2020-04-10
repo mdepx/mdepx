@@ -159,6 +159,6 @@ int mqtt_disconnect(struct mqtt_client *c);
 int mqtt_publish(struct mqtt_client *c, struct mqtt_request *r);
 int mqtt_subscribe(struct mqtt_client *c, struct mqtt_request *r);
 int mqtt_ping(struct mqtt_client *c);
-void mqtt_poll(struct mqtt_client *c);
+int mqtt_poll(struct mqtt_client *c);
 
 #endif /* !_LIB_MQTT_MQTT_H_ */
