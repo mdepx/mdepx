@@ -14,7 +14,7 @@ CMD = python3 -B ${OSDIR}/tools/emitter.py
 
 # Multi-threaded, multi-processor
 all:
-	@${CMD} mdepx.conf
+	@${CMD} -j mdepx.conf
 
 # Single-threaded, uni-processor
 st:
