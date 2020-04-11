@@ -32,7 +32,10 @@ import argparse
 import sys
 import os
 
-def open_modules(root, context):
+def warn(msg):
+	print("Warning: %s" % msg);
+
+def open_modules(root, context, debug):
 	# Include contexts
 	ky = context.copy()
 	for k in ky:
@@ -46,8 +49,8 @@ def open_modules(root, context):
 					p = el
 				p = os.path.join(root, p)
 				p = os.path.expanduser(p)
-				if not os.path.exists(p):
-					print('Directory not found %s' % p)
+				if not os.path.exists(p) and debug:
+					warn("Directory not found: %s" % p)
 				p1 = os.path.join(p, 'module.conf')
 				if not os.path.exists(p1):
 					continue
@@ -67,7 +70,7 @@ def open_modules(root, context):
 			else:
 				p = k
 			p = os.path.join(root, p)
-			open_modules(p, v)
+			open_modules(p, v, debug)
 
 def handle_options(root, context):
 	ky = context.copy()
@@ -107,7 +110,7 @@ if __name__ == '__main__':
 
 	# Merge-in module's configuration files into the main config
 	root = ''
-	open_modules(root, config)
+	open_modules(root, config, args.d)
 
 	# Process options directive
 	handle_options(root, config)
