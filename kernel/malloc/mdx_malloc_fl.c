@@ -131,6 +131,22 @@ mdx_fl_dump(void)
 	printf(" -- %s completed -- \n", __func__);
 }
 
+uint32_t
+mdx_fl_count(void)
+{
+	struct node_s *node;
+	uint32_t size;
+
+	size = 0;
+
+	for (node = &nodelist[0];
+	    node != NULL;
+	    node = node->next)
+		size += node->size;
+
+	return (size);
+}
+
 void *
 mdx_fl_malloc(size_t size)
 {

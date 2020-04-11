@@ -34,5 +34,6 @@ void mdx_fl_free(void *ptr);
 void * mdx_fl_malloc(size_t size);
 void * mdx_fl_realloc(void *ptr, size_t size);
 void * mdx_fl_calloc(size_t number, size_t size);
+uint32_t mdx_fl_count(void);
 
 #endif /* !_SYS_MALLOC_FL_*/
