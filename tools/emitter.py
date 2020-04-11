@@ -27,6 +27,7 @@
 from directives import proc_directives
 from builder import build
 from parser import to_json, merge
+from debug import warn, err
 import argparse
 import sys
 import os

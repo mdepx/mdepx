@@ -24,6 +24,7 @@
 # SUCH DAMAGE.
 #
 
+from debug import warn, err
 import multiprocessing
 import os
 
@@ -32,12 +33,12 @@ DEFAULT_OBJDIR = 'obj'
 def machine(vars, objdir):
 	machine = vars.get('machine')
 	if not machine:
-		print("Error: machine directive is not set")
+		err("machine directive is not set")
 		return False
 
 	m = os.path.abspath(machine)
 	if not os.path.exists(m):
-		print("Error: machine headers not found at path: %s" % m)
+		err("machine headers not found at path: %s" % m)
 		return False
 
 	dst = os.path.join(objdir, 'machine')
@@ -137,8 +138,9 @@ def compile(r, link_objs, debug, parallel):
 				fl = d[x]
 				break
 		if not o:
-			print("Source file not found for object: %s" % obj)
-			continue
+			err("Source code (or archive file) not found"
+			    " for the object: %s" % obj)
+			return False
 
 		ob = os.path.abspath(obj)
 		objfile = "%s/%s" % (objdir, ob)
@@ -171,8 +173,8 @@ def link(vars, link_objs, debug):
 		return True
 
 	if (len(args) % 2) != 0:
-		print("Error: link directive must have even number of "
-			"arguments: pairs of ldscript and output filename.")
+		err("link directive must have even number of "
+		    "arguments: pairs of ldscript and output filename.")
 		return False
 
 	ld = os.environ.get('LD', '')
