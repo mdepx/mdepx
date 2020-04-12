@@ -34,10 +34,10 @@ export AFLAGS = ${CFLAGS}
 CMD = python3 -B ${OSDIR}/tools/emitter.py
 
 all:	${LDSCRIPT}
-	@${CMD} mdepx.conf
+	@${CMD} -j mdepx.conf
 
 st:	${LDSCRIPT}
-	@${CMD} mdepx-st.conf
+	@${CMD} -j mdepx-st.conf
 
 ${LDSCRIPT}:
 	@sed s#__BASE_ADDR__#${BASE_ADDR}#g ${LDSCRIPT_TPL} > ${LDSCRIPT}

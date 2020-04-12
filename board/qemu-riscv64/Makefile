@@ -18,11 +18,11 @@ all:
 
 # Single-threaded, uni-processor
 st:
-	@${CMD} mdepx-st.conf
+	@${CMD} -j mdepx-st.conf
 
 # Multi-threaded, uni-processor
 up:
-	@${CMD} mdepx-up.conf
+	@${CMD} -j mdepx-up.conf
 
 clean:
 	@rm -rf obj/*
