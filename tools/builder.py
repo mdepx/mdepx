@@ -158,7 +158,9 @@ def compile(r, link_objs, debug, parallel):
 
 	# Wait completion
 	for x in res:
-		x.get()
+		rc = x.get()
+		if (rc != 0):
+			return False
 
 	# Add all the archives to the tail
 	link_objs += archive_objs
