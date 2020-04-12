@@ -58,6 +58,12 @@ malloc(size_t size)
 	ret = mdx_fl_malloc(size);
 	critical_exit();
 
+#ifdef MDX_MALLOC_DEBUG_ENOMEM
+	if (ret == NULL)
+		printf("%s: no memory (request/avail %d/%d)\n",
+		    __func__, size, mdx_fl_count());
+#endif
+
 	return (ret);
 }
 
@@ -79,6 +85,12 @@ calloc(size_t number, size_t size)
 	ret = mdx_fl_calloc(number, size);
 	critical_exit();
 
+#ifdef MDX_MALLOC_DEBUG_ENOMEM
+	if (ret == NULL)
+		printf("%s: no memory (request/avail %d/%d)\n",
+		    __func__, size, mdx_fl_count());
+#endif
+
 	return (ret);
 }
 
@@ -90,6 +102,12 @@ realloc(void *ptr, size_t size)
 	critical_enter();
 	ret = mdx_fl_realloc(ptr, size);
 	critical_exit();
+
+#ifdef MDX_MALLOC_DEBUG_ENOMEM
+	if (ret == NULL)
+		printf("%s: no memory (request/avail %d/%d)\n",
+		    __func__, size, mdx_fl_count());
+#endif
 
 	return (ret);
 }
