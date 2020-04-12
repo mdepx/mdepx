@@ -1,6 +1,13 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
  * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
+ *
+ * This software was developed by SRI International and the University of
+ * Cambridge Computer Laboratory (Department of Computer Science and
+ * Technology) under DARPA contract HR0011-18-C-0016 ("ECATS"), as part of the
+ * DARPA SSITH research programme.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,337 +31,83 @@
  * SUCH DAMAGE.
  */
 
-/* Free list memory allocator */
-
 #include <sys/cdefs.h>
-#include <sys/types.h>
+#include <sys/systm.h>
 #include <sys/malloc.h>
 
-#include <string.h>
-#include <stdio.h>
-
-struct node_s {
-	struct node_s *next;
-	struct node_s *prev;
-	uint32_t size;
-	uint32_t flags;
-#define	FLAG_ALLOCATED		(1 << 31)
-#define	FLAG_PREV_SIZE_S	0
-#define	FLAG_PREV_SIZE_M	(0x7fffffff << FLAG_PREV_SIZE_S)
-};
-
-#define	NODE_S	sizeof(struct node_s)
-
-static struct node_s nodelist[32];
-
-static int
-size2i(uint32_t size)
+void *
+zalloc(size_t size)
 {
-	int i;
+	void *ret;
 
-	i = 0;
+	ret = malloc(size);
+	if (ret == NULL)
+		return (ret);
 
-	size >>= 4;
+	bzero(ret, size);
 
-	while (size > 1) {
-		size >>= 1;
-		i++;
-	}
-
-	return (i);
-}
-
-static void
-mdx_fl_add_node(struct node_s *node)
-{
-	struct node_s *next;
-	struct node_s *prev;
-	int i;
-
-	i = size2i(node->size);
-
-	for (prev = &nodelist[i], next = nodelist[i].next;
-	    (next && next->size && (next->size < node->size));
-	     prev = next, next = next->next);
-
-	prev->next = node;
-	node->prev = prev;
-	node->next = next;
-	if (next)
-		next->prev = node;
-}
-
-void
-mdx_fl_add_region(uintptr_t base, int size)
-{
-	struct node_s *node;
-
-	node = (struct node_s *)base;
-	node->size = NODE_S;
-	node->flags = FLAG_ALLOCATED;
-
-	node = (struct node_s *)(base + NODE_S);
-	node->size = size - 2 * NODE_S;
-	node->flags = NODE_S;
-	mdx_fl_add_node(node);
-
-	node = (struct node_s *)(base + size - NODE_S);
-	node->size = NODE_S;
-	node->flags = (size - 2 * NODE_S) | FLAG_ALLOCATED;
-}
-
-void
-mdx_fl_init(void)
-{
-	int i;
-
-	memset(&nodelist, 0, NODE_S * 32);
-	for (i = 1; i < 32; i++) {
-		nodelist[i - 1].next = &nodelist[i];
-		nodelist[i].prev = &nodelist[i - 1];
-	}
-}
-
-void
-mdx_fl_dump(void)
-{
-	struct node_s *node;
-
-	printf("\n -- %s -- \n", __func__);
-
-	for (node = &nodelist[0]; node != NULL; node = node->next) {
-		if (node->size != 0)
-			printf("    ");
-		printf("node %p, next %p, prev %p, size %d, flags %x\n",
-		    node, node->next, node->prev, node->size, node->flags);
-	}
-	printf(" -- %s completed -- \n", __func__);
-}
-
-uint32_t
-mdx_fl_count(void)
-{
-	struct node_s *node;
-	uint32_t size;
-
-	size = 0;
-
-	for (node = &nodelist[0];
-	    node != NULL;
-	    node = node->next)
-		size += node->size;
-
-	return (size);
+	return (ret);
 }
 
 void *
-mdx_fl_malloc(size_t size)
+malloc(size_t size)
 {
-	struct node_s *node;
-	struct node_s *next;
-	struct node_s *new;
-	int avail;
-	int i;
+	void *ret;
 
-	if (size <= 0)
-		return (NULL);
+	critical_enter();
+	ret = mdx_fl_malloc(size);
+	critical_exit();
 
-	size += NODE_S;
-
-	while (size & 0x3)
-		size += 1;
-
-	i = size2i(size);
-
-	for (node = nodelist[i].next;
-	    (node && (node->size < size));
-	     node = node->next);
-
-	if (node) {
-		/* Node found. Remove it from list */
-		node->prev->next = node->next;
-		if (node->next)
-			node->next->prev = node->prev;
-
-		/* Split the node if space allows */
-		avail = (node->size - size);
-		if (avail > NODE_S) {
-			/* Adjust the size of current node */
-			next = (struct node_s *)((uint8_t *)node + node->size);
-			next->flags &= FLAG_ALLOCATED;
-			next->flags |= avail;
-			node->size = size;
-
-			/* Create new free node */
-			new = (struct node_s *)((uint8_t *)node + size);
-			new->size = avail;
-			new->flags = size;
-			mdx_fl_add_node(new);
-		}
-
-		node->flags |= FLAG_ALLOCATED;
-		node->next = 0;
-		node->prev = 0;
-
-		return ((void *)((uint8_t *)node + NODE_S));
-	}
-
-	return (NULL);
+	return (ret);
 }
 
 void
-mdx_fl_free(void *ptr)
+free(void *ptr)
 {
-	struct node_s *node;
-	struct node_s *prev;
-	struct node_s *next;
-	struct node_s *subseq;
 
-	if (ptr == NULL)
-		return;
-
-	node = (struct node_s *)((char *)ptr - NODE_S);
-	node->flags &= ~FLAG_ALLOCATED;
-
-	next = (struct node_s *)((uint8_t *)node + node->size);
-	if ((next->flags & FLAG_ALLOCATED) == 0) {
-		subseq = (struct node_s *)((uint8_t *)next + next->size);
-
-		/* Remove node */
-		next->prev->next = next->next;
-		if (next->next)
-			next->next->prev = next->prev;
-
-		/* Merge with next */
-		node->size += next->size;
-		subseq->flags &= FLAG_ALLOCATED;
-		subseq->flags |= node->size;
-		next = subseq;
-	}
-
-	prev = (struct node_s *)((uint8_t *)node - node->flags);
-	if ((prev->flags & FLAG_ALLOCATED) == 0) {
-
-		/* Remove node */
-		prev->prev->next = prev->next;
-		if (prev->next)
-			prev->next->prev = prev->prev;
-
-		/* Merge with prev */
-		prev->size += node->size;
-		next->flags &= FLAG_ALLOCATED;
-		next->flags |= prev->size;
-		node = prev;
-	}
-
-	mdx_fl_add_node(node);
+	critical_enter();
+	mdx_fl_free(ptr);
+	critical_exit();
 }
 
 void *
-mdx_fl_calloc(size_t number, size_t size)
+calloc(size_t number, size_t size)
 {
-	void *res;
-	size_t sz;
+	void *ret;
 
-	sz = number * size;
+	critical_enter();
+	ret = mdx_fl_calloc(number, size);
+	critical_exit();
 
-	res = mdx_fl_malloc(sz);
-	if (res)
-		bzero(res, sz);
-
-	return (res);
+	return (ret);
 }
 
 void *
-mdx_fl_realloc(void *ptr, size_t size)
+realloc(void *ptr, size_t size)
 {
-	struct node_s *node;
-	struct node_s *next;
-	struct node_s *subs;
-	struct node_s *new;
-	void *newptr;
+	void *ret;
 
-	if (ptr == NULL)
-		return (mdx_fl_malloc(size));
+	critical_enter();
+	ret = mdx_fl_realloc(ptr, size);
+	critical_exit();
 
-	if (size == 0) {
-		mdx_fl_free(ptr);
-		return (NULL);
-	}
+	return (ret);
+}
 
-	size += NODE_S;
+void            
+malloc_add_region(uintptr_t base, int size)
+{
 
-	node = (struct node_s *)((char *)ptr - NODE_S);
-	next = (struct node_s *)((uint8_t *)node + node->size);
+	critical_enter();
+	mdx_fl_add_region(base, size);
+	critical_exit();
+}
 
-	if (size <= node->size) {
-		if ((next->flags & FLAG_ALLOCATED) == 0) {
-			subs = (struct node_s *)((uint8_t *)next + next->size);
+void
+malloc_init(void)
+{
 
-			/* Remove node */
-			next->prev->next = next->next;
-			if (next->next)
-				next->next->prev = next->prev;
-
-			/* Merge with next */
-			new = (struct node_s *)((uint8_t *)node + size);
-			new->size = next->size + node->size - size;
-			new->flags = size;
-			node->size = size;
-			subs->flags &= FLAG_ALLOCATED;
-			subs->flags |= node->size;
-			mdx_fl_add_node(new);
-		} else if (node->size > (size + NODE_S)) {
-			new = (struct node_s *)((uint8_t *)node + size);
-			new->size = node->size - size;
-			new->flags = size;
-			node->size = size;
-			next->flags &= FLAG_ALLOCATED;
-			next->flags |= new->size;
-			mdx_fl_add_node(new);
-		}
-	} else {
-		if (((next->flags & FLAG_ALLOCATED) == 0) &&
-		    (node->size + next->size) > (size + NODE_S)) {
-			subs = (struct node_s *)((uint8_t *)next + next->size);
-
-			/* Remove node */
-			next->prev->next = next->next;
-			if (next->next)
-				next->next->prev = next->prev;
-
-			/* Merge with next */
-			new = (struct node_s *)((uint8_t *)node + size);
-			new->size = next->size + node->size - size;
-			new->flags = size;
-			node->size = size;
-			subs->flags &= FLAG_ALLOCATED;
-			subs->flags |= node->size;
-			mdx_fl_add_node(new);
-
-		} else if (((next->flags & FLAG_ALLOCATED) == 0) &&
-		    (node->size + next->size) == size) {
-			subs = (struct node_s *)((uint8_t *)next + next->size);
-
-			/* Remove node */
-			next->prev->next = next->next;
-			if (next->next)
-				next->next->prev = next->prev;
-
-			/* Merge with next */
-			node->size = size;
-			subs->flags &= FLAG_ALLOCATED;
-			subs->flags |= node->size;
-		} else {
-			newptr = mdx_fl_malloc(size);
-			if (newptr) {
-				memcpy(newptr, ptr, node->size);
-				mdx_fl_free(ptr);
-			}
-
-			return (newptr);
-		}
-	}
-
-	return (ptr);
+	critical_enter();
+	mdx_fl_init();
+	critical_exit();
 }
