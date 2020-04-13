@@ -45,6 +45,7 @@
 #include <arm/nordicsemi/nrf_gpio.h>
 #include <arm/nordicsemi/nrf_gpiote.h>
 #include <arm/nordicsemi/nrf_ipc.h>
+#include <arm/nordicsemi/nrf_nvmc.h>
 #include <arm/nordicsemi/nrf_reset.h>
 #include <arm/nordicsemi/nrf_rtc.h>
 #include <arm/nordicsemi/nrf_twim.h>
