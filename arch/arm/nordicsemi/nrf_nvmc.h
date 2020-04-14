@@ -30,13 +30,31 @@
 #define	NVMC_READY		0x400	/* Ready flag */
 #define	NVMC_READYNEXT		0x408	/* Ready flag */
 #define	NVMC_CONFIG		0x504	/* Configuration register */
+#define	 CONFIG_WEN_S		0
+#define	 CONFIG_WEN_M		(0x7 << CONFIG_WEN_S)
+#define	 CONFIG_REN		(0 << CONFIG_WEN_S) /* Read only access */
+#define	 CONFIG_WEN		(1 << CONFIG_WEN_S) /* Write enabled */
+#define	 CONFIG_EEN		(2 << CONFIG_WEN_S) /* Erase enabled */
+#define	 CONFIG_PEEN		(4 << CONFIG_WEN_S) /* Partial erase enabled*/
 #define	NVMC_ERASEALL		0x50C	/* Erase all non-volatile user memory*/
 #define	NVMC_ERASEPAGEPARTIALCFG 0x51C	/* Partial erase configuration */
+#define	 ERASEPAGE_DURATION_S	0	/* Duration in miliseconds */
+#define	 ERASEPAGE_DURATION_M	(0x7f << ERASEPAGE_DURATION_S)
 #define	NVMC_ICACHECNF		0x540	/* I-code cache configuration */
+#define	 ICACHECNF_CACHEEN	(1 << 0) /* Enable cache */
+#define	 ICACHECNF_CACHEPROFEN	(1 << 8) /* Enable cache profiling */
 #define	NVMC_IHIT		0x548	/* I-code cache hit counter */
 #define	NVMC_IMISS		0x54C	/* I-code cache miss counter */
 #define	NVMC_CONFIGNS		0x584
+#define	 CONFIGNS_WEN_S		0
+#define	 CONFIGNS_WEN_M		(0x3 << CONFIGNS_WEN_S)
+#define	 CONFIGNS_REN		(0 << CONFIGNS_WEN_S) /* Read only access */
+#define	 CONFIGNS_WEN		(1 << CONFIGNS_WEN_S) /* Write enabled */
+#define	 CONFIGNS_EEN		(2 << CONFIGNS_WEN_S) /* Erase enabled */
 #define	NVMC_WRITEUICRNS	0x588	/* Non-secure APPROTECT enable */
+#define	 WRITEUICRNS_SET	(1 << 0) /* Allow NS code to set APPROTECT */
+#define	 WRITEUICRNS_KEY_S	4 /* Key to write in order to validate the write operation */
+#define	 WRITEUICRNS_KEY	(0xAFBE5A7 << WRITEUICRNS_KEY_S)
 
 struct nrf_nvmc_softc {
 	size_t base;
