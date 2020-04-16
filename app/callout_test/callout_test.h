@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019-2020 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,51 +24,9 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
-#include <sys/console.h>
-#include <sys/systm.h>
-#include <sys/thread.h>
-#include <sys/spinlock.h>
-#include <sys/malloc.h>
-#include <sys/mutex.h>
-#include <sys/sem.h>
-#include <sys/list.h>
-#include <sys/smp.h>
+#ifndef _CALLOUT_TEST_H_
+#define	_CALLOUT_TEST_H_
 
-#include <machine/cpuregs.h>
-#include <machine/cpufunc.h>
+void callout_test(void);
 
-#include <app/callout_test/callout_test.h>
-
-#include "board.h"
-
-static void __unused
-hello(void *arg)
-{
-
-	if (PCPU_GET(cpuid) == 0)
-		printf("\n\nhello\n\n");
-}
-
-int
-main(void)
-{
-
-	callout_test();
-
-	/* NOT REACHED */
-
-#ifdef MDX_SCHED_SMP
-	char a;
-	while (1) {
-		a = uart_getchar();
-		if (a == 0x61) {
-			critical_enter();
-			smp_rendezvous_cpus(0xf, hello, NULL);
-			critical_exit();
-		}
-	}
-#endif
-
-	return (0);
-}
+#endif /* !_CALLOUT_TEST_H_ */
