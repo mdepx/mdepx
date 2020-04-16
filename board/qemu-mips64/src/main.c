@@ -36,6 +36,8 @@
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
 
+#include <app/callout_test/callout_test.h>
+
 #include "board.h"
 
 #ifdef MDX_SCHED
@@ -60,6 +62,11 @@ test_thr(void *arg)
 int
 main(void)
 {
+
+	callout_test();
+
+	/* NOT REACHED */
+
 #ifdef MDX_SCHED
 	struct thread *td;
 	size_t i;

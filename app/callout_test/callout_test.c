@@ -55,9 +55,8 @@ test_thr(void *arg)
 	while (1) {
 		if (!mdx_mutex_timedlock(&m0, 1000))
 			continue;
-		printf("cpu%d: hello from thread%04d cn %d mstatus %x\n",
-		    PCPU_GET(cpuid), (size_t)arg, curthread->td_critnest,
-		    csr_read(mstatus));
+		printf("cpu%d: hello from thread%04d cn %d\n",
+		    PCPU_GET(cpuid), (size_t)arg, curthread->td_critnest);
 		mdx_mutex_unlock(&m0);
 
 		mdx_tsleep(1000);
@@ -230,13 +229,11 @@ callout_test(void)
 	mdx_sched_add(td);
 #endif
 
-#if 1
 	int j;
 	for (j = 0; j < 100; j++)
 		mdx_callout_set(&c1[j], 100000 * j, cb, (void *)&c1[j]);
-#endif
 
-#ifndef MDX_SCHED
+#if 0
 	mdx_sem_t sem;
 	int ret;
 
