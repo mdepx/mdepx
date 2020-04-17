@@ -54,7 +54,15 @@ void
 mdx_mutex_lock(mdx_mutex_t *m)
 {
 
+	KASSERT(curthread->td_critnest == 0,
+	    ("Can't lock mutex in the critical section."));
+
 	mdx_sem_wait(&m->sem);
+
+	/*
+	 * Ensure that mdx_mutex_unlock() will be called
+	 * by the same thread only.
+	 */
 	m->td = curthread;
 }
 

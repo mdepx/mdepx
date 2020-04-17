@@ -95,6 +95,8 @@ mdx_sem_timedwait(mdx_sem_t *sem, int usec)
 
 	KASSERT(td->td_idle == 0,
 	    ("Can't lock mutex/sem from the idle thread"));
+	KASSERT(td->td_critnest == 0,
+	    ("Can't lock mutex/sem in the critical section"));
 
 	critical_enter();
 	sl_lock(&sem->l);
