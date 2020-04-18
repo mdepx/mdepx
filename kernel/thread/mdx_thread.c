@@ -90,7 +90,7 @@ mdx_thread_terminate(void)
 
 /*
  * Used by a thread to leave the CPU.
- * Only effective if thread's quantum is 0.
+ * The thread will be added to the scheduler run queue.
  */
 void
 mdx_thread_yield(void)
@@ -100,7 +100,13 @@ mdx_thread_yield(void)
 	td = curthread;
 	td->td_state = TD_STATE_YIELDING;
 
-	/* Interrupt could happen here. */
+	/*
+	 * Note that an interrupt could fire right here.
+	 * The thread will be added back to the run queue.
+	 * On return to this place the thread will have RUNNING
+	 * state and the following yield will trigger an exception.
+	 * The exception will have no effect for this thread.
+	 */
 
 	md_thread_yield();
 }
