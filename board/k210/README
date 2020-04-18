@@ -7,3 +7,5 @@ $ make
 $ kflash -n -p /dev/ttyUSB0 -s -t -b 115200 -B dan obj/k210.bin
 
 1. https://github.com/kendryte/kflash.py
+
+To leave the terminal press Ctrl+]
