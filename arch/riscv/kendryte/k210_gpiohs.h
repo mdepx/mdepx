@@ -24,51 +24,33 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _RISCV_KENDRYTE_K210_H_
-#define _RISCV_KENDRYTE_K210_H_
+#ifndef _RISCV_KENDRYTE_K210_GPIOHS_H_
+#define _RISCV_KENDRYTE_K210_GPIOHS_H_
 
-#include <riscv/kendryte/k210_fpioa.h>
-#include <riscv/kendryte/k210_uarths.h>
-#include <riscv/kendryte/k210_sysctl.h>
-#include <riscv/kendryte/k210_gpio.h>
-#include <riscv/kendryte/k210_gpiohs.h>
+#define	GPIOHS_INPUT_VALUE	0x00
+#define	GPIOHS_INPUT_ENABLE	0x04
+#define	GPIOHS_OUTPUT_ENABLE	0x08
+#define	GPIOHS_OUTPUT_VALUE	0x0C
+#define	GPIOHS_PULLUP_ENABLE	0x10
+#define	GPIOHS_DRIVE		0x14
+#define	GPIOHS_RISE_IE		0x18	/* Rise interrupt enable */
+#define	GPIOHS_RISE_IP		0x1C	/* Rise interrupt pending */
+#define	GPIOHS_FALL_IE		0x20
+#define	GPIOHS_FALL_IP		0x24
+#define	GPIOHS_HIGH_IE		0x28
+#define	GPIOHS_HIGH_IP		0x2C
+#define	GPIOHS_LOW_IE		0x30
+#define	GPIOHS_LOW_IP		0x34
+#define	GPIOHS_IOF_EN		0x38
+#define	GPIOHS_IOF_SEL		0x3C
+#define	GPIOHS_OUTPUT_XOR	0x40
 
-#define	BASE_GPIO	0x50200000
+struct k210_gpiohs_softc {
+	size_t base;
+};
 
-#define	BASE_UART1	0x50210000
-#define	BASE_UART2	0x50220000
-#define	BASE_UART3	0x50230000
+void k210_gpiohs_init(struct k210_gpiohs_softc *sc, uint32_t base);
+void k210_gpiohs_set_dir(struct k210_gpiohs_softc *sc, int pin, int dir);
+void k210_gpiohs_set_pin(struct k210_gpiohs_softc *sc, int pin, int val);
 
-#define	BASE_TIMER0	0x502D0000
-#define	BASE_TIMER1	0x502E0000
-#define	BASE_TIMER2	0x502F0000
-
-#define	BASE_I2C0	0x50280000
-#define	BASE_I2C1	0x50290000
-#define	BASE_I2C2	0x502A0000
-
-#define	BASE_I2S0	0x50250000
-#define	BASE_I2S1	0x50260000
-#define	BASE_I2S2	0x50270000
-#define	BASE_FPIOA	0x502B0000
-
-#define	BASE_SPI0	0x52000000
-#define	BASE_SPI1	0x53000000
-#define	BASE_SPI2	0x54000000
-
-#define	BASE_WDT0	0x50400000
-#define	BASE_WDT1	0x50410000
-
-#define	BASE_OTP	0x50420000
-#define	BASE_DVP	0x50430000
-#define	BASE_SYSCTL	0x50440000
-#define	BASE_AES	0x50450000
-#define	BASE_RTC	0x50460000
-
-#define	BASE_CLINT	0x02000000
-#define	BASE_PLIC	0x0C000000
-
-#define	BASE_UARTHS	0x38000000
-#define	BASE_GPIOHS	0x38001000
-
-#endif /* !_RISCV_KENDRYTE_K210_H_ */
+#endif /* !_RISCV_KENDRYTE_K210_GPIOHS_H_ */

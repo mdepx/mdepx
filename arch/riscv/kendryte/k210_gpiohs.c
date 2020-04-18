@@ -24,51 +24,51 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _RISCV_KENDRYTE_K210_H_
-#define _RISCV_KENDRYTE_K210_H_
+#include <sys/cdefs.h>
 
-#include <riscv/kendryte/k210_fpioa.h>
-#include <riscv/kendryte/k210_uarths.h>
-#include <riscv/kendryte/k210_sysctl.h>
-#include <riscv/kendryte/k210_gpio.h>
 #include <riscv/kendryte/k210_gpiohs.h>
 
-#define	BASE_GPIO	0x50200000
+#define	RD4(_sc, _reg)		\
+	*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	\
+	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-#define	BASE_UART1	0x50210000
-#define	BASE_UART2	0x50220000
-#define	BASE_UART3	0x50230000
+void
+k210_gpiohs_set_dir(struct k210_gpiohs_softc *sc, int pin, int dir)
+{
+	uint32_t reg;
 
-#define	BASE_TIMER0	0x502D0000
-#define	BASE_TIMER1	0x502E0000
-#define	BASE_TIMER2	0x502F0000
+	reg = RD4(sc, GPIOHS_OUTPUT_ENABLE);
+	if (dir)
+		reg |= (1 << pin);
+	else
+		reg &= ~(1 << pin);
+	WR4(sc, GPIOHS_OUTPUT_ENABLE, reg);
 
-#define	BASE_I2C0	0x50280000
-#define	BASE_I2C1	0x50290000
-#define	BASE_I2C2	0x502A0000
+	reg = RD4(sc, GPIOHS_INPUT_ENABLE);
+	if (dir)
+		reg &= ~(1 << pin);
+	else
+		reg |= (1 << pin);
+	WR4(sc, GPIOHS_INPUT_ENABLE, reg);
+}
 
-#define	BASE_I2S0	0x50250000
-#define	BASE_I2S1	0x50260000
-#define	BASE_I2S2	0x50270000
-#define	BASE_FPIOA	0x502B0000
+void
+k210_gpiohs_set_pin(struct k210_gpiohs_softc *sc, int pin, int val)
+{
+	uint32_t reg;
 
-#define	BASE_SPI0	0x52000000
-#define	BASE_SPI1	0x53000000
-#define	BASE_SPI2	0x54000000
+	reg = RD4(sc, GPIOHS_OUTPUT_VALUE);
+	if (val)
+		reg |= (1 << pin);
+	else
+		reg &= ~(1 << pin);
+	WR4(sc, GPIOHS_OUTPUT_VALUE, reg);
+}
 
-#define	BASE_WDT0	0x50400000
-#define	BASE_WDT1	0x50410000
+void
+k210_gpiohs_init(struct k210_gpiohs_softc *sc, uint32_t base)
+{
 
-#define	BASE_OTP	0x50420000
-#define	BASE_DVP	0x50430000
-#define	BASE_SYSCTL	0x50440000
-#define	BASE_AES	0x50450000
-#define	BASE_RTC	0x50460000
-
-#define	BASE_CLINT	0x02000000
-#define	BASE_PLIC	0x0C000000
-
-#define	BASE_UARTHS	0x38000000
-#define	BASE_GPIOHS	0x38001000
-
-#endif /* !_RISCV_KENDRYTE_K210_H_ */
+	sc->base = base;
+}
