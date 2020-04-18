@@ -285,22 +285,22 @@
 #define	FPIOA_FUNC_DEBUG31		255
 
 struct fpioa_io_config { 
-	uint32_t ch_sel	:8;
+	uint32_t ch_sel	:8;	/* Channel Select */
 	uint32_t ds	:4;	/* Drive */
 	uint32_t oe_en	:1;	/* Output Enable */
-	uint32_t oe_inv	:1;
-	uint32_t do_sel	:1;
-	uint32_t do_inv	:1;
-	uint32_t pu	:1;
-	uint32_t pd	:1;
-	uint32_t resv0	:1;
-	uint32_t sl	:1;
+	uint32_t oe_inv	:1;	/* Invert Output Enable */
+	uint32_t do_sel	:1;	/* Data Output Select: 0 = DO, 1 = OE. */
+	uint32_t do_inv	:1;	/* Invert Data Output Select */
+	uint32_t pu	:1;	/* Pull Up */
+	uint32_t pd	:1;	/* Pull Down */
+	uint32_t resv0	:1;	/* Reserved 0 */
+	uint32_t sl	:1;	/* Slew Rate */
 	uint32_t ie_en	:1;	/* Input Enable */
-	uint32_t ie_inv	:1;
-	uint32_t di_inv	:1;
-	uint32_t st	:1;
-	uint32_t resv1	:7;
-	uint32_t pad_di	:1;
+	uint32_t ie_inv	:1;	/* Invert Input Enable */
+	uint32_t di_inv	:1;	/* Invert Data Input */
+	uint32_t st	:1;	/* Schmitt Trigger */
+	uint32_t resv1	:7;	/* Reserved 1 */
+	uint32_t pad_di	:1;	/* Pad Data Input */
 };
 
 struct k210_fpioa_softc {
