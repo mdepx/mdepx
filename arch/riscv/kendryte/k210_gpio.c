@@ -34,6 +34,32 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
+k210_gpio_set_dir(struct k210_gpio_softc *sc, int pin, int dir)
+{
+	uint32_t reg;
+
+	reg = RD4(sc, GPIO_DIRECTION);
+	if (dir)
+		reg |= (1 << pin);
+	else
+		reg &= ~(1 << pin);
+	WR4(sc, GPIO_DIRECTION, reg);
+}
+
+void
+k210_gpio_set_pin(struct k210_gpio_softc *sc, int pin, int val)
+{
+	uint32_t reg;
+
+	reg = RD4(sc, GPIO_DATA_OUTPUT);
+	if (val)
+		reg |= (1 << pin);
+	else
+		reg &= ~(1 << pin);
+	WR4(sc, GPIO_DATA_OUTPUT, reg);
+}
+
+void
 k210_gpio_init(struct k210_gpio_softc *sc, uint32_t base)
 {
 
