@@ -48,12 +48,15 @@
 #define	DEFAULT_BAUDRATE	115200
 #define	PIN_UARTHS_RX		4
 #define	PIN_UARTHS_TX		5
+#define	PIN_GPIO_LED0		4
+#define	PIN_GPIO_LED1		5
 
 static struct k210_fpioa_softc fpioa_sc;
 static struct k210_sysctl_softc sysctl_sc;
 static struct k210_uarths_softc uarths_sc;
-static struct k210_gpio_softc gpio_sc;
 static struct clint_softc clint_sc;
+struct k210_gpio_softc gpio_sc;
+struct k210_gpiohs_softc gpiohs_sc;
 
 extern uint8_t __riscv_boot_ap[2];
 extern uint32_t _sbss;
@@ -95,6 +98,43 @@ pins_configure(void)
 	cfg.ds = 0xf;
 	cfg.oe_en = 1;
 	k210_fpioa_set_config(&fpioa_sc, PIN_UARTHS_TX, &cfg);
+
+	/* LED 0 */
+	bzero(&cfg, sizeof(struct fpioa_io_config));
+	cfg.ch_sel = FPIOA_FUNC_GPIO4;
+	cfg.ds = 0xf;
+	cfg.oe_en = 1;
+	k210_fpioa_set_config(&fpioa_sc, 12, &cfg);
+
+	/* LED 1 */
+	bzero(&cfg, sizeof(struct fpioa_io_config));
+	cfg.ch_sel = FPIOA_FUNC_GPIO5;
+	cfg.ds = 0xf;
+	cfg.oe_en = 1;
+	k210_fpioa_set_config(&fpioa_sc, 13, &cfg);
+
+	/* Set some random pins: not in use. */
+
+	/* GPIOHS20 -> PIN 36 */
+	bzero(&cfg, sizeof(struct fpioa_io_config));
+	cfg.ch_sel = FPIOA_FUNC_GPIOHS20;
+	cfg.ds = 0xf;
+	cfg.oe_en = 1;
+	k210_fpioa_set_config(&fpioa_sc, 36, &cfg);
+
+	/* GPIOHS21 -> PIN 37 */
+	bzero(&cfg, sizeof(struct fpioa_io_config));
+	cfg.ch_sel = FPIOA_FUNC_GPIOHS21;
+	cfg.ds = 0xf;
+	cfg.oe_en = 1;
+	k210_fpioa_set_config(&fpioa_sc, 37, &cfg);
+
+	/* GPIOHS26 -> PIN 42 */
+	bzero(&cfg, sizeof(struct fpioa_io_config));
+	cfg.ch_sel = FPIOA_FUNC_GPIOHS26;
+	cfg.ds = 0xf;
+	cfg.oe_en = 1;
+	k210_fpioa_set_config(&fpioa_sc, 42, &cfg);
 }
 
 void
@@ -102,14 +142,22 @@ board_init(void)
 {
 
 	k210_sysctl_init(&sysctl_sc, BASE_SYSCTL);
+
 	k210_fpioa_init(&fpioa_sc, BASE_FPIOA);
+	pins_configure();
+
 	k210_gpio_init(&gpio_sc, BASE_GPIO);
+	k210_gpiohs_init(&gpiohs_sc, BASE_GPIOHS);
 	e300g_clint_init(&clint_sc, BASE_CLINT, 8000000);
+
+	/* Enable LEDs. */
+	k210_gpio_set_dir(&gpio_sc, PIN_GPIO_LED0, 1);
+	k210_gpio_set_dir(&gpio_sc, PIN_GPIO_LED1, 1);
+	k210_gpio_set_pin(&gpio_sc, PIN_GPIO_LED0, 0);
+	k210_gpio_set_pin(&gpio_sc, PIN_GPIO_LED1, 0);
 
 	malloc_init();
 	malloc_add_region(0x40000000, 6 * 1024 * 1024);
-
-	pins_configure();
 
 	k210_uarths_init(&uarths_sc, BASE_UARTHS, CPU_FREQ, DEFAULT_BAUDRATE);
 	mdx_console_register(uart_putchar, (void *)&uarths_sc);
