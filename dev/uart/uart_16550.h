@@ -24,8 +24,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _DEV_UART_UART_16550_H
-#define _DEV_UART_UART_16550_H
+#ifndef _DEV_UART_UART_16550_H_
+#define _DEV_UART_UART_16550_H_
 
 #define	REG_DATA	0x00 /* data register (rw) */
 #define	REG_IER		0x01 /* interrupt enable register (wo) */
@@ -58,4 +58,4 @@ int uart_16550_init(struct uart_16550_softc *sc, capability base,
 void uart_16550_putc(struct uart_16550_softc *sc, char c);
 char uart_16550_getc(struct uart_16550_softc *sc);
 
-#endif /* !_DEV_UART_UART_16550_H */
+#endif /* !_DEV_UART_UART_16550_H_ */
