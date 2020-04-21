@@ -29,7 +29,7 @@
  * SUCH DAMAGE.
  */
 
-/* Round-Robin scheduler */
+/* A Round-Robin scheduler. */
 
 #include <sys/cdefs.h>
 #include <sys/mutex.h>
@@ -65,6 +65,9 @@ static struct spinlock l;
 #define	mdx_sched_unlock()
 #endif
 
+/*
+ * Take the next thread from the run queue.
+ */
 static struct thread *
 mdx_sched_pick(void)
 {
@@ -85,6 +88,9 @@ mdx_sched_pick(void)
 	return (NULL);
 }
 
+/*
+ * A thread's callout callback. Called when thread's quantum is exhausted.
+ */
 static void
 mdx_sched_cb(void *arg)
 {
@@ -97,7 +103,7 @@ mdx_sched_cb(void *arg)
 
 	mdx_sched_lock();
 	KASSERT(td->td_state == TD_STATE_RUNNING,
-	    ("sched_cb for not running thread"));
+	    ("sched_cb: thread is not running"));
 	td->td_state = TD_STATE_READY;
 	mdx_sched_unlock();
 }
@@ -144,7 +150,7 @@ mdx_sched_add(struct thread *td)
 }
 
 /*
- * Called by the exception handler only.
+ * Called by the exception handler only to release a thread from CPU.
  */
 bool
 mdx_sched_release(struct thread *td)
@@ -183,6 +189,9 @@ mdx_sched_release(struct thread *td)
 	return (released);
 }
 
+/*
+ * Called by the exception handler only to pick the next thread to run.
+ */
 struct thread *
 mdx_sched_next(void)
 {
