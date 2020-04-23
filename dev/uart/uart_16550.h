@@ -27,35 +27,51 @@
 #ifndef _DEV_UART_UART_16550_H_
 #define _DEV_UART_UART_16550_H_
 
-#define	REG_DATA	0x00 /* data register (rw) */
-#define	REG_IER		0x01 /* interrupt enable register (wo) */
-#define	 IER_ERXRDY	(1 << 0)
-#define	REG_IIR		0x02 /* interrupt identification register (ro) */
-#define	REG_LCR		0x03 /* line control register (rw) */
-#define	 LCR_BITS_S	0
-#define	 LCR_BITS_M	(0x3 << LCR_BITS_S)
-#define	 LCR_BITS_8	(0x3 << LCR_BITS_S)
-#define	 LCR_STOPB	(1 << 2)
-#define	 LCR_DLAB	(1 << 7)
-#define	REG_MCR		0x04 /* modem control register (rw) */
-#define	 MCR_RTS	(1 << 1)
-#define	REG_LSR		0x05 /* line status register (rw) */
-#define	 LSR_RXRDY	(1 << 0)
-#define	 LSR_THRE	(1 << 5)
-#define	REG_MSR		0x06 /* modem status register (rw) */
-#define	REG_SCR		0x07 /* scratch register (rw) */
+#include <dev/uart/uart.h>
 
-#define	REG_DLL		0x00 /* divisor latch low (rw) */
-#define	REG_DLM		0x01 /* divisor latch high (rw) */
+#define	REG_DATA		0x00 /* data register (rw) */
+#define	REG_IER			0x01 /* interrupt enable register (wo) */
+#define	 IER_ERXRDY		(1 << 0)
+#define	REG_IIR			0x02 /* interrupt identification register(ro) */
+#define	REG_FCR			0x02 /* fifo control register (w) */
+#define	REG_LCR			0x03 /* line control register (rw) */
+#define	 LCR_BITS_S		0 /* Data width */
+#define	 LCR_BITS_M		(0x3 << LCR_BITS_S)
+#define	 LCR_BITS_5		(0x0 << LCR_BITS_S)
+#define	 LCR_BITS_6		(0x1 << LCR_BITS_S)
+#define	 LCR_BITS_7		(0x2 << LCR_BITS_S)
+#define	 LCR_BITS_8		(0x3 << LCR_BITS_S)
+#define	 LCR_STOPB		(1 << 2)
+#define	 LCR_DLAB		(1 << 7)
+#define	 LCR_PARITY_S		3
+#define	 LCR_PARITY_NONE	(0 << LCR_PARITY_S)
+#define	 LCR_PARITY_ODD		(1 << LCR_PARITY_S)
+#define	 LCR_PARITY_EVEN	(3 << LCR_PARITY_S)
+#define	REG_MCR			0x04 /* modem control register (rw) */
+#define	 MCR_RTS		(1 << 1)
+#define	REG_LSR			0x05 /* line status register (rw) */
+#define	 LSR_RXRDY		(1 << 0)
+#define	 LSR_THRE		(1 << 5)
+#define	REG_MSR			0x06 /* modem status register (rw) */
+#define	REG_SCR			0x07 /* scratch register (rw) */
+
+#define	REG_DLL			0x00 /* divisor latch low (rw) */
+#define	REG_DLM			0x01 /* divisor latch high (rw) */
 
 struct uart_16550_softc {
 	capability base;
 	uint8_t reg_shift;
 };
 
-int uart_16550_init(struct uart_16550_softc *sc, capability base,
-    uint32_t uart_freq, uint32_t baud_rate, uint8_t reg_shift);
 void uart_16550_putc(struct uart_16550_softc *sc, char c);
 char uart_16550_getc(struct uart_16550_softc *sc);
+void uart_16550_init(struct uart_16550_softc *sc, capability base,
+    uint8_t reg_shift);
+void uart_16550_configure(struct uart_16550_softc *sc,
+    uint32_t bus_freq,
+    uint32_t baud_rate,
+    uart_bitwidth_t bitwidth,
+    uart_stopbit_t stopbit,
+    uart_parity_t parity);
 
 #endif /* !_DEV_UART_UART_16550_H_ */
