@@ -31,8 +31,40 @@
 #define	K210_SYSCTL_GIT_ID	0x00	/* Git short commit id */
 #define	K210_SYSCTL_CLK_FREQ	0x04	/* System clock base frequency */
 #define	K210_SYSCTL_PLL0	0x08	/* PLL0 controller */
+#define	 PLL0_CLKR_S		0
+#define	 PLL0_CLKF_S		4
+#define	 PLL0_CLKOD_S		10
+#define	 PLL0_BWADJ_S		14
+#define	 PLL0_RESET		(1 << 20)
+#define	 PLL0_PWRD		(1 << 21)
+#define	 PLL0_INTFB		(1 << 22)
+#define	 PLL0_BYPASS		(1 << 23)
+#define	 PLL0_TEST		(1 << 24)
+#define	 PLL0_OUT_EN		(1 << 25)
+#define	 PLL0_TEST_EN		(1 << 26)
 #define	K210_SYSCTL_PLL1	0x0c	/* PLL1 controller */
+#define	 PLL1_CLKR_S		0
+#define	 PLL1_CLKF_S		4
+#define	 PLL1_CLKOD_S		10
+#define	 PLL1_BWADJ_S		14
+#define	 PLL1_RESET		(1 << 20)
+#define	 PLL1_PWRD		(1 << 21)
+#define	 PLL1_INTFB		(1 << 22)
+#define	 PLL1_BYPASS		(1 << 23)
+#define	 PLL1_TEST		(1 << 24)
+#define	 PLL1_OUT_EN		(1 << 25)
 #define	K210_SYSCTL_PLL2	0x10	/* PLL2 controller */
+#define	 PLL2_CLKR_S		0
+#define	 PLL2_CLKF_S		4
+#define	 PLL2_CLKOD_S		10
+#define	 PLL2_BWADJ_S		14
+#define	 PLL2_RESET		(1 << 20)
+#define	 PLL2_PWRD		(1 << 21)
+#define	 PLL2_INTFB		(1 << 22)
+#define	 PLL2_BYPASS		(1 << 23)
+#define	 PLL2_TEST		(1 << 24)
+#define	 PLL2_OUT_EN		(1 << 25)
+#define	 PLL2_CKIN_SEL_S	26
 #define	K210_SYSCTL_RESV5	0x14	/* Reserved */
 #define	K210_SYSCTL_PLL_LOCK	0x18	/* PLL lock tester */
 #define	K210_SYSCTL_ROM_ERROR	0x1c	/* AXI ROM detector */
