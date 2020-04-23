@@ -27,6 +27,17 @@
 #ifndef _RISCV_KENDRYTE_K210_SYSCTL_H_
 #define _RISCV_KENDRYTE_K210_SYSCTL_H_
 
+
+#define	K210_SYSCTL_GIT_ID	0x00	/* Git short commit id */
+#define	K210_SYSCTL_CLK_FREQ	0x04	/* System clock base frequency */
+#define	K210_SYSCTL_PLL0	0x08	/* PLL0 controller */
+#define	K210_SYSCTL_PLL1	0x0c	/* PLL1 controller */
+#define	K210_SYSCTL_PLL2	0x10	/* PLL2 controller */
+#define	K210_SYSCTL_RESV5	0x14	/* Reserved */
+#define	K210_SYSCTL_PLL_LOCK	0x18	/* PLL lock tester */
+#define	K210_SYSCTL_ROM_ERROR	0x1c	/* AXI ROM detector */
+#define	K210_SYSCTL_CLK_SEL0	0x20	/* Clock select controller0 */
+#define	K210_SYSCTL_CLK_SEL1	0x24	/* Clock select controller1 */
 #define	K210_SYSCTL_CLK_EN_CENT	0x28	/* Central clock enable */
 #define	 CENT_CLK_EN_CPU	(1 << 0)
 #define	 CENT_CLK_EN_SRAM0	(1 << 1)
@@ -34,7 +45,7 @@
 #define	 CENT_CLK_EN_APB0	(1 << 3)
 #define	 CENT_CLK_EN_APB1	(1 << 4)
 #define	 CENT_CLK_EN_APB2	(1 << 5)
-#define	K210_SYSCTL_CLK_EN_PERI	0x2C	/* Peripheral clock enable */
+#define	K210_SYSCTL_CLK_EN_PERI	0x2c	/* Peripheral clock enable */
 #define	 PERI_CLK_EN_ROM	(1 << 0)
 #define	 PERI_CLK_EN_DMA	(1 << 1)
 #define	 PERI_CLK_EN_AI		(1 << 2)
@@ -67,6 +78,26 @@
 #define	 PERI_CLK_EN_RTC	(1 << 29)
 #define	 PERI_CLK_EN_RESERVED1	(1 << 30)
 #define	 PERI_CLK_EN_RESERVED2	(1 << 31)
+#define	K210_SYSCTL_SOFT_RESET	0x30	/* Soft reset ctrl */
+#define	K210_SYSCTL_PERI_RESET	0x34	/* Peripheral reset controller */
+#define	K210_SYSCTL_CLK_TH0	0x38	/* Clock threshold controller 0 */
+#define	K210_SYSCTL_CLK_TH1	0x3c	/* Clock threshold controller 1 */
+#define	K210_SYSCTL_CLK_TH2	0x40	/* Clock threshold controller 2 */
+#define	K210_SYSCTL_CLK_TH3	0x44	/* Clock threshold controller 3 */
+#define	K210_SYSCTL_CLK_TH4	0x48	/* Clock threshold controller 4 */
+#define	K210_SYSCTL_CLK_TH5	0x4c	/* Clock threshold controller 5 */
+#define	K210_SYSCTL_CLK_TH6	0x50	/* Clock threshold controller 6 */
+#define	K210_SYSCTL_MISC	0x54	/* Miscellaneous controller */
+#define	K210_SYSCTL_PERI	0x58	/* Peripheral controller */
+#define	K210_SYSCTL_SPI_SLEEP	0x5c	/* SPI sleep controller */
+#define	K210_SYSCTL_RESET_STATUS 0x60	/* Reset source status */
+#define	K210_SYSCTL_DMA_SEL0	0x64	/* DMA handshake selector */
+#define	K210_SYSCTL_DMA_SEL1	0x68	/* DMA handshake selector */
+#define	K210_SYSCTL_POWER_SEL	0x6c	/* IO Power Mode Select controller */
+#define	K210_SYSCTL_RESV28	0x70	/* Reserved */
+#define	K210_SYSCTL_RESV29	0x74	/* Reserved */
+#define	K210_SYSCTL_RESV30	0x78	/* Reserved */
+#define	K210_SYSCTL_RESV31	0x7c	/* Reserved */
 
 struct k210_sysctl_softc {
 	size_t base;
