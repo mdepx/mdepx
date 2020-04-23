@@ -42,10 +42,15 @@ k210_sysctl_init(struct k210_sysctl_softc *sc, uint32_t base)
 
 	reg = RD4(sc, K210_SYSCTL_CLK_EN_CENT);
 	reg |= CENT_CLK_EN_APB0;
+	reg |= CENT_CLK_EN_APB1;
+	reg |= CENT_CLK_EN_APB2;
 	WR4(sc, K210_SYSCTL_CLK_EN_CENT, reg);
 
 	reg = RD4(sc, K210_SYSCTL_CLK_EN_PERI);
 	reg |= PERI_CLK_EN_GPIO;
+	reg |= PERI_CLK_EN_UART1;
+	reg |= PERI_CLK_EN_UART2;
+	reg |= PERI_CLK_EN_UART3;
 	reg |= PERI_CLK_EN_FPIOA;
 	WR4(sc, K210_SYSCTL_CLK_EN_PERI, reg);
 }

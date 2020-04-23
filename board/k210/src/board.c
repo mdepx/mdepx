@@ -39,12 +39,13 @@
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
 
+#include <dev/uart/uart_16550.h>
 #include <riscv/sifive/e300g_clint.h>
 #include <riscv/kendryte/k210.h>
 
 #include "board.h"
 
-#define	CPU_FREQ		400000000
+#define	CPU_FREQ		390000000
 #define	DEFAULT_BAUDRATE	115200
 #define	PIN_UARTHS_RX		4
 #define	PIN_UARTHS_TX		5
@@ -57,6 +58,7 @@ static struct k210_uarths_softc uarths_sc;
 static struct clint_softc clint_sc;
 struct k210_gpio_softc gpio_sc;
 struct k210_gpiohs_softc gpiohs_sc;
+struct uart_16550_softc uart_sc;
 
 extern uint8_t __riscv_boot_ap[2];
 extern uint32_t _sbss;
@@ -129,12 +131,33 @@ pins_configure(void)
 	cfg.oe_en = 1;
 	k210_fpioa_set_config(&fpioa_sc, 37, &cfg);
 
+	/* GPIOHS22 -> PIN 38 */
+	bzero(&cfg, sizeof(struct fpioa_io_config));
+	cfg.ch_sel = FPIOA_FUNC_GPIOHS22;
+	cfg.ds = 0xf;
+	cfg.oe_en = 1;
+	k210_fpioa_set_config(&fpioa_sc, 38, &cfg);
+
 	/* GPIOHS26 -> PIN 42 */
 	bzero(&cfg, sizeof(struct fpioa_io_config));
 	cfg.ch_sel = FPIOA_FUNC_GPIOHS26;
 	cfg.ds = 0xf;
 	cfg.oe_en = 1;
 	k210_fpioa_set_config(&fpioa_sc, 42, &cfg);
+
+	/* UART TX */
+	bzero(&cfg, sizeof(struct fpioa_io_config));
+	cfg.ch_sel = FPIOA_FUNC_UART1_TX;
+	cfg.ds = 0xf;
+	cfg.oe_en = 1;
+	k210_fpioa_set_config(&fpioa_sc, 44, &cfg);
+
+	/* UART RX */
+	bzero(&cfg, sizeof(struct fpioa_io_config));
+	cfg.ch_sel = FPIOA_FUNC_UART1_RX;
+	cfg.ie_en = 1;
+	cfg.st = 1;
+	k210_fpioa_set_config(&fpioa_sc, 45, &cfg);
 }
 
 void
@@ -161,6 +184,10 @@ board_init(void)
 
 	k210_uarths_init(&uarths_sc, BASE_UARTHS, CPU_FREQ, DEFAULT_BAUDRATE);
 	mdx_console_register(uart_putchar, (void *)&uarths_sc);
+
+	uart_16550_init(&uart_sc, BASE_UART1, 2);
+	uart_16550_configure(&uart_sc, 200000000, 9600, UART_BITWIDTH_8,
+	    UART_STOP_1, UART_PARITY_NONE);
 
 #ifdef MDX_SCHED_SMP
 	printf("Releasing CPU 1...\n");
