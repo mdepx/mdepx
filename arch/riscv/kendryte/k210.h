@@ -28,10 +28,11 @@
 #define _RISCV_KENDRYTE_K210_H_
 
 #include <riscv/kendryte/k210_fpioa.h>
-#include <riscv/kendryte/k210_uarths.h>
-#include <riscv/kendryte/k210_sysctl.h>
 #include <riscv/kendryte/k210_gpio.h>
 #include <riscv/kendryte/k210_gpiohs.h>
+#include <riscv/kendryte/k210_i2c.h>
+#include <riscv/kendryte/k210_sysctl.h>
+#include <riscv/kendryte/k210_uarths.h>
 
 #define	BASE_GPIO	0x50200000
 
