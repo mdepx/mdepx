@@ -66,6 +66,18 @@ k210_gpiohs_set_pin(struct k210_gpiohs_softc *sc, int pin, int val)
 	WR4(sc, GPIOHS_OUTPUT_VALUE, reg);
 }
 
+int
+k210_gpiohs_get_pin(struct k210_gpiohs_softc *sc, int pin)
+{
+	uint32_t reg;
+
+	reg = RD4(sc, GPIOHS_INPUT_VALUE);
+	if (reg & (1 << pin))
+		return (1);
+
+	return (0);
+}
+
 void
 k210_gpiohs_init(struct k210_gpiohs_softc *sc, uint32_t base)
 {

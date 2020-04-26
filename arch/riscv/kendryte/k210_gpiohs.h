@@ -52,5 +52,6 @@ struct k210_gpiohs_softc {
 void k210_gpiohs_init(struct k210_gpiohs_softc *sc, uint32_t base);
 void k210_gpiohs_set_dir(struct k210_gpiohs_softc *sc, int pin, int dir);
 void k210_gpiohs_set_pin(struct k210_gpiohs_softc *sc, int pin, int val);
+int k210_gpiohs_get_pin(struct k210_gpiohs_softc *sc, int pin);
 
 #endif /* !_RISCV_KENDRYTE_K210_GPIOHS_H_ */
