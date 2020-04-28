@@ -45,6 +45,8 @@
 #define	dprintf(fmt, ...)
 #endif
 
+#ifdef MDX_SCHED
+
 /*
  * Called at the exception time to release thread's resources
  * in case of thread termination.
@@ -145,3 +147,5 @@ mdx_thread_setup(struct thread *td, const char *name,
 
 	return (MDX_OK);
 }
+
+#endif /* !MDX_SCHED */
