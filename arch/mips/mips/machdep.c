@@ -125,6 +125,9 @@ md_thread_terminate(struct thread *td)
 
 }
 
+/*
+ * The cpuid must be 0 here.
+ */
 void
 md_init(int cpuid)
 {

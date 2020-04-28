@@ -29,8 +29,8 @@
 #include <sys/thread.h>
 
 /*
- * Note we are booting on an idle thread that becomes a main thread
- * in a single-threaded environment.
+ * Note that each CPU is booting on it's idle thread.
+ * In a single-threaded environment the idle thread becomes a main thread.
  */
 
 static struct thread idle_thread[MDX_CPU_MAX];

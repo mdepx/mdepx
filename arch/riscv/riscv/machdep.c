@@ -139,6 +139,10 @@ md_init_secondary(int hart)
 }
 #endif
 
+/*
+ * The hart must be 0 here.
+ * Use md_init_secondary() for harts > 0.
+ */
 void
 md_init(int hart)
 {
