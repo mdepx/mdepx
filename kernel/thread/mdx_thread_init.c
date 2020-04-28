@@ -54,5 +54,7 @@ mdx_thread_init(int cpuid)
 #endif
 	td->td_state = TD_STATE_READY;
 
+#ifdef MDX_CPU
 	PCPU_SET(curthread, td);
+#endif
 }
