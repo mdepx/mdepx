@@ -29,7 +29,9 @@
 #include <sys/systm.h>
 #include <sys/thread.h>
 
-#if defined(MDX_SCHED) && !defined(MDX_THREAD_DYNAMIC_ALLOC)
+#ifdef MDX_SCHED
+
+#ifndef MDX_THREAD_DYNAMIC_ALLOC
 static struct thread main_thread;
 static uint8_t main_thread_stack[MDX_THREAD_STACK_SIZE]
     __aligned(MDX_THREAD_STACK_ALIGN);
@@ -38,24 +40,33 @@ static uint8_t main_thread_stack[MDX_THREAD_STACK_SIZE]
 void
 mdx_thread_main(void)
 {
-#ifdef MDX_SCHED
 	struct thread *td;
 
-#ifdef MDX_THREAD_DYNAMIC_ALLOC
-	td = mdx_thread_create("main", MDX_THREAD_PRIO,
-	    MDX_THREAD_QUANTUM, MDX_THREAD_STACK_SIZE, main, NULL);
-	if (td == NULL)
-		panic("can't create the main thread\n");
-#else
+#ifndef MDX_THREAD_DYNAMIC_ALLOC
 	td = &main_thread;
 	td->td_stack = (uint8_t *)main_thread_stack;
 	td->td_stack_size = MDX_THREAD_STACK_SIZE;
 	mdx_thread_setup(td, "main", MDX_THREAD_PRIO,
 	    MDX_THREAD_QUANTUM, main, NULL);
+#else
+	td = mdx_thread_create("main", MDX_THREAD_PRIO,
+	    MDX_THREAD_QUANTUM, MDX_THREAD_STACK_SIZE, main, NULL);
+	if (td == NULL)
+		panic("can't create the main thread\n");
 #endif
 	mdx_sched_add(td);
 	mdx_sched_enter();
-#else
-	main();
-#endif
 }
+
+#else /* !MDX_SCHED */
+
+void
+mdx_thread_main(void)
+{
+
+	main();
+
+	panic("main() returned");
+}
+
+#endif
