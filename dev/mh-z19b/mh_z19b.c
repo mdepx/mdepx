@@ -24,6 +24,10 @@
  * SUCH DAMAGE.
  */
 
+#include <sys/cdefs.h>
+
+#include "mh_z19b.h"
+
 uint8_t
 mh_z19b_checksum(uint8_t *pkt)
 {
