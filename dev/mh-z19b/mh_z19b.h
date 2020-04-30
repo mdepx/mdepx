@@ -33,4 +33,6 @@
 #define	MH_Z19B_AUTO_CALIBRATION_EN	0x79	/* On/Off auto calibration. */
 #define	MH_Z19B_DETECTION_RANGE		0x99	/* Detection range settings. */
 
+uint8_t mh_z19b_checksum(uint8_t *pkt);
+
 #endif /* !_DEV_MH_Z19B_MH_Z19B_H_ */
