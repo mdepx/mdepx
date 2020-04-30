@@ -31,7 +31,10 @@
 uint8_t
 mh_z19b_checksum(uint8_t *pkt)
 {
-	uint8_t i, csum;
+	uint8_t csum;
+	uint8_t i;
+
+	csum = 0;
 
 	for(i = 1; i < 8; i++)
 		csum += pkt[i];
