@@ -34,5 +34,7 @@
 #define	MH_Z19B_DETECTION_RANGE		0x99	/* Detection range settings. */
 
 uint8_t mh_z19b_checksum(uint8_t *pkt);
+void mh_z19b_set_range_req(uint8_t *req, int range);
+void mh_z19b_read_co2_req(uint8_t *req);
 
 #endif /* !_DEV_MH_Z19B_MH_Z19B_H_ */

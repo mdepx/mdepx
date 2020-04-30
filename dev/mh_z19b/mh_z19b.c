@@ -44,3 +44,33 @@ mh_z19b_checksum(uint8_t *pkt)
 
 	return (csum);
 }
+
+void
+mh_z19b_set_range_req(uint8_t *req, int range)
+{
+
+	req[0] = 0xFF;
+	req[1] = 0x01;
+	req[2] = MH_Z19B_DETECTION_RANGE;
+	req[3] = range / 256;
+	req[4] = range % 256;
+	req[5] = 0x00;
+	req[6] = 0x00;
+	req[7] = 0x00;
+	req[8] = mh_z19b_checksum(req);
+}
+
+void
+mh_z19b_read_co2_req(uint8_t *req)
+{
+
+	req[0] = 0xFF;
+	req[1] = 0x01;
+	req[2] = MH_Z19B_CO2_CONCENTRATION;
+	req[3] = 0x00;
+	req[4] = 0x00;
+	req[5] = 0x00;
+	req[6] = 0x00;
+	req[7] = 0x00;
+	req[8] = mh_z19b_checksum(req);
+}
