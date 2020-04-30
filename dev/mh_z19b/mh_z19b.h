@@ -36,5 +36,6 @@
 uint8_t mh_z19b_checksum(uint8_t *pkt);
 void mh_z19b_set_range_req(uint8_t *req, int range);
 void mh_z19b_read_co2_req(uint8_t *req);
+int mh_z19b_read_co2_reply(uint8_t *reply, uint32_t *co2);
 
 #endif /* !_DEV_MH_Z19B_MH_Z19B_H_ */

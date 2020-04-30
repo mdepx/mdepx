@@ -74,3 +74,17 @@ mh_z19b_read_co2_req(uint8_t *req)
 	req[7] = 0x00;
 	req[8] = mh_z19b_checksum(req);
 }
+
+int
+mh_z19b_read_co2_reply(uint8_t *reply, uint32_t *co2)
+{
+	uint8_t csum;
+
+	csum = mh_z19b_checksum(reply);
+	if (csum != reply[8])
+		return (-1);
+
+	*co2 = reply[2] * 256 + reply[3];
+
+	return (0);
+}
