@@ -51,6 +51,9 @@ k210_sysctl_init(struct k210_sysctl_softc *sc, uint32_t base)
 	reg |= PERI_CLK_EN_UART1;
 	reg |= PERI_CLK_EN_UART2;
 	reg |= PERI_CLK_EN_UART3;
+	reg |= PERI_CLK_EN_I2C0;
+	reg |= PERI_CLK_EN_I2C1;
+	reg |= PERI_CLK_EN_I2C2;
 	reg |= PERI_CLK_EN_FPIOA;
 	WR4(sc, K210_SYSCTL_CLK_EN_PERI, reg);
 }
