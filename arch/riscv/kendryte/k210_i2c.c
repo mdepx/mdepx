@@ -86,7 +86,6 @@ k210_i2c_xfer(void *arg, struct i2c_msg *msgs, int len)
 				reg = RD4(sc, K210_I2C_STATUS);
 			} while (reg & I2C_STATUS_ACTIVITY);
 
-
 			/*
 			 * TODO: not sure how to generate STOP condition.
 			 * Do a 25ms timeout which helps.
