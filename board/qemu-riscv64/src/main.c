@@ -38,6 +38,7 @@
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
 
+#include <app/fpu_test/fpu_test.h>
 #include <app/callout_test/callout_test.h>
 
 #include "board.h"
