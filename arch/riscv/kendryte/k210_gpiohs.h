@@ -27,6 +27,8 @@
 #ifndef _RISCV_KENDRYTE_K210_GPIOHS_H_
 #define _RISCV_KENDRYTE_K210_GPIOHS_H_
 
+#include <dev/gpio/gpio.h>
+
 #define	GPIOHS_INPUT_VALUE	0x00
 #define	GPIOHS_INPUT_ENABLE	0x04
 #define	GPIOHS_OUTPUT_ENABLE	0x08
@@ -50,8 +52,7 @@ struct k210_gpiohs_softc {
 };
 
 void k210_gpiohs_init(struct k210_gpiohs_softc *sc, uint32_t base);
-void k210_gpiohs_set_dir(struct k210_gpiohs_softc *sc, int pin, int dir);
-void k210_gpiohs_set_pin(struct k210_gpiohs_softc *sc, int pin, int val);
-int k210_gpiohs_get_pin(struct k210_gpiohs_softc *sc, int pin);
+
+struct mdx_gpio_ops k210_gpiohs_ops;
 
 #endif /* !_RISCV_KENDRYTE_K210_GPIOHS_H_ */

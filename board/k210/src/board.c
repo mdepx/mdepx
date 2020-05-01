@@ -40,6 +40,7 @@
 #include <machine/cpufunc.h>
 
 #include <dev/uart/uart_16550.h>
+
 #include <riscv/sifive/e300g_clint.h>
 #include <riscv/kendryte/k210.h>
 
@@ -58,6 +59,7 @@ static struct k210_uarths_softc uarths_sc;
 static struct clint_softc clint_sc;
 struct k210_gpio_softc gpio_sc;
 struct k210_gpiohs_softc gpiohs_sc;
+struct k210_i2c_softc i2c_sc;
 struct uart_16550_softc uart_sc;
 
 extern uint8_t __riscv_boot_ap[2];
@@ -82,6 +84,13 @@ uart_putchar(int c, void *arg)
 		k210_uarths_putc(&uarths_sc, '\r');
 
 	k210_uarths_putc(&uarths_sc, c);
+}
+
+void
+udelay(uint32_t usec)
+{
+
+	mdx_usleep(usec);
 }
 
 static void
@@ -145,6 +154,13 @@ pins_configure(void)
 	cfg.oe_en = 1;
 	k210_fpioa_set_config(&fpioa_sc, 42, &cfg);
 
+	/* GPIOHS27 -> PIN 43 */
+	bzero(&cfg, sizeof(struct fpioa_io_config));
+	cfg.ch_sel = FPIOA_FUNC_GPIOHS27;
+	cfg.ds = 0xf;
+	cfg.oe_en = 1;
+	k210_fpioa_set_config(&fpioa_sc, 43, &cfg);
+
 	/* UART TX */
 	bzero(&cfg, sizeof(struct fpioa_io_config));
 	cfg.ch_sel = FPIOA_FUNC_UART1_TX;
@@ -158,6 +174,33 @@ pins_configure(void)
 	cfg.ie_en = 1;
 	cfg.st = 1;
 	k210_fpioa_set_config(&fpioa_sc, 45, &cfg);
+
+	/* I2C */
+	bzero(&cfg, sizeof(struct fpioa_io_config));
+	cfg.ch_sel = FPIOA_FUNC_I2C0_SCLK;
+	/*
+	 * Bitbang ?
+	 * cfg.ch_sel = FPIOA_FUNC_GPIOHS28;
+	 */
+	cfg.oe_en = 1;
+	cfg.pu = 1;
+	cfg.sl = 1;
+	cfg.ie_en = 1;
+	cfg.st = 1;
+	k210_fpioa_set_config(&fpioa_sc, 46, &cfg);
+
+	bzero(&cfg, sizeof(struct fpioa_io_config));
+	cfg.ch_sel = FPIOA_FUNC_I2C0_SDA;
+	/*
+	 * Bitbang ?
+	 * cfg.ch_sel = FPIOA_FUNC_GPIOHS29;
+	 */
+	cfg.oe_en = 1;
+	cfg.pu = 1;
+	cfg.sl = 1;
+	cfg.ie_en = 1;
+	cfg.st = 1;
+	k210_fpioa_set_config(&fpioa_sc, 47, &cfg);
 }
 
 void
@@ -165,25 +208,32 @@ board_init(void)
 {
 
 	k210_sysctl_init(&sysctl_sc, BASE_SYSCTL);
-
 	k210_fpioa_init(&fpioa_sc, BASE_FPIOA);
 	pins_configure();
-
-	k210_gpio_init(&gpio_sc, BASE_GPIO);
-	k210_gpiohs_init(&gpiohs_sc, BASE_GPIOHS);
 	e300g_clint_init(&clint_sc, BASE_CLINT, 8000000);
 
+	/* GPIOHS */
+	k210_gpiohs_init(&gpiohs_sc, BASE_GPIOHS);
+	mdx_gpio_bank_register(0, &k210_gpiohs_ops, &gpiohs_sc);
+
+	/* GPIO */
+	k210_gpio_init(&gpio_sc, BASE_GPIO);
+	mdx_gpio_bank_register(1, &k210_gpio_ops, &gpio_sc);
+
 	/* Enable LEDs. */
-	k210_gpio_set_dir(&gpio_sc, PIN_GPIO_LED0, 1);
-	k210_gpio_set_dir(&gpio_sc, PIN_GPIO_LED1, 1);
-	k210_gpio_set_pin(&gpio_sc, PIN_GPIO_LED0, 0);
-	k210_gpio_set_pin(&gpio_sc, PIN_GPIO_LED1, 0);
+	mdx_gpio_configure(1, PIN_GPIO_LED0, MDX_GPIO_OUTPUT);
+	mdx_gpio_configure(1, PIN_GPIO_LED1, MDX_GPIO_OUTPUT);
+	mdx_gpio_set(1, PIN_GPIO_LED0, 0);
+	mdx_gpio_set(1, PIN_GPIO_LED1, 0);
 
 	malloc_init();
 	malloc_add_region(0x40000000, 6 * 1024 * 1024);
 
 	k210_uarths_init(&uarths_sc, BASE_UARTHS, CPU_FREQ, DEFAULT_BAUDRATE);
 	mdx_console_register(uart_putchar, (void *)&uarths_sc);
+
+	k210_i2c_init(&i2c_sc, BASE_I2C0);
+	k210_i2c_configure_master(&i2c_sc, 790000000, 400000);
 
 	uart_16550_init(&uart_sc, BASE_UART1, 2);
 	uart_16550_configure(&uart_sc, 200000000, 9600, UART_BITWIDTH_8,

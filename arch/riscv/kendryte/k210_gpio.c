@@ -26,6 +26,8 @@
 
 #include <sys/cdefs.h>
 
+#include <dev/gpio/gpio.h>
+
 #include <riscv/kendryte/k210_gpio.h>
 
 #define	RD4(_sc, _reg)		\
@@ -33,7 +35,7 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-void
+static void
 k210_gpio_set_dir(struct k210_gpio_softc *sc, int pin, int dir)
 {
 	uint32_t reg;
@@ -46,10 +48,28 @@ k210_gpio_set_dir(struct k210_gpio_softc *sc, int pin, int dir)
 	WR4(sc, GPIO_DIRECTION, reg);
 }
 
-void
-k210_gpio_set_pin(struct k210_gpio_softc *sc, int pin, int val)
+static int
+k210_gpio_pin_configure(void *arg, int pin, int flags)
 {
+	struct k210_gpio_softc *sc;
+
+	sc = arg;
+
+	if (flags & MDX_GPIO_INPUT)
+		k210_gpio_set_dir(sc, pin, 0);
+	else
+		k210_gpio_set_dir(sc, pin, 1);
+
+	return (0);
+}
+
+static int
+k210_gpio_set_pin(void *arg, int pin, int val)
+{
+	struct k210_gpio_softc *sc;
 	uint32_t reg;
+
+	sc = arg;
 
 	reg = RD4(sc, GPIO_DATA_OUTPUT);
 	if (val)
@@ -57,6 +77,23 @@ k210_gpio_set_pin(struct k210_gpio_softc *sc, int pin, int val)
 	else
 		reg &= ~(1 << pin);
 	WR4(sc, GPIO_DATA_OUTPUT, reg);
+
+	return (0);
+}
+
+static int
+k210_gpio_get_pin(void *arg, int pin)
+{
+	struct k210_gpio_softc *sc;
+	uint32_t reg;
+
+	sc = arg;
+
+	reg = RD4(sc, GPIO_DATA_INPUT);
+	if (reg & (1 << pin))
+		return (1);
+
+	return (0);
 }
 
 void
@@ -65,3 +102,9 @@ k210_gpio_init(struct k210_gpio_softc *sc, uint32_t base)
 
 	sc->base = base;
 }
+
+struct mdx_gpio_ops k210_gpio_ops = {
+	.pin_set = k210_gpio_set_pin,
+	.pin_get = k210_gpio_get_pin,
+	.pin_configure = k210_gpio_pin_configure,
+};

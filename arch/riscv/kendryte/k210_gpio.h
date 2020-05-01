@@ -27,6 +27,8 @@
 #ifndef _RISCV_KENDRYTE_K210_GPIO_H_
 #define _RISCV_KENDRYTE_K210_GPIO_H_
 
+#include <dev/gpio/gpio.h>
+
 /*
  * GPIOHS: 32 pins 3 Mbps
  * GPIO: 8 pins 1 Mbps
@@ -53,7 +55,7 @@ struct k210_gpio_softc {
 };
 
 void k210_gpio_init(struct k210_gpio_softc *sc, uint32_t base);
-void k210_gpio_set_dir(struct k210_gpio_softc *sc, int pin, int dir);
-void k210_gpio_set_pin(struct k210_gpio_softc *sc, int pin, int val);
+
+struct mdx_gpio_ops k210_gpio_ops;
 
 #endif /* !_RISCV_KENDRYTE_K210_GPIO_H_ */
