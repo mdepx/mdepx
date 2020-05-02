@@ -91,7 +91,7 @@ test_m0(void *arg)
 
 	while (1) {
 		if (mdx_mutex_timedlock(&m1, 50000) == 0) {
-			printf("again %ld\n", (int)arg);
+			printf("again %ld\n", (uintptr_t)arg);
 			continue;
 		}
 		printf("test_m0 acuired the mutex\n");
@@ -105,7 +105,7 @@ test_m1(void *arg)
 
 	while (1) {
 		if (mdx_mutex_timedlock(&m1, 50000) == 0) {
-			printf("again %ld\n", (int)arg);
+			printf("again %ld\n", (uintptr_t)arg);
 			continue;
 		}
 		printf("test_m1 acuired the mutex\n");
@@ -119,7 +119,7 @@ test_m2(void *arg)
 
 	while (1) {
 		if (mdx_mutex_timedlock(&m1, 50000) == 0) {
-			printf("again %ld\n", (int)arg);
+			printf("again %ld\n", (uintptr_t)arg);
 			continue;
 		}
 		printf("test_m2 acuired the mutex\n");
