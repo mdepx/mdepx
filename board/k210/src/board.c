@@ -226,9 +226,6 @@ board_init(void)
 	mdx_gpio_set(1, PIN_GPIO_LED0, 0);
 	mdx_gpio_set(1, PIN_GPIO_LED1, 0);
 
-	malloc_init();
-	malloc_add_region(0x40000000, 6 * 1024 * 1024);
-
 	k210_uarths_init(&uarths_sc, BASE_UARTHS, CPU_FREQ, DEFAULT_BAUDRATE);
 	mdx_console_register(uart_putchar, (void *)&uarths_sc);
 
@@ -244,4 +241,11 @@ board_init(void)
 	__riscv_boot_ap[1] = 1;
 	clint_set_sip(1);
 #endif
+
+	/*
+	 * This should go after releasing secondary core for some reason.
+	 * (Maybe secondary core is spinning in that area?)
+	 */
+	malloc_init();
+	malloc_add_region(0x40000000, 6 * 1024 * 1024);
 }
