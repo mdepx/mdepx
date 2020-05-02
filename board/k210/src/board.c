@@ -237,15 +237,23 @@ board_init(void)
 	    UART_STOP_1, UART_PARITY_NONE);
 
 #ifdef MDX_SCHED_SMP
-	printf("Releasing CPU 1...\n");
-	__riscv_boot_ap[1] = 1;
+	/* Release secondary core (CPU1). */
 	clint_set_sip(1);
 #endif
 
+	/* TODO: add udelay? */
+
 	/*
-	 * This should go after releasing secondary core for some reason.
-	 * (Maybe secondary core is spinning in that area?)
+	 * Malloc initialization should go after releasing secondary core
+	 * for some reason.
+	 * (Maybe secondary core is spinning in that region of memory?)
 	 */
 	malloc_init();
 	malloc_add_region(0x40000000, 6 * 1024 * 1024);
+
+	/* Now we can release CPU1 from our own holding pen. */
+#ifdef MDX_SCHED_SMP
+	printf("Releasing CPU 1...\n");
+	__riscv_boot_ap[1] = 1;
+#endif
 }
