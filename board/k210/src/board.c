@@ -236,23 +236,17 @@ board_init(void)
 	uart_16550_configure(&uart_sc, 200000000, 9600, UART_BITWIDTH_8,
 	    UART_STOP_1, UART_PARITY_NONE);
 
-#ifdef MDX_SCHED_SMP
-	/* Release secondary core (CPU1). */
-	clint_set_sip(1);
-#endif
-
-	/* TODO: add udelay? */
-
 	/*
-	 * Malloc initialization should go after releasing secondary core
-	 * for some reason.
-	 * (Maybe secondary core is spinning in that region of memory?)
+	 * TODO: Could not use 0x40000000-0x40100000 region.
+	 * (Not sure why)
 	 */
 	malloc_init();
-	malloc_add_region(0x40000000, 6 * 1024 * 1024);
+	malloc_add_region(0x40100000, 5 * 1024 * 1024);
 
-	/* Now we can release CPU1 from our own holding pen. */
 #ifdef MDX_SCHED_SMP
+	printf("Send interrupt to CPU1\n");
+	clint_set_sip(1);
+
 	printf("Releasing CPU 1...\n");
 	__riscv_boot_ap[1] = 1;
 #endif
