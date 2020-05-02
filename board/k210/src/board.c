@@ -237,11 +237,11 @@ board_init(void)
 	    UART_STOP_1, UART_PARITY_NONE);
 
 	/*
-	 * TODO: Could not use 0x40000000-0x40100000 region.
-	 * (Not sure why)
+	 * TODO: Could not use 0x40000000-0x40600000 region.
+	 * It could be that the region is used by a peripheral device.
 	 */
 	malloc_init();
-	malloc_add_region(0x40100000, 5 * 1024 * 1024);
+	malloc_add_region(0x80100000, 5 * 1024 * 1024);
 
 #ifdef MDX_SCHED_SMP
 	printf("Send interrupt to CPU1\n");

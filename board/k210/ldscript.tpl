@@ -4,7 +4,10 @@ ENTRY(_start)
 MEMORY
 {
 	sram0 (wxa!ri)  : ORIGIN = 0x80000000, LENGTH = 6M /* cached */
-	sram1 (wxa!ri)  : ORIGIN = 0x40000000, LENGTH = 6M
+	sram1 (wxa!ri)  : ORIGIN = 0x80100000, LENGTH = 5M /* cached */
+
+	/* This region could be in use by some peripheral, have to check. */
+	sram2 (wxa!ri)  : ORIGIN = 0x40000000, LENGTH = 6M
 }
 
 SECTIONS
