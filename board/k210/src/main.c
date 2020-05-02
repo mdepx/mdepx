@@ -26,6 +26,7 @@
 
 #include <stdio.h>
 
+#include <app/callout_test/callout_test.h>
 #include <app/fpu_test/fpu_test.h>
 
 int
@@ -35,6 +36,7 @@ main(void)
 	printf("Hello world!\n");
 
 	fpu_test();
+	callout_test();
 
 	return (0);
 }
