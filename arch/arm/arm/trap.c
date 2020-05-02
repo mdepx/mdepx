@@ -116,20 +116,26 @@ handle_exception(struct trapframe *tf, int exc_code)
 
 #ifdef MDX_ARM_VFP
 static bool
-save_fpu(struct thread *td)
+fpu_check_and_save(struct thread *td)
 {
-	bool fpu_is_enabled;
-
-	fpu_is_enabled = false;
-
 	struct pcb *pcb;
+
 	pcb = &td->td_pcb;
+
 	if (pcb->pcb_flags & PCB_FLAGS_FPU) {
-		fpu_is_enabled = true;
-		save_fpu_context(&pcb->pcb_vfp);
+		switch (td->td_state) {
+		case TD_STATE_SEM_WAIT:
+		case TD_STATE_SLEEPING:
+		case TD_STATE_YIELDING:
+		case TD_STATE_READY:
+			save_fpu_context(&pcb->pcb_vfp);
+			break;
+		}
+
+		return (true);
 	}
 
-	return (fpu_is_enabled);
+	return (false);
 }
 
 static void
@@ -170,16 +176,7 @@ arm_exception(struct trapframe *tf, int exc_code)
 	td->td_tf = tf;
 
 #ifdef MDX_ARM_VFP
-	switch (td->td_state) {
-	case TD_STATE_SEM_WAIT:
-	case TD_STATE_SLEEPING:
-	case TD_STATE_YIELDING:
-	case TD_STATE_READY:
-		fpu_was_enabled = save_fpu(td);
-		break;
-	default:
-		fpu_was_enabled = false;
-	}
+	fpu_was_enabled = fpu_check_and_save(td);
 #endif
 
 	/*
@@ -207,8 +204,10 @@ arm_exception(struct trapframe *tf, int exc_code)
 	if (intr)
 		arm_nvic_intr(irq, NULL);
 
-	if (!released)
+	if (!released) {
+		fpu_check_and_save(td);
 		released = mdx_sched_park(td);
+	}
 
 	if (released) {
 		/* We don't have a thread to run. Pick the next one. */
