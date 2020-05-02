@@ -190,22 +190,23 @@ mips_exception(struct trapframe *tf)
 	else
 		handle_exception(tf, exc_code);
 
-	released = mdx_sched_release(td);
+	released = mdx_sched_ack(td);
 
 	/* Switch to the interrupt thread. Stack is the same. */
 	if (released)
 		PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
-
 	curthread->td_critnest++;
 
 	if (intr)
 		mips_handle_intr(cause);
 
+	if (!released)
+		released = mdx_sched_park(td);
+
 	if (released)
 		td = mdx_sched_next();
 
 	curthread->td_critnest--;
-
 	if (released)
 		PCPU_SET(curthread, td);
 

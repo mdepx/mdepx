@@ -169,18 +169,6 @@ arm_exception(struct trapframe *tf, int exc_code)
 	 */
 	td->td_tf = tf;
 
-	/*
-	 * A thread that is leaving CPU could be added back to the run
-	 * queue by interrupt handlers, which means we have to ACK and
-	 * release it before processing interrupts.
-	 */
-	if (exc_code >= 16) {
-		/* We will handle the interrupt later. */
-		irq = exc_code - 16;
-		intr = true;
-	} else
-		handle_exception(tf, exc_code);
-
 #ifdef MDX_ARM_VFP
 	switch (td->td_state) {
 	case TD_STATE_SEM_WAIT:
@@ -194,7 +182,19 @@ arm_exception(struct trapframe *tf, int exc_code)
 	}
 #endif
 
-	released = mdx_sched_release(td);
+	/*
+	 * A thread that is leaving CPU could be added back to the run
+	 * queue by interrupt handlers, which means we have to ACK and
+	 * release it before processing interrupts.
+	 */
+	if (exc_code >= 16) {
+		/* We will handle the interrupt later. */
+		irq = exc_code - 16;
+		intr = true;
+	} else
+		handle_exception(tf, exc_code);
+
+	released = mdx_sched_ack(td);
 
 	/*
 	 * Switch to the interrupt thread if we don't have
@@ -202,11 +202,13 @@ arm_exception(struct trapframe *tf, int exc_code)
 	 */
 	if (released)
 		PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
-
 	curthread->td_critnest++;
 
 	if (intr)
 		arm_nvic_intr(irq, NULL);
+
+	if (!released)
+		released = mdx_sched_park(td);
 
 	if (released) {
 		/* We don't have a thread to run. Pick the next one. */
@@ -216,9 +218,8 @@ arm_exception(struct trapframe *tf, int exc_code)
 #endif
 	}
 
-	curthread->td_critnest--;
-
 	/* Switch to the new thread. */
+	curthread->td_critnest--;
 	if (released)
 		PCPU_SET(curthread, td);
 

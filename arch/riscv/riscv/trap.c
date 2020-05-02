@@ -133,13 +133,6 @@ riscv_exception(struct trapframe *tf)
 		mdx_sched_cpu_avail(curpcpu, false);
 #endif
 
-	/* Check the trapframe first before we release this thread. */
-	if (tf->tf_mcause & EXCP_INTR) {
-		irq = (tf->tf_mcause & EXCP_MASK);
-		intr = true;
-	} else
-		handle_exception(tf);
-
 #ifdef MDX_RISCV_FPE
 	switch (td->td_state) {
 	case TD_STATE_SEM_WAIT:
@@ -152,22 +145,32 @@ riscv_exception(struct trapframe *tf)
 	}
 #endif
 
+	/* Check the trapframe first before we release this thread. */
+	if (tf->tf_mcause & EXCP_INTR) {
+		irq = (tf->tf_mcause & EXCP_MASK);
+		intr = true;
+	} else
+		handle_exception(tf);
+
 	/*
 	 * Check if this thread went to sleep and release it from this CPU.
 	 * Note that td and tf can not be used after this call since this
 	 * thread could be added back to the run queue by another CPU in
 	 * mdx_mutex_unlock() or by this cpu in riscv_intr().
 	 */
-	released = mdx_sched_release(td);
+	released = mdx_sched_ack(td);
 
 	/* Switch to the interrupt thread. */
 	if (released)
 		PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
-
 	critical_enter();
 
 	if (intr)
 		riscv_intr(irq);
+
+	/* Check if this thread has no more CPU time. */
+	if (!released)
+		released = mdx_sched_park(td);
 
 	/* Pickup new thread if we don't have one anymore. */
 	if (released) {

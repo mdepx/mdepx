@@ -153,16 +153,13 @@ mdx_sched_add(struct thread *td)
  * Called by the exception handler only to release a thread from CPU.
  */
 bool
-mdx_sched_release(struct thread *td)
+mdx_sched_ack(struct thread *td)
 {
 	bool released;
 
 	released = false;
 
 	switch (td->td_state) {
-	case TD_STATE_RUNNING:
-		/* Current thread is still running. Do not switch. */
-		break;
 	case TD_STATE_TERMINATING:
 		/* This thread has finished work. */
 		mdx_thread_terminate_cleanup(td);
@@ -174,12 +171,34 @@ mdx_sched_release(struct thread *td)
 		/* Note that this thread can now be used by another CPU. */
 		released = true;
 		break;
+	default:
+		break;
+	}
+
+	return (released);
+}
+
+/*
+ * Called by the exception handler only to release a thread from CPU.
+ */
+bool
+mdx_sched_park(struct thread *td)
+{
+	bool released;
+
+	released = false;
+
+	switch (td->td_state) {
+	case TD_STATE_RUNNING:
+		/* Current thread is still running. Do not switch. */
+		break;
 	case TD_STATE_YIELDING:
 	case TD_STATE_READY:
 		mdx_sched_add(td);
 		released = true;
 		break;
 	case TD_STATE_WAKEUP:
+		panic("wrong state, thread name %s", td->td_name);
 	default:
 		panic("unknown state %d, thread name %s",
 		    td->td_state, td->td_name);
@@ -222,9 +241,9 @@ mdx_sched_next(void)
 	}
 
 	dprintf("%s\n", td->td_name);
-	dprintf("%s%d: curthread %p, tf %p, name %s, idx %x\n",
+	dprintf("%s%d: curthread %p, tf %p, name %s, idx %x, st %d\n",
 	    __func__, PCPU_GET(cpuid), td, td->td_tf,
-		td->td_name, (uint32_t)td->td_index);
+	    td->td_name, (uint32_t)td->td_index, td->td_state);
 
 	return (td);
 }

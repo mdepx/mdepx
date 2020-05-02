@@ -86,7 +86,8 @@ void mdx_sched_enter(void);
 void mdx_sched_init(void);
 void mdx_sched_cpu_add(struct pcpu *pcpup);
 void mdx_sched_cpu_avail(struct pcpu *pcpup, bool available);
-bool mdx_sched_release(struct thread *td);
+bool mdx_sched_park(struct thread *td);
+bool mdx_sched_ack(struct thread *td);
 
 /* Thread MD part */
 void md_init(int cpuid);
