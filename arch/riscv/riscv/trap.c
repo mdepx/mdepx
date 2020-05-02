@@ -109,7 +109,24 @@ handle_exception(struct trapframe *tf)
 }
 
 #ifdef MDX_SCHED
+#ifdef MDX_RISCV_FPE
+static void
+fpe_check_and_save(struct thread *td)
+{
+	struct pcb *pcb;
 
+	switch (td->td_state) {
+	case TD_STATE_SEM_WAIT:
+	case TD_STATE_SLEEPING:
+	case TD_STATE_YIELDING:
+	case TD_STATE_READY:
+		pcb = &td->td_pcb;
+		if (pcb->pcb_flags & PCB_FLAGS_FPE_ENABLED)
+			fpe_state_save(&pcb->pcb_x[0][0]);
+		break;
+	}
+}
+#endif
 struct trapframe *
 riscv_exception(struct trapframe *tf)
 {
@@ -134,15 +151,11 @@ riscv_exception(struct trapframe *tf)
 #endif
 
 #ifdef MDX_RISCV_FPE
-	switch (td->td_state) {
-	case TD_STATE_SEM_WAIT:
-	case TD_STATE_SLEEPING:
-	case TD_STATE_YIELDING:
-	case TD_STATE_READY:
-		pcb = &td->td_pcb;
-		if (pcb->pcb_flags & PCB_FLAGS_FPE_ENABLED)
-			fpe_state_save(&pcb->pcb_x[0][0]);
-	}
+	/*
+	 * Check if the thread will be released later in mdx_sched_ack()
+	 * and save any floating point registers before the call.
+	 */
+	fpe_check_and_save(td);
 #endif
 
 	/* Check the trapframe first before we release this thread. */
@@ -169,8 +182,16 @@ riscv_exception(struct trapframe *tf)
 		riscv_intr(irq);
 
 	/* Check if this thread has no more CPU time. */
-	if (!released)
+	if (!released) {
+#ifdef MDX_RISCV_FPE
+		/*
+		 * Check if the thread will be released in mdx_sched_park()
+		 * and save any floating point registers before the call.
+		 */
+		fpe_check_and_save(td);
+#endif
 		released = mdx_sched_park(td);
+	}
 
 	/* Pickup new thread if we don't have one anymore. */
 	if (released) {
