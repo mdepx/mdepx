@@ -55,9 +55,11 @@ i2c_scl(struct i2c_bitbang_softc *sc, bool enable)
 {
 
 	if (enable)
-		mdx_gpio_configure(&dev_gpiohs, 0, PIN_I2C_SCL, MDX_GPIO_INPUT);
+		mdx_gpio_configure(&dev_gpiohs, 0, PIN_I2C_SCL,
+		    MDX_GPIO_INPUT);
 	else
-		mdx_gpio_configure(&dev_gpiohs, 0, PIN_I2C_SCL, MDX_GPIO_OUTPUT);
+		mdx_gpio_configure(&dev_gpiohs, 0, PIN_I2C_SCL,
+		    MDX_GPIO_OUTPUT);
 }
 
 static void
