@@ -27,23 +27,24 @@
 #ifndef _DEV_GPIO_GPIO_H_
 #define	_DEV_GPIO_GPIO_H_
 
+#include <sys/driver.h>
+
 #define	MDX_GPIO_INPUT		(1 << 0)
 #define	MDX_GPIO_OUTPUT		(1 << 1)
 
 struct mdx_gpio_ops {
-	int (*pin_set)(void *arg, int pin, int value);
-	int (*pin_get)(void *arg, int pin);
-	int (*pin_configure)(void *arg, int pin, int flags);
+	int (*pin_set)(void *arg, int bank, int pin, int value);
+	int (*pin_get)(void *arg, int bank, int pin);
+	int (*pin_configure)(void *arg, int bank, int pin, int flags);
 };
 
-struct mdx_gpio_bank {
+struct mdx_gpio_dev {
 	struct mdx_gpio_ops *ops;
 	void *arg;
 };
 
-int mdx_gpio_bank_register(int bank_id, struct mdx_gpio_ops *ops, void *arg);
-int mdx_gpio_configure(int bank_id, int pin, int flags);
-int mdx_gpio_set(int bank_id, int pin, int value);
-int mdx_gpio_get(int bank_id, int pin);
+int mdx_gpio_set(mdx_device_t dev, int bank, int pin, int value);
+int mdx_gpio_get(mdx_device_t dev, int bank, int pin);
+int mdx_gpio_configure(mdx_device_t dev, int bank, int pin, int flags);
 
 #endif /* !_DEV_GPIO_GPIO_H_ */

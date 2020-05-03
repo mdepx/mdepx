@@ -26,59 +26,45 @@
 
 #include <sys/cdefs.h>
 #include <sys/console.h>
+#include <sys/driver.h>
 
 #include <dev/gpio/gpio.h>
 
-static struct mdx_gpio_bank gpio_bank[MDX_GPIO_NBANKS];
-
 int
-mdx_gpio_bank_register(int bank_id, struct mdx_gpio_ops *ops, void *arg)
+mdx_gpio_set(mdx_device_t dev, int bank, int pin, int value)
 {
-
-	if (bank_id >= MDX_GPIO_NBANKS)
-		return (-1);
-
-	gpio_bank[bank_id].ops = ops;
-	gpio_bank[bank_id].arg = arg;
-
-	return (0);
-}
-
-int
-mdx_gpio_set(int bank_id, int pin, int value)
-{
-	struct mdx_gpio_bank *bank;
+	struct mdx_gpio_ops *ops;
 	int error;
 
-	bank = &gpio_bank[bank_id];
+	ops = dev->ops;
 
-	error = bank->ops->pin_set(bank->arg, pin, value);
+	error = ops->pin_set(dev->arg, bank, pin, value);
 
 	return (error);
 }
 
 int
-mdx_gpio_get(int bank_id, int pin)
+mdx_gpio_get(mdx_device_t dev, int bank, int pin)
 {
-	struct mdx_gpio_bank *bank;
+	struct mdx_gpio_ops *ops;
 	int value;
 
-	bank = &gpio_bank[bank_id];
+	ops = dev->ops;
 
-	value = bank->ops->pin_get(bank->arg, pin);
+	value = ops->pin_get(dev->arg, bank, pin);
 
 	return (value);
 }
 
 int
-mdx_gpio_configure(int bank_id, int pin, int flags)
+mdx_gpio_configure(mdx_device_t dev, int bank, int pin, int flags)
 {
-	struct mdx_gpio_bank *bank;
+	struct mdx_gpio_ops *ops;
 	int error;
 
-	bank = &gpio_bank[bank_id];
+	ops = dev->ops;
 
-	error = bank->ops->pin_configure(bank->arg, pin, flags);
+	error = ops->pin_configure(dev->arg, bank, pin, flags);
 
 	return (error);
 }

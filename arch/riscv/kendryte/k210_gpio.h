@@ -54,8 +54,7 @@ struct k210_gpio_softc {
 	size_t base;
 };
 
-void k210_gpio_init(struct k210_gpio_softc *sc, uint32_t base);
-
-struct mdx_gpio_ops k210_gpio_ops;
+void k210_gpio_init(mdx_device_t dev,
+    struct k210_gpio_softc *sc, uint32_t base);
 
 #endif /* !_RISCV_KENDRYTE_K210_GPIO_H_ */

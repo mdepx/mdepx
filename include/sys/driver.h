@@ -27,15 +27,17 @@
 #ifndef _SYS_DRIVER_H_
 #define _SYS_DRIVER_H_
 
-struct device {
-	void *sc;	/* Software context. */
+struct mdx_device {
+	void *arg;	/* Software context. */
+	void *ops;	/* Methods. */
 	int node;	/* libfdt node. */
 };
 
-typedef struct device * device_t;
+typedef struct mdx_device *mdx_device_t;
 
+#if 0
 struct device_method {
-	int	(*probe)(device_t);
+	int	(*probe)(mdx_device_t);
 };
 
 typedef struct device_method device_method_t;
@@ -47,5 +49,6 @@ struct driver {
 };
 
 typedef struct driver driver_t;
+#endif
 
 #endif /* !_SYS_DRIVER_H_ */

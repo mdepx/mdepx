@@ -57,6 +57,10 @@ static struct k210_fpioa_softc fpioa_sc;
 static struct k210_sysctl_softc sysctl_sc;
 static struct k210_uarths_softc uarths_sc;
 static struct clint_softc clint_sc;
+
+struct mdx_device dev_gpio;
+struct mdx_device dev_gpiohs;
+
 struct k210_gpio_softc gpio_sc;
 struct k210_gpiohs_softc gpiohs_sc;
 struct k210_i2c_softc i2c_sc;
@@ -94,7 +98,7 @@ udelay(uint32_t usec)
 }
 
 static void
-pins_configure(void)
+fpioa_pins_configure(void)
 {
 	struct fpioa_io_config cfg;
 
@@ -209,22 +213,18 @@ board_init(void)
 
 	k210_sysctl_init(&sysctl_sc, BASE_SYSCTL);
 	k210_fpioa_init(&fpioa_sc, BASE_FPIOA);
-	pins_configure();
+	fpioa_pins_configure();
 	e300g_clint_init(&clint_sc, BASE_CLINT, 8000000);
 
-	/* GPIOHS */
-	k210_gpiohs_init(&gpiohs_sc, BASE_GPIOHS);
-	mdx_gpio_bank_register(0, &k210_gpiohs_ops, &gpiohs_sc);
-
 	/* GPIO */
-	k210_gpio_init(&gpio_sc, BASE_GPIO);
-	mdx_gpio_bank_register(1, &k210_gpio_ops, &gpio_sc);
+	k210_gpiohs_init(&dev_gpiohs, &gpiohs_sc, BASE_GPIOHS);
+	k210_gpio_init(&dev_gpio, &gpio_sc, BASE_GPIO);
 
 	/* Enable LEDs. */
-	mdx_gpio_configure(1, PIN_GPIO_LED0, MDX_GPIO_OUTPUT);
-	mdx_gpio_configure(1, PIN_GPIO_LED1, MDX_GPIO_OUTPUT);
-	mdx_gpio_set(1, PIN_GPIO_LED0, 0);
-	mdx_gpio_set(1, PIN_GPIO_LED1, 0);
+	mdx_gpio_configure(&dev_gpio, 0, PIN_GPIO_LED0, MDX_GPIO_OUTPUT);
+	mdx_gpio_configure(&dev_gpio, 0, PIN_GPIO_LED1, MDX_GPIO_OUTPUT);
+	mdx_gpio_set(&dev_gpio, 0, PIN_GPIO_LED0, 0);
+	mdx_gpio_set(&dev_gpio, 0, PIN_GPIO_LED1, 0);
 
 	k210_uarths_init(&uarths_sc, BASE_UARTHS, CPU_FREQ, DEFAULT_BAUDRATE);
 	mdx_console_register(uart_putchar, (void *)&uarths_sc);

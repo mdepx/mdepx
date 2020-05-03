@@ -44,6 +44,8 @@ static struct i2c_bitbang_softc i2c_bitbang_sc;
 extern struct k210_i2c_softc i2c_sc;
 extern struct uart_16550_softc uart_sc;
 
+extern struct mdx_device dev_gpiohs;
+
 #define	PIN_BME680_SDO	26
 #define	PIN_I2C_SCL	28
 #define	PIN_I2C_SDA	29
@@ -53,9 +55,9 @@ i2c_scl(struct i2c_bitbang_softc *sc, bool enable)
 {
 
 	if (enable)
-		mdx_gpio_configure(0, PIN_I2C_SCL, MDX_GPIO_INPUT);
+		mdx_gpio_configure(&dev_gpiohs, 0, PIN_I2C_SCL, MDX_GPIO_INPUT);
 	else
-		mdx_gpio_configure(0, PIN_I2C_SCL, MDX_GPIO_OUTPUT);
+		mdx_gpio_configure(&dev_gpiohs, 0, PIN_I2C_SCL, MDX_GPIO_OUTPUT);
 }
 
 static void
@@ -63,9 +65,9 @@ i2c_sda(struct i2c_bitbang_softc *sc, bool enable)
 {
 
 	if (enable)
-		mdx_gpio_set(0, PIN_I2C_SDA, 0);
+		mdx_gpio_set(&dev_gpiohs, 0, PIN_I2C_SDA, 0);
 	else
-		mdx_gpio_set(0, PIN_I2C_SDA, 1);
+		mdx_gpio_set(&dev_gpiohs, 0, PIN_I2C_SDA, 1);
 }
 
 static int
@@ -73,7 +75,7 @@ i2c_sda_val(struct i2c_bitbang_softc *sc)
 {
 	uint8_t reg;
 
-	reg = mdx_gpio_get(0, PIN_I2C_SDA);
+	reg = mdx_gpio_get(&dev_gpiohs, 0, PIN_I2C_SDA);
 
 	return (reg & 0x1);
 }
@@ -95,8 +97,8 @@ bme680_sensor_init(void)
 	i2cb.xfer = k210_i2c_xfer;
 	i2cb.arg = &i2c_sc;
 
-	mdx_gpio_set(0, PIN_I2C_SCL, 0);
-	mdx_gpio_set(0, PIN_I2C_SDA, 0);
+	mdx_gpio_set(&dev_gpiohs, 0, PIN_I2C_SCL, 0);
+	mdx_gpio_set(&dev_gpiohs, 0, PIN_I2C_SDA, 0);
 
 	dev.i2cb = &i2cb;
 	ret = bme680_initialize(&dev);
@@ -145,8 +147,8 @@ main(void)
 	 * 1: sets i2c address to 0x77
 	 * 0: sets i2c address to 0x76
 	 */
-	mdx_gpio_configure(0, PIN_BME680_SDO, MDX_GPIO_OUTPUT);
-	mdx_gpio_set(0, PIN_BME680_SDO, 1);
+	mdx_gpio_configure(&dev_gpiohs, 0, PIN_BME680_SDO, MDX_GPIO_OUTPUT);
+	mdx_gpio_set(&dev_gpiohs, 0, PIN_BME680_SDO, 1);
 
 	/*
 	 * Note that for I2C interface bme680 CS pin must be set to HIGH

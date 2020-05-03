@@ -49,7 +49,7 @@ k210_gpio_set_dir(struct k210_gpio_softc *sc, int pin, int dir)
 }
 
 static int
-k210_gpio_pin_configure(void *arg, int pin, int flags)
+k210_gpio_pin_configure(void *arg, int bank, int pin, int flags)
 {
 	struct k210_gpio_softc *sc;
 
@@ -64,7 +64,7 @@ k210_gpio_pin_configure(void *arg, int pin, int flags)
 }
 
 static int
-k210_gpio_set_pin(void *arg, int pin, int val)
+k210_gpio_set_pin(void *arg, int bank, int pin, int val)
 {
 	struct k210_gpio_softc *sc;
 	uint32_t reg;
@@ -82,7 +82,7 @@ k210_gpio_set_pin(void *arg, int pin, int val)
 }
 
 static int
-k210_gpio_get_pin(void *arg, int pin)
+k210_gpio_get_pin(void *arg, int bank, int pin)
 {
 	struct k210_gpio_softc *sc;
 	uint32_t reg;
@@ -96,15 +96,18 @@ k210_gpio_get_pin(void *arg, int pin)
 	return (0);
 }
 
-void
-k210_gpio_init(struct k210_gpio_softc *sc, uint32_t base)
-{
-
-	sc->base = base;
-}
-
-struct mdx_gpio_ops k210_gpio_ops = {
+static struct mdx_gpio_ops k210_gpio_ops = {
 	.pin_set = k210_gpio_set_pin,
 	.pin_get = k210_gpio_get_pin,
 	.pin_configure = k210_gpio_pin_configure,
 };
+
+void
+k210_gpio_init(mdx_device_t dev, struct k210_gpio_softc *sc, uint32_t base)
+{
+
+	sc->base = base;
+
+	dev->ops = (void *)&k210_gpio_ops;
+	dev->arg = sc;
+}
