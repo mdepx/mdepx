@@ -69,6 +69,18 @@ mips_cap_iowrite_uint8(capability cap, size_t offset, uint8_t v)
 
 #endif
 
+bool
+uart_16550_rxready(struct uart_16550_softc *sc)
+{
+	int status;
+
+	status = UART_READ(sc, REG_LSR);
+	if (status & LSR_RXRDY)
+		return (true);
+
+	return (false);
+}
+
 char
 uart_16550_getc(struct uart_16550_softc *sc)
 {

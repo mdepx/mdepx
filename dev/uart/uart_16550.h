@@ -63,6 +63,7 @@ struct uart_16550_softc {
 	uint8_t reg_shift;
 };
 
+bool uart_16550_rxready(struct uart_16550_softc *sc);
 void uart_16550_putc(struct uart_16550_softc *sc, char c);
 char uart_16550_getc(struct uart_16550_softc *sc);
 void uart_16550_init(struct uart_16550_softc *sc, capability base,
