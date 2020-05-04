@@ -37,14 +37,11 @@
 #define	MC6470_DEVID	0x4c
 
 int
-mc6470_read_reg(struct mc6470_dev *dev, uint8_t reg, uint8_t *val)
+mc6470_read_reg(mdx_device_t dev, uint8_t reg, uint8_t *val)
 {
 	struct i2c_msg msgs[2];
-	struct i2c_bus *i2cb;
 	uint8_t dev_id;
 	int err;
-
-	i2cb = dev->i2cb;
 
 	dev_id = MC6470_DEVID;
 
@@ -60,21 +57,18 @@ mc6470_read_reg(struct mc6470_dev *dev, uint8_t reg, uint8_t *val)
 	msgs[1].len = 1;
 	msgs[1].flags = IIC_M_RD;
 
-	err = i2cb->xfer(i2cb->arg, msgs, 2);
+	err = mdx_i2c_transfer(dev, msgs, 2);
 
 	return (err);
 }
 
 int
-mc6470_write_reg(struct mc6470_dev *dev, uint8_t reg, uint8_t val)
+mc6470_write_reg(mdx_device_t dev, uint8_t reg, uint8_t val)
 {
 	struct i2c_msg msgs[1];
-	struct i2c_bus *i2cb;
 	uint8_t data[2];
 	uint8_t dev_id;
 	int err;
-
-	i2cb = dev->i2cb;
 
 	dev_id = MC6470_DEVID;
 
@@ -87,13 +81,13 @@ mc6470_write_reg(struct mc6470_dev *dev, uint8_t reg, uint8_t val)
 	msgs[0].len = 2;
 	msgs[0].flags = 0;
 
-	err = i2cb->xfer(i2cb->arg, msgs, 1);
+	err = mdx_i2c_transfer(dev, msgs, 1);
 
 	return (err);
 }
 
 int
-mc6470_set_freq(struct mc6470_dev *dev, uint8_t val)
+mc6470_set_freq(mdx_device_t dev, uint8_t val)
 {
 	int err;
 

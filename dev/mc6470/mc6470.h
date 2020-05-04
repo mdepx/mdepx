@@ -91,12 +91,8 @@
 #define	MC6470_ZGAIN		0x29
 #define	MC6470_PCODE		0x3B
 
-struct mc6470_dev {
-	struct i2c_bus *i2cb;
-};
-
-int mc6470_read_reg(struct mc6470_dev *dev, uint8_t reg, uint8_t *val);
-int mc6470_write_reg(struct mc6470_dev *dev, uint8_t reg, uint8_t val);
-int mc6470_set_freq(struct mc6470_dev *dev, uint8_t val);
+int mc6470_read_reg(mdx_device_t dev, uint8_t reg, uint8_t *val);
+int mc6470_write_reg(mdx_device_t dev, uint8_t reg, uint8_t val);
+int mc6470_set_freq(mdx_device_t dev, uint8_t val);
 
 #endif /* !_DEV_MC6470_MC6470_H_ */
