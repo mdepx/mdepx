@@ -60,6 +60,7 @@ static struct clint_softc clint_sc;
 
 struct mdx_device dev_gpio;
 struct mdx_device dev_gpiohs;
+struct mdx_device dev_i2c;
 
 struct k210_gpio_softc gpio_sc;
 struct k210_gpiohs_softc gpiohs_sc;
@@ -229,7 +230,7 @@ board_init(void)
 	k210_uarths_init(&uarths_sc, BASE_UARTHS, CPU_FREQ, DEFAULT_BAUDRATE);
 	mdx_console_register(uart_putchar, (void *)&uarths_sc);
 
-	k210_i2c_init(&i2c_sc, BASE_I2C0);
+	k210_i2c_init(&dev_i2c, &i2c_sc, BASE_I2C0);
 	k210_i2c_configure_master(&i2c_sc, 790000000, 400000);
 
 	uart_16550_init(&uart_sc, BASE_UART1, 2);

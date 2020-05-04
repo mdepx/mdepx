@@ -36,15 +36,12 @@
 #define	BME680_CHIP_ID_VAL	0x61
 
 static int
-bme680_chip_id(struct mdx_bme680_dev *dev, int dev_id, uint8_t *result)
+bme680_chip_id(mdx_device_t dev, int dev_id, uint8_t *result)
 {
 	struct i2c_msg msgs[2];
-	struct i2c_bus *i2cb;
 	uint8_t chip_reg;
 	uint8_t chip_id;
 	int err;
-
-	i2cb = dev->i2cb;
 
 	chip_reg = BME680_CHIP_ID_ADDR;
 
@@ -59,7 +56,7 @@ bme680_chip_id(struct mdx_bme680_dev *dev, int dev_id, uint8_t *result)
 	msgs[1].buf = &chip_id;
 	msgs[1].len = 1;
 	msgs[1].flags = IIC_M_RD;
-	err = i2cb->xfer(i2cb->arg, msgs, 2);
+	err = mdx_i2c_transfer(dev, msgs, 2);
 	if (err)
 		return (err);
 
@@ -74,9 +71,8 @@ user_i2c_read(void *arg, uint8_t dev_id, uint8_t reg_addr,
 {
 	uint8_t tx_data[BME680_XFER_MAX_LEN];
 	uint8_t rx_data[BME680_XFER_MAX_LEN];
-	struct mdx_bme680_dev *dev;
+	mdx_device_t dev;
 	struct i2c_msg msgs[2];
-	struct i2c_bus *i2cb;
 	int err;
 	int i;
 
@@ -86,7 +82,6 @@ user_i2c_read(void *arg, uint8_t dev_id, uint8_t reg_addr,
 	}
 
 	dev = arg;
-	i2cb = dev->i2cb;
 
 	bzero(&msgs[0], sizeof(struct i2c_msg));
 
@@ -101,7 +96,7 @@ user_i2c_read(void *arg, uint8_t dev_id, uint8_t reg_addr,
 	msgs[1].buf = rx_data;
 	msgs[1].len = len;
 	msgs[1].flags = IIC_M_RD;
-	err = i2cb->xfer(i2cb->arg, msgs, 2);
+	err = mdx_i2c_transfer(dev, msgs, 2);
 	if (err)
 		return (err);
 
@@ -116,14 +111,12 @@ user_i2c_write(void *arg, uint8_t dev_id, uint8_t reg_addr,
     uint8_t *reg_data, uint16_t len)
 {
 	uint8_t tx_data[BME680_XFER_MAX_LEN];
-	struct mdx_bme680_dev *dev;
+	mdx_device_t dev;
 	struct i2c_msg msgs[1];
-	struct i2c_bus *i2cb;
 	int err;
 	int i;
 
 	dev = arg;
-	i2cb = dev->i2cb;
 
 	if (len > (BME680_XFER_MAX_LEN - 1)) {
 		printf("%s: failed to write data: len %d\n", len);
@@ -139,7 +132,7 @@ user_i2c_write(void *arg, uint8_t dev_id, uint8_t reg_addr,
 	msgs[0].slave = dev_id;
 	msgs[0].buf = tx_data;
 	msgs[0].len = 1 + len;
-	err = i2cb->xfer(i2cb->arg, msgs, 1);
+	err = mdx_i2c_transfer(dev, msgs, 1);
 	if (err)
 		return (err);
 
@@ -192,13 +185,11 @@ bme680_configure(struct bme680_dev *gas_sensor)
 }
 
 int
-bme680_initialize(struct mdx_bme680_dev *dev)
+bme680_initialize(mdx_device_t dev, struct bme680_dev *gas_sensor)
 {
-	struct bme680_dev *gas_sensor;
 	uint8_t chip_id;
 	int8_t rslt;
 
-	gas_sensor = &dev->gas_sensor;
 	gas_sensor->dev_id = BME680_I2C_ADDR_SECONDARY;
 	gas_sensor->intf = BME680_I2C_INTF;
 	gas_sensor->read = user_i2c_read;
@@ -230,12 +221,9 @@ bme680_initialize(struct mdx_bme680_dev *dev)
  * Trigger the next measurement.
  */
 int
-bme680_trigger(struct mdx_bme680_dev *dev)
+bme680_trigger(struct bme680_dev *gas_sensor)
 {
-	struct bme680_dev *gas_sensor;
 	int8_t rslt;
-
-	gas_sensor = &dev->gas_sensor;
 
 	rslt = BME680_OK;
 
@@ -250,12 +238,9 @@ bme680_trigger(struct mdx_bme680_dev *dev)
  * Note that a delay is required after triggering and before reading the data.
  */
 int
-bme680_read_data(struct mdx_bme680_dev *dev, struct bme680_field_data *data)
+bme680_read_data(struct bme680_dev *gas_sensor, struct bme680_field_data *data)
 {
-	struct bme680_dev *gas_sensor;
 	int8_t rslt;
-
-	gas_sensor = &dev->gas_sensor;
 
 	rslt = bme680_get_sensor_data(data, gas_sensor);
 

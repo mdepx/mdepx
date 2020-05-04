@@ -24,18 +24,21 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_DEV_BME680_BME680_DRIVER_H_
-#define	_DEV_BME680_BME680_DRIVER_H_
-
+#include <sys/cdefs.h>
+#include <sys/console.h>
 #include <sys/driver.h>
 
-struct mdx_bme680_data {
-	uint32_t temperature;
-};
+#include <dev/i2c/i2c.h>
 
-int bme680_initialize(mdx_device_t dev, struct bme680_dev *gas_sensor);
-int bme680_trigger(struct bme680_dev *gas_sensor);
-int bme680_read_data(struct bme680_dev *gas_sensor,
-    struct bme680_field_data *data);
+int
+mdx_i2c_transfer(mdx_device_t dev, struct i2c_msg *msgs, int len)
+{
+	struct mdx_i2c_ops *ops;
+	int error;
 
-#endif /* !_DEV_BME680_BME680_DRIVER_H_ */
+	ops = dev->ops;
+
+	error = ops->xfer(dev->arg, msgs, len);
+
+	return (error);
+}

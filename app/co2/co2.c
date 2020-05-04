@@ -37,14 +37,14 @@
 #include <dev/mh_z19b/mh_z19b.h>
 #include <dev/gpio/gpio.h>
 
-static struct mdx_bme680_dev dev;
-static struct i2c_bus i2cb;
+static struct bme680_dev gas_sensor;
 static struct i2c_bitbang_softc i2c_bitbang_sc;
 
 extern struct k210_i2c_softc i2c_sc;
 extern struct uart_16550_softc uart_sc;
 
 extern struct mdx_device dev_gpiohs;
+extern struct mdx_device dev_i2c;
 
 #define	PIN_BME680_SDO	26
 #define	PIN_I2C_SCL	28
@@ -91,19 +91,10 @@ bme680_sensor_init(void)
 	i2c_bitbang_sc.i2c_sda = i2c_sda;
 	i2c_bitbang_sc.i2c_sda_val = i2c_sda_val;
 
-	/* For bitbang */
-	i2cb.xfer = i2c_bitbang_xfer;
-	i2cb.arg = &i2c_bitbang_sc;
-
-	/* For k210 i2c controller */
-	i2cb.xfer = k210_i2c_xfer;
-	i2cb.arg = &i2c_sc;
-
 	mdx_gpio_set(&dev_gpiohs, 0, PIN_I2C_SCL, 0);
 	mdx_gpio_set(&dev_gpiohs, 0, PIN_I2C_SDA, 0);
 
-	dev.i2cb = &i2cb;
-	ret = bme680_initialize(&dev);
+	ret = bme680_initialize(&dev_i2c, &gas_sensor);
 
 	return (ret);
 }
@@ -184,14 +175,14 @@ main(void)
 			continue;
 		}
 
-		error = bme680_read_data(&dev, &data);
+		error = bme680_read_data(&gas_sensor, &data);
 		if (error == 0) {
 			printf("CO2 %d ppm, temp %d\n", co2, data.temperature);
 		} else
 			printf("Failed to read bme680 data, error %d\n",
 			    error);
 
-		bme680_trigger(&dev);
+		bme680_trigger(&gas_sensor);
 		mdx_usleep(5000000);
 	}
 

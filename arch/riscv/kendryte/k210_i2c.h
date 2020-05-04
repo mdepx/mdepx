@@ -27,6 +27,8 @@
 #ifndef _RISCV_KENDRYTE_K210_I2C_H_
 #define _RISCV_KENDRYTE_K210_I2C_H_
 
+#include <sys/driver.h>
+
 #include <dev/i2c/i2c.h>
 
 #define	K210_I2C_CON		0x00	/* Control */
@@ -96,9 +98,8 @@ struct k210_i2c_softc {
 	size_t base;
 };
 
-void k210_i2c_init(struct k210_i2c_softc *sc, uint32_t base);
+void k210_i2c_init(mdx_device_t dev, struct k210_i2c_softc *sc, uint32_t base);
 void k210_i2c_configure_master(struct k210_i2c_softc *sc,
     uint32_t v_i2c_freq, uint32_t i2c_clk);
-int k210_i2c_xfer(void *arg, struct i2c_msg *msgs, int len);
 
 #endif /* !_RISCV_KENDRYTE_K210_I2C_H_ */

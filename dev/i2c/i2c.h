@@ -27,6 +27,8 @@
 #ifndef _DEV_I2C_I2C_H_
 #define	_DEV_I2C_I2C_H_
 
+#include <sys/driver.h>
+
 struct i2c_msg {
 	uint16_t	slave;
 	uint16_t	flags;
@@ -38,9 +40,10 @@ struct i2c_msg {
 	uint8_t		*buf;
 };
 
-struct i2c_bus {
+struct mdx_i2c_ops {
 	int (*xfer)(void *arg, struct i2c_msg *msgs, int len);
-	void *arg;
 };
+
+int mdx_i2c_transfer(mdx_device_t dev, struct i2c_msg *msgs, int len);
 
 #endif /* !_DEV_I2C_I2C_H_ */

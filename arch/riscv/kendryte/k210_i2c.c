@@ -27,6 +27,8 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 
+#include <dev/i2c/i2c.h>
+
 #include <riscv/kendryte/k210_i2c.h>
 
 #define	RD4(_sc, _reg)		\
@@ -34,7 +36,7 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-int
+static int
 k210_i2c_xfer(void *arg, struct i2c_msg *msgs, int len)
 {
 	struct k210_i2c_softc *sc;
@@ -103,9 +105,16 @@ out:
 	return (error);
 }
 
+static struct mdx_i2c_ops k210_i2c_ops = {
+	.xfer = k210_i2c_xfer,
+};
+
 void
-k210_i2c_init(struct k210_i2c_softc *sc, uint32_t base)
+k210_i2c_init(mdx_device_t dev, struct k210_i2c_softc *sc, uint32_t base)
 {
+
+	dev->ops = &k210_i2c_ops;
+	dev->arg = sc;
 
 	sc->base = base;
 }
