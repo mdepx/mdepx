@@ -94,8 +94,10 @@ uart_putchar(int c, void *arg)
 void
 udelay(uint32_t usec)
 {
+	int i;
 
-	mdx_usleep(usec);
+	for (i = 0; i < usec * 10000; i++)
+		;
 }
 
 static void
