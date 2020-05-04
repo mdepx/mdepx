@@ -27,8 +27,6 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 
-#include <riscv/kendryte/k210.h>
-
 #include <dev/i2c/i2c.h>
 #include <dev/i2c/bitbang/i2c_bitbang.h>
 #include <dev/bme680/bme680.h>
@@ -39,9 +37,9 @@
 
 static struct bme680_dev gas_sensor;
 static struct i2c_bitbang_softc i2c_bitbang_sc;
+static struct mdx_device dev_bitbang;
 
 extern struct uart_16550_softc uart_sc;
-
 extern struct mdx_device dev_gpiohs;
 extern struct mdx_device dev_i2c;
 
@@ -50,7 +48,7 @@ extern struct mdx_device dev_i2c;
 #define	PIN_I2C_SDA	29
 
 static void
-i2c_scl(struct i2c_bitbang_softc *sc, bool enable)
+i2c_scl(void *arg, bool enable)
 {
 
 	if (enable)
@@ -62,17 +60,19 @@ i2c_scl(struct i2c_bitbang_softc *sc, bool enable)
 }
 
 static void
-i2c_sda(struct i2c_bitbang_softc *sc, bool enable)
+i2c_sda(void *arg, bool enable)
 {
 
 	if (enable)
-		mdx_gpio_set(&dev_gpiohs, 0, PIN_I2C_SDA, 0);
+		mdx_gpio_configure(&dev_gpiohs, 0, PIN_I2C_SDA,
+		    MDX_GPIO_INPUT);
 	else
-		mdx_gpio_set(&dev_gpiohs, 0, PIN_I2C_SDA, 1);
+		mdx_gpio_configure(&dev_gpiohs, 0, PIN_I2C_SDA,
+		    MDX_GPIO_OUTPUT);
 }
 
 static int
-i2c_sda_val(struct i2c_bitbang_softc *sc)
+i2c_sda_val(void *arg)
 {
 	uint8_t reg;
 
@@ -81,19 +81,32 @@ i2c_sda_val(struct i2c_bitbang_softc *sc)
 	return (reg & 0x1);
 }
 
+static struct i2c_bitbang_ops i2c_ops = {
+	.i2c_scl = &i2c_scl,
+	.i2c_sda = &i2c_sda,
+	.i2c_sda_val = &i2c_sda_val,
+};
+
 static int
 bme680_sensor_init(void)
 {
 	int ret;
 
-	i2c_bitbang_sc.i2c_scl = i2c_scl;
-	i2c_bitbang_sc.i2c_sda = i2c_sda;
-	i2c_bitbang_sc.i2c_sda_val = i2c_sda_val;
+	i2c_bitbang_init(&dev_bitbang, &i2c_bitbang_sc, &i2c_ops);
 
 	mdx_gpio_set(&dev_gpiohs, 0, PIN_I2C_SCL, 0);
 	mdx_gpio_set(&dev_gpiohs, 0, PIN_I2C_SDA, 0);
 
-	ret = bme680_initialize(&dev_i2c, &gas_sensor);
+	if (1 == 1) {
+		/* For I2C controller */
+		ret = bme680_initialize(&dev_i2c, &gas_sensor);
+	} else {
+		/*
+		 * Software bitbang.
+		 * TODO: requires K210 FPIOA pins reconfiguration.
+		 */
+		ret = bme680_initialize(&dev_bitbang, &gas_sensor);
+	}
 
 	return (ret);
 }

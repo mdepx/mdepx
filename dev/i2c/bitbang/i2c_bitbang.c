@@ -34,56 +34,68 @@
 static void
 i2c_start_condition(struct i2c_bitbang_softc *sc)
 {
+	struct i2c_bitbang_ops *ops;
 
-	sc->i2c_scl(sc, 1);
-	sc->i2c_sda(sc, 1);
+	ops = sc->ops;
+
+	ops->i2c_scl(sc, 1);
+	ops->i2c_sda(sc, 1);
 	udelay(5);
-	sc->i2c_sda(sc, 0);
+	ops->i2c_sda(sc, 0);
 	udelay(5);
-	sc->i2c_scl(sc, 0);
+	ops->i2c_scl(sc, 0);
 	udelay(5);
 }
 
 static void
 i2c_stop_condition(struct i2c_bitbang_softc *sc)
 {
+	struct i2c_bitbang_ops *ops;
 
-	sc->i2c_sda(sc, 0);
+	ops = sc->ops;
+
+	ops->i2c_sda(sc, 0);
 	udelay(5);
-	sc->i2c_scl(sc, 1);
+	ops->i2c_scl(sc, 1);
 	udelay(5);
-	sc->i2c_sda(sc, 1);
+	ops->i2c_sda(sc, 1);
 	udelay(5);
 }
 
 static void
 i2c_write_bit(struct i2c_bitbang_softc *sc, uint8_t b)
 {
+	struct i2c_bitbang_ops *ops;
+
+	ops = sc->ops;
 
 	if (b > 0)
-		sc->i2c_sda(sc, 1);
+		ops->i2c_sda(sc, 1);
 	else
-		sc->i2c_sda(sc, 0);
+		ops->i2c_sda(sc, 0);
 
 	udelay(5);
-	sc->i2c_scl(sc, 1);
+	ops->i2c_scl(sc, 1);
 	udelay(5);
-	sc->i2c_scl(sc, 0);
+	ops->i2c_scl(sc, 0);
 }
 
 static uint8_t
 i2c_read_bit(struct i2c_bitbang_softc *sc)
 {
+	struct i2c_bitbang_ops *ops;
 	uint8_t b;
 
-	sc->i2c_sda(sc, 1);
+	ops = sc->ops;
+
+	ops->i2c_sda(sc, 1);
 	udelay(5);
-	sc->i2c_scl(sc, 1);
+	ops->i2c_scl(sc, 1);
 	udelay(5);
 
-	b = sc->i2c_sda_val(sc);
+	b = ops->i2c_sda_val(sc);
 
-	sc->i2c_scl(sc, 0);
+	ops->i2c_scl(sc, 0);
  
 	return (b);
 }
@@ -135,7 +147,7 @@ i2c_read_byte(struct i2c_bitbang_softc *sc, bool ack)
 	return (b);
 }
 
-int
+static int
 i2c_bitbang_xfer(void *arg, struct i2c_msg *msgs, int len)
 {
 	struct i2c_bitbang_softc *sc;
@@ -144,8 +156,15 @@ i2c_bitbang_xfer(void *arg, struct i2c_msg *msgs, int len)
 	int j;
 	bool ack;
 	uint8_t addr;
+	int error;
 
 	sc = arg;
+
+	printf("len %d\n", len);
+
+	error = 0;
+
+	critical_enter();
 
 	for (i = 0; i < len; i++) {
 		msg = &msgs[i];
@@ -155,7 +174,8 @@ i2c_bitbang_xfer(void *arg, struct i2c_msg *msgs, int len)
 			ack = i2c_write_byte(sc, addr | I2C_RD, true);
 			if (!ack) {
 				printf("ack not received\n");
-				return (-1);
+				error = -1;
+				goto done;
 			}
 
 			for (j = 0; j < msg->len; j++) {
@@ -169,14 +189,16 @@ i2c_bitbang_xfer(void *arg, struct i2c_msg *msgs, int len)
 			ack = i2c_write_byte(sc, addr | I2C_WR, true);
 			if (!ack) {
 				printf("ack not received\n");
-				return (-1);
+				error = -1;
+				goto done;
 			}
 
 			for (j = 0; j < msg->len; j++) {
 				ack = i2c_write_byte(sc, msg->buf[j], false);
 				if (!ack) {
 					printf("ack not received\n");
-					return (-1);
+					error = -1;
+					goto done;
 				}
 			}
 		}
@@ -185,5 +207,23 @@ i2c_bitbang_xfer(void *arg, struct i2c_msg *msgs, int len)
 			i2c_stop_condition(sc);
 	}
 
-	return (0);
+done:
+	critical_exit();
+
+	return (error);
+}
+
+static struct mdx_i2c_ops i2c_bitbang_ops = {
+	.xfer = i2c_bitbang_xfer,
+};
+
+void
+i2c_bitbang_init(mdx_device_t dev, struct i2c_bitbang_softc *sc,
+    struct i2c_bitbang_ops *ops)
+{
+
+	dev->ops = &i2c_bitbang_ops;
+	dev->arg = sc;
+
+	sc->ops = ops;
 }

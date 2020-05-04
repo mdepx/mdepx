@@ -32,12 +32,18 @@
 #define	I2C_RD	1
 #define	I2C_WR	0
 
-struct i2c_bitbang_softc {
-	void (*i2c_scl)(struct i2c_bitbang_softc *sc, bool enable);
-	void (*i2c_sda)(struct i2c_bitbang_softc *sc, bool enable);
-	int (*i2c_sda_val)(struct i2c_bitbang_softc *sc);
+struct i2c_bitbang_ops {
+	void (*i2c_scl)(void *arg, bool enable);
+	void (*i2c_sda)(void *arg, bool enable);
+	int (*i2c_sda_val)(void *arg);
 };
 
-int i2c_bitbang_xfer(void *arg, struct i2c_msg *msgs, int len);
+struct i2c_bitbang_softc {
+	struct i2c_bitbang_ops *ops;
+	void *arg;
+};
+
+void i2c_bitbang_init(mdx_device_t dev, struct i2c_bitbang_softc *sc,
+    struct i2c_bitbang_ops *ops);
 
 #endif /* !_DEV_I2C_I2C_BITBANG_H_ */
