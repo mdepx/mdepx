@@ -27,6 +27,6 @@
 #ifndef	_DEV_MAX31855_MAX31855_H_
 #define	_DEV_MAX31855_MAX31855_H_
 
-int max31855_read_celsius(spi_device_t *dev);
+int max31855_read_celsius(mdx_device_t dev);
 
 #endif /* !_DEV_MAX31855_MAX31855_H_ */

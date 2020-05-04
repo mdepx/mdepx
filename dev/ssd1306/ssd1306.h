@@ -40,7 +40,7 @@ enum display_size {
 #define	SSD1306_COLUMNADDR	0x21
 #define	SSD1306_PAGEADDR	0x22
 
-void ssd1306_init(spi_device_t *dev);
+void ssd1306_init(mdx_device_t dev);
 void ssd1306_draw_pixel(uint8_t *addr, int x, int y, int pixel);
 
 #endif	/* !_DEV_SSD1306_SSD1306_H_ */

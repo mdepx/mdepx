@@ -40,14 +40,14 @@
 #endif
 
 static uint16_t
-max6675_read(spi_device_t *dev)
+max6675_read(mdx_device_t dev)
 {
 	uint16_t val;
 	uint16_t wr;
 
 	wr = 0xffff;
 
-	dev->transfer(dev, (uint8_t *)&wr, (uint8_t *)&val, 2);
+	mdx_spi_transfer(dev, (uint8_t *)&wr, (uint8_t *)&val, 2);
 
 	val = bswap16(val);
 
@@ -58,7 +58,7 @@ max6675_read(spi_device_t *dev)
 }
 
 uint32_t
-max6675_read_celsius(spi_device_t *dev)
+max6675_read_celsius(mdx_device_t dev)
 {
 	uint32_t data;
 

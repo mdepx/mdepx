@@ -80,14 +80,13 @@ stm32f4_spi_setup(struct stm32f4_spi_softc *sc)
 	WR2(sc, SPI_CR1, reg);
 }
 
-int
-stm32f4_spi_transfer(struct spi_device *dev, uint8_t *out,
-    uint8_t *in, uint32_t len)
+static int
+stm32f4_spi_transfer(void *arg, uint8_t *out, uint8_t *in, uint32_t len)
 {
 	struct stm32f4_spi_softc *sc;
 	int i;
 
-	sc = dev->sc;
+	sc = arg;
 
 	for (i = 0; i < len; i++) {
 		if (out != 0) {
@@ -113,14 +112,19 @@ stm32f4_spi_transfer(struct spi_device *dev, uint8_t *out,
 	return (0);
 }
 
+static struct mdx_spi_ops stm32f4_spi_ops = {
+	.xfer = stm32f4_spi_transfer,
+};
+
 void
-stm32f4_spi_init(struct spi_device *dev, struct stm32f4_spi_softc *sc,
+stm32f4_spi_init(mdx_device_t dev, struct stm32f4_spi_softc *sc,
     uint32_t base)
 {
 
 	sc->base = base;
-	dev->sc = sc;
-	dev->transfer = stm32f4_spi_transfer;
+
+	dev->ops = &stm32f4_spi_ops;
+	dev->arg = sc;
 
 	stm32f4_spi_setup(sc);
 }

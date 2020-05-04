@@ -52,15 +52,14 @@
 	*(volatile uint8_t *)((_sc)->base + _reg) = _val
 
 static int
-pic32_spi_transfer(struct spi_device *dev, 
-    uint8_t *out, uint8_t *in, uint32_t len)
+pic32_spi_transfer(void *arg, uint8_t *out, uint8_t *in, uint32_t len)
 {
 	struct pic32_spi_softc *sc;
 	int timeout;
 	uint8_t rd;
 	int i;
 
-	sc = (struct pic32_spi_softc *)dev->sc;
+	sc = arg;
 
 	for (i = 0; i < len; i++) {
 		WR1(sc, SPIBUF, out[i]);
@@ -85,18 +84,20 @@ pic32_spi_transfer(struct spi_device *dev,
 	return (0);
 }
 
+static struct mdx_spi_ops pic32_spi_ops = {
+	.xfer = pic32_spi_transfer,
+};
+
 void
-pic32_spi_init(struct spi_device *dev,
-    struct pic32_spi_softc *sc, uint32_t base,
-    uint32_t cpu_freq, uint32_t baud_rate,
-    uint32_t spicon)
+pic32_spi_init(mdx_device_t dev, struct pic32_spi_softc *sc, uint32_t base,
+    uint32_t cpu_freq, uint32_t baud_rate, uint32_t spicon)
 {
 	uint32_t reg;
 
 	sc->base = base;
 
-	dev->sc = sc;
-	dev->transfer = pic32_spi_transfer;
+	dev->ops = &pic32_spi_ops;
+	dev->arg = sc;
 
 	WR4(sc, SPICON, 0);
 	WR4(sc, SPISTAT, 0);

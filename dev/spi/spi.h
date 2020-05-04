@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2018-2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,8 @@
 #ifndef	_DEV_SPI_SPI_H_
 #define	_DEV_SPI_SPI_H_
 
+#include <sys/driver.h>
+
 struct spi_command {
 	void		*tx_cmd;
 	uint32_t	tx_cmd_sz;
@@ -38,12 +40,11 @@ struct spi_command {
 	uint32_t	rx_data_sz;
 };
 
-struct spi_device {
-	void *sc;
-	int (*transfer)(struct spi_device *, uint8_t *out,
-	    uint8_t *in, uint32_t len);
+struct mdx_spi_ops {
+	int (*xfer)(void *arg, uint8_t *out, uint8_t *in, uint32_t len);
 };
 
-typedef struct spi_device spi_device_t;
+int mdx_spi_transfer(mdx_device_t dev, uint8_t *out,
+    uint8_t *in, uint32_t len);
 
 #endif /* !_DEV_SPI_SPI_H_ */

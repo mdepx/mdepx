@@ -40,7 +40,7 @@
 #endif
 
 static uint32_t
-max31855_read(spi_device_t *dev)
+max31855_read(mdx_device_t dev)
 {
 	uint32_t val1;
 	uint32_t val;
@@ -48,7 +48,7 @@ max31855_read(spi_device_t *dev)
 
 	wr = 0xffffffff;
 
-	dev->transfer(dev, (uint8_t *)&wr, (uint8_t *)&val1, 4);
+	mdx_spi_transfer(dev, (uint8_t *)&wr, (uint8_t *)&val1, 4);
 
 	val = bswap32(val1);
 
@@ -69,7 +69,7 @@ max31855_read(spi_device_t *dev)
 }
 
 int
-max31855_read_celsius(spi_device_t *dev)
+max31855_read_celsius(mdx_device_t dev)
 {
 	int reg;
 	int v;

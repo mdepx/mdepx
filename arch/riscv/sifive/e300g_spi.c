@@ -37,14 +37,13 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 static int 
-e300g_spi_transfer(struct spi_device *dev,
-    uint8_t *out, uint8_t *in, uint32_t len)
+e300g_spi_transfer(void *arg, uint8_t *out, uint8_t *in, uint32_t len)
 {
 	struct spi_softc *sc;
 	uint32_t reg;
 	int i;
 
-	sc = (struct spi_softc *)dev->sc;
+	sc = arg;
 
 	WR4(sc, SPI_CSID, sc->cs);
 
@@ -64,12 +63,12 @@ e300g_spi_transfer(struct spi_device *dev,
 }
 
 void
-e300g_spi_poll_txwm(struct spi_device *dev)
+e300g_spi_poll_txwm(mdx_device_t dev)
 {
 	struct spi_softc *sc;
 	uint32_t ip;
 
-	sc = (struct spi_softc *)dev->sc;
+	sc = dev->arg;
 
 	do {
 		ip = RD4(sc, SPI_IP);
@@ -77,14 +76,13 @@ e300g_spi_poll_txwm(struct spi_device *dev)
 }
 
 int
-e300g_spi_setup(struct spi_softc *sc, struct spi_device *dev,
-    uint8_t cs)
+e300g_spi_setup(mdx_device_t dev, uint8_t cs)
 {
+	struct spi_softc *sc;
 	uint32_t reg;
 
+	sc = arg;
 	sc->cs = cs;	/* Chip Select. */
-	dev->sc = sc;
-	dev->transfer = e300g_spi_transfer;
 
 	WR4(sc, SPI_SCKDIV, 8);
 
@@ -106,9 +104,16 @@ e300g_spi_setup(struct spi_softc *sc, struct spi_device *dev,
 	return (0);
 }
 
+static struct mdx_spi_ops e300g_spi_ops = {
+	.xfer = e300g_spi_transfer,
+};
+
 int
-e300g_spi_init(struct spi_softc *sc, uint32_t base)
+e300g_spi_init(mdx_device_t dev, struct spi_softc *sc, uint32_t base)
 {
+
+	dev->arg = sc;
+	dev->ops = &e300g_spi_ops;
 
 	sc->base = base;
 

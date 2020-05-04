@@ -71,13 +71,13 @@ ssd1306_draw_pixel(uint8_t *addr, int x, int y, int pixel)
 }
 
 void
-ssd1306_init(spi_device_t *dev)
+ssd1306_init(mdx_device_t dev)
 {
 	uint8_t cmd;
 	int i;
 
 	for (i = 0; i < sizeof(init_seq_128x64); i++) {
 		cmd = init_seq_128x64[i];
-		dev->transfer(dev, &cmd, NULL, 1);
+		mdx_spi_transfer(dev, &cmd, NULL, 1);
 	}
 }

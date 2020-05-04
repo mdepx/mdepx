@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,34 +24,22 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _MIPS_MICROCHIP_PIC32_SPI_H_
-#define _MIPS_MICROCHIP_PIC32_SPI_H_
+#include <sys/cdefs.h>
+#include <sys/console.h>
+#include <sys/driver.h>
 
 #include <dev/spi/spi.h>
 
-#define	SPICON	0x00
-#define	 SPICON_MSSEN	(1 << 28)	/* MSSEN: Master Mode Slave Select Enable bit */
-#define	 SPICON_ON	(1 << 15)	/* Module On bit */
-#define	 SPICON_DISSDO	(1 << 12)	/* Disable SDOx Pin bit */
-#define	 SPICON_MODE32	(1 << 11)
-#define	 SPICON_MODE16	(1 << 10)
-#define	 SPICON_SMP	(1 << 9)	/* Data Input Sample Phase bit */
-#define	 SPICON_CKE	(1 << 8)	/* Clock Edge Select bit */
-#define	 SPICON_SSEN	(1 << 7)	/* Slave Select Enable (Slave mode) bit */
-#define	 SPICON_CKP	(1 << 6)	/* Clock Polarity Select */
-#define	 SPICON_MSTEN	(1 << 5)	/* Master Mode Enable bit */
-#define	SPISTAT	0x10
-#define	 SPISTAT_SPITBF	(1 << 1)	/* Transmit Buffer Full Status bit */
-#define	 SPISTAT_SPIRBF	(1 << 0)	/* Receive Buffer Full Status bit */
-#define	SPIBUF	0x20
-#define	SPIBRG	0x30
-#define	SPICON2	0x40
+int
+mdx_spi_transfer(mdx_device_t dev, uint8_t *out,
+    uint8_t *in, uint32_t len)
+{
+	struct mdx_spi_ops *ops;
+	int error;
 
-struct pic32_spi_softc {
-	uint32_t base;
-};
+	ops = dev->ops;
 
-void pic32_spi_init(mdx_device_t dev, struct pic32_spi_softc *sc,
-    uint32_t base, uint32_t cpu_freq, uint32_t baud_rate, uint32_t spicon);
+	error = ops->xfer(dev->arg, out, in, len);
 
-#endif /* !_MIPS_MICROCHIP_PIC32_SPI_H_ */
+	return (error);
+}
