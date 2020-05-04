@@ -63,7 +63,7 @@ nrf_twim_intr(void *arg, struct trapframe *tf, int irq)
 	}
 }
 
-int
+static int
 nrf_twim_xfer(void *arg, struct i2c_msg *msgs, int len)
 {
 	struct nrf_twim_softc *sc;
@@ -124,9 +124,16 @@ nrf_twim_setup(struct nrf_twim_softc *sc, struct nrf_twim_conf *conf)
 	WR4(sc, TWIM_ENABLE, TWIM_ENABLE_EN);
 }
 
+static struct mdx_i2c_ops nrf_twim_ops = {
+	.xfer = nrf_twim_xfer,
+};
+
 void
-nrf_twim_init(struct nrf_twim_softc *sc, uint32_t base)
+nrf_twim_init(mdx_device_t dev, struct nrf_twim_softc *sc, uint32_t base)
 {
+
+	dev->ops = &nrf_twim_ops;
+	dev->arg = sc;
 
 	sc->base = base;
 }
