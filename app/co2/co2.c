@@ -40,7 +40,6 @@
 static struct bme680_dev gas_sensor;
 static struct i2c_bitbang_softc i2c_bitbang_sc;
 
-extern struct k210_i2c_softc i2c_sc;
 extern struct uart_16550_softc uart_sc;
 
 extern struct mdx_device dev_gpiohs;
