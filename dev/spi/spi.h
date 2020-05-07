@@ -24,10 +24,10 @@
  * SUCH DAMAGE.
  */
 
+#include <sys/device.h>
+
 #ifndef	_DEV_SPI_SPI_H_
 #define	_DEV_SPI_SPI_H_
-
-#include <sys/driver.h>
 
 struct spi_command {
 	void		*tx_cmd;

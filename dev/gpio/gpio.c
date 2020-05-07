@@ -26,7 +26,6 @@
 
 #include <sys/cdefs.h>
 #include <sys/console.h>
-#include <sys/driver.h>
 
 #include <dev/gpio/gpio.h>
 

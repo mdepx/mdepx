@@ -27,8 +27,6 @@
 #ifndef _RISCV_KENDRYTE_K210_I2C_H_
 #define _RISCV_KENDRYTE_K210_I2C_H_
 
-#include <sys/driver.h>
-
 #include <dev/i2c/i2c.h>
 
 #define	K210_I2C_CON		0x00	/* Control */

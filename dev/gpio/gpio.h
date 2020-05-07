@@ -24,10 +24,10 @@
  * SUCH DAMAGE.
  */
 
+#include <sys/device.h>
+
 #ifndef _DEV_GPIO_GPIO_H_
 #define	_DEV_GPIO_GPIO_H_
-
-#include <sys/driver.h>
 
 #define	MDX_GPIO_INPUT		(1 << 0)
 #define	MDX_GPIO_OUTPUT		(1 << 1)

@@ -27,8 +27,6 @@
 #ifndef	_DEV_BME680_BME680_DRIVER_H_
 #define	_DEV_BME680_BME680_DRIVER_H_
 
-#include <sys/driver.h>
-
 struct mdx_bme680_data {
 	uint32_t temperature;
 };
