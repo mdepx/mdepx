@@ -24,8 +24,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _SYS_DRIVER_H_
-#define _SYS_DRIVER_H_
+#ifndef _SYS_DEVICE_H_
+#define _SYS_DEVICE_H_
 
 struct mdx_device {
 	void *arg;	/* Software context. */
@@ -35,20 +35,4 @@ struct mdx_device {
 
 typedef struct mdx_device *mdx_device_t;
 
-#if 0
-struct device_method {
-	int	(*probe)(mdx_device_t);
-};
-
-typedef struct device_method device_method_t;
-
-struct driver {
-	const char *name;
-	device_method_t *methods;
-	int sc_size;		/* Software context size */
-};
-
-typedef struct driver driver_t;
-#endif
-
-#endif /* !_SYS_DRIVER_H_ */
+#endif /* !_SYS_DEVICE_H_ */
