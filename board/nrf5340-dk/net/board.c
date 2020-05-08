@@ -36,8 +36,11 @@
 #include <arm/arm/nvic.h>
 #include <arm/nordicsemi/nrf5340_net_core.h>
 
+#include <dev/intc/intc.h>
+
 #include "board.h"
 
+struct mdx_device dev_nvic;
 struct arm_nvic_softc nvic_sc;
 
 struct nrf_uarte_softc uarte_sc;
@@ -77,13 +80,13 @@ board_init(void)
 	nrf_timer_init(&timer1_sc, BASE_TIMER1, 1000000);
 	nrf_power_init(&power_sc, BASE_POWER);
 
-	arm_nvic_init(&nvic_sc, BASE_SCS);
+	arm_nvic_init(&dev_nvic, &nvic_sc, BASE_SCS);
 
-	arm_nvic_setup_intr(&nvic_sc, ID_UARTE0, nrf_uarte_intr, &uarte_sc);
-	arm_nvic_setup_intr(&nvic_sc, ID_TIMER1, nrf_timer_intr, &timer1_sc);
+	mdx_intc_setup(&dev_nvic, ID_UARTE0, nrf_uarte_intr, &uarte_sc);
+	mdx_intc_setup(&dev_nvic, ID_TIMER1, nrf_timer_intr, &timer1_sc);
 
-	arm_nvic_enable_intr(&nvic_sc, ID_TIMER1);
-	arm_nvic_enable_intr(&nvic_sc, ID_UARTE0);
-	arm_nvic_enable_intr(&nvic_sc, ID_EGU0);
-	arm_nvic_enable_intr(&nvic_sc, ID_IPC);
+	mdx_intc_enable(&dev_nvic, ID_TIMER1);
+	mdx_intc_enable(&dev_nvic, ID_UARTE0);
+	mdx_intc_enable(&dev_nvic, ID_EGU0);
+	mdx_intc_enable(&dev_nvic, ID_IPC);
 }

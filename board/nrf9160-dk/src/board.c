@@ -34,8 +34,11 @@
 #include <arm/arm/nvic.h>
 #include <arm/nordicsemi/nrf9160.h>
 
+#include <dev/intc/intc.h>
+
 #include "board.h"
 
+struct mdx_device dev_nvic;
 struct arm_nvic_softc nvic_sc;
 
 struct nrf_spu_softc spu_sc;
@@ -70,13 +73,13 @@ board_init(void)
 	nrf_power_init(&power_sc, BASE_POWER);
 	nrf_timer_init(&timer0_sc, BASE_TIMER0, 1000000);
 
-	arm_nvic_init(&nvic_sc, BASE_SCS);
+	arm_nvic_init(&dev_nvic, &nvic_sc, BASE_SCS);
 
-	arm_nvic_setup_intr(&nvic_sc, ID_UARTE0, nrf_uarte_intr, &uarte_sc);
-	arm_nvic_setup_intr(&nvic_sc, ID_TIMER0, nrf_timer_intr, &timer0_sc);
+	mdx_intc_setup(&dev_nvic, ID_UARTE0, nrf_uarte_intr, &uarte_sc);
+	mdx_intc_setup(&dev_nvic, ID_TIMER0, nrf_timer_intr, &timer0_sc);
 
-	arm_nvic_enable_intr(&nvic_sc, ID_TIMER0);
-	arm_nvic_enable_intr(&nvic_sc, ID_UARTE0);
+	mdx_intc_enable(&dev_nvic, ID_TIMER0);
+	mdx_intc_enable(&dev_nvic, ID_UARTE0);
 
 	printf("mdepx initialized\n");
 }
