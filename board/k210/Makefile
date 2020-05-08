@@ -21,7 +21,7 @@ export AFLAGS = ${CFLAGS}
 CMD = python3 -B ${OSDIR}/tools/emitter.py
 
 all:	${LDSCRIPT}
-	@${CMD} mdepx.conf
+	@${CMD} -j mdepx.conf
 	@${OBJCOPY} -O binary ${OBJDIR}/${APP}.elf ${OBJDIR}/${APP}.bin
 
 ${LDSCRIPT}:
