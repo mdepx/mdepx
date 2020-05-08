@@ -25,7 +25,6 @@
  */
 
 #include <sys/cdefs.h>
-#include <sys/console.h>
 
 #include <dev/intc/intc.h>
 
