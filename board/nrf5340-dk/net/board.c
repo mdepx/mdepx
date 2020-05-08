@@ -79,7 +79,6 @@ board_init(void)
 
 	nrf_timer_init(&timer1_sc, BASE_TIMER1, 1000000);
 	nrf_power_init(&power_sc, BASE_POWER);
-
 	arm_nvic_init(&dev_nvic, &nvic_sc, BASE_SCS);
 
 	mdx_intc_setup(&dev_nvic, ID_UARTE0, nrf_uarte_intr, &uarte_sc);

@@ -80,7 +80,7 @@ board_init(void)
 
 	nrf_power_init(&power_sc, BASE_POWER);
 	nrf_rtc_init(&rtc_sc, BASE_RTC1, 0 /* prescaler */);
-
+	nrf_timer_init(&timer0_sc, BASE_TIMER0, 1000000);
 	arm_nvic_init(&dev_nvic, &nvic_sc, BASE_SCS);
 
 	mdx_intc_setup(&dev_nvic, ID_UARTE0, nrf_uarte_intr, &uarte_sc);
@@ -89,7 +89,6 @@ board_init(void)
 
 	mdx_intc_set_prio(&dev_nvic, ID_IPC, 6);
 
-	nrf_timer_init(&timer0_sc, BASE_TIMER0, 1000000);
 	mdx_intc_enable(&dev_nvic, ID_TIMER0);
 	mdx_intc_enable(&dev_nvic, ID_UARTE0);
 	mdx_intc_enable(&dev_nvic, ID_IPC);
