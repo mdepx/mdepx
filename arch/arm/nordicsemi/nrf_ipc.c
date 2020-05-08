@@ -80,7 +80,7 @@ nrf_ipc_inten(struct nrf_ipc_softc *sc, int ev, bool set)
 }
 
 void
-nrf_ipc_intr(void *arg, struct trapframe *tf, int irq)
+nrf_ipc_intr(void *arg, int irq)
 {
 	struct nrf_ipc_softc *sc;
 	struct ipc_event *ev;

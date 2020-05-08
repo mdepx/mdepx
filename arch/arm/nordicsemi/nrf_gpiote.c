@@ -27,8 +27,6 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 
-#include <machine/frame.h>
-
 #include "nrf_gpiote.h"
 
 #define	RD4(_sc, _reg)		\
@@ -37,7 +35,7 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
-nrf_gpiote_intr(void *arg, struct trapframe *tf, int irq)
+nrf_gpiote_intr(void *arg, int irq)
 {
 	struct nrf_gpiote_softc *sc;
 	uint32_t reg;
@@ -49,7 +47,7 @@ nrf_gpiote_intr(void *arg, struct trapframe *tf, int irq)
 		reg = RD4(sc, GPIOTE_EVENTS_IN(i));
 		if (reg) {
 			if (sc->intr[i].handler != NULL)
-				sc->intr[i].handler(sc->intr[i].arg, tf, irq);
+				sc->intr[i].handler(sc->intr[i].arg, irq);
 			WR4(sc, GPIOTE_EVENTS_IN(i), 0);
 		};
 	};
@@ -57,7 +55,7 @@ nrf_gpiote_intr(void *arg, struct trapframe *tf, int irq)
 
 int
 nrf_gpiote_setup_intr(struct nrf_gpiote_softc *sc, int irq,
-    void (*handler) (void *arg, struct trapframe *frame, int irq),
+    void (*handler) (void *arg, int irq),
     void *arg)
 {
 

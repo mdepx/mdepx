@@ -37,7 +37,7 @@ struct stm32f4_i2c_softc {
 	mdx_sem_t sem;
 };
 
-void stm32f4_i2c_intr(void *arg, struct trapframe *tf, int irq);
+void stm32f4_i2c_intr(void *arg, int irq);
 void stm32f4_i2c_init(struct stm32f4_i2c_softc *sc, uint32_t base);
 int stm32f4_i2c_xfer(struct stm32f4_i2c_softc *sc,
     struct i2c_msg *msgs, uint32_t len);

@@ -26,6 +26,8 @@
 
 #include <sys/cdefs.h>
 
+#include <dev/intc/intc.h>
+
 #include <arm/arm/nvic.h>
 
 #define	RD4(_sc, _reg)		\
@@ -35,9 +37,19 @@
 
 static struct nvic_intr_entry intr_map[MDX_ARM_NVIC_NINTRS];
 
-int
-arm_nvic_setup_intr(struct arm_nvic_softc *sc, int irq,
-    void (*handler) (void *arg, struct trapframe *frame, int irq),
+void
+arm_nvic_intr(uint32_t irq)
+{
+
+	if (intr_map[irq].handler != NULL)
+		intr_map[irq].handler(intr_map[irq].arg, irq);
+	else
+		printf("%s: spurious intr %d\n", __func__, irq);
+}
+
+static int
+arm_nvic_setup_intr(mdx_device_t dev, int irq,
+    void (*handler) (void *arg, int irq),
     void *arg)
 {
 
@@ -50,54 +62,58 @@ arm_nvic_setup_intr(struct arm_nvic_softc *sc, int irq,
 	return (0);
 }
 
-void
-arm_nvic_intr(uint32_t irq, struct trapframe *frame)
+static void
+arm_nvic_enable_intr(mdx_device_t dev, int n)
 {
+	struct arm_nvic_softc *sc;
 
-	if (intr_map[irq].handler != NULL)
-		intr_map[irq].handler(intr_map[irq].arg, frame, irq);
-	else
-		printf("%s: spurious intr %d\n", __func__, irq);
+	sc = dev->arg;
+
+	WR4(sc, NVIC_ISER(n / 32), (1 << (n % 32)));
 }
 
-void
-arm_nvic_set_prio(struct arm_nvic_softc *sc, uint32_t n,
-    int prio)
+static void
+arm_nvic_disable_intr(mdx_device_t dev, int n)
 {
+	struct arm_nvic_softc *sc;
+
+	sc = dev->arg;
+
+	WR4(sc, NVIC_ICER(n / 32), (1 << (n % 32)));
+}
+
+static void
+arm_nvic_set_pending(mdx_device_t dev, int n)
+{
+	struct arm_nvic_softc *sc;
+
+	sc = dev->arg;
+
+	WR4(sc, NVIC_ISPR(n / 32), (1 << (n % 32)));
+}
+
+static void
+arm_nvic_clear_pending(mdx_device_t dev, int n)
+{
+	struct arm_nvic_softc *sc;
+
+	sc = dev->arg;
+
+	WR4(sc, NVIC_ICPR(n / 32), (1 << (n % 32)));
+}
+
+static void
+arm_nvic_set_prio(mdx_device_t dev, int n, int prio)
+{
+	struct arm_nvic_softc *sc;
 	int reg;
+
+	sc = dev->arg;
 
 	reg = RD4(sc, NVIC_IPR(n / 4));
 	reg &= ~(0xff << ((n % 4) * 8));
 	reg |= (prio << ((n % 4) * 8));
 	WR4(sc, NVIC_IPR(n / 4), reg);
-}
-
-void
-arm_nvic_enable_intr(struct arm_nvic_softc *sc, uint32_t n)
-{
-
-	WR4(sc, NVIC_ISER(n / 32), (1 << (n % 32)));
-}
-
-void
-arm_nvic_disable_intr(struct arm_nvic_softc *sc, uint32_t n)
-{
-
-	WR4(sc, NVIC_ICER(n / 32), (1 << (n % 32)));
-}
-
-void
-arm_nvic_set_pending(struct arm_nvic_softc *sc, uint32_t n)
-{
-
-	WR4(sc, NVIC_ISPR(n / 32), (1 << (n % 32)));
-}
-
-void
-arm_nvic_clear_pending(struct arm_nvic_softc *sc, uint32_t n)
-{
-
-	WR4(sc, NVIC_ICPR(n / 32), (1 << (n % 32)));
 }
 
 void
@@ -116,9 +132,21 @@ arm_nvic_target_ns(struct arm_nvic_softc *sc, uint32_t n,
 	WR4(sc, NVIC_ITNS(n / 32), reg);
 }
 
+static struct mdx_intc_ops arm_nvic_ops = {
+	.setup = arm_nvic_setup_intr,
+	.enable = arm_nvic_enable_intr,
+	.disable = arm_nvic_disable_intr,
+	.set = arm_nvic_set_pending,
+	.clear = arm_nvic_clear_pending,
+	.set_prio = arm_nvic_set_prio,
+};
+
 int
-arm_nvic_init(struct arm_nvic_softc *sc, uint32_t base)
+arm_nvic_init(mdx_device_t dev, struct arm_nvic_softc *sc, uint32_t base)
 {
+
+	dev->ops = &arm_nvic_ops;
+	dev->arg = sc;
 
 	sc->base = base;
 

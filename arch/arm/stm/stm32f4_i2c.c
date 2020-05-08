@@ -38,7 +38,7 @@
 #define dprintf(fmt, ...)
 
 void
-stm32f4_i2c_intr(void *arg, struct trapframe *tf, int irq)
+stm32f4_i2c_intr(void *arg, int irq)
 {
 	struct stm32f4_i2c_softc *sc;
 	struct i2c_msg *msg;

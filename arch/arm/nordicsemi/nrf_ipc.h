@@ -27,8 +27,6 @@
 #ifndef _ARM_NORDICSEMI_NRF_IPC_H_
 #define _ARM_NORDICSEMI_NRF_IPC_H_
 
-#include <machine/frame.h>
-
 #define	NRF_IPC_MAX_EVENTS	16
 
 #define	IPC_TASKS_SEND(n)	(0x000 + (n) * 0x4)	/* Trigger events on channel enabled in SEND_CNF(n). */
@@ -57,7 +55,7 @@ struct nrf_ipc_softc {
 };
 
 void nrf_ipc_init(struct nrf_ipc_softc *sc, uint32_t base);
-void nrf_ipc_intr(void *arg, struct trapframe *tf, int irq);
+void nrf_ipc_intr(void *arg, int irq);
 
 void nrf_ipc_trigger(struct nrf_ipc_softc *sc, int ev);
 void nrf_ipc_configure_send(struct nrf_ipc_softc *sc,

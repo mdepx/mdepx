@@ -27,8 +27,6 @@
 #ifndef _ARM_NORDICSEMI_NRF9160_UARTE_H_
 #define _ARM_NORDICSEMI_NRF9160_UARTE_H_
 
-#include <machine/frame.h>
-
 #define	UARTE_TASKS_STARTRX	0x000	/* Start UART receiver */
 #define	UARTE_TASKS_STOPRX	0x004	/* Stop UART receiver */
 #define	UARTE_TASKS_STARTTX	0x008	/* Start UART transmitter */
@@ -99,7 +97,7 @@ struct nrf_uarte_softc {
 void nrf_uarte_init(struct nrf_uarte_softc *sc, uint32_t base, uint8_t pin_tx,
     uint8_t pin_rx, uint32_t baudrate);
 void nrf_uarte_putc(struct nrf_uarte_softc *sc, char ch);
-void nrf_uarte_intr(void *arg, struct trapframe *tf, int irq);
+void nrf_uarte_intr(void *arg, int irq);
 void nrf_uarte_register_callback(struct nrf_uarte_softc *sc,
     void (*func)(int c, void *arg), void *arg);
 

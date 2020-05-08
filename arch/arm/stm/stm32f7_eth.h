@@ -141,7 +141,7 @@ struct stm32f7_eth_softc {
 void stm32f7_eth_init(struct stm32f7_eth_softc *sc, uint32_t base);
 int stm32f7_eth_setup(struct stm32f7_eth_softc *sc,
     uint8_t *new_hwaddr);
-void stm32f7_eth_intr(void *arg, struct trapframe *tf, int irq);
-void stm32f7_eth_wkup_intr(void *arg, struct trapframe *tf, int irq);
+void stm32f7_eth_intr(void *arg, int irq);
+void stm32f7_eth_wkup_intr(void *arg, int irq);
 
 #endif /* !_ARM_STM_STM32F7_ETH_H_ */

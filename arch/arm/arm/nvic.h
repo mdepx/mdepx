@@ -27,7 +27,8 @@
 #ifndef _ARM_ARM_NVIC_H_
 #define _ARM_ARM_NVIC_H_
 
-#include <machine/frame.h>
+#include <sys/device.h>
+
 #include <machine/scs.h>
 
 /*
@@ -45,7 +46,7 @@
 #define	NVIC_STIR	0xF00	/* Software Trigger Interrupt Register */
 
 struct nvic_intr_entry {
-	void (*handler) (void *arg, struct trapframe *frame, int irq);
+	void (*handler) (void *arg, int irq);
 	void *arg;
 };
 
@@ -53,16 +54,9 @@ struct arm_nvic_softc {
 	uint32_t base;
 };
 
-int arm_nvic_init(struct arm_nvic_softc *sc, uint32_t base);
-void arm_nvic_enable_intr(struct arm_nvic_softc *sc, uint32_t n);
-void arm_nvic_disable_intr(struct arm_nvic_softc *sc, uint32_t n);
-void arm_nvic_intr(uint32_t irq, struct trapframe *frame);
-void arm_nvic_set_pending(struct arm_nvic_softc *sc, uint32_t n);
-void arm_nvic_clear_pending(struct arm_nvic_softc *sc, uint32_t n);
+void arm_nvic_intr(uint32_t irq);
+
+int arm_nvic_init(mdx_device_t dev, struct arm_nvic_softc *sc, uint32_t base);
 void arm_nvic_target_ns(struct arm_nvic_softc *sc, uint32_t n, int secure);
-void arm_nvic_set_prio(struct arm_nvic_softc *sc, uint32_t n, int prio);
-int arm_nvic_setup_intr(struct arm_nvic_softc *sc, int irq,
-    void (*handler) (void *arg, struct trapframe *frame, int irq),
-    void *arg);
 
 #endif /* !_ARM_ARM_NVIC_H_ */

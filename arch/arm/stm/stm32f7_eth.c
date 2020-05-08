@@ -31,7 +31,6 @@
 #include <net/if.h>
 #include <net/ethernet.h>
 
-#include <machine/frame.h>
 #include <dev/mii/mii.h>
 
 #include "stm32f7_eth.h"
@@ -191,7 +190,7 @@ dwc_rxfinish_locked(struct stm32f7_eth_softc *sc)
 }
 
 void
-stm32f7_eth_intr(void *arg, struct trapframe *tf, int irq)
+stm32f7_eth_intr(void *arg, int irq)
 {
 	struct stm32f7_eth_softc *sc;
 	uint32_t reg;
@@ -221,7 +220,7 @@ stm32f7_eth_intr(void *arg, struct trapframe *tf, int irq)
 }
 
 void
-stm32f7_eth_wkup_intr(void *arg, struct trapframe *tf, int irq)
+stm32f7_eth_wkup_intr(void *arg, int irq)
 {
 
 	printf("%s\n", __func__);

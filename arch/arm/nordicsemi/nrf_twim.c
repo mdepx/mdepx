@@ -29,8 +29,6 @@
 
 #include <dev/i2c/i2c.h>
 
-#include <machine/frame.h>
-
 #include "nrf_twim.h"
 
 #define	RD4(_sc, _reg)		\
@@ -41,7 +39,7 @@
 #define	TWIM_TIMEOUT	10000	/* usec */
 
 void
-nrf_twim_intr(void *arg, struct trapframe *tf, int irq)
+nrf_twim_intr(void *arg, int irq)
 {
 	struct nrf_twim_softc *sc;
 

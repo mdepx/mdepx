@@ -28,8 +28,6 @@
 #include <sys/systm.h>
 #include <sys/callout.h>
 
-#include <machine/frame.h>
-
 #include "nrf9160.h"
 
 #define	RD4(_sc, _reg)		\
@@ -47,7 +45,7 @@
 #endif
 
 void
-nrf_timer_intr(void *arg, struct trapframe *tf, int irq)
+nrf_timer_intr(void *arg, int irq)
 {
 	struct nrf_timer_softc *sc;
 

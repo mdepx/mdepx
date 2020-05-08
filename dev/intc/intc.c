@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,32 +24,67 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ARM_STM_STM32L4_EXTI_H_
-#define _ARM_STM_STM32L4_EXTI_H_
+#include <sys/cdefs.h>
+#include <sys/console.h>
 
-#define	EXTI_IMR(n)	((n) < 32 ? 0x00 : 0x20)	/* Interrupt mask register */
-#define	EXTI_EMR(n)	((n) < 32 ? 0x04 : 0x24)	/* Event mask register */
-#define	EXTI_RTSR(n)	((n) < 32 ? 0x08 : 0x28)	/* Rising trigger selection register */
-#define	EXTI_FTSR(n)	((n) < 32 ? 0x0C : 0x2C)	/* Falling trigger selection register */
-#define	EXTI_SWIER(n)	((n) < 32 ? 0x10 : 0x30)	/* Software interrupt event register */
-#define	EXTI_PR(n)	((n) < 32 ? 0x14 : 0x34)	/* Pending register */
+#include <dev/intc/intc.h>
 
-#define	EXTI_NUM_INT	39
+int
+mdx_intc_setup(mdx_device_t dev, int irq,
+    void (*handler)(void *arg, int irq),
+    void *arg)
+{
+	struct mdx_intc_ops *ops;
+	int error;
 
-struct exti_intr_entry {
-	void (*handler) (void *arg);
-	void *arg;
-};
+	ops = dev->ops;
 
-struct stm32l4_exti_softc {
-	uint32_t base;
-	const struct exti_intr_entry *map;
-};
+	error = ops->setup(dev, irq, handler, arg);
 
-void stm32l4_exti_init(struct stm32l4_exti_softc *sc, uint32_t base);
-void stm32l4_exti_intr(void *arg, int irq);
-void stm32l4_exti_install_intr_map(struct stm32l4_exti_softc *sc,
-    const struct exti_intr_entry *map);
-void stm32l4_exti_setup(struct stm32l4_exti_softc *sc, uint32_t n);
+	return (error);
+}
 
-#endif /* !_ARM_STM_STM32L4_EXTI_H_ */
+void
+mdx_intc_enable(mdx_device_t dev, int irq)
+{
+	struct mdx_intc_ops *ops;
+
+	ops = dev->ops;
+	ops->enable(dev, irq);
+}
+
+void
+mdx_intc_disable(mdx_device_t dev, int irq)
+{
+	struct mdx_intc_ops *ops;
+
+	ops = dev->ops;
+	ops->disable(dev, irq);
+}
+
+void
+mdx_intc_set(mdx_device_t dev, int irq)
+{
+	struct mdx_intc_ops *ops;
+
+	ops = dev->ops;
+	ops->set(dev, irq);
+}
+
+void
+mdx_intc_clear(mdx_device_t dev, int irq)
+{
+	struct mdx_intc_ops *ops;
+
+	ops = dev->ops;
+	ops->clear(dev, irq);
+}
+
+void
+mdx_intc_set_prio(mdx_device_t dev, int irq, int prio)
+{
+	struct mdx_intc_ops *ops;
+
+	ops = dev->ops;
+	ops->set_prio(dev, irq, prio);
+}

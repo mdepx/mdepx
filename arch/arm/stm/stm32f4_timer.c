@@ -28,8 +28,6 @@
 #include <sys/systm.h>
 #include <sys/callout.h>
 
-#include <machine/frame.h>
-
 #include <arm/stm/stm32f4_timer.h>
 
 #define	TIM_DEBUG
@@ -47,7 +45,7 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
-stm32f4_timer_intr(void *arg, struct trapframe *tf, int irq)
+stm32f4_timer_intr(void *arg, int irq)
 {
 	struct stm32f4_timer_softc *sc;
 	uint32_t reg;

@@ -35,7 +35,7 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
-nrf_uarte_intr(void *arg, struct trapframe *tf, int irq)
+nrf_uarte_intr(void *arg, int irq)
 {
 	struct nrf_uarte_softc *sc;
 

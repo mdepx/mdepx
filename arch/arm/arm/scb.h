@@ -27,15 +27,9 @@
 #ifndef _ARM_ARM_SCB_H_
 #define _ARM_ARM_SCB_H_
 
-#include <machine/frame.h>
 #include <machine/scs.h>
 
 /* System Control Block. */
-
-struct scb_intr_entry {
-	void (*handler) (void *arg, struct trapframe *frame, int irq);
-	void *arg;
-};
 
 struct arm_scb_softc {
 	uint32_t base;

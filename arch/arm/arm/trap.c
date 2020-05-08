@@ -202,7 +202,7 @@ arm_exception(struct trapframe *tf, int exc_code)
 	curthread->td_critnest++;
 
 	if (intr)
-		arm_nvic_intr(irq, NULL);
+		arm_nvic_intr(irq);
 
 	if (!released) {
 		fpu_check_and_save(td);

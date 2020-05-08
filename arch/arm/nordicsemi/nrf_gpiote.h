@@ -76,7 +76,7 @@ struct nrf_gpiote_conf {
 };
 
 struct nrf_gpiote_intr {
-	void (*handler) (void *arg, struct trapframe *frame, int irq);
+	void (*handler) (void *arg, int irq);
 	void *arg;
 };
 
@@ -86,11 +86,11 @@ struct nrf_gpiote_softc {
 };
 
 void nrf_gpiote_init(struct nrf_gpiote_softc *sc, uint32_t base);
-void nrf_gpiote_intr(void *arg, struct trapframe *tf, int irq);
+void nrf_gpiote_intr(void *arg, int irq);
 void nrf_gpiote_config(struct nrf_gpiote_softc *sc, uint8_t config_id,
     struct nrf_gpiote_conf *conf);
 int nrf_gpiote_setup_intr(struct nrf_gpiote_softc *sc, int irq,
-    void (*handler) (void *arg, struct trapframe *frame, int irq),
+    void (*handler) (void *arg, int irq),
     void *arg);
 void nrf_gpiote_intctl(struct nrf_gpiote_softc *sc,
     uint8_t config_id, bool enable);
