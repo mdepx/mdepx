@@ -27,6 +27,8 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 
+#include <dev/uart/uart.h>
+
 #include "nrf_uarte.h"
 
 #define	RD4(_sc, _reg)		\
@@ -49,13 +51,16 @@ nrf_uarte_intr(void *arg, int irq)
 	WR4(sc, UARTE_TASKS_STARTRX, 1);
 }
 
-void
-nrf_uarte_putc(struct nrf_uarte_softc *sc, char ch)
+static void
+nrf_uarte_putc(mdx_device_t dev, int c)
 {
+	struct nrf_uarte_softc *sc;
 	int timeout;
 
+	sc = dev->arg;
+
 	WR4(sc, UARTE_EVENTS_ENDTX, 0);
-	WR4(sc, UARTE_TXD_PTR, (uint32_t)&ch);
+	WR4(sc, UARTE_TXD_PTR, (uint32_t)&c);
 	WR4(sc, UARTE_TXD_MAXCNT, 1);
 	WR4(sc, UARTE_TASKS_STARTTX, 1);
 
@@ -102,16 +107,35 @@ nrf_uarte_register_callback(struct nrf_uarte_softc *sc,
 	sc->cb_arg = arg;
 }
 
-void
-nrf_uarte_init(struct nrf_uarte_softc *sc, uint32_t base,
-    uint8_t pin_tx, uint8_t pin_rx,
-    uint32_t baudrate)
+static void
+nrf_uarte_setup(mdx_device_t dev, int baudrate, enum uart_databits databits,
+    enum uart_stopbits stopbits, enum uart_parity parity)
 {
+	struct nrf_uarte_softc *sc;
+
+	sc = dev->arg;
+
+	/* TODO: use all the arguments. */
+
+	sc->baudrate = baudrate;
+	nrf_uarte_start(sc);
+}
+
+
+static struct mdx_uart_ops nrf_uarte_ops = {
+	.putc = nrf_uarte_putc,
+	.setup = nrf_uarte_setup,
+};
+
+void
+nrf_uarte_init(mdx_device_t dev, struct nrf_uarte_softc *sc,
+    uint32_t base, uint8_t pin_tx, uint8_t pin_rx)
+{
+
+	dev->ops = &nrf_uarte_ops;
+	dev->arg = sc;
 
 	sc->base = base;
 	sc->pin_tx = pin_tx;
 	sc->pin_rx = pin_rx;
-	sc->baudrate = baudrate;
-
-	nrf_uarte_start(sc);
 }

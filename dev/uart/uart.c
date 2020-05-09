@@ -24,44 +24,25 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _DEV_UART_UART_H_
-#define _DEV_UART_UART_H_
+#include <sys/cdefs.h>
 
-#include <sys/device.h>
+#include <dev/uart/uart.h>
 
-typedef enum uart_databits {
-	UART_BITWIDTH_5 = 5,
-	UART_BITWIDTH_6,
-	UART_BITWIDTH_7,
-	UART_BITWIDTH_8,
-} uart_databits_t;
+void
+mdx_uart_putc(mdx_device_t dev, int c)
+{
+	struct mdx_uart_ops *ops;
 
-typedef enum uart_parity {
-	UART_PARITY_NONE,
-	UART_PARITY_ODD,
-	UART_PARITY_EVEN,
-} uart_parity_t;
+	ops = dev->ops;
+	ops->putc(dev, c);
+}
 
-typedef enum uart_stopbits {
-	UART_STOP_1,
-	UART_STOP_1_5,
-	UART_STOP_2
-} uart_stopbits_t;
+void
+mdx_uart_setup(mdx_device_t dev, int baudrate, enum uart_databits databits,
+	enum uart_stopbits stopbits, enum uart_parity parity)
+{
+	struct mdx_uart_ops *ops;
 
-struct mdx_uart_ops {
-	void (*putc)(mdx_device_t dev, int c);
-	int (*rxready)(mdx_device_t dev);
-	int (*getc)(mdx_device_t dev);
-	void (*setup)(mdx_device_t dev, int baudrate,
-	    enum uart_databits databits,
-	    enum uart_stopbits stopbits,
-	    enum uart_parity parity);
-};
-
-void mdx_uart_putc(mdx_device_t dev, int c);
-void mdx_uart_setup(mdx_device_t dev, int baudrate,
-    enum uart_databits databits,
-    enum uart_stopbits stopbits,
-    enum uart_parity parity);
-
-#endif /* !_DEV_UART_UART_H_ */
+	ops = dev->ops;
+	ops->setup(dev, baudrate, databits, stopbits, parity);
+}
