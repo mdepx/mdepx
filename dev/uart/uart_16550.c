@@ -121,8 +121,8 @@ void
 uart_16550_configure(struct uart_16550_softc *sc,
     uint32_t bus_freq,
     uint32_t baud_rate,
-    uart_bitwidth_t bitwidth,
-    uart_stopbit_t stopbit,
+    uart_databits_t databits,
+    uart_stopbits_t stopbits,
     uart_parity_t parity)
 {
 	uint32_t reg;
@@ -139,7 +139,7 @@ uart_16550_configure(struct uart_16550_softc *sc,
 	UART_WRITE(sc, REG_DLL, (divisor & 0xff));
 	UART_WRITE(sc, REG_DLM, ((divisor >> 8) & 0xff));
 
-	switch (bitwidth) {
+	switch (databits) {
 	case UART_BITWIDTH_8:
 		reg |= LCR_BITS_8;
 		break;
@@ -154,7 +154,7 @@ uart_16550_configure(struct uart_16550_softc *sc,
 		break;
 	}
 
-	switch (stopbit) {
+	switch (stopbits) {
 	case UART_STOP_1:
 	case UART_STOP_1_5:
 		/* TODO: check this. */

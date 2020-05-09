@@ -71,8 +71,8 @@ void uart_16550_init(struct uart_16550_softc *sc, capability base,
 void uart_16550_configure(struct uart_16550_softc *sc,
     uint32_t bus_freq,
     uint32_t baud_rate,
-    uart_bitwidth_t bitwidth,
-    uart_stopbit_t stopbit,
+    uart_databits_t databits,
+    uart_stopbits_t stopbits,
     uart_parity_t parity);
 
 #endif /* !_DEV_UART_UART_16550_H_ */
