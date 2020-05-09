@@ -236,8 +236,8 @@ board_init(void)
 	k210_i2c_configure_master(&i2c_sc, 790000000, 400000);
 
 	uart_16550_init(&uart_sc, BASE_UART1, 2);
-	uart_16550_configure(&uart_sc, 200000000, 9600, UART_BITWIDTH_8,
-	    UART_STOP_1, UART_PARITY_NONE);
+	uart_16550_configure(&uart_sc, 200000000, 9600, UART_DATABITS_8,
+	    UART_STOPBITS_1, UART_PARITY_NONE);
 
 	/*
 	 * TODO: Could not use 0x40000000-0x40600000 region.

@@ -140,26 +140,26 @@ uart_16550_configure(struct uart_16550_softc *sc,
 	UART_WRITE(sc, REG_DLM, ((divisor >> 8) & 0xff));
 
 	switch (databits) {
-	case UART_BITWIDTH_8:
+	case UART_DATABITS_8:
 		reg |= LCR_BITS_8;
 		break;
-	case UART_BITWIDTH_7:
+	case UART_DATABITS_7:
 		reg |= LCR_BITS_7;
 		break;
-	case UART_BITWIDTH_6:
+	case UART_DATABITS_6:
 		reg |= LCR_BITS_6;
 		break;
-	case UART_BITWIDTH_5:
+	case UART_DATABITS_5:
 		reg |= LCR_BITS_5;
 		break;
 	}
 
 	switch (stopbits) {
-	case UART_STOP_1:
-	case UART_STOP_1_5:
+	case UART_STOPBITS_1:
+	case UART_STOPBITS_1_5:
 		/* TODO: check this. */
 		break;
-	case UART_STOP_2:
+	case UART_STOPBITS_2:
 		reg |= LCR_STOPB;
 		break;
 	}

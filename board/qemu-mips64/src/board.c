@@ -136,8 +136,8 @@ board_init(void)
 
 	uart_16550_init(&uart_sc, UART_BASE | 0xffffffffa0000000, 0);
 	uart_16550_configure(&uart_sc, UART_CLOCK_RATE, DEFAULT_BAUDRATE,
-	    UART_BITWIDTH_5,
-	    UART_STOP_1,
+	    UART_DATABITS_5,
+	    UART_STOPBITS_1,
 	    UART_PARITY_NONE);
 	mdx_console_register(uart_putchar, (void *)&uart_sc);
 

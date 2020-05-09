@@ -30,10 +30,10 @@
 #include <sys/device.h>
 
 typedef enum uart_databits {
-	UART_BITWIDTH_5 = 5,
-	UART_BITWIDTH_6,
-	UART_BITWIDTH_7,
-	UART_BITWIDTH_8,
+	UART_DATABITS_5 = 5,
+	UART_DATABITS_6,
+	UART_DATABITS_7,
+	UART_DATABITS_8,
 } uart_databits_t;
 
 typedef enum uart_parity {
@@ -43,9 +43,9 @@ typedef enum uart_parity {
 } uart_parity_t;
 
 typedef enum uart_stopbits {
-	UART_STOP_1,
-	UART_STOP_1_5,
-	UART_STOP_2
+	UART_STOPBITS_1,
+	UART_STOPBITS_1_5,
+	UART_STOPBITS_2
 } uart_stopbits_t;
 
 struct mdx_uart_ops {
