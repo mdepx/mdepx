@@ -31,6 +31,16 @@
 
 struct kernel_console kern_console;
 
+void
+mdx_console_register(void (*func)(int, void*), void *arg)
+{
+
+	kern_console.console_putchar = func;
+	kern_console.console_putchar_arg = arg;
+}
+
+#ifdef MDX_UART
+
 static void
 uart_putchar(int c, void *arg)
 {
@@ -52,10 +62,4 @@ mdx_console_register_uart(mdx_device_t dev)
 	kern_console.console_putchar_arg = dev;
 }
 
-void
-mdx_console_register(void (*func)(int, void*), void *arg)
-{
-
-	kern_console.console_putchar = func;
-	kern_console.console_putchar_arg = arg;
-}
+#endif
