@@ -27,7 +27,30 @@
 #include <sys/cdefs.h>
 #include <sys/console.h>
 
+#include <dev/uart/uart.h>
+
 struct kernel_console kern_console;
+
+static void
+uart_putchar(int c, void *arg)
+{
+	mdx_device_t dev;
+
+	dev = arg;
+
+	if (c == '\n')
+		mdx_uart_putc(dev, '\r');
+
+	mdx_uart_putc(dev, c);
+}
+
+void
+mdx_console_register_uart(mdx_device_t dev)
+{
+
+	kern_console.console_putchar = uart_putchar;
+	kern_console.console_putchar_arg = dev;
+}
 
 void
 mdx_console_register(void (*func)(int, void*), void *arg)
