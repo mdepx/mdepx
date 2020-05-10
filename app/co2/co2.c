@@ -27,12 +27,12 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 
+#include <dev/gpio/gpio.h>
 #include <dev/i2c/i2c.h>
 #include <dev/i2c/bitbang/i2c_bitbang.h>
 #include <dev/bme680/bme680.h>
 #include <dev/bme680/bme680_driver.h>
 #include <dev/mh_z19b/mh_z19b.h>
-#include <dev/gpio/gpio.h>
 
 static struct bme680_dev gas_sensor;
 static struct i2c_bitbang_softc i2c_bitbang_sc;
