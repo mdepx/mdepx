@@ -205,7 +205,9 @@ arm_exception(struct trapframe *tf, int exc_code)
 		arm_nvic_intr(irq);
 
 	if (!released) {
+#ifdef MDX_ARM_VFP
 		fpu_check_and_save(td);
+#endif
 		released = mdx_sched_park(td);
 	}
 
