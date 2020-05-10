@@ -31,7 +31,6 @@
 #include <dev/i2c/bitbang/i2c_bitbang.h>
 #include <dev/bme680/bme680.h>
 #include <dev/bme680/bme680_driver.h>
-#include <dev/uart/uart_16550.h>
 #include <dev/mh_z19b/mh_z19b.h>
 #include <dev/gpio/gpio.h>
 
@@ -39,9 +38,9 @@ static struct bme680_dev gas_sensor;
 static struct i2c_bitbang_softc i2c_bitbang_sc;
 static struct mdx_device dev_bitbang;
 
-extern struct uart_16550_softc uart_sc;
 extern struct mdx_device dev_gpiohs;
 extern struct mdx_device dev_i2c;
+extern struct mdx_device dev_uart;
 
 #define	PIN_BME680_SDO	26
 #define	PIN_I2C_SCL	28
@@ -117,10 +116,10 @@ mh_z19b_cycle(uint8_t *req, uint8_t *reply, int reply_len)
 	int i;
 
 	for (i = 0; i < 9; i++)
-		uart_16550_putc(&uart_sc, req[i]);
+		mdx_uart_putc(&dev_uart, req[i]);
 
 	for (i = 0; i < reply_len; i++)
-		reply[i] = uart_16550_getc(&uart_sc);
+		reply[i] = mdx_uart_getc(&dev_uart);
 }
 
 static void
@@ -129,10 +128,10 @@ drain_fifo(void)
 	bool ready;
 
 	for (;;) {
-		ready = uart_16550_rxready(&uart_sc);
+		ready = mdx_uart_rxready(&dev_uart);
 		if (!ready)
 			break;
-		uart_16550_getc(&uart_sc);
+		mdx_uart_getc(&dev_uart);
 	}
 }
 

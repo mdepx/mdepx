@@ -69,10 +69,13 @@ mips_cap_iowrite_uint8(capability cap, size_t offset, uint8_t v)
 
 #endif
 
-bool
-uart_16550_rxready(struct uart_16550_softc *sc)
+static bool
+uart_16550_rxready(mdx_device_t dev)
 {
+	struct uart_16550_softc *sc;
 	int status;
+
+	sc = dev->arg;
 
 	status = UART_READ(sc, REG_LSR);
 	if (status & LSR_RXRDY)
@@ -81,11 +84,14 @@ uart_16550_rxready(struct uart_16550_softc *sc)
 	return (false);
 }
 
-char
-uart_16550_getc(struct uart_16550_softc *sc)
+static int
+uart_16550_getc(mdx_device_t dev)
 {
+	struct uart_16550_softc *sc;
 	int status;
-	char c;
+	int c;
+
+	sc = dev->arg;
 
 	do {
 		status = UART_READ(sc, REG_LSR);
@@ -96,10 +102,13 @@ uart_16550_getc(struct uart_16550_softc *sc)
 	return (c);
 }
 
-void
-uart_16550_putc(struct uart_16550_softc *sc, char c)
+static void
+uart_16550_putc(mdx_device_t dev, int c)
 {
+	struct uart_16550_softc *sc;
 	int status;
+
+	sc = dev->arg;
 
 	do {
 		status = UART_READ(sc, REG_LSR);
@@ -108,27 +117,19 @@ uart_16550_putc(struct uart_16550_softc *sc, char c)
 	UART_WRITE(sc, REG_DATA, c);
 }
 
-void
-uart_16550_init(struct uart_16550_softc *sc, capability base,
-    uint8_t reg_shift)
-{
-
-	sc->base = base;
-	sc->reg_shift = reg_shift;
-}
-
-void
-uart_16550_configure(struct uart_16550_softc *sc,
-    uint32_t bus_freq,
-    uint32_t baud_rate,
+static void
+uart_16550_setup(mdx_device_t dev, int baud_rate,
     uart_databits_t databits,
     uart_stopbits_t stopbits,
     uart_parity_t parity)
 {
+	struct uart_16550_softc *sc;
 	uint32_t reg;
 	int divisor;
 
-	divisor = bus_freq / (16 * baud_rate);
+	sc = dev->arg;
+
+	divisor = sc->bus_freq / (16 * baud_rate);
 
 	UART_WRITE(sc, REG_IER, 0);
 
@@ -180,4 +181,25 @@ uart_16550_configure(struct uart_16550_softc *sc,
 	reg = UART_READ(sc, REG_LCR);
 	reg &= ~LCR_DLAB;
 	UART_WRITE(sc, REG_LCR, reg);
+}
+
+
+static struct mdx_uart_ops uart_16550_ops = {
+	.putc = uart_16550_putc,
+	.getc = uart_16550_getc,
+	.rxready = uart_16550_rxready,
+	.setup = uart_16550_setup,
+};
+
+void
+uart_16550_init(mdx_device_t dev, struct uart_16550_softc *sc,
+    capability base, uint8_t reg_shift, uint32_t bus_freq)
+{
+
+	dev->arg = sc;
+	dev->ops = &uart_16550_ops;
+
+	sc->base = base;
+	sc->reg_shift = reg_shift;
+	sc->bus_freq = bus_freq;
 }

@@ -37,6 +37,32 @@ mdx_uart_putc(mdx_device_t dev, int c)
 	ops->putc(dev, c);
 }
 
+int
+mdx_uart_getc(mdx_device_t dev)
+{
+	struct mdx_uart_ops *ops;
+	int c;
+
+	ops = dev->ops;
+
+	c = ops->getc(dev);
+
+	return (c);
+}
+
+bool
+mdx_uart_rxready(mdx_device_t dev)
+{
+	struct mdx_uart_ops *ops;
+	bool ready;
+
+	ops = dev->ops;
+
+	ready = ops->rxready(dev);
+
+	return (ready);
+}
+
 void
 mdx_uart_setup(mdx_device_t dev, int baudrate, enum uart_databits databits,
 	enum uart_stopbits stopbits, enum uart_parity parity)

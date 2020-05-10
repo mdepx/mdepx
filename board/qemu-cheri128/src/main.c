@@ -53,6 +53,8 @@ extern char MipsCache[], MipsCacheEnd[];
 static struct mips_timer_softc timer_sc;
 static struct uart_16550_softc uart_sc;
 
+struct mdx_device dev_uart;
+
 void * __capability kernel_sealcap;
 
 void cpu_reset(void);
@@ -86,22 +88,6 @@ hardintr(void *arg, struct trapframe *frame, int i)
 {
 }
 
-static void
-uart_putchar(int c, void *arg)
-{
-	struct uart_16550_softc *sc;
-
-	sc = arg;
-
-	if (sc == NULL)
-		return;
-
-	if (c == '\n')
-		uart_16550_putc(sc, '\r');
-
-	uart_16550_putc(sc, c);
-}
-
 void
 udelay(uint32_t usec)
 {
@@ -131,12 +117,12 @@ setup_uart(void)
 	cap = cheri_setoffset(cap, MIPS_XKPHYS_UNCACHED_BASE + UART_BASE);
 	cap = cheri_csetbounds(cap, 6);
 
-	uart_16550_init(&uart_sc, cap, 0);
-	uart_16550_configure(&uart_sc, UART_CLOCK_RATE, DEFAULT_BAUDRATE,
+	uart_16550_init(&dev_uart, &uart_sc, cap, 0, UART_CLOCK_RATE);
+	mdx_uart_setup(&dev_uart, DEFAULT_BAUDRATE,
 	    UART_DATABITS_5,
 	    UART_STOPBITS_1,
 	    UART_PARITY_NONE);
-	mdx_console_register(uart_putchar, (void *)&uart_sc);
+	mdx_console_register_uart(&dev_uart);
 }
 
 static void

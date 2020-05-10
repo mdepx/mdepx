@@ -58,6 +58,7 @@ static struct k210_sysctl_softc sysctl_sc;
 static struct k210_uarths_softc uarths_sc;
 static struct clint_softc clint_sc;
 
+struct mdx_device dev_uart;
 struct mdx_device dev_gpio;
 struct mdx_device dev_gpiohs;
 struct mdx_device dev_i2c;
@@ -235,8 +236,8 @@ board_init(void)
 	k210_i2c_init(&dev_i2c, &i2c_sc, BASE_I2C0);
 	k210_i2c_configure_master(&i2c_sc, 790000000, 400000);
 
-	uart_16550_init(&uart_sc, BASE_UART1, 2);
-	uart_16550_configure(&uart_sc, 200000000, 9600, UART_DATABITS_8,
+	uart_16550_init(&dev_uart, &uart_sc, BASE_UART1, 2, 200000000);
+	mdx_uart_setup(&dev_uart, 9600, UART_DATABITS_8,
 	    UART_STOPBITS_1, UART_PARITY_NONE);
 
 	/*

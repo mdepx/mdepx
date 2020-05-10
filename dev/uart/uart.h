@@ -50,7 +50,7 @@ typedef enum uart_stopbits {
 
 struct mdx_uart_ops {
 	void (*putc)(mdx_device_t dev, int c);
-	int (*rxready)(mdx_device_t dev);
+	bool (*rxready)(mdx_device_t dev);
 	int (*getc)(mdx_device_t dev);
 	void (*setup)(mdx_device_t dev, int baudrate,
 	    enum uart_databits databits,
@@ -59,6 +59,9 @@ struct mdx_uart_ops {
 };
 
 void mdx_uart_putc(mdx_device_t dev, int c);
+bool mdx_uart_rxready(mdx_device_t dev);
+int mdx_uart_getc(mdx_device_t dev);
+
 void mdx_uart_setup(mdx_device_t dev, int baudrate,
     enum uart_databits databits,
     enum uart_stopbits stopbits,

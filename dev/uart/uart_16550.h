@@ -61,18 +61,10 @@
 struct uart_16550_softc {
 	capability base;
 	uint8_t reg_shift;
+	uint32_t bus_freq;
 };
 
-bool uart_16550_rxready(struct uart_16550_softc *sc);
-void uart_16550_putc(struct uart_16550_softc *sc, char c);
-char uart_16550_getc(struct uart_16550_softc *sc);
-void uart_16550_init(struct uart_16550_softc *sc, capability base,
-    uint8_t reg_shift);
-void uart_16550_configure(struct uart_16550_softc *sc,
-    uint32_t bus_freq,
-    uint32_t baud_rate,
-    uart_databits_t databits,
-    uart_stopbits_t stopbits,
-    uart_parity_t parity);
+void uart_16550_init(mdx_device_t dev, struct uart_16550_softc *sc,
+    capability base, uint8_t reg_shift, uint32_t bus_freq);
 
 #endif /* !_DEV_UART_UART_16550_H_ */

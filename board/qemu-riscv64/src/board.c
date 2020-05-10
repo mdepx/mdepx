@@ -52,28 +52,14 @@ extern uint8_t __riscv_boot_ap[MDX_CPU_MAX];
 static struct uart_16550_softc uart_sc;
 static struct clint_softc clint_sc;
 
-static void
-uart_putchar(int c, void *arg)
-{
-	struct uart_16550_softc *sc;
-
-	sc = arg;
-
-	if (sc == NULL)
-		return;
-
-	if (c == '\n')
-		uart_16550_putc(sc, '\r');
-
-	uart_16550_putc(sc, c);
-}
+struct mdx_device dev_uart;
 
 char
 uart_getchar(void)
 {
 	char a;
 
-	a = uart_16550_getc(&uart_sc);
+	a = mdx_uart_getc(&dev_uart);
 
 	return (a);
 }
@@ -89,12 +75,12 @@ board_init(void)
 
 	/* Register UART */
 
-	uart_16550_init(&uart_sc, UART_BASE, 0);
-	uart_16550_configure(&uart_sc, UART_CLOCK_RATE, DEFAULT_BAUDRATE,
+	uart_16550_init(&dev_uart, &uart_sc, UART_BASE, 0, UART_CLOCK_RATE);
+	mdx_uart_setup(&dev_uart, DEFAULT_BAUDRATE,
 	    UART_DATABITS_5,
 	    UART_STOPBITS_1,
 	    UART_PARITY_NONE);
-	mdx_console_register(uart_putchar, (void *)&uart_sc);
+	mdx_console_register_uart(&dev_uart);
 
 	/* Timer */
 
