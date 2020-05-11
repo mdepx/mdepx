@@ -35,4 +35,6 @@ struct mdx_device {
 
 typedef struct mdx_device *mdx_device_t;
 
+void * mdx_device_get_softc(mdx_device_t dev);
+
 #endif /* !_SYS_DEVICE_H_ */
