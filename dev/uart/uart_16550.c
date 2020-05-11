@@ -75,7 +75,7 @@ uart_16550_rxready(mdx_device_t dev)
 	struct uart_16550_softc *sc;
 	int status;
 
-	sc = dev->arg;
+	sc = mdx_device_get_softc(dev);
 
 	status = UART_READ(sc, REG_LSR);
 	if (status & LSR_RXRDY)
@@ -91,7 +91,7 @@ uart_16550_getc(mdx_device_t dev)
 	int status;
 	int c;
 
-	sc = dev->arg;
+	sc = mdx_device_get_softc(dev);
 
 	do {
 		status = UART_READ(sc, REG_LSR);
@@ -108,7 +108,7 @@ uart_16550_putc(mdx_device_t dev, int c)
 	struct uart_16550_softc *sc;
 	int status;
 
-	sc = dev->arg;
+	sc = mdx_device_get_softc(dev);
 
 	do {
 		status = UART_READ(sc, REG_LSR);
@@ -127,7 +127,7 @@ uart_16550_setup(mdx_device_t dev, int baud_rate,
 	uint32_t reg;
 	int divisor;
 
-	sc = dev->arg;
+	sc = mdx_device_get_softc(dev);
 
 	divisor = sc->bus_freq / (16 * baud_rate);
 

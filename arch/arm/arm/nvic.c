@@ -67,7 +67,7 @@ arm_nvic_enable_intr(mdx_device_t dev, int n)
 {
 	struct arm_nvic_softc *sc;
 
-	sc = dev->arg;
+	sc = mdx_device_get_softc(dev);
 
 	WR4(sc, NVIC_ISER(n / 32), (1 << (n % 32)));
 }
@@ -77,7 +77,7 @@ arm_nvic_disable_intr(mdx_device_t dev, int n)
 {
 	struct arm_nvic_softc *sc;
 
-	sc = dev->arg;
+	sc = mdx_device_get_softc(dev);
 
 	WR4(sc, NVIC_ICER(n / 32), (1 << (n % 32)));
 }
@@ -87,7 +87,7 @@ arm_nvic_set_pending(mdx_device_t dev, int n)
 {
 	struct arm_nvic_softc *sc;
 
-	sc = dev->arg;
+	sc = mdx_device_get_softc(dev);
 
 	WR4(sc, NVIC_ISPR(n / 32), (1 << (n % 32)));
 }
@@ -97,7 +97,7 @@ arm_nvic_clear_pending(mdx_device_t dev, int n)
 {
 	struct arm_nvic_softc *sc;
 
-	sc = dev->arg;
+	sc = mdx_device_get_softc(dev);
 
 	WR4(sc, NVIC_ICPR(n / 32), (1 << (n % 32)));
 }
@@ -108,7 +108,7 @@ arm_nvic_set_prio(mdx_device_t dev, int n, int prio)
 	struct arm_nvic_softc *sc;
 	int reg;
 
-	sc = dev->arg;
+	sc = mdx_device_get_softc(dev);
 
 	reg = RD4(sc, NVIC_IPR(n / 4));
 	reg &= ~(0xff << ((n % 4) * 8));

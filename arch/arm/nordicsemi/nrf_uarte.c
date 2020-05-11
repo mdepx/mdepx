@@ -57,7 +57,7 @@ nrf_uarte_putc(mdx_device_t dev, int c)
 	struct nrf_uarte_softc *sc;
 	int timeout;
 
-	sc = dev->arg;
+	sc = mdx_device_get_softc(dev);
 
 	WR4(sc, UARTE_EVENTS_ENDTX, 0);
 	WR4(sc, UARTE_TXD_PTR, (uint32_t)&c);
@@ -113,7 +113,7 @@ nrf_uarte_setup(mdx_device_t dev, int baudrate, enum uart_databits databits,
 {
 	struct nrf_uarte_softc *sc;
 
-	sc = dev->arg;
+	sc = mdx_device_get_softc(dev);
 
 	/* TODO: use all the arguments. */
 
