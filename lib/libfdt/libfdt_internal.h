@@ -58,7 +58,7 @@ static inline struct fdt_reserve_entry *fdt_mem_rsv_w_(void *fdt, int n)
 
 /*
  * Defines assumptions which can be enabled. Each of these can be enabled
- * individually. For maximum saftey, don't enable any assumptions!
+ * individually. For maximum safety, don't enable any assumptions!
  *
  * For minimal code size and no safety, use ASSUME_PERFECT at your own risk.
  * You should have another method of validating the device tree, such as a
@@ -91,7 +91,9 @@ enum {
 	 *
 	 * With this assumption enabled, normal device trees produced by libfdt
 	 * and the compiler should be handled safely. Malicious device trees and
-	 * complete garbage may cause libfdt to behave badly or crash.
+	 * complete garbage may cause libfdt to behave badly or crash. Truncated
+	 * device trees (e.g. those only partially loaded) can also cause
+	 * problems.
 	 *
 	 * Note: Only checks that relate exclusively to the device tree itself
 	 * (not the parameters passed to libfdt) are disabled by this
@@ -121,8 +123,8 @@ enum {
 	ASSUME_LATEST		= 1 << 2,
 
 	/*
-	 * This assume that it is OK for a failed additional to the device tree
-	 * due to lack of space or some other problem can skip any rollback
+	 * This assumes that it is OK for a failed addition to the device tree,
+	 * due to lack of space or some other problem, to skip any rollback
 	 * steps (such as dropping the property name from the string table).
 	 * This is safe to enable in most circumstances, even though it may
 	 * leave the tree in a sub-optimal state.
@@ -130,12 +132,28 @@ enum {
 	ASSUME_NO_ROLLBACK	= 1 << 3,
 
 	/*
-	 * This assumes that the device tree components appear in the correct
-	 * order. As such it disables a check in fdt_open_into() and removes the
+	 * This assumes that the device tree components appear in a 'convenient'
+	 * order, i.e. the memory reservation block first, then the structure
+	 * block and finally the string block.
+	 *
+	 * This order is not specified by the device-tree specification,
+	 * but is expected by libfdt. The device-tree compiler always created
+	 * device trees with this order.
+	 *
+	 * This assumption disables a check in fdt_open_into() and removes the
 	 * ability to fix the problem there. This is safe if you know that the
 	 * device tree is correctly ordered. See fdt_blocks_misordered_().
 	 */
 	ASSUME_LIBFDT_ORDER	= 1 << 4,
+
+	/*
+	 * This assumes that libfdt itself does not have any internal bugs. It
+	 * drops certain checks that should never be needed unless libfdt has an
+	 * undiscovered bug.
+	 *
+	 * This can generally be considered safe to enable.
+	 */
+	ASSUME_LIBFDT_FLAWLESS	= 1 << 5,
 };
 
 /**
