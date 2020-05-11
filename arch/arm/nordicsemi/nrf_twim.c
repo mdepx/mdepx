@@ -127,11 +127,12 @@ static struct mdx_i2c_ops nrf_twim_ops = {
 };
 
 void
-nrf_twim_init(mdx_device_t dev, struct nrf_twim_softc *sc, uint32_t base)
+nrf_twim_init(mdx_device_t dev, uint32_t base)
 {
+	struct nrf_twim_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
+	sc->base = base;
 
 	dev->ops = &nrf_twim_ops;
-	dev->arg = sc;
-
-	sc->base = base;
 }

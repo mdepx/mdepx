@@ -101,7 +101,7 @@ struct nrf_twim_conf {
 };
 
 void nrf_twim_setup(struct nrf_twim_softc *sc, struct nrf_twim_conf *conf);
-void nrf_twim_init(mdx_device_t dev, struct nrf_twim_softc *sc, uint32_t base);
+void nrf_twim_init(mdx_device_t dev, uint32_t base);
 void nrf_twim_intr(void *arg, int irq);
 
 #endif /* !_ARM_NORDICSEMI_NRF_TWIM_H_ */

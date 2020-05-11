@@ -128,14 +128,15 @@ static struct mdx_uart_ops nrf_uarte_ops = {
 };
 
 void
-nrf_uarte_init(mdx_device_t dev, struct nrf_uarte_softc *sc,
+nrf_uarte_init(mdx_device_t dev,
     uint32_t base, uint8_t pin_tx, uint8_t pin_rx)
 {
+	struct nrf_uarte_softc *sc;
 
-	dev->ops = &nrf_uarte_ops;
-	dev->arg = sc;
-
+	sc = mdx_device_get_softc(dev);
 	sc->base = base;
 	sc->pin_tx = pin_tx;
 	sc->pin_rx = pin_rx;
+
+	dev->ops = &nrf_uarte_ops;
 }

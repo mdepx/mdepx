@@ -142,13 +142,14 @@ static struct mdx_intc_ops arm_nvic_ops = {
 };
 
 int
-arm_nvic_init(mdx_device_t dev, struct arm_nvic_softc *sc, uint32_t base)
+arm_nvic_init(mdx_device_t dev, uint32_t base)
 {
+	struct arm_nvic_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
+	sc->base = base;
 
 	dev->ops = &arm_nvic_ops;
-	dev->arg = sc;
-
-	sc->base = base;
 
 	return (0);
 }
