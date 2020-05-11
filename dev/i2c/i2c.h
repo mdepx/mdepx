@@ -41,7 +41,7 @@ struct i2c_msg {
 };
 
 struct mdx_i2c_ops {
-	int (*xfer)(void *arg, struct i2c_msg *msgs, int len);
+	int (*xfer)(mdx_device_t dev, struct i2c_msg *msgs, int len);
 };
 
 int mdx_i2c_transfer(mdx_device_t dev, struct i2c_msg *msgs, int len);

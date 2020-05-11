@@ -62,14 +62,14 @@ nrf_twim_intr(void *arg, int irq)
 }
 
 static int
-nrf_twim_xfer(void *arg, struct i2c_msg *msgs, int len)
+nrf_twim_xfer(mdx_device_t dev, struct i2c_msg *msgs, int len)
 {
 	struct nrf_twim_softc *sc;
 	struct i2c_msg *msg;
 	int err;
 	int i;
 
-	sc = arg;
+	sc = mdx_device_get_softc(dev);
 
 	/* TODO: handle errors. */
 

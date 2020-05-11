@@ -148,7 +148,7 @@ i2c_read_byte(struct i2c_bitbang_softc *sc, bool ack)
 }
 
 static int
-i2c_bitbang_xfer(void *arg, struct i2c_msg *msgs, int len)
+i2c_bitbang_xfer(mdx_device_t dev, struct i2c_msg *msgs, int len)
 {
 	struct i2c_bitbang_softc *sc;
 	struct i2c_msg *msg;
@@ -158,7 +158,7 @@ i2c_bitbang_xfer(void *arg, struct i2c_msg *msgs, int len)
 	uint8_t addr;
 	int error;
 
-	sc = arg;
+	sc = mdx_device_get_softc(dev);
 
 	printf("len %d\n", len);
 

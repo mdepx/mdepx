@@ -36,7 +36,7 @@ mdx_i2c_transfer(mdx_device_t dev, struct i2c_msg *msgs, int len)
 
 	ops = dev->ops;
 
-	error = ops->xfer(dev->arg, msgs, len);
+	error = ops->xfer(dev, msgs, len);
 
 	return (error);
 }

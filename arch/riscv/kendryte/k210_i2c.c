@@ -37,7 +37,7 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 static int
-k210_i2c_xfer(void *arg, struct i2c_msg *msgs, int len)
+k210_i2c_xfer(mdx_device_t dev, struct i2c_msg *msgs, int len)
 {
 	struct k210_i2c_softc *sc;
 	struct i2c_msg *msg;
@@ -46,7 +46,7 @@ k210_i2c_xfer(void *arg, struct i2c_msg *msgs, int len)
 	int i;
 	int j;
 
-	sc = arg;
+	sc = mdx_device_get_softc(dev);
 	error = 0;
 
 	critical_enter();
