@@ -41,7 +41,7 @@ struct spi_command {
 };
 
 struct mdx_spi_ops {
-	int (*xfer)(void *arg, uint8_t *out, uint8_t *in, uint32_t len);
+	int (*xfer)(mdx_device_t dev, uint8_t *out, uint8_t *in, uint32_t len);
 };
 
 int mdx_spi_transfer(mdx_device_t dev, uint8_t *out,

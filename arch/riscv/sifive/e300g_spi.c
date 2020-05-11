@@ -37,13 +37,13 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 static int 
-e300g_spi_transfer(void *arg, uint8_t *out, uint8_t *in, uint32_t len)
+e300g_spi_transfer(mdx_device_t dev, uint8_t *out, uint8_t *in, uint32_t len)
 {
 	struct spi_softc *sc;
 	uint32_t reg;
 	int i;
 
-	sc = arg;
+	sc = mdx_device_get_softc(dev);
 
 	WR4(sc, SPI_CSID, sc->cs);
 
@@ -68,7 +68,7 @@ e300g_spi_poll_txwm(mdx_device_t dev)
 	struct spi_softc *sc;
 	uint32_t ip;
 
-	sc = dev->arg;
+	sc = mdx_device_get_softc(dev);
 
 	do {
 		ip = RD4(sc, SPI_IP);

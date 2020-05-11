@@ -81,12 +81,12 @@ stm32f4_spi_setup(struct stm32f4_spi_softc *sc)
 }
 
 static int
-stm32f4_spi_transfer(void *arg, uint8_t *out, uint8_t *in, uint32_t len)
+stm32f4_spi_transfer(mdx_device_t dev, uint8_t *out, uint8_t *in, uint32_t len)
 {
 	struct stm32f4_spi_softc *sc;
 	int i;
 
-	sc = arg;
+	sc = mdx_device_get_softc(dev);
 
 	for (i = 0; i < len; i++) {
 		if (out != 0) {

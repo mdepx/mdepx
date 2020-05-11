@@ -37,7 +37,7 @@ mdx_spi_transfer(mdx_device_t dev, uint8_t *out,
 
 	ops = dev->ops;
 
-	error = ops->xfer(dev->arg, out, in, len);
+	error = ops->xfer(dev, out, in, len);
 
 	return (error);
 }

@@ -52,14 +52,14 @@
 	*(volatile uint8_t *)((_sc)->base + _reg) = _val
 
 static int
-pic32_spi_transfer(void *arg, uint8_t *out, uint8_t *in, uint32_t len)
+pic32_spi_transfer(mdx_device_t dev, uint8_t *out, uint8_t *in, uint32_t len)
 {
 	struct pic32_spi_softc *sc;
 	int timeout;
 	uint8_t rd;
 	int i;
 
-	sc = arg;
+	sc = mdx_device_get_softc(dev);
 
 	for (i = 0; i < len; i++) {
 		WR1(sc, SPIBUF, out[i]);
