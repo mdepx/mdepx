@@ -97,7 +97,7 @@ struct nrf_uarte_softc {
 void nrf_uarte_init(mdx_device_t dev,
     uint32_t base, uint8_t pin_tx, uint8_t pin_rx);
 void nrf_uarte_intr(void *arg, int irq);
-void nrf_uarte_register_callback(struct nrf_uarte_softc *sc,
+void nrf_uarte_register_callback(mdx_device_t dev,
     void (*func)(int c, void *arg), void *arg);
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_UARTE_H_ */

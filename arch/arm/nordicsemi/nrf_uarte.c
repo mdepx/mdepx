@@ -99,9 +99,12 @@ nrf_uarte_start(struct nrf_uarte_softc *sc)
 }
 
 void
-nrf_uarte_register_callback(struct nrf_uarte_softc *sc,
+nrf_uarte_register_callback(mdx_device_t dev,
     void (*func)(int c, void *arg), void *arg)
 {
+	struct nrf_uarte_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
 
 	sc->cb = func;
 	sc->cb_arg = arg;
