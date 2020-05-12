@@ -52,7 +52,7 @@ extern uint8_t __riscv_boot_ap[MDX_CPU_MAX];
 static struct uart_16550_softc uart_sc;
 static struct clint_softc clint_sc;
 
-struct mdx_device dev_uart;
+struct mdx_device dev_uart = { .sc = &uart_sc };
 
 char
 uart_getchar(void)
@@ -75,7 +75,7 @@ board_init(void)
 
 	/* Register UART */
 
-	uart_16550_init(&dev_uart, &uart_sc, UART_BASE, 0, UART_CLOCK_RATE);
+	uart_16550_init(&dev_uart, UART_BASE, 0, UART_CLOCK_RATE);
 	mdx_uart_setup(&dev_uart, DEFAULT_BAUDRATE,
 	    UART_DATABITS_5,
 	    UART_STOPBITS_1,

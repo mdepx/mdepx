@@ -54,14 +54,11 @@ k210_gpio_set_dir(mdx_device_t dev, int pin, int dir)
 static int
 k210_gpio_pin_configure(mdx_device_t dev, int bank, int pin, int flags)
 {
-	struct k210_gpio_softc *sc;
-
-	sc = mdx_device_get_softc(dev);
 
 	if (flags & MDX_GPIO_INPUT)
-		k210_gpio_set_dir(sc, pin, 0);
+		k210_gpio_set_dir(dev, pin, 0);
 	else
-		k210_gpio_set_dir(sc, pin, 1);
+		k210_gpio_set_dir(dev, pin, 1);
 
 	return (0);
 }

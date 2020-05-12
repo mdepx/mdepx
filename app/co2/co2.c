@@ -27,6 +27,7 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 
+#include <dev/uart/uart.h>
 #include <dev/gpio/gpio.h>
 #include <dev/i2c/i2c.h>
 #include <dev/i2c/bitbang/i2c_bitbang.h>
@@ -36,7 +37,7 @@
 
 static struct bme680_dev gas_sensor;
 static struct i2c_bitbang_softc i2c_bitbang_sc;
-static struct mdx_device dev_bitbang;
+static struct mdx_device dev_bitbang = { .sc = &i2c_bitbang_sc };
 
 extern struct mdx_device dev_gpiohs;
 extern struct mdx_device dev_i2c;
@@ -91,7 +92,7 @@ bme680_sensor_init(void)
 {
 	int ret;
 
-	i2c_bitbang_init(&dev_bitbang, &i2c_bitbang_sc, &i2c_ops);
+	i2c_bitbang_init(&dev_bitbang, &i2c_ops);
 
 	mdx_gpio_set(&dev_gpiohs, 0, PIN_I2C_SCL, 0);
 	mdx_gpio_set(&dev_gpiohs, 0, PIN_I2C_SDA, 0);

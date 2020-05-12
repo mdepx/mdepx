@@ -53,8 +53,8 @@ struct stm32f4_ltdc_softc ltdc_sc;
 struct stm32f4_dsi_softc dsi_sc;
 struct stm32f4_timer_softc timer_sc;
 
-struct mdx_device dev_nvic;
 struct arm_nvic_softc nvic_sc;
+struct mdx_device dev_nvic = { .sc = &nvic_sc };
 
 dsi_device_t dsi_dev;
 
@@ -179,7 +179,7 @@ board_init(void)
 
 	/* (168/4) * 2 = 84MHz / 1 PSC = 84 */
 	stm32f4_timer_init(&timer_sc, TIM1_BASE, (84000000 * 2));
-	arm_nvic_init(&dev_nvic, &nvic_sc, NVIC_BASE);
+	arm_nvic_init(&dev_nvic, NVIC_BASE);
 
 	mdx_intc_setup(&dev_nvic, 27, stm32f4_timer_intr, &timer_sc);
 	mdx_intc_enable(&dev_nvic, 27);

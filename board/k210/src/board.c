@@ -58,15 +58,15 @@ static struct k210_sysctl_softc sysctl_sc;
 static struct k210_uarths_softc uarths_sc;
 static struct clint_softc clint_sc;
 
-struct mdx_device dev_uart;
-struct mdx_device dev_gpio;
-struct mdx_device dev_gpiohs;
-struct mdx_device dev_i2c;
-
 struct k210_gpio_softc gpio_sc;
 struct k210_gpiohs_softc gpiohs_sc;
 struct k210_i2c_softc i2c_sc;
 struct uart_16550_softc uart_sc;
+
+struct mdx_device dev_uart = {.sc = &uart_sc };
+struct mdx_device dev_gpio = {.sc = &gpio_sc };
+struct mdx_device dev_gpiohs = {.sc = &gpiohs_sc };
+struct mdx_device dev_i2c = {.sc = &i2c_sc };
 
 extern uint8_t __riscv_boot_ap[2];
 extern uint32_t _sbss;
@@ -221,8 +221,8 @@ board_init(void)
 	e300g_clint_init(&clint_sc, BASE_CLINT, 8000000);
 
 	/* GPIO */
-	k210_gpiohs_init(&dev_gpiohs, &gpiohs_sc, BASE_GPIOHS);
-	k210_gpio_init(&dev_gpio, &gpio_sc, BASE_GPIO);
+	k210_gpiohs_init(&dev_gpiohs, BASE_GPIOHS);
+	k210_gpio_init(&dev_gpio, BASE_GPIO);
 
 	/* Enable LEDs. */
 	mdx_gpio_configure(&dev_gpio, 0, PIN_GPIO_LED0, MDX_GPIO_OUTPUT);
@@ -233,10 +233,10 @@ board_init(void)
 	k210_uarths_init(&uarths_sc, BASE_UARTHS, CPU_FREQ, DEFAULT_BAUDRATE);
 	mdx_console_register(uart_putchar, (void *)&uarths_sc);
 
-	k210_i2c_init(&dev_i2c, &i2c_sc, BASE_I2C0);
+	k210_i2c_init(&dev_i2c, BASE_I2C0);
 	k210_i2c_configure_master(&i2c_sc, 790000000, 400000);
 
-	uart_16550_init(&dev_uart, &uart_sc, BASE_UART1, 2, 200000000);
+	uart_16550_init(&dev_uart, BASE_UART1, 2, 200000000);
 	mdx_uart_setup(&dev_uart, 9600, UART_DATABITS_8,
 	    UART_STOPBITS_1, UART_PARITY_NONE);
 

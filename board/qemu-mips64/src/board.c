@@ -50,7 +50,7 @@ extern char MipsCache[], MipsCacheEnd[];
 static struct mips_timer_softc timer_sc;
 static struct uart_16550_softc uart_sc;
 
-struct mdx_device dev_uart;
+struct mdx_device dev_uart = { .sc = &uart_sc };
 
 #define	UART_BASE		0x180003f8
 #define	UART_CLOCK_RATE		3686400
@@ -120,7 +120,7 @@ board_init(void)
 	uint32_t status;
 	int malloc_size;
 
-	uart_16550_init(&dev_uart, &uart_sc, UART_BASE | 0xffffffffa0000000, 0,
+	uart_16550_init(&dev_uart, UART_BASE | 0xffffffffa0000000, 0,
 	    UART_CLOCK_RATE);
 	mdx_uart_setup(&dev_uart, DEFAULT_BAUDRATE,
 	    UART_DATABITS_5,

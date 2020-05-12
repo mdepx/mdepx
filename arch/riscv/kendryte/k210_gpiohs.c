@@ -61,14 +61,11 @@ k210_gpiohs_set_dir(mdx_device_t dev, int pin, int dir)
 static int
 k210_gpiohs_pin_configure(mdx_device_t dev, int bank, int pin, int flags)
 {
-	struct k210_gpiohs_softc *sc;
-
-	sc = mdx_device_get_softc(dev);
 
 	if (flags & MDX_GPIO_INPUT)
-		k210_gpiohs_set_dir(sc, pin, 0);
+		k210_gpiohs_set_dir(dev, pin, 0);
 	else
-		k210_gpiohs_set_dir(sc, pin, 1);
+		k210_gpiohs_set_dir(dev, pin, 1);
 
 	return (0);
 }
@@ -115,6 +112,7 @@ static struct mdx_gpio_ops k210_gpiohs_ops = {
 void
 k210_gpiohs_init(mdx_device_t dev, uint32_t base)
 {
+	struct k210_gpiohs_softc *sc;
 
 	sc = mdx_device_get_softc(dev);
 	sc->base = base;
