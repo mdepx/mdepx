@@ -36,16 +36,21 @@
 #define	FPIOA_IO(n)	(0x00 + (n) * 4)
 
 void
-k210_fpioa_set_config(struct k210_fpioa_softc *sc,
+k210_fpioa_set_config(mdx_device_t dev,
     uint32_t number, struct fpioa_io_config *cfg)
 {
+	struct k210_fpioa_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
 
 	WR4(sc, FPIOA_IO(number), *(uint32_t *)cfg);
 }
 
 void
-k210_fpioa_init(struct k210_fpioa_softc *sc, uint32_t base)
+k210_fpioa_init(mdx_device_t dev, uint32_t base)
 {
+	struct k210_fpioa_softc *sc;
 
+	sc = mdx_device_get_softc(dev);
 	sc->base = base;
 }

@@ -63,6 +63,7 @@ struct k210_gpiohs_softc gpiohs_sc;
 struct k210_i2c_softc i2c_sc;
 struct uart_16550_softc uart_sc;
 
+static struct mdx_device dev_fpioa = {.sc = &fpioa_sc };
 struct mdx_device dev_uart = {.sc = &uart_sc };
 struct mdx_device dev_gpio = {.sc = &gpio_sc };
 struct mdx_device dev_gpiohs = {.sc = &gpiohs_sc };
@@ -110,27 +111,27 @@ fpioa_pins_configure(void)
 	cfg.ch_sel = FPIOA_FUNC_UARTHS_RX;
 	cfg.ie_en = 1;
 	cfg.st = 1;
-	k210_fpioa_set_config(&fpioa_sc, PIN_UARTHS_RX, &cfg);
+	k210_fpioa_set_config(&dev_fpioa, PIN_UARTHS_RX, &cfg);
 
 	bzero(&cfg, sizeof(struct fpioa_io_config));
 	cfg.ch_sel = FPIOA_FUNC_UARTHS_TX;
 	cfg.ds = 0xf;
 	cfg.oe_en = 1;
-	k210_fpioa_set_config(&fpioa_sc, PIN_UARTHS_TX, &cfg);
+	k210_fpioa_set_config(&dev_fpioa, PIN_UARTHS_TX, &cfg);
 
 	/* LED 0 */
 	bzero(&cfg, sizeof(struct fpioa_io_config));
 	cfg.ch_sel = FPIOA_FUNC_GPIO4;
 	cfg.ds = 0xf;
 	cfg.oe_en = 1;
-	k210_fpioa_set_config(&fpioa_sc, 12, &cfg);
+	k210_fpioa_set_config(&dev_fpioa, 12, &cfg);
 
 	/* LED 1 */
 	bzero(&cfg, sizeof(struct fpioa_io_config));
 	cfg.ch_sel = FPIOA_FUNC_GPIO5;
 	cfg.ds = 0xf;
 	cfg.oe_en = 1;
-	k210_fpioa_set_config(&fpioa_sc, 13, &cfg);
+	k210_fpioa_set_config(&dev_fpioa, 13, &cfg);
 
 	/* Set some random pins: not in use. */
 
@@ -139,49 +140,49 @@ fpioa_pins_configure(void)
 	cfg.ch_sel = FPIOA_FUNC_GPIOHS20;
 	cfg.ds = 0xf;
 	cfg.oe_en = 1;
-	k210_fpioa_set_config(&fpioa_sc, 36, &cfg);
+	k210_fpioa_set_config(&dev_fpioa, 36, &cfg);
 
 	/* GPIOHS21 -> PIN 37 */
 	bzero(&cfg, sizeof(struct fpioa_io_config));
 	cfg.ch_sel = FPIOA_FUNC_GPIOHS21;
 	cfg.ds = 0xf;
 	cfg.oe_en = 1;
-	k210_fpioa_set_config(&fpioa_sc, 37, &cfg);
+	k210_fpioa_set_config(&dev_fpioa, 37, &cfg);
 
 	/* GPIOHS22 -> PIN 38 */
 	bzero(&cfg, sizeof(struct fpioa_io_config));
 	cfg.ch_sel = FPIOA_FUNC_GPIOHS22;
 	cfg.ds = 0xf;
 	cfg.oe_en = 1;
-	k210_fpioa_set_config(&fpioa_sc, 38, &cfg);
+	k210_fpioa_set_config(&dev_fpioa, 38, &cfg);
 
 	/* GPIOHS26 -> PIN 42 */
 	bzero(&cfg, sizeof(struct fpioa_io_config));
 	cfg.ch_sel = FPIOA_FUNC_GPIOHS26;
 	cfg.ds = 0xf;
 	cfg.oe_en = 1;
-	k210_fpioa_set_config(&fpioa_sc, 42, &cfg);
+	k210_fpioa_set_config(&dev_fpioa, 42, &cfg);
 
 	/* GPIOHS27 -> PIN 43 */
 	bzero(&cfg, sizeof(struct fpioa_io_config));
 	cfg.ch_sel = FPIOA_FUNC_GPIOHS27;
 	cfg.ds = 0xf;
 	cfg.oe_en = 1;
-	k210_fpioa_set_config(&fpioa_sc, 43, &cfg);
+	k210_fpioa_set_config(&dev_fpioa, 43, &cfg);
 
 	/* UART TX */
 	bzero(&cfg, sizeof(struct fpioa_io_config));
 	cfg.ch_sel = FPIOA_FUNC_UART1_TX;
 	cfg.ds = 0xf;
 	cfg.oe_en = 1;
-	k210_fpioa_set_config(&fpioa_sc, 44, &cfg);
+	k210_fpioa_set_config(&dev_fpioa, 44, &cfg);
 
 	/* UART RX */
 	bzero(&cfg, sizeof(struct fpioa_io_config));
 	cfg.ch_sel = FPIOA_FUNC_UART1_RX;
 	cfg.ie_en = 1;
 	cfg.st = 1;
-	k210_fpioa_set_config(&fpioa_sc, 45, &cfg);
+	k210_fpioa_set_config(&dev_fpioa, 45, &cfg);
 
 	/* I2C */
 	bzero(&cfg, sizeof(struct fpioa_io_config));
@@ -195,7 +196,7 @@ fpioa_pins_configure(void)
 	cfg.sl = 1;
 	cfg.ie_en = 1;
 	cfg.st = 1;
-	k210_fpioa_set_config(&fpioa_sc, 46, &cfg);
+	k210_fpioa_set_config(&dev_fpioa, 46, &cfg);
 
 	bzero(&cfg, sizeof(struct fpioa_io_config));
 	cfg.ch_sel = FPIOA_FUNC_I2C0_SDA;
@@ -208,7 +209,7 @@ fpioa_pins_configure(void)
 	cfg.sl = 1;
 	cfg.ie_en = 1;
 	cfg.st = 1;
-	k210_fpioa_set_config(&fpioa_sc, 47, &cfg);
+	k210_fpioa_set_config(&dev_fpioa, 47, &cfg);
 }
 
 void
@@ -216,7 +217,7 @@ board_init(void)
 {
 
 	k210_sysctl_init(&sysctl_sc, BASE_SYSCTL);
-	k210_fpioa_init(&fpioa_sc, BASE_FPIOA);
+	k210_fpioa_init(&dev_fpioa, BASE_FPIOA);
 	fpioa_pins_configure();
 	e300g_clint_init(&clint_sc, BASE_CLINT, 8000000);
 

@@ -307,8 +307,8 @@ struct k210_fpioa_softc {
 	size_t base;
 };
 
-void k210_fpioa_init(struct k210_fpioa_softc *sc, uint32_t base);
-void k210_fpioa_set_config(struct k210_fpioa_softc *sc,
+void k210_fpioa_init(mdx_device_t dev, uint32_t base);
+void k210_fpioa_set_config(mdx_device_t dev,
     uint32_t number, struct fpioa_io_config *cfg);
 
 #endif /* !_RISCV_KENDRYTE_K210_FPIOA_H_ */
