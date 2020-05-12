@@ -69,8 +69,7 @@ struct stm32f4_spi_softc {
 	uint32_t base;
 };
 
-void stm32f4_spi_init(mdx_device_t dev, struct stm32f4_spi_softc *sc,
-    uint32_t base);
+void stm32f4_spi_init(mdx_device_t dev, uint32_t base);
 void stm32f4_spi_intr(void *arg);
 
 #endif /* !_ARM_STM_STM32F4_SPI_H_ */

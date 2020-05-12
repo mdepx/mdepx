@@ -96,7 +96,7 @@ struct k210_i2c_softc {
 	size_t base;
 };
 
-void k210_i2c_init(mdx_device_t dev, struct k210_i2c_softc *sc, uint32_t base);
+void k210_i2c_init(mdx_device_t dev, uint32_t base);
 void k210_i2c_configure_master(struct k210_i2c_softc *sc,
     uint32_t v_i2c_freq, uint32_t i2c_clk);
 
