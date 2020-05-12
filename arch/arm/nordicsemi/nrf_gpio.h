@@ -27,6 +27,8 @@
 #ifndef _ARM_NORDICSEMI_NRF_GPIO_H_
 #define _ARM_NORDICSEMI_NRF_GPIO_H_
 
+#include <sys/device.h>
+
 #define	GPIO_OUT		0x004	/* Write GPIO port */
 #define	GPIO_OUTSET		0x008	/* Set individual bits in GPIO port */
 #define	GPIO_OUTCLR		0x00C	/* Clear individual bits in GPIO port */
@@ -71,10 +73,7 @@ struct nrf_gpio_softc {
 	size_t base;
 };
 
-void nrf_gpio_init(struct nrf_gpio_softc *sc, uint32_t base);
-void nrf_gpio_pincfg(struct nrf_gpio_softc *sc, int pin, int cfg);
-void nrf_gpio_outset(struct nrf_gpio_softc *sc, int pin, int out);
-void nrf_gpio_dirset(struct nrf_gpio_softc *sc, int pin, int dir);
-bool nrf_gpio_get(struct nrf_gpio_softc *sc, int pin);
+void nrf_gpio_init(mdx_device_t dev, uint32_t base);
+void nrf_gpio_pincfg(mdx_device_t dev, int pin, int cfg);
 
 #endif /* !_ARM_NORDICSEMI_NRF_GPIO_H_ */

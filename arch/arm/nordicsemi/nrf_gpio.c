@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2019-2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,8 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 
+#include <dev/gpio/gpio.h>
+
 #include "nrf_gpio.h"
 
 #define	RD4(_sc, _reg)		\
@@ -34,46 +36,72 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-bool
-nrf_gpio_get(struct nrf_gpio_softc *sc, int pin)
+static int
+nrf_gpio_set_pin(mdx_device_t dev, int bank, int pin, int val)
 {
+	struct nrf_gpio_softc *sc;
 
-	if (RD4(sc, GPIO_IN) & (1 << pin))
-		return (true);
+	sc = mdx_device_get_softc(dev);
 
-	return (false);
-}
-
-void
-nrf_gpio_outset(struct nrf_gpio_softc *sc, int pin, int out)
-{
-
-	if (out)
+	if (val)
 		WR4(sc, GPIO_OUTSET, (1 << pin));
 	else
 		WR4(sc, GPIO_OUTCLR, (1 << pin));
+
+	return (0);
 }
 
-void
-nrf_gpio_dirset(struct nrf_gpio_softc *sc, int pin, int dir)
+static int
+nrf_gpio_get_pin(mdx_device_t dev, int bank, int pin)
 {
+	struct nrf_gpio_softc *sc;
 
-	if (dir)
-		WR4(sc, GPIO_DIRSET, (1 << pin));
-	else
+	sc = mdx_device_get_softc(dev);
+
+	if (RD4(sc, GPIO_IN) & (1 << pin))
+		return (1);
+
+	return (0);
+}
+
+static int
+nrf_gpio_pin_configure(mdx_device_t dev, int bank, int pin, int flags)
+{
+	struct nrf_gpio_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
+
+	if (flags & MDX_GPIO_INPUT)
 		WR4(sc, GPIO_DIRCLR, (1 << pin));
+	else
+		WR4(sc, GPIO_DIRSET, (1 << pin));
+
+	return (0);
 }
 
 void
-nrf_gpio_pincfg(struct nrf_gpio_softc *sc, int pin, int cfg)
+nrf_gpio_pincfg(mdx_device_t dev, int pin, int cfg)
 {
+	struct nrf_gpio_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
 
 	WR4(sc, GPIO_PIN_CNF(pin), cfg);
 }
 
-void
-nrf_gpio_init(struct nrf_gpio_softc *sc, uint32_t base)
-{
+static struct mdx_gpio_ops nrf_gpio_ops = {
+	.pin_set = nrf_gpio_set_pin,
+	.pin_get = nrf_gpio_get_pin,
+	.pin_configure = nrf_gpio_pin_configure,
+};
 
+void
+nrf_gpio_init(mdx_device_t dev, uint32_t base)
+{
+	struct nrf_gpio_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
 	sc->base = base;
+
+	dev->ops = &nrf_gpio_ops;
 }
