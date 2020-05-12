@@ -51,7 +51,6 @@ struct k210_gpiohs_softc {
 	size_t base;
 };
 
-void k210_gpiohs_init(mdx_device_t dev,
-    struct k210_gpiohs_softc *sc, uint32_t base);
+void k210_gpiohs_init(mdx_device_t dev, uint32_t base);
 
 #endif /* !_RISCV_KENDRYTE_K210_GPIOHS_H_ */

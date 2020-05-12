@@ -43,7 +43,6 @@ struct i2c_bitbang_softc {
 	void *arg;
 };
 
-void i2c_bitbang_init(mdx_device_t dev, struct i2c_bitbang_softc *sc,
-    struct i2c_bitbang_ops *ops);
+void i2c_bitbang_init(mdx_device_t dev, struct i2c_bitbang_ops *ops);
 
 #endif /* !_DEV_I2C_I2C_BITBANG_H_ */

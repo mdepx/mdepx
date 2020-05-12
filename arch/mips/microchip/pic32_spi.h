@@ -51,7 +51,7 @@ struct pic32_spi_softc {
 	uint32_t base;
 };
 
-void pic32_spi_init(mdx_device_t dev, struct pic32_spi_softc *sc,
-    uint32_t base, uint32_t cpu_freq, uint32_t baud_rate, uint32_t spicon);
+void pic32_spi_init(mdx_device_t dev, uint32_t base,
+    uint32_t cpu_freq, uint32_t baud_rate, uint32_t spicon);
 
 #endif /* !_MIPS_MICROCHIP_PIC32_SPI_H_ */

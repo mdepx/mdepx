@@ -109,13 +109,13 @@ static struct mdx_spi_ops e300g_spi_ops = {
 };
 
 int
-e300g_spi_init(mdx_device_t dev, struct spi_softc *sc, uint32_t base)
+e300g_spi_init(mdx_device_t dev, uint32_t base)
 {
 
-	dev->arg = sc;
-	dev->ops = &e300g_spi_ops;
-
+	sc = mdx_device_get_softc(dev);
 	sc->base = base;
+
+	dev->ops = &e300g_spi_ops;
 
 	return (0);
 }

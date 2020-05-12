@@ -117,14 +117,14 @@ static struct mdx_spi_ops stm32f4_spi_ops = {
 };
 
 void
-stm32f4_spi_init(mdx_device_t dev, struct stm32f4_spi_softc *sc,
-    uint32_t base)
+stm32f4_spi_init(mdx_device_t dev, uint32_t base)
 {
+	struct stm32f4_spi_softc *sc;
 
+	sc = mdx_device_get_softc(dev);
 	sc->base = base;
 
 	dev->ops = &stm32f4_spi_ops;
-	dev->arg = sc;
 
 	stm32f4_spi_setup(sc);
 }

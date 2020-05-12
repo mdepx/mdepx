@@ -218,12 +218,12 @@ static struct mdx_i2c_ops i2c_bitbang_ops = {
 };
 
 void
-i2c_bitbang_init(mdx_device_t dev, struct i2c_bitbang_softc *sc,
-    struct i2c_bitbang_ops *ops)
+i2c_bitbang_init(mdx_device_t dev, struct i2c_bitbang_ops *ops)
 {
+	struct i2c_bitbang_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
+	sc->ops = ops;
 
 	dev->ops = &i2c_bitbang_ops;
-	dev->arg = sc;
-
-	sc->ops = ops;
 }

@@ -106,11 +106,12 @@ static struct mdx_gpio_ops k210_gpio_ops = {
 };
 
 void
-k210_gpio_init(mdx_device_t dev, struct k210_gpio_softc *sc, uint32_t base)
+k210_gpio_init(mdx_device_t dev, uint32_t base)
 {
+	struct k210_gpio_softc *sc;
 
+	sc = mdx_device_get_softc(dev);
 	sc->base = base;
 
 	dev->ops = (void *)&k210_gpio_ops;
-	dev->arg = sc;
 }

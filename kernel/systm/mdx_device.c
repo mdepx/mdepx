@@ -31,5 +31,5 @@ void *
 mdx_device_get_softc(mdx_device_t dev)
 {
 
-	return (dev->arg);
+	return (dev->sc);
 }

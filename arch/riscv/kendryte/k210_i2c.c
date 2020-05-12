@@ -110,13 +110,14 @@ static struct mdx_i2c_ops k210_i2c_ops = {
 };
 
 void
-k210_i2c_init(mdx_device_t dev, struct k210_i2c_softc *sc, uint32_t base)
+k210_i2c_init(mdx_device_t dev, uint32_t base)
 {
+	struct k210_i2c_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
+	sc->base = base;
 
 	dev->ops = &k210_i2c_ops;
-	dev->arg = sc;
-
-	sc->base = base;
 }
 
 void

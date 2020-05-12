@@ -28,7 +28,7 @@
 #define _SYS_DEVICE_H_
 
 struct mdx_device {
-	void *arg;	/* Software context. */
+	void *sc;	/* Software context. */
 	void *ops;	/* Methods. */
 	int node;	/* libfdt node. */
 };
@@ -36,5 +36,9 @@ struct mdx_device {
 typedef struct mdx_device *mdx_device_t;
 
 void * mdx_device_get_softc(mdx_device_t dev);
+
+#if 0
+#define	mdx_device_get_softc(dev)	((dev)->sc)
+#endif
 
 #endif /* !_SYS_DEVICE_H_ */

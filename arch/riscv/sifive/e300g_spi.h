@@ -74,7 +74,7 @@ struct spi_softc {
 	int cs;
 };
 
-int e300g_spi_init(mdx_device_t dev, struct spi_softc *sc, uint32_t base);
+int e300g_spi_init(mdx_device_t dev, uint32_t base);
 int e300g_spi_setup(mdx_device_t dev, uint8_t cs);
 void e300g_spi_poll_txwm(mdx_device_t dev);
 

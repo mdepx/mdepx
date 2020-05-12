@@ -192,14 +192,15 @@ static struct mdx_uart_ops uart_16550_ops = {
 };
 
 void
-uart_16550_init(mdx_device_t dev, struct uart_16550_softc *sc,
-    capability base, uint8_t reg_shift, uint32_t bus_freq)
+uart_16550_init(mdx_device_t dev, capability base,
+    uint8_t reg_shift, uint32_t bus_freq)
 {
+	struct uart_16550_softc *sc;
 
-	dev->arg = sc;
-	dev->ops = &uart_16550_ops;
-
+	sc = mdx_device_get_softc(dev);
 	sc->base = base;
 	sc->reg_shift = reg_shift;
 	sc->bus_freq = bus_freq;
+
+	dev->ops = &uart_16550_ops;
 }
