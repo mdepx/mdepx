@@ -33,9 +33,9 @@
 #define	MDX_GPIO_OUTPUT		(1 << 1)
 
 struct mdx_gpio_ops {
-	int (*pin_set)(void *arg, int bank, int pin, int value);
-	int (*pin_get)(void *arg, int bank, int pin);
-	int (*pin_configure)(void *arg, int bank, int pin, int flags);
+	int (*pin_set)(mdx_device_t dev, int bank, int pin, int value);
+	int (*pin_get)(mdx_device_t dev, int bank, int pin);
+	int (*pin_configure)(mdx_device_t dev, int bank, int pin, int flags);
 };
 
 int mdx_gpio_set(mdx_device_t dev, int bank, int pin, int value);

@@ -36,7 +36,7 @@ mdx_gpio_set(mdx_device_t dev, int bank, int pin, int value)
 
 	ops = dev->ops;
 
-	error = ops->pin_set(dev->arg, bank, pin, value);
+	error = ops->pin_set(dev, bank, pin, value);
 
 	return (error);
 }
@@ -49,7 +49,7 @@ mdx_gpio_get(mdx_device_t dev, int bank, int pin)
 
 	ops = dev->ops;
 
-	value = ops->pin_get(dev->arg, bank, pin);
+	value = ops->pin_get(dev, bank, pin);
 
 	return (value);
 }
@@ -62,7 +62,7 @@ mdx_gpio_configure(mdx_device_t dev, int bank, int pin, int flags)
 
 	ops = dev->ops;
 
-	error = ops->pin_configure(dev->arg, bank, pin, flags);
+	error = ops->pin_configure(dev, bank, pin, flags);
 
 	return (error);
 }

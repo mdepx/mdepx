@@ -36,9 +36,12 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 static void
-k210_gpio_set_dir(struct k210_gpio_softc *sc, int pin, int dir)
+k210_gpio_set_dir(mdx_device_t dev, int pin, int dir)
 {
+	struct k210_gpio_softc *sc;
 	uint32_t reg;
+
+	sc = mdx_device_get_softc(dev);
 
 	reg = RD4(sc, GPIO_DIRECTION);
 	if (dir)
@@ -49,11 +52,11 @@ k210_gpio_set_dir(struct k210_gpio_softc *sc, int pin, int dir)
 }
 
 static int
-k210_gpio_pin_configure(void *arg, int bank, int pin, int flags)
+k210_gpio_pin_configure(mdx_device_t dev, int bank, int pin, int flags)
 {
 	struct k210_gpio_softc *sc;
 
-	sc = arg;
+	sc = mdx_device_get_softc(dev);
 
 	if (flags & MDX_GPIO_INPUT)
 		k210_gpio_set_dir(sc, pin, 0);
@@ -64,12 +67,12 @@ k210_gpio_pin_configure(void *arg, int bank, int pin, int flags)
 }
 
 static int
-k210_gpio_set_pin(void *arg, int bank, int pin, int val)
+k210_gpio_set_pin(mdx_device_t dev, int bank, int pin, int val)
 {
 	struct k210_gpio_softc *sc;
 	uint32_t reg;
 
-	sc = arg;
+	sc = mdx_device_get_softc(dev);
 
 	reg = RD4(sc, GPIO_DATA_OUTPUT);
 	if (val)
@@ -82,12 +85,12 @@ k210_gpio_set_pin(void *arg, int bank, int pin, int val)
 }
 
 static int
-k210_gpio_get_pin(void *arg, int bank, int pin)
+k210_gpio_get_pin(mdx_device_t dev, int bank, int pin)
 {
 	struct k210_gpio_softc *sc;
 	uint32_t reg;
 
-	sc = arg;
+	sc = mdx_device_get_softc(dev);
 
 	reg = RD4(sc, GPIO_DATA_INPUT);
 	if (reg & (1 << pin))
