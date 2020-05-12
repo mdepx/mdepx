@@ -29,6 +29,8 @@
 
 #include <sys/types.h>
 #include <sys/errno.h>
+#include <sys/device.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
