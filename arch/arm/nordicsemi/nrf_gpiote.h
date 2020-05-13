@@ -85,14 +85,13 @@ struct nrf_gpiote_softc {
 	struct nrf_gpiote_intr intr[NRF_GPIOTE_NCONFIGS];
 };
 
-void nrf_gpiote_init(struct nrf_gpiote_softc *sc, uint32_t base);
+void nrf_gpiote_init(mdx_device_t dev, uint32_t base);
 void nrf_gpiote_intr(void *arg, int irq);
-void nrf_gpiote_config(struct nrf_gpiote_softc *sc, uint8_t config_id,
+void nrf_gpiote_config(mdx_device_t dev, uint8_t config_id,
     struct nrf_gpiote_conf *conf);
-int nrf_gpiote_setup_intr(struct nrf_gpiote_softc *sc, int irq,
+int nrf_gpiote_setup_intr(mdx_device_t dev, int irq,
     void (*handler) (void *arg, int irq),
     void *arg);
-void nrf_gpiote_intctl(struct nrf_gpiote_softc *sc,
-    uint8_t config_id, bool enable);
+void nrf_gpiote_intctl(mdx_device_t dev, uint8_t config_id, bool enable);
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_GPIOTE_H_ */

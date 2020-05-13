@@ -54,10 +54,13 @@ nrf_gpiote_intr(void *arg, int irq)
 }
 
 int
-nrf_gpiote_setup_intr(struct nrf_gpiote_softc *sc, int irq,
+nrf_gpiote_setup_intr(mdx_device_t dev, int irq,
     void (*handler) (void *arg, int irq),
     void *arg)
 {
+	struct nrf_gpiote_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
 
 	if (irq < 0)
 		return (-1);
@@ -72,9 +75,11 @@ nrf_gpiote_setup_intr(struct nrf_gpiote_softc *sc, int irq,
 }
 
 void
-nrf_gpiote_intctl(struct nrf_gpiote_softc *sc, uint8_t config_id,
-    bool enable)
+nrf_gpiote_intctl(mdx_device_t dev, uint8_t config_id, bool enable)
 {
+	struct nrf_gpiote_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
 
 	if (enable)
 		WR4(sc, GPIOTE_INTENSET, (1 << config_id));
@@ -83,10 +88,13 @@ nrf_gpiote_intctl(struct nrf_gpiote_softc *sc, uint8_t config_id,
 }
 
 void
-nrf_gpiote_config(struct nrf_gpiote_softc *sc, uint8_t config_id,
+nrf_gpiote_config(mdx_device_t dev, uint8_t config_id,
     struct nrf_gpiote_conf *conf)
 {
+	struct nrf_gpiote_softc *sc;
 	uint32_t reg;
+
+	sc = mdx_device_get_softc(dev);
 
 	reg = CONFIG_PSEL(conf->pin);
 
@@ -115,8 +123,10 @@ nrf_gpiote_config(struct nrf_gpiote_softc *sc, uint8_t config_id,
 }
 
 void
-nrf_gpiote_init(struct nrf_gpiote_softc *sc, uint32_t base)
+nrf_gpiote_init(mdx_device_t dev, uint32_t base)
 {
+	struct nrf_gpiote_softc *sc;
 
+	sc = mdx_device_get_softc(dev);
 	sc->base = base;
 }
