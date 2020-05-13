@@ -34,11 +34,12 @@
 #include <arm/arm/nvic.h>
 #include <arm/nordicsemi/nrf9160.h>
 
+#include <dev/gpio/gpio.h>
 #include <dev/intc/intc.h>
+#include <dev/uart/uart.h>
 
 #include "board.h"
 
-struct mdx_device dev_nvic;
 struct arm_nvic_softc nvic_sc;
 
 struct nrf_spu_softc spu_sc;
@@ -46,26 +47,17 @@ struct nrf_uarte_softc uarte_sc;
 struct nrf_power_softc power_sc;
 struct nrf_timer_softc timer0_sc;
 
-static void
-uart_putchar(int c, void *arg)
-{
-	struct nrf_uarte_softc *sc;
- 
-	sc = arg;
- 
-	if (c == '\n')
-		nrf_uarte_putc(sc, '\r');
-
-	nrf_uarte_putc(sc, c);
-}
+struct mdx_device dev_nvic = {.sc = &nvic_sc };
+struct mdx_device dev_uart = {.sc = &uarte_sc };
 
 void
 board_init(void)
 {
 
-	nrf_uarte_init(&uarte_sc, BASE_UARTE0,
-	    UART_PIN_TX, UART_PIN_RX, UART_BAUDRATE);
-	mdx_console_register(uart_putchar, (void *)&uarte_sc);
+	nrf_uarte_init(&dev_uart, BASE_UARTE0, UART_PIN_TX, UART_PIN_RX);
+	mdx_uart_setup(&dev_uart, UART_BAUDRATE, UART_DATABITS_8,
+	    UART_STOPBITS_1, UART_PARITY_NONE);
+	mdx_console_register_uart(&dev_uart);
 
 	mdx_fl_init();
 	mdx_fl_add_region(0x20030000, 0x10000);
@@ -73,7 +65,7 @@ board_init(void)
 	nrf_power_init(&power_sc, BASE_POWER);
 	nrf_timer_init(&timer0_sc, BASE_TIMER0, 1000000);
 
-	arm_nvic_init(&dev_nvic, &nvic_sc, BASE_SCS);
+	arm_nvic_init(&dev_nvic, BASE_SCS);
 
 	mdx_intc_setup(&dev_nvic, ID_UARTE0, nrf_uarte_intr, &uarte_sc);
 	mdx_intc_setup(&dev_nvic, ID_TIMER0, nrf_timer_intr, &timer0_sc);
