@@ -93,17 +93,17 @@ struct nrf_spu_softc {
 	size_t base;
 };
 
-void nrf_spu_init(struct nrf_spu_softc *sc, uint32_t base);
-void nrf_spu_periph_set_attr(struct nrf_spu_softc *sc, int periph_id,
+void nrf_spu_init(mdx_device_t dev, uint32_t base);
+void nrf_spu_periph_set_attr(mdx_device_t dev, int periph_id,
     bool secure_attr, bool secure_dma);
-void nrf_spu_flash_set_perm(struct nrf_spu_softc *sc, int region_id,
+void nrf_spu_flash_set_perm(mdx_device_t dev, int region_id,
     bool secure);
-void nrf_spu_sram_set_perm(struct nrf_spu_softc *sc, int region_id,
+void nrf_spu_sram_set_perm(mdx_device_t dev, int region_id,
     bool secure);
-void nrf_spu_gpio_set_perm(struct nrf_spu_softc *sc, int region_id,
+void nrf_spu_gpio_set_perm(mdx_device_t dev, int region_id,
     int perm);
-void nrf_spu_extdomain(struct nrf_spu_softc *sc, bool secure, bool lock);
-void nrf_spu_flashnsc(struct nrf_spu_softc *sc, int nsc_region,
+void nrf_spu_extdomain(mdx_device_t dev, bool secure, bool lock);
+void nrf_spu_flashnsc(mdx_device_t dev, int nsc_region,
     int flash_region, int size, bool lock);
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_SPU_H_ */

@@ -48,9 +48,11 @@ nrf_rtc_intr(void *arg, int irq)
 }
 
 void
-nrf_rtc_init(struct nrf_rtc_softc *sc,
-    uint32_t base, uint16_t prescaler)
+nrf_rtc_init(mdx_device_t dev, uint32_t base, uint16_t prescaler)
 {
+	struct nrf_rtc_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
 
 	sc->base = base;
 	sc->prescaler = prescaler;

@@ -35,16 +35,21 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
-nrf_power_reset_events(struct nrf_power_softc *sc)
+nrf_power_reset_events(mdx_device_t dev)
 {
+	struct nrf_power_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
 
 	WR4(sc, POWER_EVENTS_SLEEPENTER, 0);
 	WR4(sc, POWER_EVENTS_SLEEPEXIT, 0);
 }
 
 void
-nrf_power_init(struct nrf_power_softc *sc, uint32_t base)
+nrf_power_init(mdx_device_t dev, uint32_t base)
 {
+	struct nrf_power_softc *sc;
 
+	sc = mdx_device_get_softc(dev);
 	sc->base = base;
 }

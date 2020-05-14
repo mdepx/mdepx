@@ -35,15 +35,20 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
-nrf_reset_release(struct nrf_reset_softc *sc)
+nrf_reset_release(mdx_device_t dev)
 {
+	struct nrf_reset_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
 
 	WR4(sc, RESET_NETWORK_FORCEOFF, FORCEOFF_RELEASE);
 }
 
 void
-nrf_reset_init(struct nrf_reset_softc *sc, uint32_t base)
+nrf_reset_init(mdx_device_t dev, uint32_t base)
 {
+	struct nrf_reset_softc *sc;
 
+	sc = mdx_device_get_softc(dev);
 	sc->base = base;
 }

@@ -36,7 +36,7 @@ struct nrf_reset_softc {
 	uint32_t base;
 };
 
-void nrf_reset_init(struct nrf_reset_softc *sc, uint32_t base);
-void nrf_reset_release(struct nrf_reset_softc *sc);
+void nrf_reset_init(mdx_device_t dev, uint32_t base);
+void nrf_reset_release(mdx_device_t dev);
 
 #endif /* !_ARM_NORDICSEMI_NRF_RESET_H_ */

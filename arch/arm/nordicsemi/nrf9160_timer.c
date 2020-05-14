@@ -106,10 +106,11 @@ nrf_timer_start(void *arg, uint32_t ticks)
 }
 
 void
-nrf_timer_init(struct nrf_timer_softc *sc, uint32_t base,
-    uint32_t frequency)
+nrf_timer_init(mdx_device_t dev, uint32_t base, uint32_t frequency)
 {
+	struct nrf_timer_softc *sc;
 
+	sc = mdx_device_get_softc(dev);
 	sc->base = base;
 	sc->cc_idx = 0;
 

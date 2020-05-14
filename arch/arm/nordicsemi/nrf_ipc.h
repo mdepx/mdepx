@@ -54,14 +54,14 @@ struct nrf_ipc_softc {
 	struct ipc_event ev[NRF_IPC_MAX_EVENTS];
 };
 
-void nrf_ipc_init(struct nrf_ipc_softc *sc, uint32_t base);
+void nrf_ipc_init(mdx_device_t dev, uint32_t base);
 void nrf_ipc_intr(void *arg, int irq);
 
-void nrf_ipc_trigger(struct nrf_ipc_softc *sc, int ev);
-void nrf_ipc_configure_send(struct nrf_ipc_softc *sc,
+void nrf_ipc_trigger(mdx_device_t dev, int ev);
+void nrf_ipc_configure_send(mdx_device_t dev,
     int ev, int chanmask);
-void nrf_ipc_configure_recv(struct nrf_ipc_softc *sc,
+void nrf_ipc_configure_recv(mdx_device_t dev,
     int ev, int chanmask, void (*cb)(void *arg), void *user);
-void nrf_ipc_inten(struct nrf_ipc_softc *sc, int ev, bool set);
+void nrf_ipc_inten(mdx_device_t dev, int ev, bool set);
 
 #endif /* !_ARM_NORDICSEMI_NRF_IPC_H_ */

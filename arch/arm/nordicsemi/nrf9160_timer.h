@@ -56,8 +56,7 @@ struct nrf_timer_softc {
 	struct mi_timer mt;
 };
 
-void nrf_timer_init(struct nrf_timer_softc *sc, uint32_t base,
-    uint32_t frequency);
+void nrf_timer_init(mdx_device_t dev, uint32_t base, uint32_t frequency);
 void nrf_timer_intr(void *arg, int irq);
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_TIMER_H_ */

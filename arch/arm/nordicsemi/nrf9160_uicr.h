@@ -46,6 +46,6 @@ struct nrf_uicr_softc {
 	size_t base;
 };
 
-void nrf_uicr_init(struct nrf_uicr_softc *sc, uint32_t base);
+void nrf_uicr_init(mdx_device_t dev, uint32_t base);
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_UICR_H_ */

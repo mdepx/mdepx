@@ -48,7 +48,7 @@ struct nrf_power_softc {
 	size_t base;
 };
 
-void nrf_power_init(struct nrf_power_softc *sc, uint32_t base);
-void nrf_power_reset_events(struct nrf_power_softc *sc);
+void nrf_power_init(mdx_device_t dev, uint32_t base);
+void nrf_power_reset_events(mdx_device_t dev);
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_POWER_H_ */

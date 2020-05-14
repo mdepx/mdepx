@@ -44,24 +44,33 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
-nrf_ipc_trigger(struct nrf_ipc_softc *sc, int ev)
+nrf_ipc_trigger(mdx_device_t dev, int ev)
 {
+	struct nrf_ipc_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
 
 	WR4(sc, IPC_TASKS_SEND(ev), 1);
 }
 
 void
-nrf_ipc_configure_send(struct nrf_ipc_softc *sc,
+nrf_ipc_configure_send(mdx_device_t dev,
     int ev, int chanmask)
 {
+	struct nrf_ipc_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
 
 	WR4(sc, IPC_SEND_CNF(ev), chanmask);
 }
 
 void
-nrf_ipc_configure_recv(struct nrf_ipc_softc *sc,
+nrf_ipc_configure_recv(mdx_device_t dev,
     int ev, int chanmask, void (*cb)(void *arg), void *user)
 {
+	struct nrf_ipc_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
 
 	sc->ev[ev].cb = cb;
 	sc->ev[ev].user = user;
@@ -70,8 +79,11 @@ nrf_ipc_configure_recv(struct nrf_ipc_softc *sc,
 }
 
 void
-nrf_ipc_inten(struct nrf_ipc_softc *sc, int ev, bool set)
+nrf_ipc_inten(mdx_device_t dev, int ev, bool set)
 {
+	struct nrf_ipc_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
 
 	if (set)
 		WR4(sc, IPC_INTENSET, (1 << ev));
@@ -102,8 +114,11 @@ nrf_ipc_intr(void *arg, int irq)
 }
 
 void
-nrf_ipc_init(struct nrf_ipc_softc *sc, uint32_t base)
+nrf_ipc_init(mdx_device_t dev, uint32_t base)
 {
+	struct nrf_ipc_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
 
 	sc->base = base;
 }

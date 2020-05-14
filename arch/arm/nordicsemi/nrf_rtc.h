@@ -56,7 +56,7 @@ struct nrf_rtc_softc {
 	uint32_t period;
 };
 
-void nrf_rtc_init(struct nrf_rtc_softc *sc, uint32_t base, uint16_t prescaler);
+void nrf_rtc_init(mdx_device_t dev, uint32_t base, uint16_t prescaler);
 void nrf_rtc_intr(void *arg, int irq);
 
 struct rtc_driver nrf_rtc_driver;
