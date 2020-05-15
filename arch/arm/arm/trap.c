@@ -241,7 +241,7 @@ arm_exception(struct trapframe *tf, int exc_code)
 
 	if (exc_code >= 16) {
 		irq = exc_code - 16;
-		arm_nvic_intr(irq, tf);
+		arm_nvic_intr(irq);
 	} else
 		handle_exception(tf, exc_code);
 
