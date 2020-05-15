@@ -36,10 +36,13 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
-arm_scb_exceptions_prio_config(struct arm_scb_softc *sc,
+arm_scb_exceptions_prio_config(mdx_device_t dev,
     int prio_secure)
 {
+	struct arm_scb_softc *sc;
 	uint32_t reg;
+
+	sc = mdx_device_get_softc(dev);
 
 	reg = RD4(sc, SCB_AIRCR);
 	reg &= ~(AIRCR_VECTKEY_M);
@@ -59,10 +62,13 @@ arm_scb_exceptions_prio_config(struct arm_scb_softc *sc,
 }
 
 void
-arm_scb_exceptions_target_config(struct arm_scb_softc *sc,
+arm_scb_exceptions_target_config(mdx_device_t dev,
     int secure)
 {
+	struct arm_scb_softc *sc;
 	uint32_t reg;
+
+	sc = mdx_device_get_softc(dev);
 
 	reg = RD4(sc, SCB_AIRCR);
 	reg &= ~(AIRCR_VECTKEY_M);
@@ -82,10 +88,13 @@ arm_scb_exceptions_target_config(struct arm_scb_softc *sc,
 }
 
 void
-arm_scb_sysreset_secure(struct arm_scb_softc *sc,
+arm_scb_sysreset_secure(mdx_device_t dev,
     int secure_only)
 {
+	struct arm_scb_softc *sc;
 	uint32_t reg;
+
+	sc = mdx_device_get_softc(dev);
 
 	reg = RD4(sc, SCB_AIRCR);
 	reg &= ~(AIRCR_VECTKEY_M);
@@ -107,16 +116,22 @@ arm_scb_sysreset_secure(struct arm_scb_softc *sc,
 }
 
 void
-arm_scb_set_vector(struct arm_scb_softc *sc, uint32_t vtor)
+arm_scb_set_vector(mdx_device_t dev, uint32_t vtor)
 {
+	struct arm_scb_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
 
 	WR4(sc, SCB_VTOR, vtor);
 }
 
 void
-arm_fpu_non_secure(struct arm_scb_softc *sc, int enable)
+arm_fpu_non_secure(mdx_device_t dev, int enable)
 {
+	struct arm_scb_softc *sc;
 	uint32_t reg;
+
+	sc = mdx_device_get_softc(dev);
 
 	reg = RD4(sc, SCB_NSACR);
 
@@ -131,9 +146,12 @@ arm_fpu_non_secure(struct arm_scb_softc *sc, int enable)
 /* SAU Control Register routines */
 
 void
-arm_sau_configure(struct arm_scb_softc *sc, int enable, int allns)
+arm_sau_configure(mdx_device_t dev, int enable, int allns)
 {
+	struct arm_scb_softc *sc;
 	uint32_t reg;
+
+	sc = mdx_device_get_softc(dev);
 
 	reg = RD4(sc, SAU_CTRL);
 	if (enable)
@@ -150,9 +168,12 @@ arm_sau_configure(struct arm_scb_softc *sc, int enable, int allns)
 }
 
 int
-arm_sau_nregions(struct arm_scb_softc *sc)
+arm_sau_nregions(mdx_device_t dev)
 {
+	struct arm_scb_softc *sc;
 	int nreg;
+
+	sc = mdx_device_get_softc(dev);
 
 	nreg = RD4(sc, SAU_TYPE);
 
@@ -160,9 +181,11 @@ arm_sau_nregions(struct arm_scb_softc *sc)
 }
 
 int
-arm_scb_init(struct arm_scb_softc *sc, uint32_t base)
+arm_scb_init(mdx_device_t dev, uint32_t base)
 {
+	struct arm_scb_softc *sc;
 
+	sc = mdx_device_get_softc(dev);
 	sc->base = base;
 
 	return (0);

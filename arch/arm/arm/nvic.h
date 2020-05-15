@@ -57,6 +57,6 @@ struct arm_nvic_softc {
 void arm_nvic_intr(uint32_t irq);
 
 int arm_nvic_init(mdx_device_t dev, uint32_t base);
-void arm_nvic_target_ns(struct arm_nvic_softc *sc, uint32_t n, int secure);
+void arm_nvic_target_ns(mdx_device_t dev, uint32_t n, int secure);
 
 #endif /* !_ARM_ARM_NVIC_H_ */

@@ -35,17 +35,17 @@ struct arm_scb_softc {
 	uint32_t base;
 };
 
-int arm_scb_init(struct arm_scb_softc *sc, uint32_t base);
-void arm_scb_set_vector(struct arm_scb_softc *sc, uint32_t vtor);
-void arm_scb_exceptions_prio_config(struct arm_scb_softc *sc,
+int arm_scb_init(mdx_device_t dev, uint32_t base);
+void arm_scb_set_vector(mdx_device_t dev, uint32_t vtor);
+void arm_scb_exceptions_prio_config(mdx_device_t dev,
     int prio_secure);
-void arm_scb_exceptions_target_config(struct arm_scb_softc *sc,
+void arm_scb_exceptions_target_config(mdx_device_t dev,
     int secure);
-void arm_scb_sysreset_secure(struct arm_scb_softc *sc,
+void arm_scb_sysreset_secure(mdx_device_t dev,
     int secure_only);
-void arm_fpu_non_secure(struct arm_scb_softc *sc, int enable);
+void arm_fpu_non_secure(mdx_device_t dev, int enable);
 
-void arm_sau_configure(struct arm_scb_softc *sc, int enable, int allns);
-int arm_sau_nregions(struct arm_scb_softc *sc);
+void arm_sau_configure(mdx_device_t dev, int enable, int allns);
+int arm_sau_nregions(mdx_device_t dev);
 
 #endif /* !_ARM_ARM_SCB_H_ */

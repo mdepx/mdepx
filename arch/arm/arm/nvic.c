@@ -117,10 +117,12 @@ arm_nvic_set_prio(mdx_device_t dev, int n, int prio)
 }
 
 void
-arm_nvic_target_ns(struct arm_nvic_softc *sc, uint32_t n,
-    int secure)
+arm_nvic_target_ns(mdx_device_t dev, uint32_t n, int secure)
 {
+	struct arm_nvic_softc *sc;
 	int reg;
+
+	sc = mdx_device_get_softc(dev);
 
 	reg = RD4(sc, NVIC_ITNS(n / 32));
 
