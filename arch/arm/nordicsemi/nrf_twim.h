@@ -100,7 +100,7 @@ struct nrf_twim_conf {
 	uint8_t pin_sda;
 };
 
-void nrf_twim_setup(struct nrf_twim_softc *sc, struct nrf_twim_conf *conf);
+void nrf_twim_setup(mdx_device_t dev, struct nrf_twim_conf *conf);
 void nrf_twim_init(mdx_device_t dev, uint32_t base);
 void nrf_twim_intr(void *arg, int irq);
 

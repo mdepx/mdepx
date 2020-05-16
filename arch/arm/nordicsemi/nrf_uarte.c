@@ -136,7 +136,7 @@ nrf_uarte_init(mdx_device_t dev,
 {
 	struct nrf_uarte_softc *sc;
 
-	sc = mdx_device_get_softc(dev);
+	sc = mdx_device_alloc_softc(dev, sizeof(*sc));
 	sc->base = base;
 	sc->pin_tx = pin_tx;
 	sc->pin_rx = pin_rx;

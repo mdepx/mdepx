@@ -36,6 +36,7 @@ struct mdx_device {
 typedef struct mdx_device *mdx_device_t;
 
 void * mdx_device_get_softc(mdx_device_t dev);
+void * mdx_device_alloc_softc(mdx_device_t dev, size_t size);
 
 #if 0
 #define	mdx_device_get_softc(dev)	((dev)->sc)

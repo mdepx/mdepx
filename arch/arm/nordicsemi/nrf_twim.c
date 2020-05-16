@@ -112,8 +112,11 @@ nrf_twim_xfer(mdx_device_t dev, struct i2c_msg *msgs, int len)
 }
 
 void
-nrf_twim_setup(struct nrf_twim_softc *sc, struct nrf_twim_conf *conf)
+nrf_twim_setup(mdx_device_t dev, struct nrf_twim_conf *conf)
 {
+	struct nrf_twim_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
 
 	WR4(sc, TWIM_FREQUENCY, conf->freq);
 	WR4(sc, TWIM_PSEL_SCL, conf->pin_scl);
@@ -131,7 +134,7 @@ nrf_twim_init(mdx_device_t dev, uint32_t base)
 {
 	struct nrf_twim_softc *sc;
 
-	sc = mdx_device_get_softc(dev);
+	sc = mdx_device_alloc_softc(dev, sizeof(*sc));
 	sc->base = base;
 
 	dev->ops = &nrf_twim_ops;

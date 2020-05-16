@@ -47,19 +47,6 @@ nrf_rtc_intr(void *arg, int irq)
 	sc->ts.tv_sec += sc->period;
 }
 
-void
-nrf_rtc_init(mdx_device_t dev, uint32_t base, uint16_t prescaler)
-{
-	struct nrf_rtc_softc *sc;
-
-	sc = mdx_device_get_softc(dev);
-
-	sc->base = base;
-	sc->prescaler = prescaler;
-	sc->freq = (32768 / (sc->prescaler + 1));
-	sc->period = 0x1000000 / sc->freq;
-}
-
 static int
 nrf_rtc_settime(const struct timespec *tp, void *arg)
 {
@@ -124,3 +111,16 @@ struct rtc_driver nrf_rtc_driver = {
 	.settime = nrf_rtc_settime,
 	.gettime = nrf_rtc_gettime,
 };
+
+void
+nrf_rtc_init(mdx_device_t dev, uint32_t base, uint16_t prescaler)
+{
+	struct nrf_rtc_softc *sc;
+
+	sc = mdx_device_alloc_softc(dev, sizeof(*sc));
+
+	sc->base = base;
+	sc->prescaler = prescaler;
+	sc->freq = (32768 / (sc->prescaler + 1));
+	sc->period = 0x1000000 / sc->freq;
+}

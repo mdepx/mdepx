@@ -127,6 +127,6 @@ nrf_gpiote_init(mdx_device_t dev, uint32_t base)
 {
 	struct nrf_gpiote_softc *sc;
 
-	sc = mdx_device_get_softc(dev);
+	sc = mdx_device_alloc_softc(dev, sizeof(*sc));
 	sc->base = base;
 }
