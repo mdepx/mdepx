@@ -30,16 +30,44 @@
 struct mdx_device {
 	void *sc;	/* Software context. */
 	void *ops;	/* Methods. */
-	int node;	/* libfdt node. */
+	int node;	/* libfdt node offset. */
 };
 
 typedef struct mdx_device *mdx_device_t;
 
-void * mdx_device_get_softc(mdx_device_t dev);
-void * mdx_device_alloc_softc(mdx_device_t dev, size_t size);
+struct mdx_device_ops {
+	int (*probe)(mdx_device_t dev);
+	int (*attach)(mdx_device_t dev);
+};
+
+struct mdx_driver {
+	const char		*name;
+	struct mdx_device_ops	*ops;
+	size_t			size;
+};
+
+typedef struct mdx_driver mdx_driver_t;
+
+struct mdx_sysinit {
+	mdx_driver_t		*dri;
+};
+
+#define DRIVER_MODULE(name, driver)		\
+	struct mdx_sysinit name##_sysinit	\
+	__attribute__((__section__(".sysinit"),	\
+	__used__, __aligned__(4))) = {		\
+		.dri = &driver,			\
+	};
 
 #if 0
 #define	mdx_device_get_softc(dev)	((dev)->sc)
 #endif
+
+void * mdx_device_get_softc(mdx_device_t dev);
+void * mdx_device_alloc_softc(mdx_device_t dev, size_t size);
+bool mdx_dev_is_compatible(mdx_device_t dev, const char *compatstr);
+int mdx_device_probe_and_attach(int nodeoffset);
+int mdx_dev_get_address(mdx_device_t dev, int index,
+    size_t *addr, size_t *size);
 
 #endif /* !_SYS_DEVICE_H_ */
