@@ -19,6 +19,12 @@ SECTIONS
 		*(.text)
 	} > sram0
 
+	.sysinit : {
+		__sysinit_start = ABSOLUTE(.);
+		*(.sysinit)
+		__sysinit_end = ABSOLUTE(.);
+	} > flash
+
 	.rodata : {
 		*(.rodata)
 	} > sram0
