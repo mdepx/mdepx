@@ -25,16 +25,26 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/malloc.h>
 #include <sys/of.h>
 
 #include <libfdt/libfdt.h>
 
+static void *fdt;
+
+void
+mdx_of_install_dtbp(void *dtbp)
+{
+
+	fdt = dtbp;
+}
+
 static bool
-fdt_is_enabled(void *dtb, int offset)
+mdx_of_is_enabled(int offset)
 {
 	const char *status;
 
-	status = fdt_getprop(dtb, offset, "status", NULL);
+	status = fdt_getprop(fdt, offset, "status", NULL);
 	if (status == NULL)
 		return (true);
 
@@ -45,12 +55,12 @@ fdt_is_enabled(void *dtb, int offset)
 }
 
 static bool
-fdt_is_compatible(void *dtb, int offset, const char *check)
+fdt_is_compatible(int offset, const char *check)
 {
 	const char *compat;
 	int len;
 
-	compat = fdt_getprop(dtb, offset, "compatible", &len);
+	compat = fdt_getprop(fdt, offset, "compatible", &len);
 	if (compat == NULL)
 		return (false);
 
@@ -65,7 +75,7 @@ fdt_is_compatible(void *dtb, int offset, const char *check)
 }
 
 int
-fdt_find_first_compatible(void *dtb, const char *compat)
+mdx_of_find_first_compatible(const char *compat)
 {
 	int offset;
 	int depth;
@@ -74,13 +84,71 @@ fdt_find_first_compatible(void *dtb, const char *compat)
 	depth = 1;
 
 	do {
-		offset = fdt_next_node(dtb, offset, &depth);
-		if (!fdt_is_enabled(dtb, offset))
+		offset = fdt_next_node(fdt, offset, &depth);
+		if (!mdx_of_is_enabled(offset))
 			continue;
 
-		if (fdt_is_compatible(dtb, offset, compat))
+		if (fdt_is_compatible(offset, compat))
 			return (offset);
 	} while (offset > 0);
 
 	return (MDX_OK);
+}
+
+void
+mdx_of_probe_devices(void)
+{
+	mdx_device_t dev;
+	const void *prop;
+	int offset;
+	int depth;
+	int error;
+	int len;
+
+	offset = 0;
+	depth = 0;
+
+	printf("%s\n", __func__);
+
+	do {
+		prop = fdt_getprop(fdt, offset, "compatible", &len);
+		if (prop) {
+			dev = zalloc(sizeof(struct mdx_device));
+			dev->node = offset;
+			error = mdx_device_probe_and_attach(dev);
+			if (error != 0)
+				free(dev);
+			else
+				printf("device attached (depth %d): %s\n",
+				    depth, prop);
+		}
+		offset = fdt_next_node(fdt, offset, &depth);
+	} while (offset > 0);
+}
+
+int
+mdx_of_get_reg(mdx_device_t dev, int index,
+    size_t *addr, size_t *size)
+{
+	const fdt32_t *regp;
+	uint32_t reg;
+
+	/* TODO: address cells, ranges, ... */
+
+	regp = fdt_getprop(fdt, dev->node, "reg", NULL);
+	if (!regp)
+		return (-1);
+
+	reg = fdt32_ld(regp);
+
+	*addr = reg;
+
+	return (0);
+}
+
+bool
+mdx_of_is_compatible(mdx_device_t dev, const char *compatstr)
+{
+
+	return (fdt_is_compatible(dev->node, compatstr));
 }

@@ -25,7 +25,12 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/systm.h>
+#include <sys/malloc.h>
 #include <sys/device.h>
+
+extern uintptr_t __attribute((weak)) __sysinit_start;
+extern uintptr_t __attribute((weak)) __sysinit_end;
 
 void *
 mdx_device_get_softc(mdx_device_t dev)
@@ -44,4 +49,36 @@ mdx_device_alloc_softc(mdx_device_t dev, size_t size)
 	dev->sc = malloc(size);
 
 	return (dev->sc);
+}
+
+int
+mdx_device_probe_and_attach(mdx_device_t dev)
+{
+	mdx_driver_t *driver;
+	struct mdx_device_ops *ops;
+	struct mdx_sysinit *si;
+	uint8_t *start;
+	uint8_t *end;
+	int error;
+
+	start = (uint8_t *)&__sysinit_start;
+	end = (uint8_t *)&__sysinit_end;
+
+	for (; start < end; start += sizeof(struct mdx_sysinit)) {
+		si = (struct mdx_sysinit *)start;
+		driver = si->dri;
+		ops = driver->ops;
+		error = ops->probe(dev);
+		if (error == 0) {
+			mdx_device_alloc_softc(dev, driver->size);
+
+			error = ops->attach(dev);
+			if (error != 0) {
+				/* TODO: free the softc */
+			}
+			return (error);
+		}
+	}
+
+	return (-1);
 }

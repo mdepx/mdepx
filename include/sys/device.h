@@ -65,9 +65,6 @@ struct mdx_sysinit {
 
 void * mdx_device_get_softc(mdx_device_t dev);
 void * mdx_device_alloc_softc(mdx_device_t dev, size_t size);
-bool mdx_dev_is_compatible(mdx_device_t dev, const char *compatstr);
-int mdx_device_probe_and_attach(int nodeoffset);
-int mdx_dev_get_address(mdx_device_t dev, int index,
-    size_t *addr, size_t *size);
+int mdx_device_probe_and_attach(mdx_device_t dev);
 
 #endif /* !_SYS_DEVICE_H_ */

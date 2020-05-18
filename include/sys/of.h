@@ -27,6 +27,11 @@
 #ifndef	_SYS_OF_H_
 #define	_SYS_OF_H_
 
-int fdt_find_first_compatible(void *dtb, const char *compat);
+bool mdx_of_is_compatible(mdx_device_t dev, const char *compatstr);
+void mdx_of_install_dtbp(void *dtbp);
+void mdx_of_probe_devices(void);
+int mdx_of_find_first_compatible(const char *compat);
+int mdx_of_get_reg(mdx_device_t dev, int index,
+    size_t *addr, size_t *size);
 
 #endif /* _SYS_OF_H_ */
