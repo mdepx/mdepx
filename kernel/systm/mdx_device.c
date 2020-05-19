@@ -28,9 +28,12 @@
 #include <sys/systm.h>
 #include <sys/malloc.h>
 #include <sys/device.h>
+#include <sys/list.h>
 
 extern uintptr_t __attribute((weak)) __sysinit_start;
 extern uintptr_t __attribute((weak)) __sysinit_end;
+
+static struct entry devs = LIST_INIT_STATIC(&devs);
 
 void *
 mdx_device_get_softc(mdx_device_t dev)
@@ -66,6 +69,7 @@ mdx_device_probe_and_attach(mdx_device_t dev)
 
 	for (; start < end; start += sizeof(struct mdx_sysinit)) {
 		si = (struct mdx_sysinit *)start;
+		dev->si = si;
 		driver = si->dri;
 		ops = driver->ops;
 		error = ops->probe(dev);
@@ -73,7 +77,9 @@ mdx_device_probe_and_attach(mdx_device_t dev)
 			mdx_device_alloc_softc(dev, driver->size);
 
 			error = ops->attach(dev);
-			if (error != 0) {
+			if (error == 0)
+				list_append(&devs, &dev->node);
+			else {
 				/* TODO: free the softc */
 			}
 			return (error);
@@ -81,4 +87,47 @@ mdx_device_probe_and_attach(mdx_device_t dev)
 	}
 
 	return (-1);
+}
+
+static mdx_device_t
+first(void)
+{
+	struct mdx_device *c;
+
+	if (list_empty(&devs))
+		return (NULL);
+
+	c = CONTAINER_OF(devs.next, struct mdx_device, node);
+
+	return (c);
+}
+
+static mdx_device_t
+next(struct mdx_device *c0)
+{
+	struct mdx_device *c;
+
+	if (c0->node.next == &devs)
+		return (NULL);
+
+	c = CONTAINER_OF(c0->node.next, struct mdx_device, node);
+
+	return (c);
+}
+
+mdx_device_t
+mdx_device_lookup_by_name(const char *name)
+{
+	struct mdx_driver *dri;
+	struct mdx_sysinit *si;
+	mdx_device_t dev;
+
+	for (dev = first(); dev != NULL; dev = next(dev)) {
+		si = dev->si;
+		dri = si->dri;
+		if (strcmp(name, dri->name) == 0)
+			return (dev);
+	}
+
+	return (NULL);
 }

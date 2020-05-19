@@ -114,13 +114,13 @@ mdx_of_probe_devices(void)
 		prop = fdt_getprop(fdt, offset, "compatible", &len);
 		if (prop) {
 			dev = zalloc(sizeof(struct mdx_device));
-			dev->node = offset;
+			dev->nodeoffset = offset;
 			error = mdx_device_probe_and_attach(dev);
-			if (error != 0)
-				free(dev);
-			else
+			if (error == 0) {
 				printf("device attached (depth %d): %s\n",
 				    depth, prop);
+			} else
+				free(dev);
 		}
 		offset = fdt_next_node(fdt, offset, &depth);
 	} while (offset > 0);
@@ -135,7 +135,7 @@ mdx_of_get_reg(mdx_device_t dev, int index,
 
 	/* TODO: address cells, ranges, ... */
 
-	regp = fdt_getprop(fdt, dev->node, "reg", NULL);
+	regp = fdt_getprop(fdt, dev->nodeoffset, "reg", NULL);
 	if (!regp)
 		return (-1);
 
@@ -150,5 +150,5 @@ bool
 mdx_of_is_compatible(mdx_device_t dev, const char *compatstr)
 {
 
-	return (fdt_is_compatible(dev->node, compatstr));
+	return (fdt_is_compatible(dev->nodeoffset, compatstr));
 }
