@@ -35,6 +35,7 @@ struct mdx_device {
 	struct entry		node;		/* Entry in the devs list. */
 	int			nodeoffset;	/* libfdt node offset. */
 	struct mdx_sysinit	*si;
+	int			unit;
 };
 
 typedef struct mdx_device *mdx_device_t;
@@ -70,6 +71,6 @@ struct mdx_sysinit {
 void * mdx_device_get_softc(mdx_device_t dev);
 void * mdx_device_alloc_softc(mdx_device_t dev, size_t size);
 int mdx_device_probe_and_attach(mdx_device_t dev);
-mdx_device_t mdx_device_lookup_by_name(const char *name);
+mdx_device_t mdx_device_lookup_by_name(const char *name, int unit);
 
 #endif /* !_SYS_DEVICE_H_ */

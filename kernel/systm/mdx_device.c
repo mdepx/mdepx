@@ -35,60 +35,6 @@ extern uintptr_t __attribute((weak)) __sysinit_end;
 
 static struct entry devs = LIST_INIT_STATIC(&devs);
 
-void *
-mdx_device_get_softc(mdx_device_t dev)
-{
-
-	return (dev->sc);
-}
-
-void *
-mdx_device_alloc_softc(mdx_device_t dev, size_t size)
-{
-
-	if (dev->sc)
-		return (dev->sc);
-
-	dev->sc = malloc(size);
-
-	return (dev->sc);
-}
-
-int
-mdx_device_probe_and_attach(mdx_device_t dev)
-{
-	mdx_driver_t *driver;
-	struct mdx_device_ops *ops;
-	struct mdx_sysinit *si;
-	uint8_t *start;
-	uint8_t *end;
-	int error;
-
-	start = (uint8_t *)&__sysinit_start;
-	end = (uint8_t *)&__sysinit_end;
-
-	for (; start < end; start += sizeof(struct mdx_sysinit)) {
-		si = (struct mdx_sysinit *)start;
-		dev->si = si;
-		driver = si->dri;
-		ops = driver->ops;
-		error = ops->probe(dev);
-		if (error == 0) {
-			mdx_device_alloc_softc(dev, driver->size);
-
-			error = ops->attach(dev);
-			if (error == 0)
-				list_append(&devs, &dev->node);
-			else {
-				/* TODO: free the softc */
-			}
-			return (error);
-		}
-	}
-
-	return (-1);
-}
-
 static mdx_device_t
 first(void)
 {
@@ -115,8 +61,89 @@ next(struct mdx_device *c0)
 	return (c);
 }
 
+void *
+mdx_device_get_softc(mdx_device_t dev)
+{
+
+	return (dev->sc);
+}
+
+void *
+mdx_device_alloc_softc(mdx_device_t dev, size_t size)
+{
+
+	if (dev->sc)
+		return (dev->sc);
+
+	dev->sc = malloc(size);
+
+	return (dev->sc);
+}
+
+static void
+mdx_device_add(mdx_device_t dev)
+{
+	struct mdx_sysinit *si, *si1;
+	struct mdx_driver *dri, *dri1;
+	mdx_device_t dev1;
+	int unit;
+
+	si = dev->si;
+	dri = si->dri;
+
+	unit = -1;
+
+	for (dev1 = first(); dev1 != NULL; dev1 = next(dev1)) {
+		si1 = dev1->si;
+		dri1 = si1->dri;
+
+		if (strcmp(dri->name, dri1->name))
+			if (dev1->unit > unit)
+				unit = dev1->unit;
+	}
+
+	dev->unit = unit + 1;
+
+	list_append(&devs, &dev->node);
+}
+
+int
+mdx_device_probe_and_attach(mdx_device_t dev)
+{
+	mdx_driver_t *driver;
+	struct mdx_device_ops *ops;
+	struct mdx_sysinit *si;
+	uint8_t *start;
+	uint8_t *end;
+	int error;
+
+	start = (uint8_t *)&__sysinit_start;
+	end = (uint8_t *)&__sysinit_end;
+
+	for (; start < end; start += sizeof(struct mdx_sysinit)) {
+		si = (struct mdx_sysinit *)start;
+		dev->si = si;
+		driver = si->dri;
+		ops = driver->ops;
+		error = ops->probe(dev);
+		if (error == 0) {
+			mdx_device_alloc_softc(dev, driver->size);
+
+			error = ops->attach(dev);
+			if (error == 0)
+				mdx_device_add(dev);
+			else {
+				/* TODO: free the softc */
+			}
+			return (error);
+		}
+	}
+
+	return (-1);
+}
+
 mdx_device_t
-mdx_device_lookup_by_name(const char *name)
+mdx_device_lookup_by_name(const char *name, int unit)
 {
 	struct mdx_driver *dri;
 	struct mdx_sysinit *si;
@@ -125,7 +152,7 @@ mdx_device_lookup_by_name(const char *name)
 	for (dev = first(); dev != NULL; dev = next(dev)) {
 		si = dev->si;
 		dri = si->dri;
-		if (strcmp(name, dri->name) == 0)
+		if (strcmp(name, dri->name) == 0 && dev->unit == unit)
 			return (dev);
 	}
 
