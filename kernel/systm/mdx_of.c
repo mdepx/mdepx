@@ -126,22 +126,82 @@ mdx_of_probe_devices(void)
 	} while (offset > 0);
 }
 
+static int
+mdx_of_get_props(int offset, uint32_t *addr, uint32_t *size)
+{
+	const fdt32_t *regp;
+
+	regp = fdt_getprop(fdt, offset, "#address-cells", NULL);
+	if (!regp)
+		return (-1);
+	*addr = fdt32_ld(regp);
+
+	regp = fdt_getprop(fdt, offset, "#size-cells", NULL);
+	if (!regp)
+		return (-1);
+	*size = fdt32_ld(regp);
+
+	return (0);
+}
+
 int
 mdx_of_get_reg(mdx_device_t dev, int index,
     size_t *addr, size_t *size)
 {
-	const fdt32_t *regp;
-	uint32_t reg;
+	const fdt32_t *regp, *r;
+	int parent, bus;
+	int len;
+	uint32_t naddr, nsize;
+	uint32_t baddr, bsize;
+	uint32_t paddr;
+	uint64_t caddr;
+	int ntuples;
+	int i, j;
 
-	/* TODO: address cells, ranges, ... */
+	parent = fdt_parent_offset(fdt, dev->nodeoffset);
+	if (!parent)
+		return (-1);
+
+	mdx_of_get_props(parent, &naddr, &nsize);
 
 	regp = fdt_getprop(fdt, dev->nodeoffset, "reg", NULL);
 	if (!regp)
 		return (-1);
 
-	reg = fdt32_ld(regp);
+	paddr = fdt32_ld(regp);
 
-	*addr = reg;
+	do {
+		bus = fdt_parent_offset(fdt, parent);
+		mdx_of_get_props(bus, &baddr, &bsize);
+
+		r = fdt_getprop(fdt, parent, "ranges", &len);
+		if (!r)
+			break;
+
+		if (len == 0)
+			goto next;
+
+		len /= sizeof(int);
+
+		ntuples = len / (naddr + baddr + nsize);
+		for (i = 0; i < ntuples; i++) {
+			caddr = 0;
+			for (j = 0; j < naddr; j++)
+				caddr = ((uint64_t)caddr << 32) | fdt32_ld(r++);
+		}
+
+		printf("len %d, exp %d\n", len, (naddr + baddr + nsize));
+		printf("%s: ranges found, offs %x, len %d\n",
+		    __func__, parent, len);
+
+next:
+		bus = parent;
+		parent = fdt_parent_offset(fdt, bus);
+		mdx_of_get_props(bus, &baddr, &bsize);
+
+	} while (parent >= 0);
+
+	*addr = paddr;
 
 	return (0);
 }
