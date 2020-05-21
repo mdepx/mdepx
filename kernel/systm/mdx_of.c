@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2019-2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -151,10 +151,9 @@ mdx_of_get_reg(mdx_device_t dev, int index,
 	const fdt32_t *regp, *r;
 	int parent, bus;
 	int len;
-	uint32_t naddr, nsize;
-	uint32_t baddr, bsize;
-	uint32_t paddr;
-	uint64_t caddr;
+	uint32_t naddr, nsize, b_naddr, b_nsize;
+	uint64_t raddr, rsize, baddr;
+	size_t paddr;
 	int ntuples;
 	int i, j;
 
@@ -172,7 +171,7 @@ mdx_of_get_reg(mdx_device_t dev, int index,
 
 	do {
 		bus = fdt_parent_offset(fdt, parent);
-		mdx_of_get_props(bus, &baddr, &bsize);
+		mdx_of_get_props(bus, &b_naddr, &b_nsize);
 
 		r = fdt_getprop(fdt, parent, "ranges", &len);
 		if (!r)
@@ -183,21 +182,33 @@ mdx_of_get_reg(mdx_device_t dev, int index,
 
 		len /= sizeof(int);
 
-		ntuples = len / (naddr + baddr + nsize);
+		ntuples = len / (naddr + b_naddr + nsize);
 		for (i = 0; i < ntuples; i++) {
-			caddr = 0;
+			raddr = 0;
 			for (j = 0; j < naddr; j++)
-				caddr = ((uint64_t)caddr << 32) | fdt32_ld(r++);
+				raddr = ((uint64_t)raddr << 32) | fdt32_ld(r++);
+			baddr = 0;
+			for (j = 0; j < b_naddr; j++)
+				baddr = ((uint64_t)baddr << 32) | fdt32_ld(r++);
+			rsize = 0;
+			for (j = 0; j < nsize; j++)
+				rsize = ((uint64_t)rsize << 32) | fdt32_ld(r++);
+
+			printf("paddr %x, raddr %x, rsize %x, baddr %x\n",
+			    paddr, raddr, rsize, baddr);
+			if (paddr < raddr || paddr >= raddr + rsize)
+				continue;
+			paddr = paddr - raddr + baddr;
 		}
 
-		printf("len %d, exp %d\n", len, (naddr + baddr + nsize));
+		printf("len %d, exp %d\n", len, (naddr + b_naddr + nsize));
 		printf("%s: ranges found, offs %x, len %d\n",
 		    __func__, parent, len);
 
 next:
 		bus = parent;
 		parent = fdt_parent_offset(fdt, bus);
-		mdx_of_get_props(bus, &baddr, &bsize);
+		mdx_of_get_props(bus, &b_naddr, &b_nsize);
 
 	} while (parent >= 0);
 
