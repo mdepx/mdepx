@@ -33,5 +33,6 @@ void mdx_of_probe_devices(void);
 int mdx_of_find_first_compatible(const char *compat);
 int mdx_of_get_reg(mdx_device_t dev, int index,
     size_t *addr, size_t *size);
+int mdx_of_intc_offset(int offset);
 
 #endif /* _SYS_OF_H_ */

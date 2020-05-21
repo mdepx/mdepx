@@ -223,3 +223,33 @@ mdx_of_is_compatible(mdx_device_t dev, const char *compatstr)
 
 	return (fdt_is_compatible(dev->nodeoffset, compatstr));
 }
+
+/*
+ * Find an interrupt controller offset for the given node
+ */
+int
+mdx_of_intc_offset(int offset)
+{
+	int intc_offset;
+	uint32_t phandle;
+	const fdt32_t *regp;
+
+	intc_offset = -1;
+
+	printf("%s\n", __func__);
+
+	do {
+		regp = fdt_getprop(fdt, offset, "interrupt-parent", NULL);
+		if (regp) {
+			phandle = fdt32_ld(regp);
+			intc_offset = fdt_node_offset_by_phandle(fdt, phandle);
+			break;
+		}
+		offset = fdt_parent_offset(fdt, offset);
+	} while (offset >= 0);
+
+	if (!intc_offset)
+		return (-1);
+
+	return (intc_offset);
+}
