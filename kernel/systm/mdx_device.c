@@ -81,7 +81,7 @@ mdx_device_alloc_softc(mdx_device_t dev, size_t size)
 }
 
 static void
-mdx_device_add(mdx_device_t dev)
+mdx_device_set_unit(mdx_device_t dev)
 {
 	struct mdx_sysinit *si, *si1;
 	struct mdx_driver *dri, *dri1;
@@ -97,14 +97,12 @@ mdx_device_add(mdx_device_t dev)
 		si1 = dev1->si;
 		dri1 = si1->dri;
 
-		if (strcmp(dri->name, dri1->name))
+		if (strcmp(dri->name, dri1->name) == 0)
 			if (dev1->unit > unit)
 				unit = dev1->unit;
 	}
 
 	dev->unit = unit + 1;
-
-	list_append(&devs, &dev->node);
 }
 
 int
@@ -125,13 +123,14 @@ mdx_device_probe_and_attach(mdx_device_t dev)
 		dev->si = si;
 		driver = si->dri;
 		ops = driver->ops;
+		mdx_device_set_unit(dev);
 		error = ops->probe(dev);
 		if (error == 0) {
 			mdx_device_alloc_softc(dev, driver->size);
 
 			error = ops->attach(dev);
 			if (error == 0)
-				mdx_device_add(dev);
+				list_append(&devs, &dev->node);
 			else {
 				/* TODO: free the softc */
 			}
