@@ -48,7 +48,7 @@ mdx_of_is_enabled(int offset)
 	if (status == NULL)
 		return (true);
 
-	if (strcmp(status, "disabled"))
+	if (strcmp(status, "disabled") == 0)
 		return (false);
 
 	return (true);
@@ -112,7 +112,7 @@ mdx_of_probe_devices(void)
 
 	do {
 		prop = fdt_getprop(fdt, offset, "compatible", &len);
-		if (prop) {
+		if (prop && mdx_of_is_enabled(offset)) {
 			dev = zalloc(sizeof(struct mdx_device));
 			dev->nodeoffset = offset;
 			error = mdx_device_probe_and_attach(dev);
