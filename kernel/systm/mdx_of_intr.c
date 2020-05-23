@@ -72,6 +72,10 @@ mdx_of_setup_intr(mdx_device_t dev, int index,
 		return (MDX_ERROR);
 
 	error = mdx_intc_setup(intc, irq, handler, arg);
+	if (error)
+		return (error);
 
-	return (error);
+	mdx_intc_enable(intc, irq);
+
+	return (0);
 }
