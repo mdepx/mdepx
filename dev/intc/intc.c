@@ -37,7 +37,6 @@ mdx_intc_setup(mdx_device_t dev, int irq,
 	int error;
 
 	ops = dev->ops;
-
 	error = ops->setup(dev, irq, handler, arg);
 
 	return (error);
