@@ -30,7 +30,7 @@
 
 #include <libfdt/libfdt.h>
 
-static void *fdt;
+void *fdt;
 
 void
 mdx_of_install_dtbp(void *dtbp)
@@ -225,7 +225,7 @@ mdx_of_is_compatible(mdx_device_t dev, const char *compatstr)
 }
 
 /*
- * Find an interrupt controller offset for the given node
+ * Find an interrupt controller parent offset for the given node offset.
  */
 int
 mdx_of_intc_offset(int offset)
