@@ -75,7 +75,7 @@ mdx_device_alloc_softc(mdx_device_t dev, size_t size)
 	if (dev->sc)
 		return (dev->sc);
 
-	dev->sc = malloc(size);
+	dev->sc = zalloc(size);
 
 	return (dev->sc);
 }
