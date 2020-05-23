@@ -26,6 +26,7 @@
 
 #include <sys/cdefs.h>
 #include <sys/systm.h>
+#include <sys/of.h>
 
 #include "nrf9160.h"
 
@@ -53,3 +54,41 @@ nrf_power_init(mdx_device_t dev, uint32_t base)
 	sc = mdx_device_alloc_softc(dev, sizeof(*sc));
 	sc->base = base;
 }
+
+static int
+nrf_power_probe(mdx_device_t dev)
+{
+
+	if (!mdx_of_is_compatible(dev, "nordic,nrf-power"))
+		return (MDX_ERROR);
+
+	return (MDX_OK);
+}
+
+static int
+nrf_power_attach(mdx_device_t dev)
+{
+	struct nrf_power_softc *sc;
+	int error;
+
+	sc = mdx_device_get_softc(dev);
+
+	error = mdx_of_get_reg(dev, 0, &sc->base, NULL);
+	if (error)
+		return (error);
+
+	return (0);
+}
+
+static struct mdx_device_ops nrf_power_ops = {
+	.probe = nrf_power_probe,
+	.attach = nrf_power_attach,
+};
+
+static mdx_driver_t nrf_power_driver = {
+	"nrf_power",
+	&nrf_power_ops,
+	sizeof(struct nrf_power_softc),
+};
+
+DRIVER_MODULE(nrf_power, nrf_power_driver);

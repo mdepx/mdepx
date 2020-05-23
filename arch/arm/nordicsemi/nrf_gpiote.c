@@ -25,6 +25,7 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/of.h>
 #include <sys/systm.h>
 
 #include "nrf_gpiote.h"
@@ -130,3 +131,43 @@ nrf_gpiote_init(mdx_device_t dev, uint32_t base)
 	sc = mdx_device_alloc_softc(dev, sizeof(*sc));
 	sc->base = base;
 }
+
+static int
+nrf_gpiote_probe(mdx_device_t dev)
+{
+
+	if (!mdx_of_is_compatible(dev, "nordic,nrf-gpiote"))
+		return (MDX_ERROR);
+
+	return (MDX_OK);
+}
+
+static int
+nrf_gpiote_attach(mdx_device_t dev)
+{
+	struct nrf_gpiote_softc *sc;
+	int error;
+
+	sc = mdx_device_get_softc(dev);
+
+	error = mdx_of_get_reg(dev, 0, &sc->base, NULL);
+	if (error)
+		return (error);
+
+	mdx_of_setup_intr(dev, 0, nrf_gpiote_intr, sc);
+
+	return (0);
+}
+
+static struct mdx_device_ops nrf_gpiote_ops = {
+	.probe = nrf_gpiote_probe,
+	.attach = nrf_gpiote_attach,
+};
+
+static mdx_driver_t nrf_gpiote_driver = {
+	"nrf_gpiote",
+	&nrf_gpiote_ops,
+	sizeof(struct nrf_gpiote_softc),
+};
+
+DRIVER_MODULE(nrf_gpiote, nrf_gpiote_driver);

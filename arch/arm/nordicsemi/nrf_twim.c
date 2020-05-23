@@ -26,6 +26,7 @@
 
 #include <sys/cdefs.h>
 #include <sys/systm.h>
+#include <sys/of.h>
 
 #include <dev/i2c/i2c.h>
 
@@ -125,7 +126,7 @@ nrf_twim_setup(mdx_device_t dev, struct nrf_twim_conf *conf)
 	WR4(sc, TWIM_ENABLE, TWIM_ENABLE_EN);
 }
 
-static struct mdx_i2c_ops nrf_twim_ops = {
+static struct mdx_i2c_ops nrf_twim_i2c_ops = {
 	.xfer = nrf_twim_xfer,
 };
 
@@ -137,5 +138,73 @@ nrf_twim_init(mdx_device_t dev, uint32_t base)
 	sc = mdx_device_alloc_softc(dev, sizeof(*sc));
 	sc->base = base;
 
-	dev->ops = &nrf_twim_ops;
+	dev->ops = &nrf_twim_i2c_ops;
 }
+
+static int
+nrf_twim_probe(mdx_device_t dev)
+{
+
+	if (!mdx_of_is_compatible(dev, "nordic,nrf-twim"))
+		return (MDX_ERROR);
+
+	return (MDX_OK);
+}
+
+static int
+nrf_twim_attach(mdx_device_t dev)
+{
+	struct nrf_twim_softc *sc;
+	int sda, scl, clk;
+	int error;
+
+	sc = mdx_device_get_softc(dev);
+
+	error = mdx_of_get_reg(dev, 0, &sc->base, NULL);
+	if (error)
+		return (error);
+
+	error = mdx_of_get_prop32(dev, "sda-pin", &sda);
+	if (error)
+		return (error);
+
+	error = mdx_of_get_prop32(dev, "scl-pin", &scl);
+	if (error)
+		return (error);
+
+	error = mdx_of_get_prop32(dev, "clock-frequency", &clk);
+	if (error)
+		return (error);
+
+	mdx_of_setup_intr(dev, 0, nrf_twim_intr, sc);
+
+	switch (clk) {
+	case 100000:
+		WR4(sc, TWIM_FREQUENCY, TWIM_FREQ_K100);
+		break;
+	default:
+		panic("unknown clock frequency");
+	};
+
+	WR4(sc, TWIM_PSEL_SCL, scl);
+	WR4(sc, TWIM_PSEL_SDA, sda);
+	WR4(sc, TWIM_INTEN, INTEN_LASTTX | INTEN_LASTRX | INTEN_STOPPED);
+	WR4(sc, TWIM_ENABLE, TWIM_ENABLE_EN);
+
+	dev->ops = &nrf_twim_i2c_ops;
+
+	return (0);
+}
+
+static struct mdx_device_ops nrf_twim_ops = {
+	.probe = nrf_twim_probe,
+	.attach = nrf_twim_attach,
+};
+
+static mdx_driver_t nrf_twim_driver = {
+	"nrf_twim",
+	&nrf_twim_ops,
+	sizeof(struct nrf_twim_softc),
+};
+
+DRIVER_MODULE(nrf_twim, nrf_twim_driver);

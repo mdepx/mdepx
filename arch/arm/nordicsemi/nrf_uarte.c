@@ -25,6 +25,7 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/of.h>
 #include <sys/systm.h>
 
 #include <dev/uart/uart.h>
@@ -125,7 +126,7 @@ nrf_uarte_setup(mdx_device_t dev, int baudrate, enum uart_databits databits,
 }
 
 
-static struct mdx_uart_ops nrf_uarte_ops = {
+static struct mdx_uart_ops nrf_uarte_uart_ops = {
 	.putc = nrf_uarte_putc,
 	.setup = nrf_uarte_setup,
 };
@@ -141,5 +142,55 @@ nrf_uarte_init(mdx_device_t dev,
 	sc->pin_tx = pin_tx;
 	sc->pin_rx = pin_rx;
 
-	dev->ops = &nrf_uarte_ops;
+	dev->ops = &nrf_uarte_uart_ops;
 }
+
+static int
+nrf_uarte_probe(mdx_device_t dev)
+{
+
+	if (!mdx_of_is_compatible(dev, "nordic,nrf-uarte"))
+		return (MDX_ERROR);
+
+	return (MDX_OK);
+}
+
+static int
+nrf_uarte_attach(mdx_device_t dev)
+{
+	struct nrf_uarte_softc *sc;
+	int error;
+
+	sc = mdx_device_get_softc(dev);
+
+	error = mdx_of_get_reg(dev, 0, &sc->base, NULL);
+	if (error)
+		return (error);
+
+	error = mdx_of_get_prop32(dev, "tx-pin", &sc->pin_tx);
+	if (error)
+		return (error);
+
+	error = mdx_of_get_prop32(dev, "rx-pin", &sc->pin_rx);
+	if (error)
+		return (error);
+
+	dev->ops = &nrf_uarte_uart_ops;
+
+	mdx_of_setup_intr(dev, 0, nrf_uarte_intr, sc);
+
+	return (0);
+}
+
+static struct mdx_device_ops nrf_uarte_ops = {
+	.probe = nrf_uarte_probe,
+	.attach = nrf_uarte_attach,
+};
+
+static mdx_driver_t nrf_uarte_driver = {
+	"nrf_uarte",
+	&nrf_uarte_ops,
+	sizeof(struct nrf_uarte_softc),
+};
+
+DRIVER_MODULE(nrf_uarte, nrf_uarte_driver);

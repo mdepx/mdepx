@@ -25,6 +25,7 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/of.h>
 #include <sys/systm.h>
 
 #include <dev/gpio/gpio.h>
@@ -89,7 +90,7 @@ nrf_gpio_pincfg(mdx_device_t dev, int pin, int cfg)
 	WR4(sc, GPIO_PIN_CNF(pin), cfg);
 }
 
-static struct mdx_gpio_ops nrf_gpio_ops = {
+static struct mdx_gpio_ops nrf_gpio_gpio_ops = {
 	.pin_set = nrf_gpio_set_pin,
 	.pin_get = nrf_gpio_get_pin,
 	.pin_configure = nrf_gpio_pin_configure,
@@ -103,5 +104,45 @@ nrf_gpio_init(mdx_device_t dev, uint32_t base)
 	sc = mdx_device_alloc_softc(dev, sizeof(*sc));
 	sc->base = base;
 
-	dev->ops = &nrf_gpio_ops;
+	dev->ops = &nrf_gpio_gpio_ops;
 }
+
+static int
+nrf_gpio_probe(mdx_device_t dev)
+{
+
+	if (!mdx_of_is_compatible(dev, "nordic,nrf-gpio"))
+		return (MDX_ERROR);
+
+	return (MDX_OK);
+}
+
+static int
+nrf_gpio_attach(mdx_device_t dev)
+{
+	struct nrf_gpio_softc *sc;
+	int error;
+
+	sc = mdx_device_get_softc(dev);
+
+	error = mdx_of_get_reg(dev, 0, &sc->base, NULL);
+	if (error)
+		return (error);
+
+	dev->ops = &nrf_gpio_gpio_ops;
+
+	return (0);
+}
+
+static struct mdx_device_ops nrf_gpio_ops = {
+	.probe = nrf_gpio_probe,
+	.attach = nrf_gpio_attach,
+};
+
+static mdx_driver_t nrf_gpio_driver = {
+	"nrf_gpio",
+	&nrf_gpio_ops,
+	sizeof(struct nrf_gpio_softc),
+};
+
+DRIVER_MODULE(nrf_gpio, nrf_gpio_driver);

@@ -25,6 +25,7 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/of.h>
 
 #include <dev/intc/intc.h>
 
@@ -134,7 +135,7 @@ arm_nvic_target_ns(mdx_device_t dev, uint32_t n, int secure)
 	WR4(sc, NVIC_ITNS(n / 32), reg);
 }
 
-static struct mdx_intc_ops arm_nvic_ops = {
+static struct mdx_intc_ops arm_nvic_intc_ops = {
 	.setup = arm_nvic_setup_intr,
 	.enable = arm_nvic_enable_intr,
 	.disable = arm_nvic_disable_intr,
@@ -151,7 +152,47 @@ arm_nvic_init(mdx_device_t dev, uint32_t base)
 	sc = mdx_device_alloc_softc(dev, sizeof(*sc));
 	sc->base = base;
 
-	dev->ops = &arm_nvic_ops;
+	dev->ops = &arm_nvic_intc_ops;
 
 	return (0);
 }
+
+static int
+arm_nvic_probe(mdx_device_t dev)
+{
+
+	if (!mdx_of_is_compatible(dev, "arm,v8m-nvic"))
+		return (MDX_ERROR);
+
+	return (MDX_OK);
+}
+
+static int
+arm_nvic_attach(mdx_device_t dev)
+{
+	struct arm_nvic_softc *sc;
+	int error;
+
+	sc = mdx_device_get_softc(dev);
+
+	error = mdx_of_get_reg(dev, 0, &sc->base, NULL);
+	if (error)
+		return (error);
+
+	dev->ops = &arm_nvic_intc_ops;
+
+	return (0);
+}
+
+static struct mdx_device_ops arm_nvic_ops = {
+	.probe = arm_nvic_probe,
+	.attach = arm_nvic_attach,
+};
+
+static mdx_driver_t nvic_driver = {
+	"nvic",
+	&arm_nvic_ops,
+	sizeof(struct arm_nvic_softc),
+};
+
+DRIVER_MODULE(nvic, nvic_driver);

@@ -26,6 +26,7 @@
 
 #include <sys/cdefs.h>
 #include <sys/systm.h>
+#include <sys/of.h>
 #include <sys/callout.h>
 
 #include "nrf9160.h"
@@ -126,3 +127,57 @@ nrf_timer_init(mdx_device_t dev, uint32_t base, uint32_t frequency)
 	sc->mt.arg = sc;
 	mdx_callout_register(&sc->mt);
 }
+
+static int
+nrf_timer_probe(mdx_device_t dev)
+{
+
+	if (!mdx_of_is_compatible(dev, "nordic,nrf-timer"))
+		return (MDX_ERROR);
+
+	return (MDX_OK);
+}
+
+static int
+nrf_timer_attach(mdx_device_t dev)
+{
+	struct nrf_timer_softc *sc;
+	int error;
+
+	sc = mdx_device_get_softc(dev);
+
+	error = mdx_of_get_reg(dev, 0, &sc->base, NULL);
+	if (error)
+		return (error);
+
+	sc->cc_idx = 0;
+
+	WR4(sc, TIMER_BITMODE, BITMODE_32);
+	WR4(sc, TIMER_INTENSET, INTENSET_COMPARE(sc->cc_idx));
+
+	mdx_of_setup_intr(dev, 0, nrf_timer_intr, sc);
+
+	bzero(&sc->mt, sizeof(struct mi_timer));
+	sc->mt.start = nrf_timer_start;
+	sc->mt.stop = nrf_timer_stop;
+	sc->mt.count = nrf_timer_count;
+	sc->mt.maxcnt = 0xffffffff;
+	sc->mt.frequency = 1000000;
+	sc->mt.arg = sc;
+	mdx_callout_register(&sc->mt);
+
+	return (0);
+}
+
+static struct mdx_device_ops nrf_timer_ops = {
+	.probe = nrf_timer_probe,
+	.attach = nrf_timer_attach,
+};
+
+static mdx_driver_t nrf_timer_driver = {
+	"nrf_timer",
+	&nrf_timer_ops,
+	sizeof(struct nrf_timer_softc),
+};
+
+DRIVER_MODULE(nrf_timer, nrf_timer_driver);
