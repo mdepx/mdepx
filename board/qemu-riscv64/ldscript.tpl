@@ -23,7 +23,7 @@ SECTIONS
 		__sysinit_start = ABSOLUTE(.);
 		*(.sysinit)
 		__sysinit_end = ABSOLUTE(.);
-	} > flash
+	} > sram0
 
 	.rodata : {
 		*(.rodata)
