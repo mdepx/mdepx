@@ -126,6 +126,20 @@ mdx_of_probe_devices(void)
 	} while (offset > 0);
 }
 
+int
+mdx_of_get_prop32(mdx_device_t dev, const char *propname, int *res)
+{
+	const fdt32_t *regp;
+
+	regp = fdt_getprop(fdt, dev->nodeoffset, propname, NULL);
+	if (!regp)
+		return (-1);
+
+	*res = fdt32_ld(regp);
+
+	return (0);
+}
+
 static int
 mdx_of_get_props(int offset, uint32_t *addr, uint32_t *size)
 {
