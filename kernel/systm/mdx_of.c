@@ -108,8 +108,6 @@ mdx_of_probe_devices(void)
 	offset = 0;
 	depth = 0;
 
-	printf("%s\n", __func__);
-
 	do {
 		prop = fdt_getprop(fdt, offset, "compatible", &len);
 		if (prop && mdx_of_is_enabled(offset)) {
@@ -117,8 +115,7 @@ mdx_of_probe_devices(void)
 			dev->nodeoffset = offset;
 			error = mdx_device_probe_and_attach(dev);
 			if (error == 0) {
-				printf("device attached (depth %d): %s\n",
-				    depth, prop);
+				printf("device attached: %s\n", prop);
 			} else
 				free(dev);
 		}
@@ -208,16 +205,10 @@ mdx_of_get_reg(mdx_device_t dev, int index,
 			for (j = 0; j < nsize; j++)
 				rsize = ((uint64_t)rsize << 32) | fdt32_ld(r++);
 
-			printf("paddr %x, raddr %x, rsize %x, baddr %x\n",
-			    paddr, raddr, rsize, baddr);
 			if (paddr < raddr || paddr >= raddr + rsize)
 				continue;
 			paddr = paddr - raddr + baddr;
 		}
-
-		printf("len %d, exp %d\n", len, (naddr + b_naddr + nsize));
-		printf("%s: ranges found, offs %x, len %d\n",
-		    __func__, parent, len);
 
 next:
 		bus = parent;
@@ -249,8 +240,6 @@ mdx_of_intc_offset(int offset)
 	const fdt32_t *regp;
 
 	intc_offset = -1;
-
-	printf("%s\n", __func__);
 
 	do {
 		regp = fdt_getprop(fdt, offset, "interrupt-parent", NULL);

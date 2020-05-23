@@ -67,8 +67,6 @@ mdx_of_setup_intr(mdx_device_t dev, int index,
 	/* TODO: decode specifier correctly. */
 	irq = fdt32_ld(regp + index * ncells);
 
-	printf("irq is %d\n", irq);
-
 	intc = mdx_device_lookup_by_offset(intc_offset);
 	if (intc == NULL)
 		return (MDX_ERROR);
