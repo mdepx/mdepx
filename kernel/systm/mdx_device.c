@@ -157,3 +157,15 @@ mdx_device_lookup_by_name(const char *name, int unit)
 
 	return (NULL);
 }
+
+mdx_device_t
+mdx_device_lookup_by_offset(int offset)
+{
+	mdx_device_t dev;
+
+	for (dev = first(); dev != NULL; dev = next(dev))
+		if (dev->nodeoffset == offset)
+			return (dev);
+
+	return (NULL);
+}
