@@ -175,6 +175,10 @@ nrf_uarte_attach(mdx_device_t dev)
 	if (error)
 		return (error);
 
+	error = mdx_of_get_prop32(dev, "current-speed", &sc->baudrate);
+	if (error)
+		return (error);
+
 	dev->ops = &nrf_uarte_uart_ops;
 
 	mdx_of_setup_intr(dev, 0, nrf_uarte_intr, sc);

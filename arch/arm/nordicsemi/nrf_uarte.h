@@ -89,7 +89,7 @@ struct nrf_uarte_softc {
 	uint8_t rx_data[16];
 	int pin_tx;
 	int pin_rx;
-	uint32_t baudrate;
+	int baudrate;
 	void (*cb)(int c, void *arg);
 	void *cb_arg;
 };
