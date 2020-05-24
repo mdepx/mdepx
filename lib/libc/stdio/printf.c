@@ -54,6 +54,9 @@ int
 vprintf(const char *fmt, va_list ap)
 {
 
+	if (kern_console.console_putchar == NULL)
+		return (0);
+
 	return (kvprintf(fmt, kern_console.console_putchar,
 	    kern_console.console_putchar_arg, 10, ap));
 }
