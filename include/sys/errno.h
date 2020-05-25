@@ -29,7 +29,7 @@
 
 #define	MDX_OK		0
 #define	MDX_ERROR	-1
-#define	MDX_EXIST	-2
+#define	MDX_EEXIST	-2
 
 #define	EIO		5
 #define	EDEADLK		11

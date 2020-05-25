@@ -480,7 +480,7 @@ mdx_callout_register(struct mi_timer *mt)
 	int i;
 
 	if (mi_tmr != NULL)
-		return (MDX_EXIST);
+		return (MDX_EEXIST);
 
 	if (mt->maxcnt == 0 ||
 	    mt->start == NULL ||
