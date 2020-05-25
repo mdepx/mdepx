@@ -128,6 +128,7 @@ nrf_timer_init(mdx_device_t dev, uint32_t base, uint32_t frequency)
 	mdx_callout_register(&sc->mt);
 }
 
+#ifdef MDX_FDT
 static int
 nrf_timer_probe(mdx_device_t dev)
 {
@@ -181,3 +182,4 @@ static mdx_driver_t nrf_timer_driver = {
 };
 
 DRIVER_MODULE(nrf_timer, nrf_timer_driver);
+#endif

@@ -145,6 +145,7 @@ nrf_uarte_init(mdx_device_t dev,
 	dev->ops = &nrf_uarte_uart_ops;
 }
 
+#ifdef MDX_FDT
 static int
 nrf_uarte_probe(mdx_device_t dev)
 {
@@ -201,3 +202,4 @@ static mdx_driver_t nrf_uarte_driver = {
 };
 
 DRIVER_MODULE(nrf_uarte, nrf_uarte_driver);
+#endif

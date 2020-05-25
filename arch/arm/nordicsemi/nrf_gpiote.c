@@ -132,6 +132,7 @@ nrf_gpiote_init(mdx_device_t dev, uint32_t base)
 	sc->base = base;
 }
 
+#ifdef MDX_FDT
 static int
 nrf_gpiote_probe(mdx_device_t dev)
 {
@@ -171,3 +172,4 @@ static mdx_driver_t nrf_gpiote_driver = {
 };
 
 DRIVER_MODULE(nrf_gpiote, nrf_gpiote_driver);
+#endif

@@ -55,6 +55,7 @@ nrf_power_init(mdx_device_t dev, uint32_t base)
 	sc->base = base;
 }
 
+#ifdef MDX_FDT
 static int
 nrf_power_probe(mdx_device_t dev)
 {
@@ -92,3 +93,4 @@ static mdx_driver_t nrf_power_driver = {
 };
 
 DRIVER_MODULE(nrf_power, nrf_power_driver);
+#endif

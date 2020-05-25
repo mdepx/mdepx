@@ -157,6 +157,7 @@ arm_nvic_init(mdx_device_t dev, uint32_t base)
 	return (0);
 }
 
+#ifdef MDX_FDT
 static int
 arm_nvic_probe(mdx_device_t dev)
 {
@@ -196,3 +197,4 @@ static mdx_driver_t nvic_driver = {
 };
 
 DRIVER_MODULE(nvic, nvic_driver);
+#endif

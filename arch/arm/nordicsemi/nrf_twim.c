@@ -141,6 +141,7 @@ nrf_twim_init(mdx_device_t dev, uint32_t base)
 	dev->ops = &nrf_twim_i2c_ops;
 }
 
+#ifdef MDX_FDT
 static int
 nrf_twim_probe(mdx_device_t dev)
 {
@@ -208,3 +209,4 @@ static mdx_driver_t nrf_twim_driver = {
 };
 
 DRIVER_MODULE(nrf_twim, nrf_twim_driver);
+#endif

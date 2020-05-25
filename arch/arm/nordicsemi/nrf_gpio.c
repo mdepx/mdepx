@@ -107,6 +107,7 @@ nrf_gpio_init(mdx_device_t dev, uint32_t base)
 	dev->ops = &nrf_gpio_gpio_ops;
 }
 
+#ifdef MDX_FDT
 static int
 nrf_gpio_probe(mdx_device_t dev)
 {
@@ -146,3 +147,4 @@ static mdx_driver_t nrf_gpio_driver = {
 };
 
 DRIVER_MODULE(nrf_gpio, nrf_gpio_driver);
+#endif
