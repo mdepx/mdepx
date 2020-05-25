@@ -40,6 +40,13 @@ mdx_of_install_dtbp(void *dtbp)
 	fdt = dtbp;
 }
 
+int
+mdx_of_check_header(void)
+{
+
+	return (fdt_check_header(fdt));
+}
+
 static bool
 mdx_of_is_enabled(int offset)
 {

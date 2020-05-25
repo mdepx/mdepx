@@ -29,6 +29,7 @@
 
 bool mdx_of_is_compatible(mdx_device_t dev, const char *compatstr);
 void mdx_of_install_dtbp(void *dtbp);
+int mdx_of_check_header(void);
 void mdx_of_probe_devices(void);
 int mdx_of_find_first_compatible(const char *compat);
 int mdx_of_get_reg(mdx_device_t dev, int index,
