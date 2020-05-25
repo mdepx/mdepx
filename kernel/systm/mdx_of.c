@@ -25,6 +25,7 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/console.h>
 #include <sys/malloc.h>
 #include <sys/of.h>
 
@@ -95,30 +96,76 @@ mdx_of_find_first_compatible(const char *compat)
 	return (MDX_OK);
 }
 
+static int
+mdx_of_probe_and_attach(int offset, mdx_device_t *dev0)
+{
+	const void *prop;
+	mdx_device_t dev;
+	int len;
+	int error;
+
+	if (mdx_of_is_enabled(offset) == false)
+		return (-1);
+
+	if (mdx_device_lookup_by_offset(offset) != NULL)
+		return (MDX_EEXIST);
+
+	prop = fdt_getprop(fdt, offset, "compatible", &len);
+	if (prop == NULL)
+		return (-2);
+
+	dev = zalloc(sizeof(struct mdx_device));
+	dev->nodeoffset = offset;
+
+	error = mdx_device_probe_and_attach(dev);
+	if (error) {
+		free(dev);
+		return (MDX_ERROR);
+	}
+
+	printf("device attached: %s (offset %x)\n", prop, offset);
+
+	if (dev0)
+		*dev0 = dev;
+
+	return (MDX_OK);
+}
+
+static void
+mdx_of_process_chosen(void)
+{
+	mdx_device_t dev;
+	const fdt32_t *prop;
+	int uart_offset;
+	int offset;
+	int error;
+	int len;
+
+	offset = fdt_path_offset(fdt, "/chosen");
+	if (offset >= 0) {
+		prop = fdt_getprop(fdt, offset, "mdepx,console", &len);
+		if (prop) {
+			uart_offset = fdt_path_offset(fdt, (const char *)prop);
+			error = mdx_of_probe_and_attach(uart_offset, &dev);
+			if (error == 0)
+				mdx_console_register_uart(dev);
+		}
+	}
+}
+
 void
 mdx_of_probe_devices(void)
 {
-	mdx_device_t dev;
-	const void *prop;
 	int offset;
 	int depth;
-	int error;
-	int len;
 
 	offset = 0;
 	depth = 0;
 
+	mdx_of_process_chosen();
+
 	do {
-		prop = fdt_getprop(fdt, offset, "compatible", &len);
-		if (prop && mdx_of_is_enabled(offset)) {
-			dev = zalloc(sizeof(struct mdx_device));
-			dev->nodeoffset = offset;
-			error = mdx_device_probe_and_attach(dev);
-			if (error == 0) {
-				printf("device attached: %s\n", prop);
-			} else
-				free(dev);
-		}
+		mdx_of_probe_and_attach(offset, NULL);
 		offset = fdt_next_node(fdt, offset, &depth);
 	} while (offset > 0);
 }
@@ -251,7 +298,7 @@ mdx_of_intc_offset(int offset)
 		offset = fdt_parent_offset(fdt, offset);
 	} while (offset >= 0);
 
-	if (!intc_offset)
+	if (intc_offset < 0)
 		return (-1);
 
 	return (intc_offset);
