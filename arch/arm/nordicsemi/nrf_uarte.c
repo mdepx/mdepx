@@ -183,6 +183,9 @@ nrf_uarte_attach(mdx_device_t dev)
 
 	mdx_of_setup_intr(dev, 0, nrf_uarte_intr, sc);
 
+	mdx_uart_setup(dev, sc->baudrate, UART_DATABITS_8,
+	    UART_STOPBITS_1, UART_PARITY_NONE);
+
 	return (0);
 }
 
