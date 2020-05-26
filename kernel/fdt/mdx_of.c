@@ -25,6 +25,7 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/systm.h>
 #include <sys/console.h>
 #include <sys/malloc.h>
 #include <sys/of.h>
@@ -122,6 +123,8 @@ mdx_of_probe_and_attach(int offset, mdx_device_t *dev0)
 		return (-2);
 
 	dev = zalloc(sizeof(struct mdx_device));
+	if (dev == NULL)
+		panic("could not allocate device");
 	dev->nodeoffset = offset;
 
 	error = mdx_device_probe_and_attach(dev);
