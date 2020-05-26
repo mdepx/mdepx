@@ -25,7 +25,7 @@
  */
 
 #include <sys/cdefs.h>
-#include <sys/console.h>
+#include <sys/of.h>
 #include <sys/callout.h>
 #include <sys/systm.h>
 #include <sys/malloc.h>
@@ -47,36 +47,21 @@ struct nrf_power_softc power_sc;
 struct nrf_timer_softc timer0_sc;
 struct nrf_rtc_softc rtc_sc;
 
-static void
-uart_putchar(int c, void *arg)
-{
-	struct nrf_uarte_softc *sc;
- 
-	sc = arg;
- 
-	if (c == '\n')
-		nrf_uarte_putc(sc, '\r');
-
-	nrf_uarte_putc(sc, c);
-}
-
-static void
-nrf_input(int c, void *arg)
-{
-
-}
-
 void
 board_init(void)
 {
 
+	mdx_fl_init();
+	mdx_fl_add_region(0x20021000, 0x1f000);
+
+	mdx_of_install_dtbp((void *)0xf8000);
+	mdx_of_probe_devices();
+
+#if 0
 	nrf_uarte_init(&uarte_sc, BASE_UARTE0,
 	    UART_PIN_TX, UART_PIN_RX, UART_BAUDRATE);
 	mdx_console_register(uart_putchar, (void *)&uarte_sc);
 	nrf_uarte_register_callback(&uarte_sc, nrf_input, NULL);
-
-	mdx_fl_init();
-	mdx_fl_add_region(0x20021000, 0x1f000);
 
 	nrf_power_init(&power_sc, BASE_POWER);
 	nrf_rtc_init(&rtc_sc, BASE_RTC1, 0 /* prescaler */);
@@ -95,6 +80,7 @@ board_init(void)
 	mdx_intc_enable(&dev_nvic, ID_RTC1);
 
 	mdx_clock_register(CLOCK_REALTIME, &nrf_rtc_driver, &rtc_sc);
+#endif
 
 	printf("mdepx initialized\n");
 }

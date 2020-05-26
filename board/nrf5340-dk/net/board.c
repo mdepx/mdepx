@@ -25,7 +25,7 @@
  */
 
 #include <sys/cdefs.h>
-#include <sys/console.h>
+#include <sys/of.h>
 #include <sys/callout.h>
 #include <sys/systm.h>
 #include <sys/malloc.h>
@@ -47,45 +47,23 @@ struct nrf_uarte_softc uarte_sc;
 struct nrf_power_softc power_sc;
 struct nrf_timer_softc timer1_sc;
 
-static void
-uart_putchar(int c, void *arg)
-{
-	struct nrf_uarte_softc *sc;
- 
-	sc = arg;
- 
-	if (c == '\n')
-		nrf_uarte_putc(sc, '\r');
-
-	nrf_uarte_putc(sc, c);
-}
-
-static void
-nrf_input(int c, void *arg)
-{
-
-}
-
 void
 board_init(void)
 {
+	mdx_device_t nvic;
 
-	nrf_uarte_init(&uarte_sc, BASE_UARTE0,
-	    UART_PIN_TX, UART_PIN_RX, UART_BAUDRATE);
-	mdx_console_register(uart_putchar, (void *)&uarte_sc);
-	nrf_uarte_register_callback(&uarte_sc, nrf_input, NULL);
+	mdx_fl_init();
+	mdx_fl_add_region(0x2100c000, 16 * 1024);
+
+	mdx_of_install_dtbp((void *)0x0103c000);
+	mdx_of_probe_devices();
+
+	nvic = mdx_device_lookup_by_name("nvic", 0);
+	if (nvic == NULL)
+		panic("could not find nvic device");
+
+	mdx_intc_enable(nvic, ID_EGU0);
+	mdx_intc_enable(nvic, ID_IPC);
 
 	printf("mdepx initialized\n");
-
-	nrf_timer_init(&timer1_sc, BASE_TIMER1, 1000000);
-	nrf_power_init(&power_sc, BASE_POWER);
-	arm_nvic_init(&dev_nvic, &nvic_sc, BASE_SCS);
-
-	mdx_intc_setup(&dev_nvic, ID_UARTE0, nrf_uarte_intr, &uarte_sc);
-	mdx_intc_setup(&dev_nvic, ID_TIMER1, nrf_timer_intr, &timer1_sc);
-
-	mdx_intc_enable(&dev_nvic, ID_TIMER1);
-	mdx_intc_enable(&dev_nvic, ID_UARTE0);
-	mdx_intc_enable(&dev_nvic, ID_EGU0);
-	mdx_intc_enable(&dev_nvic, ID_IPC);
 }
