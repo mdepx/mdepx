@@ -151,6 +151,11 @@ nrf_rtc_attach(mdx_device_t dev)
 
 	mdx_of_setup_intr(dev, 0, nrf_rtc_intr, sc);
 
+	/* TODO: grab from FDT */
+	sc->prescaler = 1;
+	sc->freq = (32768 / (sc->prescaler + 1));
+	sc->period = 0x1000000 / sc->freq;
+
 	mdx_clock_register(CLOCK_REALTIME, &nrf_rtc_methods, sc);
 
 	return (0);
