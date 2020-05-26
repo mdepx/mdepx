@@ -30,8 +30,10 @@
 #include <sys/device.h>
 #include <sys/list.h>
 
-extern uintptr_t __attribute((weak)) __sysinit_start;
-extern uintptr_t __attribute((weak)) __sysinit_end;
+#ifdef MDX_FDT
+extern uintptr_t __sysinit_start;
+extern uintptr_t __sysinit_end;
+#endif
 
 static struct entry devs = LIST_INIT_STATIC(&devs);
 
@@ -80,6 +82,7 @@ mdx_device_alloc_softc(mdx_device_t dev, size_t size)
 	return (dev->sc);
 }
 
+#ifdef MDX_FDT
 static void
 mdx_device_set_unit(mdx_device_t dev)
 {
@@ -140,6 +143,7 @@ mdx_device_probe_and_attach(mdx_device_t dev)
 
 	return (-1);
 }
+#endif
 
 mdx_device_t
 mdx_device_lookup_by_name(const char *name, int unit)
