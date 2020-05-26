@@ -25,6 +25,7 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/of.h>
 #include <sys/systm.h>
 #include <sys/time.h>
 
@@ -107,7 +108,7 @@ again:
 	return (0);
 }
 
-struct rtc_driver nrf_rtc_driver = {
+struct rtc_driver nrf_rtc_methods = {
 	.settime = nrf_rtc_settime,
 	.gettime = nrf_rtc_gettime,
 };
@@ -124,3 +125,47 @@ nrf_rtc_init(mdx_device_t dev, uint32_t base, uint16_t prescaler)
 	sc->freq = (32768 / (sc->prescaler + 1));
 	sc->period = 0x1000000 / sc->freq;
 }
+
+#ifdef MDX_FDT
+static int
+nrf_rtc_probe(mdx_device_t dev)
+{
+
+	if (!mdx_of_is_compatible(dev, "nordic,nrf-rtc"))
+		return (MDX_ERROR);
+
+	return (MDX_OK);
+}
+
+static int
+nrf_rtc_attach(mdx_device_t dev)
+{
+	struct nrf_rtc_softc *sc;
+	int error;
+
+	sc = mdx_device_get_softc(dev);
+
+	error = mdx_of_get_reg(dev, 0, &sc->base, NULL);
+	if (error)
+		return (error);
+
+	mdx_of_setup_intr(dev, 0, nrf_rtc_intr, sc);
+
+	mdx_clock_register(CLOCK_REALTIME, &nrf_rtc_methods, sc);
+
+	return (0);
+}
+
+static struct mdx_device_ops nrf_rtc_ops = {
+	.probe = nrf_rtc_probe,
+	.attach = nrf_rtc_attach,
+};
+
+static mdx_driver_t nrf_rtc_driver = {
+	"nrf_rtc",
+	&nrf_rtc_ops,
+	sizeof(struct nrf_rtc_softc),
+};
+
+DRIVER_MODULE(nrf_rtc, nrf_rtc_driver);
+#endif

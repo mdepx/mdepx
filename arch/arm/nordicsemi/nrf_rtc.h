@@ -59,6 +59,4 @@ struct nrf_rtc_softc {
 void nrf_rtc_init(mdx_device_t dev, uint32_t base, uint16_t prescaler);
 void nrf_rtc_intr(void *arg, int irq);
 
-struct rtc_driver nrf_rtc_driver;
-
 #endif /* !_ARM_NORDICSEMI_NRF9160_RTC_H_ */
