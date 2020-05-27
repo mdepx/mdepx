@@ -25,6 +25,7 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/of.h>
 #include <sys/systm.h>
 
 #include "nrf_reset.h"
@@ -52,3 +53,43 @@ nrf_reset_init(mdx_device_t dev, uint32_t base)
 	sc = mdx_device_alloc_softc(dev, sizeof(*sc));
 	sc->base = base;
 }
+
+#ifdef MDX_FDT
+static int
+nrf_reset_probe(mdx_device_t dev)
+{
+
+	if (!mdx_of_is_compatible(dev, "nordic,nrf-reset"))
+		return (MDX_ERROR);
+
+	return (MDX_OK);
+}
+
+static int
+nrf_reset_attach(mdx_device_t dev)
+{
+	struct nrf_reset_softc *sc;
+	int error;
+
+	sc = mdx_device_get_softc(dev);
+
+	error = mdx_of_get_reg(dev, 0, &sc->base, NULL);
+	if (error)
+		return (error);
+
+	return (0);
+}
+
+static struct mdx_device_ops nrf_reset_ops = {
+	.probe = nrf_reset_probe,
+	.attach = nrf_reset_attach,
+};
+
+static mdx_driver_t nrf_reset_driver = {
+	"nrf_reset",
+	&nrf_reset_ops,
+	sizeof(struct nrf_reset_softc),
+};
+
+DRIVER_MODULE(nrf_reset, nrf_reset_driver);
+#endif

@@ -25,6 +25,7 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/of.h>
 #include <sys/systm.h>
 
 #include "nrf9160.h"
@@ -190,3 +191,43 @@ nrf_spu_init(mdx_device_t dev, uint32_t base)
 	sc = mdx_device_alloc_softc(dev, sizeof(*sc));
 	sc->base = base;
 }
+
+#ifdef MDX_FDT
+static int
+nrf_spu_probe(mdx_device_t dev)
+{
+
+	if (!mdx_of_is_compatible(dev, "nordic,nrf-spu"))
+		return (MDX_ERROR);
+
+	return (MDX_OK);
+}
+
+static int
+nrf_spu_attach(mdx_device_t dev)
+{
+	struct nrf_spu_softc *sc;
+	int error;
+
+	sc = mdx_device_get_softc(dev);
+
+	error = mdx_of_get_reg(dev, 0, &sc->base, NULL);
+	if (error)
+		return (error);
+
+	return (0);
+}
+
+static struct mdx_device_ops nrf_spu_ops = {
+	.probe = nrf_spu_probe,
+	.attach = nrf_spu_attach,
+};
+
+static mdx_driver_t nrf_spu_driver = {
+	"nrf_spu",
+	&nrf_spu_ops,
+	sizeof(struct nrf_spu_softc),
+};
+
+DRIVER_MODULE(nrf_spu, nrf_spu_driver);
+#endif
