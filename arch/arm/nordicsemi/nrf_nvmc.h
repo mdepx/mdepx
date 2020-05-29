@@ -60,4 +60,7 @@ struct nrf_nvmc_softc {
 	size_t base;
 };
 
+void nrf_nvmc_init(mdx_device_t dev, uint32_t base);
+void nrf_nvmc_icache_control(mdx_device_t dev, bool enable);
+
 #endif /* !_ARM_NORDICSEMI_NRF_NVMC_H_ */
