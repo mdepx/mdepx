@@ -41,6 +41,7 @@ mdx_of_setup_intr(mdx_device_t dev, int index,
 	const fdt32_t *regp;
 	mdx_device_t intc;
 	int intc_offset;
+	int ntuples;
 	int error;
 	int ncells;
 	int len;
@@ -62,13 +63,14 @@ mdx_of_setup_intr(mdx_device_t dev, int index,
 	if (regp == NULL)
 		return (MDX_ERROR);
 
+	len /= sizeof(int);
+	ntuples = len / ncells;
+	if (index >= ntuples)
+		return (MDX_ERROR);
+
 	intc = mdx_device_lookup_by_offset(intc_offset);
 	if (intc == NULL)
 		return (MDX_ERROR);
-
-	len /= sizeof(int);
-
-	/* TODO: check if index within len. */
 
 	error = mdx_intc_map(intc, regp + index * ncells, ncells, &irq);
 	if (error)
