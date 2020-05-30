@@ -62,14 +62,17 @@ mdx_of_setup_intr(mdx_device_t dev, int index,
 	if (regp == NULL)
 		return (MDX_ERROR);
 
-	len /= sizeof(int);
-
-	/* TODO: decode specifier correctly. */
-	irq = fdt32_ld(regp + index * ncells);
-
 	intc = mdx_device_lookup_by_offset(intc_offset);
 	if (intc == NULL)
 		return (MDX_ERROR);
+
+	len /= sizeof(int);
+
+	/* TODO: check if index within len. */
+
+	error = mdx_intc_map(intc, regp + index * ncells, ncells, &irq);
+	if (error)
+		return (error);
 
 	error = mdx_intc_setup(intc, irq, handler, arg);
 	if (error)

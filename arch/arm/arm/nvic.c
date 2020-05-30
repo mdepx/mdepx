@@ -117,6 +117,17 @@ arm_nvic_set_prio(mdx_device_t dev, int n, int prio)
 	WR4(sc, NVIC_IPR(n / 4), reg);
 }
 
+#ifdef MDX_FDT
+static int
+arm_nvic_map(mdx_device_t dev, const void *regp, int ncells, int *irq)
+{
+
+	*irq = fdt32_ld(regp);
+
+	return (0);
+}
+#endif
+
 void
 arm_nvic_target_ns(mdx_device_t dev, uint32_t n, int secure)
 {
@@ -142,6 +153,9 @@ static struct mdx_intc_ops arm_nvic_intc_ops = {
 	.set = arm_nvic_set_pending,
 	.clear = arm_nvic_clear_pending,
 	.set_prio = arm_nvic_set_prio,
+#ifdef MDX_FDT
+	.map = arm_nvic_map,
+#endif
 };
 
 int

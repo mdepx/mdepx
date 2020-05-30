@@ -86,3 +86,18 @@ mdx_intc_set_prio(mdx_device_t dev, int irq, int prio)
 	ops = dev->ops;
 	ops->set_prio(dev, irq, prio);
 }
+
+#ifdef MDX_FDT
+int
+mdx_intc_map(mdx_device_t dev, const void *regp, int ncells, int *irq)
+{
+	struct mdx_intc_ops *ops;
+	int error;
+
+	ops = dev->ops;
+
+	error = ops->map(dev, regp, ncells, irq);
+
+	return (error);
+}
+#endif

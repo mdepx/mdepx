@@ -30,6 +30,8 @@
 #define	_DEV_INTC_INTC_H_
 
 struct mdx_intc_ops {
+	int (*map)(mdx_device_t dev, const void *regp,
+	    int ncells, int *irq);
 	int (*setup)(mdx_device_t dev, int irq,
 	    void (*handler)(void *arg, int irq),
 	    void *arg);
@@ -40,6 +42,7 @@ struct mdx_intc_ops {
 	void (*set_prio)(mdx_device_t dev, int irq, int prio);
 };
 
+int mdx_intc_map(mdx_device_t dev, const void *regp, int ncells, int *irq);
 int mdx_intc_setup(mdx_device_t dev, int irq,
     void (*handler)(void *arg, int irq),
     void *arg);
