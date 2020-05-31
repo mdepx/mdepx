@@ -29,11 +29,14 @@
 
 #include <dev/intc/intc.h>
 
+#include <libfdt/libfdt.h>
+
 int
 mdx_of_setup_intr(mdx_device_t dev, int index,
     void (*handler)(void *arg, int irq),
     void *arg)
 {
+	void *fdt;
 	const fdt32_t *regp;
 	mdx_device_t intc;
 	int intc_offset;
@@ -42,6 +45,10 @@ mdx_of_setup_intr(mdx_device_t dev, int index,
 	int ncells;
 	int len;
 	int irq;
+
+	fdt = mdx_of_get_dtbp();
+	if (fdt == NULL)
+		return (MDX_ERROR);
 
 	intc_offset = mdx_of_intc_offset(dev->nodeoffset);
 	if (intc_offset < 0)

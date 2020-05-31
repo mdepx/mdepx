@@ -168,15 +168,15 @@ nrf_uarte_attach(mdx_device_t dev)
 	if (error)
 		return (error);
 
-	error = mdx_of_get_prop32(dev, "tx-pin", &sc->pin_tx);
+	error = mdx_of_get_prop32(dev, "tx-pin", &sc->pin_tx, NULL);
 	if (error)
 		return (error);
 
-	error = mdx_of_get_prop32(dev, "rx-pin", &sc->pin_rx);
+	error = mdx_of_get_prop32(dev, "rx-pin", &sc->pin_rx, NULL);
 	if (error)
 		return (error);
 
-	error = mdx_of_get_prop32(dev, "current-speed", &sc->baudrate);
+	error = mdx_of_get_prop32(dev, "current-speed", &sc->baudrate, NULL);
 	if (error)
 		return (error);
 

@@ -122,7 +122,7 @@ static int
 arm_nvic_map(mdx_device_t dev, const void *regp, int ncells, int *irq)
 {
 
-	*irq = fdt32_ld(regp);
+	*irq = mdx_of_ld32(regp);
 
 	return (0);
 }

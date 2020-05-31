@@ -27,8 +27,6 @@
 #ifndef	_SYS_OF_H_
 #define	_SYS_OF_H_
 
-#include <libfdt/libfdt.h>
-
 bool mdx_of_is_compatible(mdx_device_t dev, const char *compatstr);
 void mdx_of_install_dtbp(void *dtbp);
 int mdx_of_check_header(void);
@@ -37,10 +35,11 @@ int mdx_of_find_first_compatible(const char *compat);
 int mdx_of_get_reg(mdx_device_t dev, int index,
     size_t *addr, size_t *size);
 int mdx_of_intc_offset(int offset);
-int mdx_of_get_prop32(mdx_device_t dev, const char *propname, int *res);
+int mdx_of_get_prop32(mdx_device_t dev, const char *propname,
+    int *res, int *len);
 int mdx_of_setup_intr(mdx_device_t dev, int irq,
     void (*handler)(void *arg, int irq), void *arg);
-
-extern void *fdt;
+int mdx_of_ld32(const void *regp);
+void * mdx_of_get_dtbp(void);
 
 #endif /* _SYS_OF_H_ */

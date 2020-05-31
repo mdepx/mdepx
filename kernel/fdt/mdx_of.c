@@ -30,13 +30,22 @@
 #include <sys/malloc.h>
 #include <sys/of.h>
 
-void *fdt;
+#include <libfdt/libfdt.h>
+
+static void *fdt;
 
 void
 mdx_of_install_dtbp(void *dtbp)
 {
 
 	fdt = dtbp;
+}
+
+void *
+mdx_of_get_dtbp(void)
+{
+
+	return (fdt);
 }
 
 int
@@ -179,11 +188,22 @@ mdx_of_probe_devices(void)
 }
 
 int
-mdx_of_get_prop32(mdx_device_t dev, const char *propname, int *res)
+mdx_of_ld32(const void *regp)
+{
+	int ret;
+
+	ret = fdt32_ld(regp);
+
+	return (ret);
+}
+
+int
+mdx_of_get_prop32(mdx_device_t dev, const char *propname,
+    int *res, int *len)
 {
 	const fdt32_t *regp;
 
-	regp = fdt_getprop(fdt, dev->nodeoffset, propname, NULL);
+	regp = fdt_getprop(fdt, dev->nodeoffset, propname, len);
 	if (!regp)
 		return (-1);
 
