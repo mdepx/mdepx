@@ -107,7 +107,7 @@ nrf_gpio_init(mdx_device_t dev, uint32_t base)
 	dev->ops = &nrf_gpio_gpio_ops;
 }
 
-#ifdef MDX_FDT
+#ifdef MDX_OF
 static int
 nrf_gpio_probe(mdx_device_t dev)
 {

@@ -87,7 +87,7 @@ mdx_intc_set_prio(mdx_device_t dev, int irq, int prio)
 	ops->set_prio(dev, irq, prio);
 }
 
-#ifdef MDX_FDT
+#ifdef MDX_OF
 int
 mdx_intc_map(mdx_device_t dev, const void *regp, int ncells, int *irq)
 {

@@ -60,7 +60,7 @@ nrf_nvmc_icache_control(mdx_device_t dev, bool enable)
 	WR4(sc, NVMC_ICACHECNF, reg);
 }
 
-#ifdef MDX_FDT
+#ifdef MDX_OF
 static int
 nrf_nvmc_probe(mdx_device_t dev)
 {

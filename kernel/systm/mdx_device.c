@@ -30,7 +30,7 @@
 #include <sys/device.h>
 #include <sys/list.h>
 
-#ifdef MDX_FDT
+#ifdef MDX_OF
 extern uintptr_t __sysinit_start;
 extern uintptr_t __sysinit_end;
 #endif
@@ -82,7 +82,7 @@ mdx_device_alloc_softc(mdx_device_t dev, size_t size)
 	return (dev->sc);
 }
 
-#ifdef MDX_FDT
+#ifdef MDX_OF
 static void
 mdx_device_set_unit(mdx_device_t dev)
 {

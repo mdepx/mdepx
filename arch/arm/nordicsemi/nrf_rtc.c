@@ -126,7 +126,7 @@ nrf_rtc_init(mdx_device_t dev, uint32_t base, uint16_t prescaler)
 	sc->period = 0x1000000 / sc->freq;
 }
 
-#ifdef MDX_FDT
+#ifdef MDX_OF
 static int
 nrf_rtc_probe(mdx_device_t dev)
 {

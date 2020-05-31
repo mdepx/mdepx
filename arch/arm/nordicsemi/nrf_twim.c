@@ -141,7 +141,7 @@ nrf_twim_init(mdx_device_t dev, uint32_t base)
 	dev->ops = &nrf_twim_i2c_ops;
 }
 
-#ifdef MDX_FDT
+#ifdef MDX_OF
 static int
 nrf_twim_probe(mdx_device_t dev)
 {

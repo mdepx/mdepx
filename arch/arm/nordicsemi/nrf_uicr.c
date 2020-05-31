@@ -44,7 +44,7 @@ nrf_uicr_init(mdx_device_t dev, uint32_t base)
 	sc->base = base;
 }
 
-#ifdef MDX_FDT
+#ifdef MDX_OF
 static int
 nrf_uicr_probe(mdx_device_t dev)
 {

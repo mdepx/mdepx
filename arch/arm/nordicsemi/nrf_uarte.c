@@ -145,7 +145,7 @@ nrf_uarte_init(mdx_device_t dev,
 	dev->ops = &nrf_uarte_uart_ops;
 }
 
-#ifdef MDX_FDT
+#ifdef MDX_OF
 static int
 nrf_uarte_probe(mdx_device_t dev)
 {
