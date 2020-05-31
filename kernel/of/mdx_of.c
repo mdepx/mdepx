@@ -32,7 +32,7 @@
 
 #include <libfdt/libfdt.h>
 
-static void *fdt;
+void *fdt;
 
 void
 mdx_of_install_dtbp(void *dtbp)
@@ -55,7 +55,17 @@ mdx_of_check_header(void)
 	return (fdt_check_header(fdt));
 }
 
-static bool
+int
+mdx_of_ld32(const void *regp)
+{
+	int ret;
+
+	ret = fdt32_ld(regp);
+
+	return (ret);
+}
+
+bool
 mdx_of_is_enabled(int offset)
 {
 	const char *status;
@@ -70,7 +80,7 @@ mdx_of_is_enabled(int offset)
 	return (true);
 }
 
-static bool
+bool
 fdt_is_compatible(int offset, const char *check)
 {
 	const char *compat;
@@ -109,199 +119,6 @@ mdx_of_find_first_compatible(const char *compat)
 	} while (offset > 0);
 
 	return (MDX_OK);
-}
-
-static int
-mdx_of_probe_and_attach(int offset, mdx_device_t *dev0)
-{
-	const void *prop;
-	mdx_device_t dev;
-	int len;
-	int error;
-
-	if (mdx_of_is_enabled(offset) == false)
-		return (-1);
-
-	if (mdx_device_lookup_by_offset(offset) != NULL)
-		return (MDX_EEXIST);
-
-	prop = fdt_getprop(fdt, offset, "compatible", &len);
-	if (prop == NULL)
-		return (-2);
-
-	dev = zalloc(sizeof(struct mdx_device));
-	if (dev == NULL)
-		panic("could not allocate device");
-	dev->nodeoffset = offset;
-
-	error = mdx_device_probe_and_attach(dev);
-	if (error) {
-		free(dev);
-		return (MDX_ERROR);
-	}
-
-	printf("device attached: %s (offset %x)\n", prop, offset);
-
-	if (dev0)
-		*dev0 = dev;
-
-	return (MDX_OK);
-}
-
-static void
-mdx_of_process_chosen(void)
-{
-	mdx_device_t dev;
-	const fdt32_t *prop;
-	int uart_offset;
-	int offset;
-	int error;
-	int len;
-
-	offset = fdt_path_offset(fdt, "/chosen");
-	if (offset >= 0) {
-		prop = fdt_getprop(fdt, offset, "mdepx,console", &len);
-		if (prop) {
-			uart_offset = fdt_path_offset(fdt, (const char *)prop);
-			error = mdx_of_probe_and_attach(uart_offset, &dev);
-			if (error == 0)
-				mdx_console_register_uart(dev);
-		}
-	}
-}
-
-void
-mdx_of_probe_devices(void)
-{
-	int offset;
-	int depth;
-
-	offset = 0;
-	depth = 0;
-
-	mdx_of_process_chosen();
-
-	do {
-		mdx_of_probe_and_attach(offset, NULL);
-		offset = fdt_next_node(fdt, offset, &depth);
-	} while (offset > 0);
-}
-
-int
-mdx_of_ld32(const void *regp)
-{
-	int ret;
-
-	ret = fdt32_ld(regp);
-
-	return (ret);
-}
-
-int
-mdx_of_get_prop32(mdx_device_t dev, const char *propname,
-    int *res, int *len)
-{
-	const fdt32_t *regp;
-
-	regp = fdt_getprop(fdt, dev->nodeoffset, propname, len);
-	if (!regp)
-		return (-1);
-
-	*res = fdt32_ld(regp);
-
-	return (0);
-}
-
-static int
-mdx_of_get_props(int offset, uint32_t *addr, uint32_t *size)
-{
-	const fdt32_t *regp;
-
-	regp = fdt_getprop(fdt, offset, "#address-cells", NULL);
-	if (!regp)
-		return (-1);
-	*addr = fdt32_ld(regp);
-
-	regp = fdt_getprop(fdt, offset, "#size-cells", NULL);
-	if (!regp)
-		return (-1);
-	*size = fdt32_ld(regp);
-
-	return (0);
-}
-
-int
-mdx_of_get_reg(mdx_device_t dev, int index,
-    size_t *addr, size_t *size)
-{
-	const fdt32_t *regp, *r;
-	int parent, bus;
-	int len;
-	uint32_t naddr, nsize, b_naddr, b_nsize;
-	uint64_t raddr, rsize, baddr;
-	size_t paddr;
-	int ntuples;
-	int i, j;
-
-	parent = fdt_parent_offset(fdt, dev->nodeoffset);
-	if (!parent)
-		return (-1);
-
-	mdx_of_get_props(parent, &naddr, &nsize);
-
-	regp = fdt_getprop(fdt, dev->nodeoffset, "reg", NULL);
-	if (!regp)
-		return (-1);
-
-	paddr = fdt32_ld(regp);
-
-	do {
-		bus = fdt_parent_offset(fdt, parent);
-		mdx_of_get_props(bus, &b_naddr, &b_nsize);
-
-		r = fdt_getprop(fdt, parent, "ranges", &len);
-		if (!r)
-			break;
-
-		if (len == 0)
-			goto next;
-
-		len /= sizeof(int);
-
-		ntuples = len / (naddr + b_naddr + nsize);
-		for (i = 0; i < ntuples; i++) {
-			raddr = 0;
-			for (j = 0; j < naddr; j++)
-				raddr = ((uint64_t)raddr << 32) | fdt32_ld(r++);
-			baddr = 0;
-			for (j = 0; j < b_naddr; j++)
-				baddr = ((uint64_t)baddr << 32) | fdt32_ld(r++);
-			rsize = 0;
-			for (j = 0; j < nsize; j++)
-				rsize = ((uint64_t)rsize << 32) | fdt32_ld(r++);
-
-			if (paddr < raddr || paddr >= raddr + rsize)
-				continue;
-			paddr = paddr - raddr + baddr;
-		}
-
-next:
-		bus = parent;
-		parent = fdt_parent_offset(fdt, bus);
-		mdx_of_get_props(bus, &b_naddr, &b_nsize);
-
-	} while (parent >= 0);
-
-	*addr = paddr;
-
-	return (0);
-}
-
-bool
-mdx_of_is_compatible(mdx_device_t dev, const char *compatstr)
-{
-
-	return (fdt_is_compatible(dev->nodeoffset, compatstr));
 }
 
 /*

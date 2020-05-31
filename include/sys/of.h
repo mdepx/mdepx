@@ -41,5 +41,7 @@ int mdx_of_setup_intr(mdx_device_t dev, int irq,
     void (*handler)(void *arg, int irq), void *arg);
 int mdx_of_ld32(const void *regp);
 void * mdx_of_get_dtbp(void);
+bool mdx_of_is_enabled(int offset);
+bool fdt_is_compatible(int offset, const char *check);
 
 #endif /* _SYS_OF_H_ */
