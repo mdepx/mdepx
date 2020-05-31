@@ -30,8 +30,6 @@
 #include <sys/malloc.h>
 #include <sys/of.h>
 
-#include <libfdt/libfdt.h>
-
 void *fdt;
 
 void

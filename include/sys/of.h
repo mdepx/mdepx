@@ -27,9 +27,7 @@
 #ifndef	_SYS_OF_H_
 #define	_SYS_OF_H_
 
-#ifdef MDX_FDT
 #include <libfdt/libfdt.h>
-#endif
 
 bool mdx_of_is_compatible(mdx_device_t dev, const char *compatstr);
 void mdx_of_install_dtbp(void *dtbp);
@@ -42,5 +40,7 @@ int mdx_of_intc_offset(int offset);
 int mdx_of_get_prop32(mdx_device_t dev, const char *propname, int *res);
 int mdx_of_setup_intr(mdx_device_t dev, int irq,
     void (*handler)(void *arg, int irq), void *arg);
+
+extern void *fdt;
 
 #endif /* _SYS_OF_H_ */

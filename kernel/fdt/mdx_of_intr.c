@@ -27,11 +27,7 @@
 #include <sys/cdefs.h>
 #include <sys/of.h>
 
-#include <libfdt/libfdt.h>
-
 #include <dev/intc/intc.h>
-
-extern void *fdt;
 
 int
 mdx_of_setup_intr(mdx_device_t dev, int index,
