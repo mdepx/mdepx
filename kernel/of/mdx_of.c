@@ -66,7 +66,7 @@ mdx_of_ld32(const void *regp)
 }
 
 bool
-mdx_of_is_enabled(int offset)
+mdx_of_node_is_enabled(int offset)
 {
 	const char *status;
 
@@ -81,7 +81,7 @@ mdx_of_is_enabled(int offset)
 }
 
 bool
-fdt_is_compatible(int offset, const char *check)
+mdx_of_node_is_compatible(int offset, const char *check)
 {
 	const char *compat;
 	int len;
@@ -111,10 +111,10 @@ mdx_of_find_first_compatible(const char *compat)
 
 	do {
 		offset = fdt_next_node(fdt, offset, &depth);
-		if (!mdx_of_is_enabled(offset))
+		if (!mdx_of_node_is_enabled(offset))
 			continue;
 
-		if (fdt_is_compatible(offset, compat))
+		if (mdx_of_node_is_compatible(offset, compat))
 			return (offset);
 	} while (offset > 0);
 
