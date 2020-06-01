@@ -27,6 +27,11 @@
 #ifndef	_DEV_MC6470_MC6470_H_
 #define	_DEV_MC6470_MC6470_H_
 
+/* i2c addresses for accelerometer and magnetometer. */
+#define	MC6470_ACC		0x4c
+#define	MC6470_ACC_ALT		0x6c
+#define	MC6470_MAG		0x0c
+
 #define	MC6470_SR		0x03
 #define	MC6470_OPSTAT		0x04
 #define	MC6470_INTEN		0x06
@@ -137,8 +142,10 @@
 #define	MC6470_MAG_ITHRH	0x27
 #define	MC6470_MAG_TEMP		0x31
 
-int mc6470_read_reg(mdx_device_t dev, uint8_t reg, uint8_t *val);
-int mc6470_write_reg(mdx_device_t dev, uint8_t reg, uint8_t val);
+int mc6470_read_reg(mdx_device_t dev, uint8_t i2c_addr,
+    uint8_t reg, uint8_t *val);
+int mc6470_write_reg(mdx_device_t dev, uint8_t i2c_addr,
+    uint8_t reg, uint8_t val);
 int mc6470_set_freq(mdx_device_t dev, uint8_t val);
 
 #endif /* !_DEV_MC6470_MC6470_H_ */

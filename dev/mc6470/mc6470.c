@@ -34,25 +34,20 @@
 #include <dev/i2c/i2c.h>
 #include <dev/mc6470/mc6470.h>
 
-#define	MC6470_DEVID	0x4c
-
 int
-mc6470_read_reg(mdx_device_t dev, uint8_t reg, uint8_t *val)
+mc6470_read_reg(mdx_device_t dev, uint8_t i2c_addr, uint8_t reg, uint8_t *val)
 {
 	struct i2c_msg msgs[2];
-	uint8_t dev_id;
 	int err;
 
-	dev_id = MC6470_DEVID;
-
 	/* Write register */
-	msgs[0].slave = dev_id;
+	msgs[0].slave = i2c_addr;
 	msgs[0].buf = &reg;
 	msgs[0].len = 1;
 	msgs[0].flags = 0;
 
         /* Read data */
-	msgs[1].slave = dev_id;
+	msgs[1].slave = i2c_addr;
 	msgs[1].buf = val;
 	msgs[1].len = 1;
 	msgs[1].flags = IIC_M_RD;
@@ -63,20 +58,17 @@ mc6470_read_reg(mdx_device_t dev, uint8_t reg, uint8_t *val)
 }
 
 int
-mc6470_write_reg(mdx_device_t dev, uint8_t reg, uint8_t val)
+mc6470_write_reg(mdx_device_t dev, uint8_t i2c_addr, uint8_t reg, uint8_t val)
 {
 	struct i2c_msg msgs[1];
 	uint8_t data[2];
-	uint8_t dev_id;
 	int err;
-
-	dev_id = MC6470_DEVID;
 
 	data[0] = reg;
 	data[1] = val;
 
 	/* Write register and data. */
-	msgs[0].slave = dev_id;
+	msgs[0].slave = i2c_addr;
 	msgs[0].buf = data;
 	msgs[0].len = 2;
 	msgs[0].flags = 0;
@@ -91,7 +83,7 @@ mc6470_set_freq(mdx_device_t dev, uint8_t val)
 {
 	int err;
 
-	err = mc6470_write_reg(dev, MC6470_SRTFR, val);
+	err = mc6470_write_reg(dev, MC6470_ACC, MC6470_SRTFR, val);
 
 	return (err);
 }
