@@ -91,6 +91,52 @@
 #define	MC6470_ZGAIN		0x29
 #define	MC6470_PCODE		0x3B
 
+#define	MC6470_MAG_SELFTEST	0x0C	/* Self test response */
+#define	MC6470_MAG_MOREINFO_VER	0x0D	/* More info version */
+#define	MC6470_MAG_MOREINFO	0x0E
+#define	MC6470_MAG_WHOAMI	0x0F
+#define	MC6470_MAG_XOUTL	0x10
+#define	MC6470_MAG_XOUTH	0x11
+#define	MC6470_MAG_YOUTL	0x12
+#define	MC6470_MAG_YOUTH	0x13
+#define	MC6470_MAG_ZOUTL	0x14
+#define	MC6470_MAG_ZOUTH	0x15
+#define	MC6470_MAG_STATUS	0x18
+#define	MC6470_MAG_CTRL1	0x1B
+#define	 MAG_CTRL1_PC		(1 << 7)
+#define	 MAG_CTRL1_ODR_S	3
+#define	 MAG_CTRL1_ODR_M	(0x3 << MAG_CTRL1_ODR_S)
+#define	 MAG_CTRL1_FS		1
+#define	MC6470_MAG_CTRL2	0x1C
+#define	 MAG_CTRL2_AVG		(1 << 7)
+#define	 MAG_CTRL2_FCO		(1 << 6)
+#define	 MAG_CTRL2_AOR		(1 << 5)
+#define	 MAG_CTRL2_FF		(1 << 4)
+#define	 MAG_CTRL2_DEN		(1 << 3)
+#define	 MAG_CTRL2_DRP		(1 << 2)
+#define	 MAG_CTRL2_DTS		(1 << 1)
+#define	 MAG_CTRL2_DOS		(1 << 0)
+#define	MC6470_MAG_CTRL3	0x1D
+#define	 MAG_CTRL3_SRST		(1 << 7)
+#define	 MAG_CTRL3_FORCE	(1 << 6)
+#define	 MAG_CTRL3_STC		(1 << 4)
+#define	 MAG_CTRL3_TCS		(1 << 1)
+#define	 MAG_CTRL3_OCL		(1 << 0)
+#define	MC6470_MAG_CTRL4	0x1E
+#define	 MAG_CTRL4_MMD_S	6
+#define	 MAG_CTRL4_MMD_M	(0x3 << MAG_CTRL4_MMD_S)
+#define	 MAG_CTRL4_RS		(1 << 4)
+#define	 MAG_CTRL4_AS		(1 << 3)
+#define	MC6470_MAG_XOFFL	0x20
+#define	MC6470_MAG_XOFFH	0x21
+#define	MC6470_MAG_YOFFL	0x22
+#define	MC6470_MAG_YOFFH	0x23
+#define	MC6470_MAG_ZOFFL	0x24
+#define	MC6470_MAG_ZOFFH	0x25
+#define	MC6470_MAG_ITHRL	0x26
+#define	MC6470_MAG_ITHRH	0x27
+#define	MC6470_MAG_TEMP		0x31
+
 int mc6470_read_reg(mdx_device_t dev, uint8_t reg, uint8_t *val);
 int mc6470_write_reg(mdx_device_t dev, uint8_t reg, uint8_t val);
 int mc6470_set_freq(mdx_device_t dev, uint8_t val);
