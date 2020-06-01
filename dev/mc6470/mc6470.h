@@ -111,7 +111,7 @@
 #define	 MAG_CTRL1_PC		(1 << 7)
 #define	 MAG_CTRL1_ODR_S	3
 #define	 MAG_CTRL1_ODR_M	(0x3 << MAG_CTRL1_ODR_S)
-#define	 MAG_CTRL1_FS		1
+#define	 MAG_CTRL1_FS		(1 << 1)
 #define	MC6470_MAG_CTRL2	0x1C
 #define	 MAG_CTRL2_AVG		(1 << 7)
 #define	 MAG_CTRL2_FCO		(1 << 6)
