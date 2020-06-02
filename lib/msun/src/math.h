@@ -21,6 +21,8 @@
 #include <sys/types.h>
 #include <machine/limits.h>
 
+#include "cdefs.h"
+
 /*
  * ANSI/POSIX
  */
