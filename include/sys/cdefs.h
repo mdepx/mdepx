@@ -44,29 +44,18 @@
 #define	__aligned(x)		__attribute__((__aligned__(x)))
 #define	__section(x)		__attribute__((__section__(x)))
 #define	__weak_symbol		__attribute__((__weak__))
+#define	__dead2			__attribute__((__noreturn__))
+#define	__pure2			__attribute__((__const__))
+#define	__always_inline		__attribute__((__always_inline__))
+#define	__result_use_check	__attribute__((__warn_unused_result__))
 
-/* Check if compiler supports GNU extensions */
-#if defined(__GNUC__)
-#define	__GNUCLIKE___SECTION 1
-#endif
-
-#define	__CONCAT1(x,y)	x ## y
-#define	__CONCAT(x,y)	__CONCAT1(x,y)
-
-#define	__GLOBL1(sym)	__asm__(".globl " #sym)
-#define	__GLOBL(sym)	__GLOBL1(sym)
+#define	__weak_reference(sym, alias)	\
+	__asm__(".weak " #alias);	\
+	__asm__(".equ "  #alias ", " #sym)
 
 #define	offsetof(st, m) __builtin_offsetof(st, m)
 
 #define	CONTAINER_OF(ptr, type, field)	\
 	((type *)((char *)ptr - offsetof(type, field)))
-
-#if defined(__GNUC__)
-#define	__always_inline		__attribute__((__always_inline__))
-#define	__result_use_check	__attribute__((__warn_unused_result__))
-#else
-#define	__always_inline
-#define	__result_use_check
-#endif
 
 #endif	/* !_SYS_CDEFS_H_ */
