@@ -28,7 +28,7 @@
  * $FreeBSD$
  */
 
-#include <float.h>
+#include <machine/float.h>
 
 #include "fpmath.h"
 

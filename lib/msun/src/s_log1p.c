@@ -77,7 +77,7 @@
  *	 See HP-15C Advanced Functions Handbook, p.193.
  */
 
-#include <float.h>
+#include <machine/float.h>
 
 #include "math.h"
 #include "math_private.h"

@@ -23,7 +23,7 @@
  * in not-quite-routine extra precision.
  */
 
-#include <float.h>
+#include <machine/float.h>
 
 #include "math.h"
 #include "math_private.h"

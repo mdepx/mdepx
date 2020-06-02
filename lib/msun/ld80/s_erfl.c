@@ -17,7 +17,7 @@
  *
  * Converted to long double by Steven G. Kargl.
  */
-#include <float.h>
+#include <machine/float.h>
 #ifdef __i386__
 #include <ieeefp.h>
 #endif

@@ -34,7 +34,7 @@
  * ld128 version of s_expl.c.  See ../ld80/s_expl.c for most comments.
  */
 
-#include <float.h>
+#include <machine/float.h>
 
 #include "fpmath.h"
 #include "math.h"

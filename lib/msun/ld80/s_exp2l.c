@@ -28,7 +28,7 @@
 
 #include <sys/cdefs.h>
 
-#include <float.h>
+#include <machine/float.h>
 #include <stdint.h>
 
 #ifdef __i386__

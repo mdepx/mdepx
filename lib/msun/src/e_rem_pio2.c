@@ -21,7 +21,7 @@
  * use __kernel_rem_pio2()
  */
 
-#include <float.h>
+#include <machine/float.h>
 
 #include "math.h"
 #include "math_private.h"

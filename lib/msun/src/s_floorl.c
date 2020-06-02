@@ -22,7 +22,7 @@
  *	Inexact flag raised if x not equal to floorl(x).
  */
 
-#include <float.h>
+#include <machine/float.h>
 #include <math.h>
 #include <stdint.h>
 

@@ -23,7 +23,7 @@
  *		 := sign(x)*log1p(|x| + x^2/(1 + sqrt(1+x^2)))
  */
 
-#include <float.h>
+#include <machine/float.h>
 
 #include "math.h"
 #include "math_private.h"

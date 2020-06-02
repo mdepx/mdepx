@@ -25,7 +25,7 @@
  * for scalbn(), so we don't use this routine.
  */
 
-#include <float.h>
+#include <machine/float.h>
 #include <math.h>
 
 #include "fpmath.h"

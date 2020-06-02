@@ -22,7 +22,7 @@
  *	Based on fmod() return x-[x/p]chopped*p exactlp.
  */
 
-#include <float.h>
+#include <machine/float.h>
 
 #include "math.h"
 #include "math_private.h"

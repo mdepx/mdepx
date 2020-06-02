@@ -22,7 +22,7 @@
  *	Inexact flag raised if x not equal to ceill(x).
  */
 
-#include <float.h>
+#include <machine/float.h>
 #include <math.h>
 #include <stdint.h>
 

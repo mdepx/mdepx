@@ -20,7 +20,7 @@
  * Method: call __ieee754_lgamma_r
  */
 
-#include <float.h>
+#include <machine/float.h>
 
 #include "math.h"
 #include "math_private.h"

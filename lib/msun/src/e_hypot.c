@@ -45,7 +45,7 @@
  * 	than 1 ulps (units in the last place) 
  */
 
-#include <float.h>
+#include <machine/float.h>
 
 #include "math.h"
 #include "math_private.h"

@@ -27,7 +27,7 @@
 #include <sys/cdefs.h>
 
 #include <complex.h>
-#include <float.h>
+#include <machine/float.h>
 
 #include "fpmath.h"
 #include "math.h"

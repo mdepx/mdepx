@@ -18,7 +18,7 @@
  * for nextafter(), so we don't use this routine.
  */
 
-#include <float.h>
+#include <machine/float.h>
 
 #include "fpmath.h"
 #include "math.h"

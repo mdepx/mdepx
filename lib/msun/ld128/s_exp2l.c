@@ -28,7 +28,7 @@
 
 #include <sys/cdefs.h>
 
-#include <float.h>
+#include <machine/float.h>
 #include <stdint.h>
 
 #include "fpmath.h"

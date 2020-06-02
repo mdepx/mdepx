@@ -14,7 +14,7 @@
 
 #include <sys/cdefs.h>
 
-#include <float.h>
+#include <machine/float.h>
 
 #include "math.h"
 #define INLINE_REM_PIO2

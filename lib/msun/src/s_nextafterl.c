@@ -19,7 +19,7 @@
  *   Special cases:
  */
 
-#include <float.h>
+#include <machine/float.h>
 
 #include "fpmath.h"
 #include "math.h"

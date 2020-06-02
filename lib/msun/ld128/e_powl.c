@@ -61,7 +61,7 @@
 
 #include <sys/cdefs.h>
 
-#include <float.h>
+#include <machine/float.h>
 #include <math.h>
 
 #include "math_private.h"

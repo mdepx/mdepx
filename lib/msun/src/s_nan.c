@@ -30,7 +30,7 @@
 
 #include <sys/endian.h>
 #include <ctype.h>
-#include <float.h>
+#include <machine/float.h>
 #include <math.h>
 #include <stdint.h>
 #include <strings.h>

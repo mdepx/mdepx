@@ -21,7 +21,7 @@
  *	Inexact flag raised if x not equal to ceil(x).
  */
 
-#include <float.h>
+#include <machine/float.h>
 
 #include "math.h"
 #include "math_private.h"

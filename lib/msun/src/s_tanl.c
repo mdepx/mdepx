@@ -34,7 +34,7 @@
  * possibles resulted in tan(x) that exceeded 0.5 ULP (ie., 0.6%).
  */
 
-#include <float.h>
+#include <machine/float.h>
 #ifdef __i386__
 #include <ieeefp.h>
 #endif

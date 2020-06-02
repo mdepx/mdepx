@@ -19,7 +19,7 @@
  * Converted to long double by David Schultz <das@FreeBSD.ORG>.
  */
 
-#include <float.h>
+#include <machine/float.h>
 
 #include "invtrig.h"
 #include "math.h"

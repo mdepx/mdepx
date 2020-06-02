@@ -31,7 +31,7 @@
  *	only sinh(0)=0 is exact for finite x.
  */
 
-#include <float.h>
+#include <machine/float.h>
 
 #include "math.h"
 #include "math_private.h"

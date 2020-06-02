@@ -40,7 +40,7 @@
  * where the 32 table entries have been expanded to INTERVALS (see below).
  */
 
-#include <float.h>
+#include <machine/float.h>
 
 #ifdef __i386__
 #include <ieeefp.h>

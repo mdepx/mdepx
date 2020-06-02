@@ -42,7 +42,7 @@
  *	TRIG(x) returns trig(x) nearly rounded
  */
 
-#include <float.h>
+#include <machine/float.h>
 
 #include "math.h"
 #define INLINE_REM_PIO2

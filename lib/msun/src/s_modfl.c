@@ -38,7 +38,7 @@
  * $FreeBSD$
  */
 
-#include <float.h>
+#include <machine/float.h>
 #include <math.h>
 #include <sys/types.h>
 

@@ -20,7 +20,7 @@
  * Converted to long double by Bruce D. Evans.
  */
 
-#include <float.h>
+#include <machine/float.h>
 #ifdef __i386__
 #include <ieeefp.h>
 #endif

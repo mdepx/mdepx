@@ -79,7 +79,7 @@
  *		lgamma(-inf) = inf (bug for bug compatible with C99!?)
  */
 
-#include <float.h>
+#include <machine/float.h>
 
 #include "math.h"
 #include "math_private.h"
