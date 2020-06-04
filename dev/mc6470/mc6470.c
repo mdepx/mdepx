@@ -35,7 +35,8 @@
 #include <dev/mc6470/mc6470.h>
 
 int
-mc6470_read_reg(mdx_device_t dev, uint8_t i2c_addr, uint8_t reg, uint8_t *val)
+mc6470_read_data(mdx_device_t dev, uint8_t i2c_addr,
+    uint8_t reg, int n, uint8_t *val)
 {
 	struct i2c_msg msgs[2];
 	int err;
@@ -49,10 +50,20 @@ mc6470_read_reg(mdx_device_t dev, uint8_t i2c_addr, uint8_t reg, uint8_t *val)
         /* Read data */
 	msgs[1].slave = i2c_addr;
 	msgs[1].buf = val;
-	msgs[1].len = 1;
+	msgs[1].len = n;
 	msgs[1].flags = IIC_M_RD;
 
 	err = mdx_i2c_transfer(dev, msgs, 2);
+
+	return (err);
+}
+
+int
+mc6470_read_reg(mdx_device_t dev, uint8_t i2c_addr, uint8_t reg, uint8_t *val)
+{
+	int err;
+
+	err = mc6470_read_data(dev, i2c_addr, reg, 1, val);
 
 	return (err);
 }

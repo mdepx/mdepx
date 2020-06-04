@@ -130,7 +130,7 @@
 #define	MC6470_MAG_CTRL4	0x1E
 #define	 MAG_CTRL4_MMD_S	6
 #define	 MAG_CTRL4_MMD_M	(0x3 << MAG_CTRL4_MMD_S)
-#define	 MAG_CTRL4_RS		(1 << 4)
+#define	 MAG_CTRL4_RS		(1 << 4) /* 15 bit signed value */
 #define	 MAG_CTRL4_AS		(1 << 3)
 #define	MC6470_MAG_XOFFL	0x20
 #define	MC6470_MAG_XOFFH	0x21
@@ -147,5 +147,7 @@ int mc6470_read_reg(mdx_device_t dev, uint8_t i2c_addr,
 int mc6470_write_reg(mdx_device_t dev, uint8_t i2c_addr,
     uint8_t reg, uint8_t val);
 int mc6470_set_freq(mdx_device_t dev, uint8_t val);
+int mc6470_read_data(mdx_device_t dev, uint8_t i2c_addr,
+    uint8_t reg, int n, uint8_t *val);
 
 #endif /* !_DEV_MC6470_MC6470_H_ */
