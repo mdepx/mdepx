@@ -23,11 +23,7 @@
 
 /* Compatibility. */
 #include "cdefs.h"
-typedef	__uint32_t	u_int32_t;
-typedef	__uint64_t	u_int64_t;
-#define	LITTLE_ENDIAN	_LITTLE_ENDIAN
-#define	BIG_ENDIAN	_BIG_ENDIAN
-#define	BYTE_ORDER	_BYTE_ORDER
+#include "compat.h"
 
 /*
  * ANSI/POSIX
