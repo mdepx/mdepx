@@ -58,4 +58,12 @@
 #define	CONTAINER_OF(ptr, type, field)	\
 	((type *)((char *)ptr - offsetof(type, field)))
 
+#if defined(__cplusplus)
+#define	__BEGIN_DECLS	extern "C" {
+#define	__END_DECLS	}
+#else
+#define	__BEGIN_DECLS
+#define	__END_DECLS
+#endif
+
 #endif	/* !_SYS_CDEFS_H_ */
