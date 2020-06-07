@@ -31,6 +31,16 @@
 
 #define	MDX_GPIO_INPUT		(1 << 0)
 #define	MDX_GPIO_OUTPUT		(1 << 1)
+#define	MDX_GPIO_OPEN_DRAIN	(1 << 2)
+#define	MDX_GPIO_PUSH_PULL	(1 << 3)
+#define	MDX_GPIO_FLOATING	(1 << 4)
+#define	MDX_GPIO_PULL_UP	(1 << 5)
+#define	MDX_GPIO_PULL_DOWN	(1 << 6)
+#define	MDX_GPIO_SPEED_LOW	(1 << 7)
+#define	MDX_GPIO_SPEED_MEDIUM	(1 << 8)
+#define	MDX_GPIO_SPEED_HIGH	(1 << 9)
+#define	MDX_GPIO_ALT_FUNC	(1 << 10)	/* Alternate function */
+#define	MDX_GPIO_ANALOG		(1 << 11)	/* Pin is in analog mode */
 
 struct mdx_gpio_ops {
 	int (*pin_set)(mdx_device_t dev, int bank, int pin, int value);
