@@ -183,7 +183,6 @@ uart_16550_setup(mdx_device_t dev, int baud_rate,
 	UART_WRITE(sc, REG_LCR, reg);
 }
 
-
 static struct mdx_uart_ops uart_16550_ops = {
 	.putc = uart_16550_putc,
 	.getc = uart_16550_getc,
