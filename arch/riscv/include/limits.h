@@ -32,6 +32,11 @@
 #define	__UINT_MAX	0xffffffff
 #define	__INT_MAX	0x7fffffff
 
+/* long long */
+#define	__ULLONG_MAX	0xffffffffffffffffULL
+#define	__LLONG_MAX	0x7fffffffffffffffLL
+#define	__LLONG_MIN	(-0x7fffffffffffffffLL - 1)
+
 #if __riscv_xlen == 64
 #define	__ULONG_MAX	0xffffffffffffffffUL
 #define	__LONG_MAX	0x7fffffffffffffffL
@@ -49,6 +54,9 @@
 #define	__LONG_BIT	32
 #define	__LONG_MAX	0x7fffffff
 #define	__LONG_MIN	(-0x7fffffff - 1)
+#define	__UQUAD_MAX	__ULLONG_MAX
+#define	__QUAD_MAX	__LLONG_MAX
+#define	__QUAD_MIN	__LLONG_MIN
 #endif
 
 #define	__CHAR_BIT	8
