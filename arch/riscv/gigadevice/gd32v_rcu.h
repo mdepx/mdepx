@@ -24,8 +24,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _RISCV_GIGADEVICE_GD32V_RCC_H_
-#define _RISCV_GIGADEVICE_GD32V_RCC_H_
+#ifndef _RISCV_GIGADEVICE_GD32V_RCU_H_
+#define _RISCV_GIGADEVICE_GD32V_RCU_H_
 
 #define	RCU_CTL		0x00	/* Control register */
 #define	RCU_CFG0	0x04	/* Clock configuration register 0 */
@@ -51,4 +51,4 @@ int gd32v_rcu_init(mdx_device_t dev, uint32_t base);
 void gd32v_rcc_setup(mdx_device_t dev,
     uint32_t ahben, uint32_t apb1en, uint32_t apb2en);
 
-#endif /* !_RISCV_GIGADEVICE_GD32V_RCC_H_ */
+#endif /* !_RISCV_GIGADEVICE_GD32V_RCU_H_ */
