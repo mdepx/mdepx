@@ -24,34 +24,20 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _RISCV_GIGADEVICE_GD32V_H_
-#define _RISCV_GIGADEVICE_GD32V_H_
+#ifndef _RISCV_GIGADEVICE_GD32V_EXTI_H_
+#define _RISCV_GIGADEVICE_GD32V_EXTI_H_
 
-#include <riscv/gigadevice/gd32v_exti.h>
-#include <riscv/gigadevice/gd32v_gpio.h>
-#include <riscv/gigadevice/gd32v_rcu.h>
-#include <riscv/gigadevice/gd32v_timer.h>
-#include <riscv/gigadevice/gd32v_usart.h>
+#define	EXTI_INTEN	0x00	/* Interrupt enable register */
+#define	EXTI_EVEN	0x04	/* Event enable register */
+#define	EXTI_RTEN	0x08	/* Rising edge trigger enable register */
+#define	EXTI_FTEN	0x0C	/* Falling edge trigger enable register */
+#define	EXTI_SWIEV	0x10	/* Software interrupt event register */
+#define	EXTI_PD		0x14	/* Pending register */
 
-#define	BASE_RCU	0x40021000
-#define	BASE_GFIO	0x40010000
-#define	BASE_GPIOA	0x40010800
-#define	BASE_GPIOB	0x40010C00
-#define	BASE_GPIOC	0x40011000
-#define	BASE_GPIOD	0x40011400
-#define	BASE_GPIOE	0x40011800
-#define	BASE_USART0	0x40013800
-#define	BASE_USART1	0x40004400
-#define	BASE_USART2	0x40004800
-#define	BASE_UART3	0x40004C00
-#define	BASE_UART4	0x40005000
-#define	BASE_EXTI	0x40010400
-#define	BASE_TIMER0	0x40012C00
-#define	BASE_TIMER1	0x40000000
-#define	BASE_TIMER2	0x40000400
-#define	BASE_TIMER3	0x40000800
-#define	BASE_TIMER4	0x40000C00
-#define	BASE_TIMER5	0x40001000
-#define	BASE_TIMER6	0x40001400
+struct gd32v_exti_softc {
+	uint32_t base;
+};
 
-#endif	/* !_RISCV_GIGADEVICE_GD32V_H_ */
+int gd32v_exti_init(mdx_device_t dev, uint32_t base);
+
+#endif /* !_RISCV_GIGADEVICE_GD32V_EXTI_H_ */
