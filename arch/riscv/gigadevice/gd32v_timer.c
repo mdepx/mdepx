@@ -26,6 +26,7 @@
 
 #include <sys/cdefs.h>
 #include <sys/systm.h>
+#include <sys/callout.h>
 
 #include "gd32v_timer.h"
 
@@ -34,13 +35,100 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
+void
+gd32v_timer_intr(void *arg, int irq)
+{
+	struct gd32v_timer_softc *sc;
+	mdx_device_t dev;
+	uint32_t reg;
+
+	dev = arg;
+
+	sc = mdx_device_get_softc(dev);
+
+	reg = RD4(sc, TIMER_DMAINTEN);
+	reg &= ~DMAINTEN_CH0IE;
+	WR4(sc, TIMER_DMAINTEN, reg);
+
+	reg = RD4(sc, TIMER_INTF);
+	reg &= ~INTF_CH0IF;
+	WR4(sc, TIMER_INTF, reg);
+
+	mdx_callout_callback(&sc->mt);
+}
+
+static void
+gd32v_timer_start(void *arg, uint32_t ticks)
+{
+	struct gd32v_timer_softc *sc;
+	uint32_t reg;
+	uint16_t val;
+
+	sc = arg;
+
+	val = RD4(sc, TIMER_CNT);
+	val += ticks;
+	WR4(sc, TIMER_CH0CV, val);
+
+	reg = RD4(sc, TIMER_CHCTL2);
+	reg |= CHCTL2_CH0EN;
+	WR4(sc, TIMER_CHCTL2, reg);
+
+	reg = RD4(sc, TIMER_DMAINTEN);
+	reg |= DMAINTEN_CH0IE;
+	WR4(sc, TIMER_DMAINTEN, reg);
+
+	reg = RD4(sc, TIMER_CTL0);
+	reg |= CTL0_CEN;
+	WR4(sc, TIMER_CTL0, reg);
+}
+
+static void
+gd32v_timer_stop(void *arg)
+{
+	struct gd32v_timer_softc *sc;
+	uint32_t reg;
+
+	sc = arg;
+
+	reg = RD4(sc, TIMER_CTL0);
+	reg &= ~CTL0_CEN;
+	WR4(sc, TIMER_CTL0, reg);
+}
+
+static uint32_t
+gd32v_timer_count(void *arg)
+{
+	struct gd32v_timer_softc *sc;
+	uint32_t reg;
+
+	sc = arg;
+
+	reg = RD4(sc, TIMER_CNT);
+
+	return (reg);
+}
+
 int
-gd32v_timer_init(mdx_device_t dev, uint32_t base)
+gd32v_timer_init(mdx_device_t dev, uint32_t base, int freq)
 {
 	struct gd32v_timer_softc *sc;
 
 	sc = mdx_device_alloc_softc(dev, sizeof(struct gd32v_timer_softc));
 	sc->base = base;
+
+	WR4(sc, TIMER_CTL0, 0);
+	WR4(sc, TIMER_PSC, (freq / 10000) - 1);
+	WR4(sc, TIMER_CAR, 0xffff);
+
+	sc->mt.start = gd32v_timer_start;
+	sc->mt.stop = gd32v_timer_stop;
+	sc->mt.count = gd32v_timer_count;
+	sc->mt.maxcnt = 0x0000ffff;
+	sc->mt.frequency = 10000;
+	sc->mt.usec_to_ticks = mdx_time_usec_to_ticks;
+	sc->mt.arg = sc;
+	mdx_callout_register(&sc->mt);
 
 	return (0);
 }

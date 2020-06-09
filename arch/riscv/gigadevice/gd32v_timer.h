@@ -28,14 +28,19 @@
 #define _RISCV_GIGADEVICE_GD32V_TIMER_H_
 
 #define	TIMER_CTL0	0x00	/* Control register 0 */
+#define	 CTL0_CEN	(1 << 0) /* Counter enable */
 #define	TIMER_CTL1	0x04	/* Control register 1 */
 #define	TIMER_SMCFG	0x08	/* Slave mode configuration register */
 #define	TIMER_DMAINTEN	0x0C	/* DMA and interrupt enable register */
+#define	 DMAINTEN_CH0IE	(1 << 1) /* Channel 0 capture/compare interrupt enable*/
+#define	 DMAINTEN_UPIE	(1 << 0) /* Update interrupt enable */
 #define	TIMER_INTF	0x10	/* Interrupt flag register */
+#define	 INTF_CH0IF	(1 << 1) /* Channel 0 capture/compare interrupt flag */
 #define	TIMER_SWEVG	0x14	/* Software event generation register */
 #define	TIMER_CHCTL0	0x18	/* Channel control register 0 */
 #define	TIMER_CHCTL1	0x1C	/* Channel control register 1 */
 #define	TIMER_CHCTL2	0x20	/* Channel control register 2 */
+#define	 CHCTL2_CH0EN	(1 << 0) /* Channel 0 capture/compare function enable*/
 #define	TIMER_CNT	0x24	/* Counter register */
 #define	TIMER_PSC	0x28	/* Prescaler register */
 #define	TIMER_CAR	0x2C	/* Counter auto reload register */
@@ -50,8 +55,10 @@
 
 struct gd32v_timer_softc {
 	uint32_t base;
+	struct mi_timer mt;
 };
 
-int gd32v_timer_init(mdx_device_t dev, uint32_t base);
+int gd32v_timer_init(mdx_device_t dev, uint32_t base, int freq);
+void gd32v_timer_intr(void *arg, int irq);
 
 #endif /* !_RISCV_GIGADEVICE_GD32V_TIMER_H_ */
