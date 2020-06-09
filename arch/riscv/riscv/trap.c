@@ -84,7 +84,7 @@ handle_exception(struct trapframe *tf)
 	struct pcb *pcb;
 #endif
 
-	switch (tf->tf_mcause) {
+	switch (tf->tf_mcause & EXCP_MASK) {
 	case EXCP_MACHINE_ECALL:
 		tf->tf_mepc += 4;
 		break;

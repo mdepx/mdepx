@@ -38,7 +38,7 @@
 #define	_MACHINE_CPUREGS_H_
 
 #define	EXCP_SHIFT			0
-#define	EXCP_MASK			(0xf << EXCP_SHIFT)
+#define	EXCP_MASK			(0xfff << EXCP_SHIFT)
 #define	EXCP_MISALIGNED_FETCH		0
 #define	EXCP_FAULT_FETCH		1
 #define	EXCP_ILLEGAL_INSTRUCTION	2
