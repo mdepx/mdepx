@@ -34,9 +34,11 @@
 #define	RCU_APB1RST	0x10	/* APB1 reset register */
 #define	RCU_AHBEN	0x14	/* AHB enable register */
 #define	RCU_APB2EN	0x18	/* APB2 enable register */
-#define	 APB2EN_USART0	(1 << 14)	/* USART0 clock enable */
-#define	 APB2EN_PAEN	(1 << 2)	/* GPIO port A clock enable */
+#define	 APB2EN_USART0EN	(1 << 14)	/* USART0 clock enable */
+#define	 APB2EN_TIMER0EN	(1 << 11)	/* TIMER0 clock enable */
+#define	 APB2EN_PAEN		(1 << 2)	/* GPIO port A clock enable */
 #define	RCU_APB1EN	0x1C	/* APB1 enable register */
+#define	 APB1EN_TIMER1EN	(1 << 0) /* TIMER1 clock enable */
 #define	RCU_BDCTL	0x20	/* Backup domain control register */
 #define	RCU_RSTSCK	0x24	/* Reset source/clock register */
 #define	RCU_AHBRST	0x28	/* AHB reset register */
