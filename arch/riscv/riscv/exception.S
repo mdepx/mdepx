@@ -117,7 +117,12 @@
 	addi	sp, sp, (35 * REG_SIZE)
 .endm
 
-	.align 2
+/*
+ * riscv bumblebee core (gd32v) requires 6 bits alignment for its
+ * exception handler.
+ */
+
+	.align 6
 ASM_ENTRY(cpu_exception_handler)
 	save_registers 1
 	mv	a0, sp
