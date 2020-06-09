@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2019-2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,6 +34,7 @@
 
 #include <riscv/riscv/trap.h>
 #include <riscv/include/intr.h>
+#include <riscv/include/clic.h>
 #include <riscv/sifive/e300g_clint.h>
 
 #define	INTR_DEBUG
@@ -49,6 +50,13 @@ void
 riscv_intr(int irq)
 {
 
+#ifdef MDX_RISCV_CLIC
+	if (irq >= 16) {
+		clic_intr(irq);
+		return;
+	}
+#endif
+
 	switch (irq) {
 	case IRQ_TIMER_MACHINE:
 		clint_intr();
@@ -59,7 +67,8 @@ riscv_intr(int irq)
 		break;
 #endif
 	default:
-		printf("%s%d: %d\n", __func__, PCPU_GET(cpuid), irq);
+		printf("%s%d: Unhandled interrupt %d\n",
+		    __func__, PCPU_GET(cpuid), irq);
 		break;
 	}
 }

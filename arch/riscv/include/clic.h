@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019-2020 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,27 +24,24 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_MACHINE_INTR_H_
-#define	_MACHINE_INTR_H_
+#ifndef	_MACHINE_CLIC_H_
+#define	_MACHINE_CLIC_H_
 
-enum {
-	IRQ_SOFTWARE_USER,		/* CLINT */
-	IRQ_SOFTWARE_SUPERVISOR,	/* CLINT */
-	IRQ_SOFTWARE_HYPERVISOR,	/* CLINT */
-	IRQ_SOFTWARE_MACHINE,		/* CLINT */
-	IRQ_TIMER_USER,
-	IRQ_TIMER_SUPERVISOR,
-	IRQ_TIMER_HYPERVISOR,
-	IRQ_TIMER_MACHINE,
-	IRQ_EXTERNAL_USER,		/* PLIC */
-	IRQ_EXTERNAL_SUPERVISOR,	/* PLIC */
-	IRQ_EXTERNAL_HYPERVISOR,	/* PLIC */
-	IRQ_EXTERNAL_MACHINE,		/* PLIC */
-	IRQ_CLIC_SOFTWARE,		/* CLIC */
-	IRQ_CLIC_SUPERVISOR,		/* CLIC reserved */
-	IRQ_CLIC_HYPERVISOR,		/* CLIC reserved */
-	IRQ_CLIC_MACHINE,		/* CLIC reserved */
-	/* 16+ CLIC external inputs */
+#define	CLIC_MAX_INTERRUPTS	4096
+
+#define	CLIC_CFG		0x00
+#define	CLIC_INFO		0x04
+#define	CLIC_INT_IP(n)		(0x1000 + 4 * (n))
+#define	CLIC_INT_IE(n)		(0x1001 + 4 * (n))
+#define	CLIC_INT_ATTR(n)	(0x1002 + 4 * (n))
+#define	CLIC_INT_CTRL(n)	(0x1003 + 4 * (n))
+
+void clic_intr(int irq);
+void clic_init(mdx_device_t dev, size_t base);
+
+struct clic_intr_entry {
+	void (*handler) (void *arg, int irq);
+	void *arg;
 };
 
-#endif /* !_MACHINE_INTR_H_ */
+#endif /* !_MACHINE_CLIC_H_ */
