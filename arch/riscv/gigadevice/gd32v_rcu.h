@@ -38,6 +38,8 @@
 #define	 APB2EN_TIMER0EN	(1 << 11)	/* TIMER0 clock enable */
 #define	 APB2EN_PAEN		(1 << 2)	/* GPIO port A clock enable */
 #define	RCU_APB1EN	0x1C	/* APB1 enable register */
+#define	 APB1EN_I2C1EN		(1 << 22) /* I2C1 clock enable */
+#define	 APB1EN_I2C0EN		(1 << 21) /* I2C0 clock enable */
 #define	 APB1EN_TIMER1EN	(1 << 0) /* TIMER1 clock enable */
 #define	RCU_BDCTL	0x20	/* Backup domain control register */
 #define	RCU_RSTSCK	0x24	/* Reset source/clock register */
@@ -50,7 +52,7 @@ struct gd32v_rcu_softc {
 };
 
 int gd32v_rcu_init(mdx_device_t dev, uint32_t base);
-void gd32v_rcc_setup(mdx_device_t dev,
+void gd32v_rcu_setup(mdx_device_t dev,
     uint32_t ahben, uint32_t apb1en, uint32_t apb2en);
 
 #endif /* !_RISCV_GIGADEVICE_GD32V_RCU_H_ */

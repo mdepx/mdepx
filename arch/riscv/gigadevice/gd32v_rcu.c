@@ -35,7 +35,7 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
-gd32v_rcc_setup(mdx_device_t dev,
+gd32v_rcu_setup(mdx_device_t dev,
     uint32_t ahben, uint32_t apb1en, uint32_t apb2en)
 {
 	struct gd32v_rcu_softc *sc;
