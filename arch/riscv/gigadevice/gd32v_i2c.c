@@ -24,38 +24,23 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _RISCV_GIGADEVICE_GD32V_H_
-#define _RISCV_GIGADEVICE_GD32V_H_
+#include <sys/cdefs.h>
+#include <sys/systm.h>
 
-#include <riscv/gigadevice/gd32v_exti.h>
-#include <riscv/gigadevice/gd32v_gpio.h>
-#include <riscv/gigadevice/gd32v_i2c.h>
-#include <riscv/gigadevice/gd32v_rcu.h>
-#include <riscv/gigadevice/gd32v_timer.h>
-#include <riscv/gigadevice/gd32v_usart.h>
+#include "gd32v_i2c.h"
 
-#define	BASE_RCU	0x40021000
-#define	BASE_GFIO	0x40010000
-#define	BASE_GPIOA	0x40010800
-#define	BASE_GPIOB	0x40010C00
-#define	BASE_GPIOC	0x40011000
-#define	BASE_GPIOD	0x40011400
-#define	BASE_GPIOE	0x40011800
-#define	BASE_USART0	0x40013800
-#define	BASE_USART1	0x40004400
-#define	BASE_USART2	0x40004800
-#define	BASE_UART3	0x40004C00
-#define	BASE_UART4	0x40005000
-#define	BASE_EXTI	0x40010400
-#define	BASE_TIMER0	0x40012C00
-#define	BASE_TIMER1	0x40000000
-#define	BASE_TIMER2	0x40000400
-#define	BASE_TIMER3	0x40000800
-#define	BASE_TIMER4	0x40000C00
-#define	BASE_TIMER5	0x40001000
-#define	BASE_TIMER6	0x40001400
-#define	BASE_ECLIC	0xd2000000
-#define	BASE_I2C0	0x40005400
-#define	BASE_I2C1	0x40005800
+#define	RD4(_sc, _reg)		\
+	*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	\
+	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-#endif	/* !_RISCV_GIGADEVICE_GD32V_H_ */
+int
+gd32v_i2c_init(mdx_device_t dev, uint32_t base)
+{
+	struct gd32v_i2c_softc *sc;
+
+	sc = mdx_device_alloc_softc(dev, sizeof(struct gd32v_i2c_softc));
+	sc->base = base;
+
+	return (0);
+}
