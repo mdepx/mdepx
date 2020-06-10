@@ -28,8 +28,15 @@
 #define _RISCV_GIGADEVICE_GD32V_I2C_H_
 
 #define	I2C_CTL0	0x00	/* Control register 0 */
+#define	 CTL0_ACKEN	(1 << 10) /* Whether or not to send an ACK */
+#define	 CTL0_STOP	(1 << 9) /* Generate a STOP condition on I2C bus */
+#define	 CTL0_START	(1 << 8) /* Generate a START condition on I2C bus */
+#define	 CTL0_SS	(1 << 7) /* Whether to stretch SCL low when data is not ready in slave mode. */
+#define	 CTL0_GCEN	(1 << 6) /* Whether or not to response to a General Call (0x00) */
 #define	 CTL0_I2CEN	(1 << 0) /* I2C peripheral enable */
 #define	I2C_CTL1	0x04	/* Control register 1 */
+#define	 CTL1_I2CCLK_S	0	/*I2C Peripheral clock frequency */
+#define	 CTL1_I2CCLK_M	(0x3f << CTL1_I2CCLK_S)
 #define	I2C_SADDR0	0x08	/* Slave address register 0 */
 #define	I2C_SADDR1	0x0C	/* Slave address register 1 */
 #define	I2C_DATA	0x10	/* Transfer buffer register */
