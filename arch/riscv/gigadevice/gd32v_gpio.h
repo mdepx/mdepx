@@ -27,29 +27,31 @@
 #ifndef _RISCV_GIGADEVICE_GD32V_GPIO_H_
 #define _RISCV_GIGADEVICE_GD32V_GPIO_H_
 
-#define	GPIO_CTL(n)		(0x04 * (n))
-#define	 CTL_MD_S(n)		((n) * 0x4)
-#define	 CTL_MD_M(n)		(0x3 << CTL_MD_S(n))
-#define	 CTL_MD_INP(n)		(0 << CTL_MD_S(n))
-#define	 CTL_MD_OUT_10MHZ(n)	(1 << CTL_MD_S(n))
-#define	 CTL_MD_OUT_2MHZ(n)	(2 << CTL_MD_S(n))
-#define	 CTL_MD_OUT_50MHZ(n)	(3 << CTL_MD_S(n))
+#define	GPIO_CTL(pin)		(0x04 * ((pin) / 8))
+#define	 CTL_MD_S(pin)		(((pin) % 8) * 4)
+#define	 CTL_MD_M(pin)		(0x3 << CTL_MD_S(pin))
+#define	 CTL_MD_INP(pin)	(0 << CTL_MD_S(pin))
+#define	 CTL_MD_OUT_10MHZ(pin)	(1 << CTL_MD_S(pin))
+#define	 CTL_MD_OUT_2MHZ(pin)	(2 << CTL_MD_S(pin))
+#define	 CTL_MD_OUT_50MHZ(pin)	(3 << CTL_MD_S(pin))
 
-#define	 CTL_CTL_S(n)		(2 + (n) * 0x4)
-#define	 CTL_CTL_M(n)		(0x3 << CTL_CTL_S(n))
+#define	 CTL_CTL_S(pin)		(2 + ((pin) % 8) * 4)
+#define	 CTL_CTL_M(pin)		(0x3 << CTL_CTL_S(pin))
 /* Pin is output. */
-#define	 CTL_CTL_GPIO_PUSHPULL(n)	(0 << CTL_CTL_S(n))
-#define	 CTL_CTL_GPIO_OPENDRAIN(n)	(1 << CTL_CTL_S(n))
-#define	 CTL_CTL_AFIO_PUSHPULL(n)	(2 << CTL_CTL_S(n))
-#define	 CTL_CTL_AFIO_OPENDRAIN(n)	(3 << CTL_CTL_S(n))
+#define	 CTL_CTL_GPIO_PUSHPULL(pin)	(0 << CTL_CTL_S(pin))
+#define	 CTL_CTL_GPIO_OPENDRAIN(pin)	(1 << CTL_CTL_S(pin))
+#define	 CTL_CTL_AFIO_PUSHPULL(pin)	(2 << CTL_CTL_S(pin))
+#define	 CTL_CTL_AFIO_OPENDRAIN(pin)	(3 << CTL_CTL_S(pin))
 /* Pin is input. */
-#define	 CTL_CTL_ANALOG(n)		(0 << CTL_CTL_S(n))
-#define	 CTL_CTL_INP_FLOATING(n)	(1 << CTL_CTL_S(n))
-#define	 CTL_CTL_INP_PULLUPDOWN(n)	(2 << CTL_CTL_S(n))
+#define	 CTL_CTL_ANALOG(pin)		(0 << CTL_CTL_S(pin))
+#define	 CTL_CTL_INP_FLOATING(pin)	(1 << CTL_CTL_S(pin))
+#define	 CTL_CTL_INP_PULLUPDOWN(pin)	(2 << CTL_CTL_S(pin))
 
 #define	GPIO_BOP		0x10 /* Port bit operate register */
 #define	 BOP_BOP_S		0	/* Port Set bit */
+#define	 BOP_BOP(pin)		(1 << ((pin) + BOP_BOP_S))
 #define	 BOP_CR_S		16	/* Port Clear bit */
+#define	 BOP_CR(pin)		(1 << ((pin) + BOP_CR_S))
 
 struct gd32v_gpio_softc {
 	uint32_t base;

@@ -46,45 +46,44 @@ gd32v_gpio_pin_configure(mdx_device_t dev, int bank, int pin, int flags)
 
 	KASSERT(bank == 0, ("Bank 0 supported only."));
 
-	reg = RD4(sc, GPIO_CTL(pin / 8));
-	reg &= ~CTL_MD_M(pin / 8);
-	reg &= ~CTL_CTL_M(pin / 8);
+	reg = RD4(sc, GPIO_CTL(pin));
+	reg &= ~CTL_MD_M(pin);
+	reg &= ~CTL_CTL_M(pin);
 
 	if (flags & MDX_GPIO_OUTPUT) {
 		if (flags & MDX_GPIO_SPEED_LOW)
-			reg |= CTL_MD_OUT_2MHZ(pin / 8);
+			reg |= CTL_MD_OUT_2MHZ(pin);
 		else if (flags & MDX_GPIO_SPEED_MEDIUM)
-			reg |= CTL_MD_OUT_10MHZ(pin / 8);
+			reg |= CTL_MD_OUT_10MHZ(pin);
 		else if (flags & MDX_GPIO_SPEED_HIGH)
-			reg |= CTL_MD_OUT_50MHZ(pin / 8);
+			reg |= CTL_MD_OUT_50MHZ(pin);
 
 		if (flags & MDX_GPIO_ALT_FUNC) {
 			if (flags & MDX_GPIO_PUSH_PULL)
-				reg |= CTL_CTL_AFIO_PUSHPULL(pin / 8);
+				reg |= CTL_CTL_AFIO_PUSHPULL(pin);
 			else if (flags & MDX_GPIO_OPEN_DRAIN)
-				reg |= CTL_CTL_AFIO_OPENDRAIN(pin / 8);
+				reg |= CTL_CTL_AFIO_OPENDRAIN(pin);
 		} else {
 			if (flags & MDX_GPIO_PUSH_PULL)
-				reg |= CTL_CTL_GPIO_PUSHPULL(pin / 8);
+				reg |= CTL_CTL_GPIO_PUSHPULL(pin);
 			else if (flags & MDX_GPIO_OPEN_DRAIN)
-				reg |= CTL_CTL_GPIO_OPENDRAIN(pin / 8);
+				reg |= CTL_CTL_GPIO_OPENDRAIN(pin);
 		}
 	} else {
-		reg |= CTL_MD_INP(pin / 8);
+		reg |= CTL_MD_INP(pin);
 		if (flags & MDX_GPIO_FLOATING)
-			reg |= CTL_CTL_INP_FLOATING(pin / 8);
-
-		if (flags & MDX_GPIO_PULL_UP ||
+			reg |= CTL_CTL_INP_FLOATING(pin);
+		else if (flags & MDX_GPIO_PULL_UP ||
 		    flags & MDX_GPIO_PULL_DOWN)
-			reg |= CTL_CTL_INP_PULLUPDOWN(pin / 8);
+			reg |= CTL_CTL_INP_PULLUPDOWN(pin);
 
 		if (flags & MDX_GPIO_PULL_UP)
-			WR4(sc, GPIO_BOP, pin << BOP_BOP_S);
+			WR4(sc, GPIO_BOP, BOP_BOP(pin));
 		else if (flags & MDX_GPIO_PULL_DOWN)
-			WR4(sc, GPIO_BOP, pin << BOP_CR_S);
+			WR4(sc, GPIO_BOP, BOP_CR(pin));
 	}
 
-	WR4(sc, GPIO_CTL(pin / 8), reg);
+	WR4(sc, GPIO_CTL(pin), reg);
 
 	return (0);
 }
@@ -92,8 +91,14 @@ gd32v_gpio_pin_configure(mdx_device_t dev, int bank, int pin, int flags)
 static int
 gd32v_gpio_pin_set(mdx_device_t dev, int bank, int pin, int val)
 {
+	struct gd32v_gpio_softc *sc;
 
-	/* TODO */
+	sc = mdx_device_get_softc(dev);
+
+	if (val)
+		WR4(sc, GPIO_BOP, BOP_BOP(pin));
+	else
+		WR4(sc, GPIO_BOP, BOP_CR(pin));
 
 	return (0);
 }
