@@ -37,6 +37,10 @@
 #define	 APB2EN_USART0EN	(1 << 14)	/* USART0 clock enable */
 #define	 APB2EN_TIMER0EN	(1 << 11)	/* TIMER0 clock enable */
 #define	 APB2EN_PAEN		(1 << 2)	/* GPIO port A clock enable */
+#define	 APB2EN_PBEN		(1 << 3)	/* GPIO port B clock enable */
+#define	 APB2EN_PCEN		(1 << 4)	/* GPIO port B clock enable */
+#define	 APB2EN_PDEN		(1 << 5)	/* GPIO port B clock enable */
+#define	 APB2EN_PEEN		(1 << 6)	/* GPIO port B clock enable */
 #define	RCU_APB1EN	0x1C	/* APB1 enable register */
 #define	 APB1EN_I2C1EN		(1 << 22) /* I2C1 clock enable */
 #define	 APB1EN_I2C0EN		(1 << 21) /* I2C0 clock enable */
