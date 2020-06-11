@@ -27,6 +27,8 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 
+#include <dev/i2c/i2c.h>
+
 #include "gd32v_i2c.h"
 
 #define	RD4(_sc, _reg)		\
@@ -34,13 +36,108 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
+static int
+gd32v_i2c_xfer(mdx_device_t dev, struct i2c_msg *msgs, int len)
+{
+	struct gd32v_i2c_softc *sc;
+	struct i2c_msg *msg;
+	uint32_t reg;
+	int i;
+	int j;
+
+	sc = mdx_device_get_softc(dev);
+
+	for (i = 0; i < len; i++) {
+		msg = &msgs[i];
+
+		/* Wait until i2c bus is empty. */
+		while (RD4(sc, I2C_STAT1) & STAT1_I2CBSY);
+
+		/* Send start condition. */
+		reg = RD4(sc, I2C_CTL0);
+		reg |= CTL0_START;
+		WR4(sc, I2C_CTL0, reg);
+
+		/* Wait for the start condition to happen. */
+		while ((RD4(sc, I2C_STAT0) & STAT0_SBSEND) == 0);
+
+		/* Send i2c address. */
+		if (msg->flags & IIC_M_RD)
+			WR4(sc, I2C_DATA, (msg->slave << 1 | 1));
+		else
+			WR4(sc, I2C_DATA, (msg->slave << 1 | 0));
+
+		/* Wait until address sent. */
+		while ((RD4(sc, I2C_STAT0) & STAT0_ADDSEND) == 0);
+
+		/* Clear ADDSEND by reading STAT1. */
+		reg = RD4(sc, I2C_STAT1);
+
+		if (msg->flags & IIC_M_RD) {
+			for (j = 0; j < msg->len; j++) {
+				if (j == (msg->len - 1)) {
+					reg = RD4(sc, I2C_CTL0);
+					reg &= ~CTL0_ACKEN;
+					WR4(sc, I2C_CTL0, reg);
+
+					reg = RD4(sc, I2C_CTL0);
+					reg |= CTL0_STOP;
+					WR4(sc, I2C_CTL0, reg);
+				}
+				/* Wait for the data. */
+				while ((RD4(sc, I2C_STAT0) & STAT0_RBNE) == 0);
+
+				msg->buf[j] = RD4(sc, I2C_DATA);
+			}
+
+			while (RD4(sc, I2C_STAT0) & STAT0_LOSTARB);
+
+			/* Restore ACK. */
+			reg = RD4(sc, I2C_CTL0);
+			reg |= CTL0_ACKEN;
+			WR4(sc, I2C_CTL0, reg);
+		} else {
+			for (j = 0; j < msg->len; j++) {
+				while ((RD4(sc, I2C_STAT0) & STAT0_TBE) == 0);
+				WR4(sc, I2C_DATA, msg->buf[j]);
+				while ((RD4(sc, I2C_STAT0) & STAT0_BTC) == 0);
+			}
+			if ((msg->flags & IIC_M_NOSTOP) == 0) {
+				reg = RD4(sc, I2C_CTL0);
+				reg |= CTL0_STOP;
+				WR4(sc, I2C_CTL0, reg);
+				while (RD4(sc, I2C_STAT0) & STAT0_LOSTARB);
+			}
+		}
+	}
+
+	return (0);
+}
+
+static struct mdx_i2c_ops gd32v_i2c_ops = {
+	.xfer = gd32v_i2c_xfer,
+};
+
 int
 gd32v_i2c_init(mdx_device_t dev, uint32_t base)
 {
 	struct gd32v_i2c_softc *sc;
+	uint32_t reg;
 
 	sc = mdx_device_alloc_softc(dev, sizeof(struct gd32v_i2c_softc));
 	sc->base = base;
+
+	dev->ops = (void *)&gd32v_i2c_ops;
+
+#if 1
+	/* TODO: remove this */
+	WR4(sc, I2C_RT, 4);
+	WR4(sc, I2C_CKCFG, 30);
+
+	reg = 25 << CTL1_I2CCLK_S;
+	WR4(sc, I2C_CTL1, reg);
+	WR4(sc, I2C_CTL0, CTL0_I2CEN | CTL0_ACKEN);
+#endif
 
 	return (0);
 }

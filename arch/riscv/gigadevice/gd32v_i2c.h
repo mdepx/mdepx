@@ -41,7 +41,14 @@
 #define	I2C_SADDR1	0x0C	/* Slave address register 1 */
 #define	I2C_DATA	0x10	/* Transfer buffer register */
 #define	I2C_STAT0	0x14	/* Transfer status register 0 */
+#define	 STAT0_LOSTARB	(1 << 9) /*  Arbitration Lost in master mode */
+#define	 STAT0_TBE	(1 << 7) /* I2C_DATA is Empty during transmitting */
+#define	 STAT0_RBNE	(1 << 6) /* I2C_DATA is not Empty during receiving */
+#define	 STAT0_BTC	(1 << 2) /* Byte transmission completed. */
+#define	 STAT0_ADDSEND	(1 << 1) /* Address is sent in master mode or received and matches in slave mode. */
+#define	 STAT0_SBSEND	(1 << 0) /* START condition sent out in master mode */
 #define	I2C_STAT1	0x18	/* Transfer status register 1 */
+#define	 STAT1_I2CBSY	(1 << 1) /* Busy flag */
 #define	I2C_CKCFG	0x1C	/* Clock configure register */
 #define	I2C_RT		0x20	/* Rise time register */
 #define	I2C_FMPCFG	0x90	/* Fast mode plus configure register */
