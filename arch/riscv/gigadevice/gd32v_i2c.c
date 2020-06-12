@@ -37,6 +37,46 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 static int
+gd32v_i2c_wait_bsy(struct gd32v_i2c_softc *sc)
+{
+	int timeout;
+
+	timeout = 100;
+
+	do
+		if ((RD4(sc, I2C_STAT1) & STAT1_I2CBSY) == 0)
+			break;
+	while (timeout--);
+
+	if (timeout <= 0) {
+		printf("i2c bus is busy\n");
+		return (0);
+	}
+
+	return (1);
+}
+
+static int
+gd32v_i2c_wait_flag(struct gd32v_i2c_softc *sc, int flag)
+{
+	int timeout;
+
+	timeout = 100;
+
+	do
+		if (RD4(sc, I2C_STAT0) & flag)
+			break;
+	while (timeout--);
+
+	if (timeout <= 0) {
+		printf("timeout\n");
+		return (0);
+	}
+
+	return (1);
+}
+
+static int
 gd32v_i2c_xfer(mdx_device_t dev, struct i2c_msg *msgs, int len)
 {
 	struct gd32v_i2c_softc *sc;
@@ -50,8 +90,9 @@ gd32v_i2c_xfer(mdx_device_t dev, struct i2c_msg *msgs, int len)
 	for (i = 0; i < len; i++) {
 		msg = &msgs[i];
 
-		/* Wait until i2c bus is empty. */
-		while (RD4(sc, I2C_STAT1) & STAT1_I2CBSY);
+		/* Ensure i2c bus is not busy */
+		if (gd32v_i2c_wait_bsy(sc) == 0)
+			return (-1);
 
 		/* Send start condition. */
 		reg = RD4(sc, I2C_CTL0);
@@ -59,7 +100,8 @@ gd32v_i2c_xfer(mdx_device_t dev, struct i2c_msg *msgs, int len)
 		WR4(sc, I2C_CTL0, reg);
 
 		/* Wait for the start condition to happen. */
-		while ((RD4(sc, I2C_STAT0) & STAT0_SBSEND) == 0);
+		if (gd32v_i2c_wait_flag(sc, STAT0_SBSEND) == 0)
+			return (-1);
 
 		/* Send i2c address. */
 		if (msg->flags & IIC_M_RD)
@@ -68,7 +110,8 @@ gd32v_i2c_xfer(mdx_device_t dev, struct i2c_msg *msgs, int len)
 			WR4(sc, I2C_DATA, (msg->slave << 1 | 0));
 
 		/* Wait until address sent. */
-		while ((RD4(sc, I2C_STAT0) & STAT0_ADDSEND) == 0);
+		if (gd32v_i2c_wait_flag(sc, STAT0_ADDSEND) == 0)
+			return (-1);
 
 		/* Clear ADDSEND by reading STAT1. */
 		reg = RD4(sc, I2C_STAT1);
