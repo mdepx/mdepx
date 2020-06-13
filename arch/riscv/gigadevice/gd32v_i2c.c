@@ -26,6 +26,8 @@
 
 #include <sys/cdefs.h>
 #include <sys/systm.h>
+#include <sys/mutex.h>
+#include <sys/sem.h>
 
 #include <dev/i2c/i2c.h>
 
@@ -36,89 +38,52 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-static int
-gd32v_i2c_wait_bsy(struct gd32v_i2c_softc *sc)
-{
-	int timeout;
-
-	timeout = 100;
-
-	do
-		if ((RD4(sc, I2C_STAT1) & STAT1_I2CBSY) == 0)
-			break;
-	while (timeout--);
-
-	if (timeout <= 0) {
-		printf("i2c bus is busy\n");
-		return (0);
-	}
-
-	return (1);
-}
-
-static int
-gd32v_i2c_wait_flag(struct gd32v_i2c_softc *sc, int flag)
-{
-	int timeout;
-
-	timeout = 100;
-
-	do
-		if (RD4(sc, I2C_STAT0) & flag)
-			break;
-	while (timeout--);
-
-	if (timeout <= 0) {
-		printf("timeout\n");
-		return (0);
-	}
-
-	return (1);
-}
-
-static int
-gd32v_i2c_xfer(mdx_device_t dev, struct i2c_msg *msgs, int len)
+void
+gd32v_i2c_event_intr(void *arg, int irq)
 {
 	struct gd32v_i2c_softc *sc;
 	struct i2c_msg *msg;
+	mdx_device_t dev;
+	int pending0;
+	int pending1;
 	uint32_t reg;
-	int i;
-	int j;
 
+	dev = arg;
 	sc = mdx_device_get_softc(dev);
 
-	for (i = 0; i < len; i++) {
-		msg = &msgs[i];
+	pending0 = RD4(sc, I2C_STAT0);
+	pending1 = RD4(sc, I2C_STAT1);
 
-		/* Ensure i2c bus is not busy */
-		if (gd32v_i2c_wait_bsy(sc) == 0)
-			return (-1);
+	msg = sc->curmsg;
 
-		/* Send start condition. */
-		reg = RD4(sc, I2C_CTL0);
-		reg |= CTL0_START;
-		WR4(sc, I2C_CTL0, reg);
+	if (pending1 == 0) {
+		if (pending0 == 0) {
+			/* Not sure why we are here. */
+			return;
+		}
+		/* I2C bus is not active, ensure fifo has no entries. */
+		while (RD4(sc, I2C_STAT0) & 0x40)
+			reg = RD4(sc, I2C_DATA);
+		mdx_sem_post(&sc->sem);
+		return;
+	}
 
-		/* Wait for the start condition to happen. */
-		if (gd32v_i2c_wait_flag(sc, STAT0_SBSEND) == 0)
-			return (-1);
-
+	if (pending0 & STAT0_SBSEND) {
 		/* Send i2c address. */
 		if (msg->flags & IIC_M_RD)
 			WR4(sc, I2C_DATA, (msg->slave << 1 | 1));
 		else
 			WR4(sc, I2C_DATA, (msg->slave << 1 | 0));
+		return;
+	}
 
-		/* Wait until address sent. */
-		if (gd32v_i2c_wait_flag(sc, STAT0_ADDSEND) == 0)
-			return (-1);
+	if (msg->len == 0)
+		return;
 
-		/* Clear ADDSEND by reading STAT1. */
-		reg = RD4(sc, I2C_STAT1);
-
-		if (msg->flags & IIC_M_RD) {
-			for (j = 0; j < msg->len; j++) {
-				if (j == (msg->len - 1)) {
+	if (msg->flags & IIC_M_RD) {
+		if (pending0 & STAT0_RBNE) {
+			while (RD4(sc, I2C_STAT0) & STAT0_RBNE) {
+				if (msg->len == 1) {
 					reg = RD4(sc, I2C_CTL0);
 					reg &= ~CTL0_ACKEN;
 					WR4(sc, I2C_CTL0, reg);
@@ -127,31 +92,62 @@ gd32v_i2c_xfer(mdx_device_t dev, struct i2c_msg *msgs, int len)
 					reg |= CTL0_STOP;
 					WR4(sc, I2C_CTL0, reg);
 				}
-				/* Wait for the data. */
-				while ((RD4(sc, I2C_STAT0) & STAT0_RBNE) == 0);
 
-				msg->buf[j] = RD4(sc, I2C_DATA);
+				msg->buf[sc->bufpos++] = RD4(sc, I2C_DATA);
+				msg->len -= 1;
+				if (msg->len == 0)
+					break;
 			}
-
-			while (RD4(sc, I2C_STAT0) & STAT0_LOSTARB);
-
-			/* Restore ACK. */
-			reg = RD4(sc, I2C_CTL0);
-			reg |= CTL0_ACKEN;
-			WR4(sc, I2C_CTL0, reg);
-		} else {
-			for (j = 0; j < msg->len; j++) {
-				while ((RD4(sc, I2C_STAT0) & STAT0_TBE) == 0);
-				WR4(sc, I2C_DATA, msg->buf[j]);
-				while ((RD4(sc, I2C_STAT0) & STAT0_BTC) == 0);
-			}
-			if ((msg->flags & IIC_M_NOSTOP) == 0) {
+		}
+	} else {
+		if (pending0 & STAT0_TBE) {
+			WR4(sc, I2C_DATA, msg->buf[sc->bufpos++]);
+			msg->len -= 1;
+			if (msg->len == 0) {
 				reg = RD4(sc, I2C_CTL0);
 				reg |= CTL0_STOP;
 				WR4(sc, I2C_CTL0, reg);
-				while (RD4(sc, I2C_STAT0) & STAT0_LOSTARB);
+				mdx_sem_post(&sc->sem);
 			}
 		}
+	}
+}
+
+void
+gd32v_i2c_error_intr(void *arg, int irq)
+{
+
+	printf("%s\n", __func__);
+}
+
+static int
+gd32v_i2c_xfer(mdx_device_t dev, struct i2c_msg *msgs, int len)
+{
+	struct gd32v_i2c_softc *sc;
+	struct i2c_msg *msg;
+	uint32_t reg;
+	int error;
+	int i;
+
+	sc = mdx_device_get_softc(dev);
+
+	for (i = 0; i < len; i++) {
+		msg = &msgs[i];
+
+		sc->curmsg = msg;
+
+		mdx_sem_init(&sc->sem, 0);
+		sc->bufpos = 0;
+
+		/* Send start condition. */
+		reg = RD4(sc, I2C_CTL0);
+		reg |= CTL0_ACKEN;
+		reg |= CTL0_START;
+		WR4(sc, I2C_CTL0, reg);
+
+		error = mdx_sem_timedwait(&sc->sem, 1000000);
+		if (error == 0)
+			return (-1);
 	}
 
 	return (0);
@@ -178,6 +174,7 @@ gd32v_i2c_init(mdx_device_t dev, uint32_t base)
 	WR4(sc, I2C_CKCFG, 30);
 
 	reg = 25 << CTL1_I2CCLK_S;
+	reg |= CTL1_BUFIE | CTL1_EVIE | CTL1_ERRIE;
 	WR4(sc, I2C_CTL1, reg);
 	WR4(sc, I2C_CTL0, CTL0_I2CEN | CTL0_ACKEN);
 #endif

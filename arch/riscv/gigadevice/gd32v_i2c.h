@@ -27,6 +27,8 @@
 #ifndef _RISCV_GIGADEVICE_GD32V_I2C_H_
 #define _RISCV_GIGADEVICE_GD32V_I2C_H_
 
+#include <sys/sem.h>
+
 #define	I2C_CTL0	0x00	/* Control register 0 */
 #define	 CTL0_ACKEN	(1 << 10) /* Whether or not to send an ACK */
 #define	 CTL0_STOP	(1 << 9) /* Generate a STOP condition on I2C bus */
@@ -35,6 +37,9 @@
 #define	 CTL0_GCEN	(1 << 6) /* Whether or not to response to a General Call (0x00) */
 #define	 CTL0_I2CEN	(1 << 0) /* I2C peripheral enable */
 #define	I2C_CTL1	0x04	/* Control register 1 */
+#define	 CTL1_BUFIE	(1 << 10) /* BUFIE  Buffer interrupt enable */
+#define	 CTL1_EVIE	(1 << 9) /* Event interrupt enable */
+#define	 CTL1_ERRIE	(1 << 8) /* Error interrupt enable */
 #define	 CTL1_I2CCLK_S	0	/*I2C Peripheral clock frequency */
 #define	 CTL1_I2CCLK_M	(0x3f << CTL1_I2CCLK_S)
 #define	I2C_SADDR0	0x08	/* Slave address register 0 */
@@ -49,14 +54,20 @@
 #define	 STAT0_SBSEND	(1 << 0) /* START condition sent out in master mode */
 #define	I2C_STAT1	0x18	/* Transfer status register 1 */
 #define	 STAT1_I2CBSY	(1 << 1) /* Busy flag */
+#define	 STAT1_MASTER	(1 << 0) /* I2C block is in master mode */
 #define	I2C_CKCFG	0x1C	/* Clock configure register */
 #define	I2C_RT		0x20	/* Rise time register */
 #define	I2C_FMPCFG	0x90	/* Fast mode plus configure register */
 
 struct gd32v_i2c_softc {
 	uint32_t base;
+	struct i2c_msg *curmsg;
+	int bufpos;
+	mdx_sem_t sem;
 };
 
 int gd32v_i2c_init(mdx_device_t dev, uint32_t base);
+void gd32v_i2c_event_intr(void *arg, int irq);
+void gd32v_i2c_error_intr(void *arg, int irq);
 
 #endif /* !_RISCV_GIGADEVICE_GD32V_I2C_H_ */
