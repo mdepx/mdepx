@@ -61,9 +61,12 @@ gd32v_i2c_event_intr(void *arg, int irq)
 			/* Not sure why we are here. */
 			return;
 		}
-		/* I2C bus is not active, ensure fifo has no entries. */
-		while (RD4(sc, I2C_STAT0) & 0x40)
-			reg = RD4(sc, I2C_DATA);
+		/*
+		 * I2C bus is not active, but fifo has entries.
+		 * Drain it.
+		 */
+		while (RD4(sc, I2C_STAT0) & STAT0_RBNE)
+			RD4(sc, I2C_DATA);
 		mdx_sem_post(&sc->sem);
 		return;
 	}
