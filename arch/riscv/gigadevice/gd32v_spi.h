@@ -30,8 +30,25 @@
 #include <sys/sem.h>
 
 #define	SPI_CTL0	0x00	/* Control register 0 */
+#define	 CTL0_SWNSSEN	(1 << 9) /* NSS software mode enable */
+#define	 CTL0_SPIEN	(1 << 6) /* SPI enable */
+#define	 CTL0_PSC_S	3
+#define	 CTL0_PSC_M	(0x7 << CTL0_PSC_S)
+#define	 CTL0_PSC_2	(0 << CTL0_PSC_S)
+#define	 CTL0_PSC_4	(1 << CTL0_PSC_S)
+#define	 CTL0_PSC_8	(2 << CTL0_PSC_S)
+#define	 CTL0_PSC_16	(3 << CTL0_PSC_S)
+#define	 CTL0_PSC_32	(4 << CTL0_PSC_S)
+#define	 CTL0_PSC_64	(5 << CTL0_PSC_S)
+#define	 CTL0_PSC_128	(6 << CTL0_PSC_S)
+#define	 CTL0_PSC_256	(7 << CTL0_PSC_S)
+#define	 CTL0_MSTMOD	(1 << 2) /* Master mode enable */
+#define	 CTL0_CKPL	(1 << 1) /* Clock polarity selection */
+#define	 CTL0_CKPH	(1 << 0) /* Clock phase selection */
 #define	SPI_CTL1	0x04	/* Control register 1 */
 #define	SPI_STAT	0x08	/* Status register */
+#define	 STAT_TRANS	(1 << 7) /* Transmitting ongoing bit */
+#define	 STAT_TBE	(1 << 1) /* Transmit buffer empty */
 #define	SPI_DATA	0x0C	/* Data register */
 #define	SPI_CRCPOLY	0x10	/* CRC polynomial register */
 #define	SPI_RCRC	0x14	/* RX CRC register */
@@ -44,6 +61,7 @@ struct gd32v_spi_softc {
 	mdx_sem_t sem;
 };
 
-int gd32v_spi_init(mdx_device_t dev, uint32_t base);
+void gd32v_spi_init(mdx_device_t dev, uint32_t base);
+void gd32v_spi_intr(void *arg);
 
 #endif /* !_RISCV_GIGADEVICE_GD32V_SPI_H_ */
