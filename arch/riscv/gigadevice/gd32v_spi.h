@@ -24,44 +24,26 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _RISCV_GIGADEVICE_GD32V_H_
-#define _RISCV_GIGADEVICE_GD32V_H_
+#ifndef _RISCV_GIGADEVICE_GD32V_SPI_H_
+#define _RISCV_GIGADEVICE_GD32V_SPI_H_
 
-#include <riscv/gigadevice/gd32v_exti.h>
-#include <riscv/gigadevice/gd32v_gpio.h>
-#include <riscv/gigadevice/gd32v_i2c.h>
-#include <riscv/gigadevice/gd32v_rcu.h>
-#include <riscv/gigadevice/gd32v_spi.h>
-#include <riscv/gigadevice/gd32v_timer.h>
-#include <riscv/gigadevice/gd32v_usart.h>
+#include <sys/sem.h>
 
-#define	BASE_RCU	0x40021000
-#define	BASE_GFIO	0x40010000
-#define	BASE_GPIOA	0x40010800
-#define	BASE_GPIOB	0x40010C00
-#define	BASE_GPIOC	0x40011000
-#define	BASE_GPIOD	0x40011400
-#define	BASE_GPIOE	0x40011800
-#define	BASE_USART0	0x40013800
-#define	BASE_USART1	0x40004400
-#define	BASE_USART2	0x40004800
-#define	BASE_UART3	0x40004C00
-#define	BASE_UART4	0x40005000
-#define	BASE_EXTI	0x40010400
-#define	BASE_TIMER0	0x40012C00
-#define	BASE_TIMER1	0x40000000
-#define	BASE_TIMER2	0x40000400
-#define	BASE_TIMER3	0x40000800
-#define	BASE_TIMER4	0x40000C00
-#define	BASE_TIMER5	0x40001000
-#define	BASE_TIMER6	0x40001400
-#define	BASE_ECLIC	0xd2000000
-#define	BASE_I2C0	0x40005400
-#define	BASE_I2C1	0x40005800
-#define	BASE_SPI0	0x40013000
-#define	BASE_SPI1	0x40003800
-#define	BASE_SPI2	0x40003C00
-#define	BASE_I2S1	0x40003800
-#define	BASE_I2S2	0x40003C00
+#define	SPI_CTL0	0x00	/* Control register 0 */
+#define	SPI_CTL1	0x04	/* Control register 1 */
+#define	SPI_STAT	0x08	/* Status register */
+#define	SPI_DATA	0x0C	/* Data register */
+#define	SPI_CRCPOLY	0x10	/* CRC polynomial register */
+#define	SPI_RCRC	0x14	/* RX CRC register */
+#define	SPI_TCRC	0x18	/* TX CRC register */
+#define	SPI_I2SCTL	0x1C	/* I2S control register */
+#define	SPI_I2SPSC	0x20	/* I2S clock prescaler register */
 
-#endif	/* !_RISCV_GIGADEVICE_GD32V_H_ */
+struct gd32v_spi_softc {
+	uint32_t base;
+	mdx_sem_t sem;
+};
+
+int gd32v_spi_init(mdx_device_t dev, uint32_t base);
+
+#endif /* !_RISCV_GIGADEVICE_GD32V_SPI_H_ */
