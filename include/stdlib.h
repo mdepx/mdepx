@@ -27,6 +27,8 @@
 #ifndef _STDLIB_H_
 #define _STDLIB_H_
 
+#include <sys/types.h>
+
 void *malloc(size_t size);
 void *calloc(size_t number, size_t size);
 void *realloc(void *ptr, size_t size);
