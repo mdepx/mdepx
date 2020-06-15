@@ -109,7 +109,8 @@ get_char_info(struct font_info *font, uint16_t c,
 	ci->xsize = (ci->right - ci->left);
 	ci->ysize = (ci->ascent + ci->descent);
 
-	dprintf("xsize %d ysize %d box %d\n", ci->xsize, ci->ysize, (ci->xsize * ci->ysize));
+	dprintf("xsize %d ysize %d box %d\n",
+	    ci->xsize, ci->ysize, (ci->xsize * ci->ysize));
 	dprintf("left %d right %d width %d ascent %d descent %d\n",
 	    ci->left, ci->right, ci->width, ci->ascent, ci->descent);
 }

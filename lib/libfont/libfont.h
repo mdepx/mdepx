@@ -30,24 +30,24 @@
 #define	MAXCHAR	2048 /* Limit, max possible 0xffff */
 
 struct font_info {
-	uint16_t charmap[MAXCHAR];
-	uint8_t *metrics_data;
-	uint16_t metrics_count;
-	uint8_t *bitmap_data;
-	uint32_t *offsets_data;
-	uint16_t *encodings_data;
-	void	(*draw_pixel)(void *arg, int x, int y, int bit);
-	void	*draw_pixel_arg;
+	uint16_t	charmap[MAXCHAR];
+	uint8_t		*metrics_data;
+	uint16_t	metrics_count;
+	uint8_t		*bitmap_data;
+	uint32_t	*offsets_data;
+	uint16_t	*encodings_data;
+	void		(*draw_pixel)(void *arg, int x, int y, int bit);
+	void		*draw_pixel_arg;
 };
 
 struct char_info {
-	uint8_t left;
-	uint8_t right;
-	uint8_t width;
-	uint8_t ascent;
-	uint8_t descent;
-	uint32_t xsize;
-	uint32_t ysize;
+	uint8_t		left;
+	uint8_t		right;
+	uint8_t		width;
+	uint8_t		ascent;
+	uint8_t		descent;
+	uint32_t	xsize;
+	uint32_t	ysize;
 };
 
 int font_init(struct font_info *font, uint8_t *header);
