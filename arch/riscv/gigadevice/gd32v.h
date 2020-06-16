@@ -27,6 +27,7 @@
 #ifndef _RISCV_GIGADEVICE_GD32V_H_
 #define _RISCV_GIGADEVICE_GD32V_H_
 
+#include <riscv/gigadevice/gd32v_dma.h>
 #include <riscv/gigadevice/gd32v_exti.h>
 #include <riscv/gigadevice/gd32v_gpio.h>
 #include <riscv/gigadevice/gd32v_i2c.h>
@@ -63,5 +64,7 @@
 #define	BASE_SPI2	0x40003C00
 #define	BASE_I2S1	0x40003800
 #define	BASE_I2S2	0x40003C00
+#define	BASE_DMA0	0x40020000
+#define	BASE_DMA1	0x40020400
 
 #endif	/* !_RISCV_GIGADEVICE_GD32V_H_ */
