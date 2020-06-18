@@ -25,6 +25,7 @@
  */
 
 #include <sys/cdefs.h>
+#include <dev/dma/dma.h>
 
 #include "gd32v_dma.h"
 
@@ -41,15 +42,96 @@
 	*(volatile uint32_t *)((_sc)->base + _reg)
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
-#define	RD2(_sc, _reg)		\
-	*(volatile uint16_t *)((_sc)->base + _reg)
-#define	WR2(_sc, _reg, _val)	\
-	*(volatile uint16_t *)((_sc)->base + _reg) = _val
 
 void
-gd32v_dma_intr(void *arg)
+gd32v_dma_intr(void *arg, int irq)
 {
+	struct gd32v_dma_softc *sc;
+	mdx_device_t dev;
+	uint32_t pending;
 
+	dev = arg;
+	sc = mdx_device_get_softc(dev);
+
+	pending = RD4(sc, DMA_INTF);
+
+	dprintf("%s: %x\n", __func__, pending);
+
+	WR4(sc, DMA_INTC, pending);
+
+	mdx_sem_post(&sc->sem);
+}
+
+void
+gd32v_dma_setup(mdx_device_t dev, int chan, struct dma_desc *desc)
+{
+	struct gd32v_dma_softc *sc;
+	uint32_t reg;
+
+	sc = mdx_device_get_softc(dev);
+
+	WR4(sc, DMA_CHCTL(chan), 0);
+
+	mdx_sem_init(&sc->sem, 0);
+
+	dprintf("dma: chan %d copying %d times %x -> %x\n",
+	    chan, desc->count, desc->src_addr, desc->dst_addr);
+
+	WR4(sc, DMA_CHMADDR(chan), desc->src_addr);
+	WR4(sc, DMA_CHPADDR(chan), desc->dst_addr);
+
+	reg = 0;
+
+	switch (desc->src_width) {
+	case 32:
+		reg |= CHCTL_MWIDTH_32BIT;
+		break;
+	case 16:
+		reg |= CHCTL_MWIDTH_16BIT;
+		break;
+	case 8:
+		reg |= CHCTL_MWIDTH_8BIT;
+		break;
+	};
+
+	switch (desc->dst_width) {
+	case 32:
+		reg |= CHCTL_PWIDTH_32BIT;
+		break;
+	case 16:
+		reg |= CHCTL_PWIDTH_16BIT;
+		break;
+	case 8:
+		reg |= CHCTL_PWIDTH_8BIT;
+		break;
+	};
+
+	if (desc->src_inc)
+		reg |= CHCTL_MNAGA;
+	if (desc->dst_inc)
+		reg |= CHCTL_PNAGA;
+
+	switch (desc->direction) {
+	case DMA_MEM_TO_MEM:
+		reg |= CHCTL_M2M;
+		break;
+	case DMA_MEM_TO_DEV:
+		reg |= CHCTL_DIR;
+		break;
+	case DMA_DEV_TO_MEM:
+	case DMA_DEV_TO_DEV:
+		break;
+	};
+
+	reg |= CHCTL_FTFIE | CHCTL_ERRIE;
+	WR4(sc, DMA_CHCTL(chan), reg);
+	WR4(sc, DMA_CHCNT(chan), desc->count);
+
+	/* Enable the channel. */
+	reg |= CHCTL_CHEN;
+	WR4(sc, DMA_CHCTL(chan), reg);
+
+	mdx_sem_wait(&sc->sem);
 }
 
 void

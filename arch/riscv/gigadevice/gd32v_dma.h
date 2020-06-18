@@ -27,6 +27,9 @@
 #ifndef _RISCV_GIGADEVICE_GD32V_DMA_H_
 #define _RISCV_GIGADEVICE_GD32V_DMA_H_
 
+#include <sys/sem.h>
+#include <dev/dma/dma.h>
+
 #define	DMA_INTF	0x00	/* Interrupt flag register */
 #define	 INTF_GIF(n)	(1 << (0x4 * (n)) /* Global interrupt flag of chan x*/
 #define	 INTF_FTFIF(n)	(2 << (0x4 * (n)) /* Full Transfer finish flag */
@@ -57,8 +60,8 @@
 #define	 CHCTL_PWIDTH_32BIT	(0x02 << CHCTL_PWIDTH_S)
 #define	 CHCTL_MNAGA		(1 << 7) /* Memory next address generation */
 #define	 CHCTL_PNAGA		(1 << 6) /* Peripheral next address generation*/
-#define	 CHCTL_CMEN		(1 << 5) /*  Circular mode enable */
-#define	 CHCTL_DIR		(1 << 4) /* Transfer direction */
+#define	 CHCTL_CMEN		(1 << 5) /* Circular mode enable */
+#define	 CHCTL_DIR		(1 << 4) /* Transfer direction: to peripheral*/
 #define	 CHCTL_ERRIE		(1 << 3) /* Channel error interrupt enable */
 #define	 CHCTL_HTFIE		(1 << 2) /* Channel half transfer finish intr*/
 #define	 CHCTL_FTFIE		(1 << 1) /* Channel full transfer finish intr*/
@@ -73,9 +76,11 @@
 
 struct gd32v_dma_softc {
 	uint32_t base;
+	mdx_sem_t sem;
 };
 
-void gd32v_dma_intr(void *arg);
+void gd32v_dma_intr(void *arg, int irq);
 void gd32v_dma_init(mdx_device_t dev, uint32_t base);
+void gd32v_dma_setup(mdx_device_t dev, int chan, struct dma_desc *desc);
 
 #endif /* !_RISCV_GIGADEVICE_GD32V_DMA_H_ */
