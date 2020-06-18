@@ -33,6 +33,8 @@
 #define	RCU_APB2RST	0x0C	/* APB2 reset register */
 #define	RCU_APB1RST	0x10	/* APB1 reset register */
 #define	RCU_AHBEN	0x14	/* AHB enable register */
+#define	 AHBEN_DMA1EN	(1 << 1) /* DMA1 clock enable */
+#define	 AHBEN_DMA0EN	(1 << 0) /* DMA0 clock enable */
 #define	RCU_APB2EN	0x18	/* APB2 enable register */
 #define	 APB2EN_USART0EN	(1 << 14)	/* USART0 clock enable */
 #define	 APB2EN_SPI0EN		(1 << 12)	/* SPI0 clock enable */
