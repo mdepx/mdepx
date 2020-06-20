@@ -30,7 +30,10 @@
 #include <sys/sem.h>
 
 #define	SPI_CTL0	0x00	/* Control register 0 */
+#define	 CTL0_FF16	(1 << 11) /* Data frame format */
 #define	 CTL0_SWNSSEN	(1 << 9) /* NSS software mode enable */
+#define	 CTL0_SWNSS	(1 << 8) /* NSS pin selection in NSS software mode */
+#define	 CTL0_LF	(1 << 7) /* LSB first mode */
 #define	 CTL0_SPIEN	(1 << 6) /* SPI enable */
 #define	 CTL0_PSC_S	3
 #define	 CTL0_PSC_M	(0x7 << CTL0_PSC_S)
@@ -46,6 +49,8 @@
 #define	 CTL0_CKPL	(1 << 1) /* Clock polarity selection */
 #define	 CTL0_CKPH	(1 << 0) /* Clock phase selection */
 #define	SPI_CTL1	0x04	/* Control register 1 */
+#define	 CTL1_DMATEN	(1 << 1) /* Transmit buffer DMA enable */
+#define	 CTL1_DMAREN	(1 << 0) /* Receive buffer DMA enable */
 #define	SPI_STAT	0x08	/* Status register */
 #define	 STAT_TRANS	(1 << 7) /* Transmitting ongoing bit */
 #define	 STAT_TBE	(1 << 1) /* Transmit buffer empty */
