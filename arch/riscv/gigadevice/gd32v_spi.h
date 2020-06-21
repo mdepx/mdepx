@@ -61,6 +61,14 @@
 #define	SPI_I2SCTL	0x1C	/* I2S control register */
 #define	SPI_I2SPSC	0x20	/* I2S clock prescaler register */
 
+struct gd32v_spi_config {
+	bool ff16;		/* Frame format */
+	bool master;		/* Master or slave */
+	uint16_t prescaler;	/* 2 to 256 */
+	bool dma_tx;		/* Enable TX dma */
+	bool dma_rx;		/* Enable RX dma */
+};
+
 struct gd32v_spi_softc {
 	uint32_t base;
 	mdx_sem_t sem;
@@ -68,5 +76,6 @@ struct gd32v_spi_softc {
 
 void gd32v_spi_init(mdx_device_t dev, uint32_t base);
 void gd32v_spi_intr(void *arg);
+int gd32v_spi_setup(mdx_device_t dev, struct gd32v_spi_config *config);
 
 #endif /* !_RISCV_GIGADEVICE_GD32V_SPI_H_ */

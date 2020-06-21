@@ -53,19 +53,70 @@ gd32v_spi_intr(void *arg)
 
 }
 
-static void
-gd32v_spi_setup(struct gd32v_spi_softc *sc)
+int
+gd32v_spi_setup(mdx_device_t dev, struct gd32v_spi_config *config)
 {
+	struct gd32v_spi_softc *sc;
 	uint32_t reg;
 
-	/* TODO */
+	sc = mdx_device_get_softc(dev);
 
-	reg = CTL0_MSTMOD | CTL0_SWNSSEN | CTL0_PSC_8;
-	reg = CTL0_MSTMOD | CTL0_PSC_8;
+	/* Ensure the unit is disabled. */
+	reg = RD4(sc, SPI_CTL0);
+	reg &= ~CTL0_SPIEN;
 	WR4(sc, SPI_CTL0, reg);
 
+	reg = 0;
+	if (config->master)
+		reg |= CTL0_MSTMOD;
+
+	switch (config->prescaler) {
+	case 2:
+		reg |= CTL0_PSC_2;
+		break;
+	case 4:
+		reg |= CTL0_PSC_4;
+		break;
+	case 8:
+		reg |= CTL0_PSC_8;
+		break;
+	case 16:
+		reg |= CTL0_PSC_16;
+		break;
+	case 32:
+		reg |= CTL0_PSC_32;
+		break;
+	case 64:
+		reg |= CTL0_PSC_64;
+		break;
+	case 128:
+		reg |= CTL0_PSC_128;
+		break;
+	case 256:
+		reg |= CTL0_PSC_256;
+		break;
+	default:
+		printf("Invalid prescaler: %d", config->prescaler);
+		return (MDX_ERROR);
+	}
+
+	if (config->ff16)
+		reg |= CTL0_FF16;
+
+	WR4(sc, SPI_CTL0, reg);
+
+	reg = 0;
+	if (config->dma_tx)
+		reg |= CTL1_DMATEN;
+	if (config->dma_rx)
+		reg |= CTL1_DMAREN;
+	WR4(sc, SPI_CTL1, reg);
+
+	reg = RD4(sc, SPI_CTL0);
 	reg |= CTL0_SPIEN;
 	WR4(sc, SPI_CTL0, reg);
+
+	return (MDX_OK);
 }
 
 static int
@@ -99,6 +150,4 @@ gd32v_spi_init(mdx_device_t dev, uint32_t base)
 	sc->base = base;
 
 	dev->ops = &gd32v_spi_ops;
-
-	gd32v_spi_setup(sc);
 }
