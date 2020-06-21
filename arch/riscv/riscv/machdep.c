@@ -71,7 +71,7 @@ critical_exit(void)
 		intr_restore(td->td_md.md_saved_sstatus_ie);
 }
 
-void
+void __weak_symbol
 cpu_idle(void)
 {
 
