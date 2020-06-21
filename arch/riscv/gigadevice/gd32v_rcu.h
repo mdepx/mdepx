@@ -112,5 +112,6 @@ struct gd32v_rcu_softc {
 int gd32v_rcu_init(mdx_device_t dev, uint32_t base);
 void gd32v_rcu_setup(mdx_device_t dev,
     uint32_t ahben, uint32_t apb1en, uint32_t apb2en);
+void gd32v_rcu_dump(mdx_device_t dev);
 
 #endif /* !_RISCV_GIGADEVICE_GD32V_RCU_H_ */

@@ -47,6 +47,110 @@ gd32v_rcu_setup(mdx_device_t dev,
 	WR4(sc, RCU_APB2EN, apb2en);
 }
 
+void
+gd32v_rcu_dump(mdx_device_t dev)
+{
+	struct gd32v_rcu_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
+
+	printf("%s: ctl %x\n", __func__, RD4(sc, RCU_CTL));
+	printf("%s: cfg0 %x\n", __func__, RD4(sc, RCU_CFG0));
+	printf("%s: cfg1 %x\n", __func__, RD4(sc, RCU_CFG1));
+}
+
+static void
+gd32v_rcu_108mhz(struct gd32v_rcu_softc *sc)
+{
+	uint32_t reg;
+
+	reg = RD4(sc, RCU_CTL);
+	reg |= CTL_HXTALEN;
+	WR4(sc, RCU_CTL, reg);
+
+	do {
+		reg = RD4(sc, RCU_CTL);
+	} while ((reg & CTL_HXTALSTB) == 0);
+
+	reg = RD4(sc, RCU_CFG0);
+	reg &= ~CFG0_AHBPSC_CK_SYS_M;
+	reg |= CFG0_AHBPSC_CK_SYS_DIV_1;
+	reg |= CFG0_APB2PSC_CK_AHB_DIV_1;
+	reg |= CFG0_APB1PSC_CK_AHB_DIV_2;
+	WR4(sc, RCU_CFG0, reg);
+
+	reg &= CFG0_PLLMF_M;
+	reg &= CFG0_PLLMF4;
+	WR4(sc, RCU_CFG0, reg);
+
+	/* 8 MHz hxtal */
+	reg = RD4(sc, RCU_CFG1);
+	reg |= CFG1_PREDV0_DIV_2 | CFG1_PREDV1_DIV_2;
+	reg |= CFG1_PLL1MF_20 | CFG1_PLL2MF_20;
+	WR4(sc, RCU_CFG1, reg);
+
+	reg = RD4(sc, RCU_CTL);
+	reg |= CTL_PLL1EN;
+	WR4(sc, RCU_CTL, reg);
+
+	do {
+		reg = RD4(sc, RCU_CTL);
+	} while ((reg & CTL_PLL1STB) == 0);
+
+	reg = RD4(sc, RCU_CTL);
+	reg |= CTL_PLL2EN;
+	WR4(sc, RCU_CTL, reg);
+
+	do {
+		reg = RD4(sc, RCU_CTL);
+	} while ((reg & CTL_PLL2STB) == 0);
+
+	reg = RD4(sc, RCU_CTL);
+	reg |= CTL_PLLEN;
+	WR4(sc, RCU_CTL, reg);
+
+	do {
+		reg = RD4(sc, RCU_CTL);
+	} while ((reg & CTL_PLLSTB) == 0);
+
+	reg = RD4(sc, RCU_CFG0);
+	reg &= ~CFG0_SCS_M;
+	reg |= CFG0_SCS_CK_PLL;
+	WR4(sc, RCU_CFG0, reg);
+
+	do {
+		reg = RD4(sc, RCU_CFG0);
+	} while ((reg & CFG0_SCSS_M) != CFG0_SCSS_CK_PLL);
+}
+
+static void
+gd32v_rcu_configure(mdx_device_t dev)
+{
+	struct gd32v_rcu_softc *sc;
+	uint32_t reg;
+
+	sc = mdx_device_get_softc(dev);
+
+	reg = RD4(sc, RCU_CTL);
+	reg |= CTL_IRC8MEN;
+	WR4(sc, RCU_CTL, reg);
+
+	reg &= ~(CTL_HXTALEN | CTL_CKMEN | CTL_PLLEN);
+	WR4(sc, RCU_CTL, reg);
+
+	reg &= ~(CTL_HXTALBPS);
+	WR4(sc, RCU_CTL, reg);
+
+	WR4(sc, RCU_CFG1, 0);
+
+	reg = RD4(sc, RCU_CTL);
+	reg &= ~(CTL_PLLEN | CTL_PLL1EN | CTL_PLL2EN | CTL_CKMEN | CTL_HXTALEN);
+	WR4(sc, RCU_CTL, reg);
+	WR4(sc, RCU_INT, 0x00FF0000);
+
+	gd32v_rcu_108mhz(sc);
+}
+
 int
 gd32v_rcu_init(mdx_device_t dev, uint32_t base)
 {
@@ -54,6 +158,8 @@ gd32v_rcu_init(mdx_device_t dev, uint32_t base)
 
 	sc = mdx_device_alloc_softc(dev, sizeof(struct gd32v_rcu_softc));
 	sc->base = base;
+
+	gd32v_rcu_configure(dev);
 
 	return (0);
 }
