@@ -112,18 +112,6 @@ bme680_sensor_init(void)
 }
 
 static void
-mh_z19b_cycle(uint8_t *req, uint8_t *reply, int reply_len)
-{
-	int i;
-
-	for (i = 0; i < 9; i++)
-		mdx_uart_putc(&dev_uart, req[i]);
-
-	for (i = 0; i < reply_len; i++)
-		reply[i] = mdx_uart_getc(&dev_uart);
-}
-
-static void
 drain_fifo(void)
 {
 	bool ready;
@@ -168,7 +156,7 @@ main(void)
 	drain_fifo();
 
 	mh_z19b_set_range_req(req, 2000);
-	mh_z19b_cycle(req, reply, 2);
+	mh_z19b_cycle(&dev_uart, req, reply, 2);
 
 	/* Measurement range changed, wait a bit. */
 	mdx_usleep(5000000);
@@ -178,7 +166,7 @@ main(void)
 	mh_z19b_read_co2_req(req);
 
 	while (1) {
-		mh_z19b_cycle(req, reply, 9);
+		mh_z19b_cycle(&dev_uart, req, reply, 9);
 
 		error = mh_z19b_read_co2_reply(reply, &co2);
 		if (error) {

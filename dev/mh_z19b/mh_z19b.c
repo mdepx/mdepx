@@ -26,6 +26,8 @@
 
 #include <sys/cdefs.h>
 
+#include <dev/uart/uart.h>
+
 #include "mh_z19b.h"
 
 uint8_t
@@ -87,4 +89,17 @@ mh_z19b_read_co2_reply(uint8_t *reply, uint32_t *co2)
 	*co2 = reply[2] * 256 + reply[3];
 
 	return (0);
+}
+
+void
+mh_z19b_cycle(mdx_device_t dev, uint8_t *req,
+    uint8_t *reply, int reply_len)
+{
+	int i;
+
+	for (i = 0; i < 9; i++)
+		mdx_uart_putc(dev, req[i]);
+
+	for (i = 0; i < reply_len; i++)
+		reply[i] = mdx_uart_getc(dev);
 }
