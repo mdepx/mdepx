@@ -28,8 +28,9 @@
 #define _RISCV_GIGADEVICE_GD32V_USART_H_
 
 #define	USART_STAT		0x00 /* Status register */
-#define	 USART_STAT_RBNE	(1 << 5) /* Read data buffer not empty */
 #define	 USART_STAT_TBE		(1 << 7) /* Transmit data buffer empty */
+#define	 USART_STAT_TC		(1 << 6) /* Transmission complete */
+#define	 USART_STAT_RBNE	(1 << 5) /* Read data buffer not empty */
 #define	USART_DATA		0x04 /* Data register */
 #define	USART_BAUD		0x08 /* Baud rate register */
 #define	USART_CTL0		0x0C /* Control register 0 */
