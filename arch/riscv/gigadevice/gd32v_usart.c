@@ -48,11 +48,31 @@ gd32v_usart_putc(mdx_device_t dev, int c)
 	WR4(sc, USART_DATA, c);
 }
 
+static int
+gd32v_usart_getc(mdx_device_t dev)
+{
+	struct gd32v_usart_softc *sc;
+	uint32_t reg;
+
+	sc = mdx_device_get_softc(dev);
+
+	while ((RD4(sc, USART_STAT) & USART_STAT_RBNE) == 0)
+		;
+
+	reg = RD4(sc, USART_DATA);
+
+	return (reg);
+}
+
 static bool
 gd32v_usart_rxready(mdx_device_t dev)
 {
+	struct gd32v_usart_softc *sc;
 
-	/* TODO */
+	sc = mdx_device_get_softc(dev);
+
+	if (RD4(sc, USART_STAT) & USART_STAT_RBNE)
+		return (true);
 
 	return (false);
 }
@@ -75,12 +95,14 @@ gd32v_usart_setup(mdx_device_t dev, int baud_rate,
 	reg = (sc->cpu_freq / baud_rate);
 	WR4(sc, USART_BAUD, reg);
 
-	WR4(sc, USART_CTL0, USART_CTL0_TEN);
-	WR4(sc, USART_CTL0, USART_CTL0_TEN | USART_CTL0_UEN);
+	reg = USART_CTL0_TEN | USART_CTL0_REN;
+	WR4(sc, USART_CTL0, reg);
+	WR4(sc, USART_CTL0, reg | USART_CTL0_UEN);
 }
 
 static struct mdx_uart_ops gd32v_usart_ops = {
 	.putc = gd32v_usart_putc,
+	.getc = gd32v_usart_getc,
 	.rxready = gd32v_usart_rxready,
 	.setup = gd32v_usart_setup,
 };
