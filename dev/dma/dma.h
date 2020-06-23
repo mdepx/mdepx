@@ -35,8 +35,8 @@ enum dma_direction {
 };
 
 struct dma_desc {
-	uint32_t src_addr;
-	uint32_t dst_addr;
+	uintptr_t src_addr;
+	uintptr_t dst_addr;
 	uint8_t src_width;
 	uint8_t dst_width;
 	uint32_t count;
