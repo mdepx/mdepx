@@ -38,7 +38,7 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 static int
-nrf_gpio_set_pin(mdx_device_t dev, int bank, int pin, int val)
+nrf_gpio_set_pin(mdx_device_t dev, int pin, int val)
 {
 	struct nrf_gpio_softc *sc;
 
@@ -53,7 +53,7 @@ nrf_gpio_set_pin(mdx_device_t dev, int bank, int pin, int val)
 }
 
 static int
-nrf_gpio_get_pin(mdx_device_t dev, int bank, int pin)
+nrf_gpio_get_pin(mdx_device_t dev, int pin)
 {
 	struct nrf_gpio_softc *sc;
 
@@ -66,7 +66,7 @@ nrf_gpio_get_pin(mdx_device_t dev, int bank, int pin)
 }
 
 static int
-nrf_gpio_pin_configure(mdx_device_t dev, int bank, int pin, int flags)
+nrf_gpio_pin_configure(mdx_device_t dev, int pin, int flags)
 {
 	struct nrf_gpio_softc *sc;
 

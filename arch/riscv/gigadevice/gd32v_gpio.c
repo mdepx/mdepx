@@ -37,14 +37,12 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 static int
-gd32v_gpio_pin_configure(mdx_device_t dev, int bank, int pin, int flags)
+gd32v_gpio_pin_configure(mdx_device_t dev, int pin, int flags)
 {
 	struct gd32v_gpio_softc *sc;
 	uint32_t reg;
 
 	sc = mdx_device_get_softc(dev);
-
-	KASSERT(bank == 0, ("Bank 0 supported only."));
 
 	reg = RD4(sc, GPIO_CTL(pin));
 	reg &= ~CTL_MD_M(pin);
@@ -89,7 +87,7 @@ gd32v_gpio_pin_configure(mdx_device_t dev, int bank, int pin, int flags)
 }
 
 static int
-gd32v_gpio_pin_set(mdx_device_t dev, int bank, int pin, int val)
+gd32v_gpio_pin_set(mdx_device_t dev, int pin, int val)
 {
 	struct gd32v_gpio_softc *sc;
 
@@ -104,7 +102,7 @@ gd32v_gpio_pin_set(mdx_device_t dev, int bank, int pin, int val)
 }
 
 static int
-gd32v_gpio_pin_get(mdx_device_t dev, int bank, int pin)
+gd32v_gpio_pin_get(mdx_device_t dev, int pin)
 {
 
 	/* TODO */

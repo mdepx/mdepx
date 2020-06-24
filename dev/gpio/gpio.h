@@ -43,13 +43,13 @@
 #define	MDX_GPIO_ANALOG		(1 << 11)	/* Pin is in analog mode */
 
 struct mdx_gpio_ops {
-	int (*pin_set)(mdx_device_t dev, int bank, int pin, int value);
-	int (*pin_get)(mdx_device_t dev, int bank, int pin);
-	int (*pin_configure)(mdx_device_t dev, int bank, int pin, int flags);
+	int (*pin_set)(mdx_device_t dev, int pin, int value);
+	int (*pin_get)(mdx_device_t dev, int pin);
+	int (*pin_configure)(mdx_device_t dev, int pin, int flags);
 };
 
-int mdx_gpio_set(mdx_device_t dev, int bank, int pin, int value);
-int mdx_gpio_get(mdx_device_t dev, int bank, int pin);
-int mdx_gpio_configure(mdx_device_t dev, int bank, int pin, int flags);
+int mdx_gpio_set(mdx_device_t dev, int pin, int value);
+int mdx_gpio_get(mdx_device_t dev, int pin);
+int mdx_gpio_configure(mdx_device_t dev, int pin, int flags);
 
 #endif /* !_DEV_GPIO_GPIO_H_ */

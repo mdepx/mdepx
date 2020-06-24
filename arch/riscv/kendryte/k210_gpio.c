@@ -52,7 +52,7 @@ k210_gpio_set_dir(mdx_device_t dev, int pin, int dir)
 }
 
 static int
-k210_gpio_pin_configure(mdx_device_t dev, int bank, int pin, int flags)
+k210_gpio_pin_configure(mdx_device_t dev, int pin, int flags)
 {
 
 	if (flags & MDX_GPIO_INPUT)
@@ -64,7 +64,7 @@ k210_gpio_pin_configure(mdx_device_t dev, int bank, int pin, int flags)
 }
 
 static int
-k210_gpio_set_pin(mdx_device_t dev, int bank, int pin, int val)
+k210_gpio_set_pin(mdx_device_t dev, int pin, int val)
 {
 	struct k210_gpio_softc *sc;
 	uint32_t reg;
@@ -82,7 +82,7 @@ k210_gpio_set_pin(mdx_device_t dev, int bank, int pin, int val)
 }
 
 static int
-k210_gpio_get_pin(mdx_device_t dev, int bank, int pin)
+k210_gpio_get_pin(mdx_device_t dev, int pin)
 {
 	struct k210_gpio_softc *sc;
 	uint32_t reg;

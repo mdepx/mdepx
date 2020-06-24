@@ -52,10 +52,10 @@ i2c_scl(void *arg, bool enable)
 {
 
 	if (enable)
-		mdx_gpio_configure(&dev_gpiohs, 0, PIN_I2C_SCL,
+		mdx_gpio_configure(&dev_gpiohs, PIN_I2C_SCL,
 		    MDX_GPIO_INPUT);
 	else
-		mdx_gpio_configure(&dev_gpiohs, 0, PIN_I2C_SCL,
+		mdx_gpio_configure(&dev_gpiohs, PIN_I2C_SCL,
 		    MDX_GPIO_OUTPUT);
 }
 
@@ -64,10 +64,10 @@ i2c_sda(void *arg, bool enable)
 {
 
 	if (enable)
-		mdx_gpio_configure(&dev_gpiohs, 0, PIN_I2C_SDA,
+		mdx_gpio_configure(&dev_gpiohs, PIN_I2C_SDA,
 		    MDX_GPIO_INPUT);
 	else
-		mdx_gpio_configure(&dev_gpiohs, 0, PIN_I2C_SDA,
+		mdx_gpio_configure(&dev_gpiohs, PIN_I2C_SDA,
 		    MDX_GPIO_OUTPUT);
 }
 
@@ -76,7 +76,7 @@ i2c_sda_val(void *arg)
 {
 	uint8_t reg;
 
-	reg = mdx_gpio_get(&dev_gpiohs, 0, PIN_I2C_SDA);
+	reg = mdx_gpio_get(&dev_gpiohs, PIN_I2C_SDA);
 
 	return (reg & 0x1);
 }
@@ -94,8 +94,8 @@ bme680_sensor_init(void)
 
 	i2c_bitbang_init(&dev_bitbang, &i2c_ops);
 
-	mdx_gpio_set(&dev_gpiohs, 0, PIN_I2C_SCL, 0);
-	mdx_gpio_set(&dev_gpiohs, 0, PIN_I2C_SDA, 0);
+	mdx_gpio_set(&dev_gpiohs, PIN_I2C_SCL, 0);
+	mdx_gpio_set(&dev_gpiohs, PIN_I2C_SDA, 0);
 
 	if (1 == 1) {
 		/* For I2C controller */
@@ -140,8 +140,8 @@ main(void)
 	 * 1: sets i2c address to 0x77
 	 * 0: sets i2c address to 0x76
 	 */
-	mdx_gpio_configure(&dev_gpiohs, 0, PIN_BME680_SDO, MDX_GPIO_OUTPUT);
-	mdx_gpio_set(&dev_gpiohs, 0, PIN_BME680_SDO, 1);
+	mdx_gpio_configure(&dev_gpiohs, PIN_BME680_SDO, MDX_GPIO_OUTPUT);
+	mdx_gpio_set(&dev_gpiohs, PIN_BME680_SDO, 1);
 
 	/*
 	 * Note that for I2C interface bme680 CS pin must be set to HIGH
