@@ -1,5 +1,5 @@
 This app demonstrates multithreading and symmetric multiprocessing (SMP)
-on a octa core riscv64 system.
+support on a multi-core riscv64 system.
 
 1. Build QEMU
 
