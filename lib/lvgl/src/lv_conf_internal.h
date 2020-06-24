@@ -363,6 +363,12 @@
 #define LV_EXPORT_CONST_INT(int_value) struct _silence_gcc_warning
 #endif
 
+/* Prefix variables that are used in GPU accelerated operations, often these need to be
+ * placed in RAM sections that are DMA accessible */
+#ifndef LV_ATTRIBUTE_DMA
+#define LV_ATTRIBUTE_DMA
+#endif
+
 /*===================
  *  HAL settings
  *==================*/
@@ -678,14 +684,14 @@
 #define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 3
 #endif
 
-/* The control character to use for signalling text recoloring. */
+/* The control character to use for signaling text recoloring. */
 #ifndef LV_TXT_COLOR_CMD
 #define LV_TXT_COLOR_CMD "#"
 #endif
 
 /* Support bidirectional texts.
  * Allows mixing Left-to-Right and Right-to-Left texts.
- * The direction will be processed according to the Unicode Bidirectioanl Algorithm:
+ * The direction will be processed according to the Unicode Bidirectional Algorithm:
  * https://www.w3.org/International/articles/inline-bidi-markup/uba-basics*/
 #ifndef LV_USE_BIDI
 #define LV_USE_BIDI     0
@@ -748,7 +754,7 @@
 #endif
 #endif
 
-/*1: enable `lv_obj_realaign()` based on `lv_obj_align()` parameters*/
+/*1: enable `lv_obj_realign()` based on `lv_obj_align()` parameters*/
 #ifndef LV_USE_OBJ_REALIGN
 #define LV_USE_OBJ_REALIGN          1
 #endif

@@ -94,7 +94,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Init the new list object*/
     if(copy == NULL) {
         lv_page_set_anim_time(list, LV_LIST_DEF_ANIM_TIME);
-        lv_page_set_scrllable_fit2(list, LV_FIT_PARENT, LV_FIT_TIGHT);
+        lv_page_set_scrollable_fit2(list, LV_FIT_PARENT, LV_FIT_TIGHT);
         lv_obj_set_size(list, 2 * LV_DPI, 3 * LV_DPI);
         lv_page_set_scrl_layout(list, LV_LIST_LAYOUT_DEF);
         lv_list_set_scrollbar_mode(list, LV_SCROLLBAR_MODE_DRAG);
@@ -131,7 +131,7 @@ void lv_list_clean(lv_obj_t * list)
 {
     LV_ASSERT_OBJ(list, LV_OBJX_NAME);
 
-    lv_obj_t * scrl = lv_page_get_scrllable(list);
+    lv_obj_t * scrl = lv_page_get_scrollable(list);
     lv_obj_clean(scrl);
 }
 
@@ -155,7 +155,7 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * img_src, const char * t
     lv_coord_t pos_x_ori = lv_obj_get_x(list);
     lv_coord_t pos_y_ori = lv_obj_get_y(list);
 
-    lv_obj_t * scrl =  lv_page_get_scrllable(list);
+    lv_obj_t * scrl =  lv_page_get_scrollable(list);
     lv_obj_add_protect(scrl, LV_PROTECT_CHILD_CHG);
 
     /*Create a list element with the image an the text*/
@@ -328,10 +328,10 @@ void lv_list_set_layout(lv_obj_t * list, lv_layout_t layout)
     }
 
     if(layout == LV_LAYOUT_COLUMN_MID || layout == LV_LAYOUT_COLUMN_LEFT || layout == LV_LAYOUT_COLUMN_RIGHT) {
-        lv_page_set_scrllable_fit2(list, LV_FIT_PARENT, LV_FIT_TIGHT);
+        lv_page_set_scrollable_fit2(list, LV_FIT_PARENT, LV_FIT_TIGHT);
     }
     else if(layout == LV_LAYOUT_ROW_MID || layout == LV_LAYOUT_ROW_TOP || layout == LV_LAYOUT_ROW_BOTTOM) {
-        lv_page_set_scrllable_fit2(list, LV_FIT_TIGHT, LV_FIT_TIGHT);
+        lv_page_set_scrollable_fit2(list, LV_FIT_TIGHT, LV_FIT_TIGHT);
         lv_cont_set_fit2(list, LV_FIT_NONE, LV_FIT_TIGHT);
     }
 
@@ -414,7 +414,7 @@ lv_obj_t * lv_list_get_prev_btn(const lv_obj_t * list, lv_obj_t * prev_btn)
      * When getting the next button try to be sure that it is at least a button */
 
     lv_obj_t * btn;
-    lv_obj_t * scrl = lv_page_get_scrllable(list);
+    lv_obj_t * scrl = lv_page_get_scrollable(list);
 
     btn = lv_obj_get_child(scrl, prev_btn);
     if(btn == NULL) return NULL;
@@ -441,7 +441,7 @@ lv_obj_t * lv_list_get_next_btn(const lv_obj_t * list, lv_obj_t * prev_btn)
      * When getting the next button try to be sure that it is at least a button */
 
     lv_obj_t * btn;
-    lv_obj_t * scrl = lv_page_get_scrllable(list);
+    lv_obj_t * scrl = lv_page_get_scrollable(list);
 
     btn = lv_obj_get_child_back(scrl, prev_btn);
     if(btn == NULL) return NULL;
@@ -540,7 +540,7 @@ void lv_list_up(const lv_obj_t * list)
 
     /*Search the first list element which 'y' coordinate is below the parent
      * and position the list to show this element on the bottom*/
-    lv_obj_t * scrl = lv_page_get_scrllable(list);
+    lv_obj_t * scrl = lv_page_get_scrollable(list);
     lv_obj_t * e;
     lv_obj_t * e_prev = NULL;
 
@@ -581,7 +581,7 @@ void lv_list_down(const lv_obj_t * list)
 
     /*Search the first list element which 'y' coordinate is above the parent
      * and position the list to show this element on the top*/
-    lv_obj_t * scrl = lv_page_get_scrllable(list);
+    lv_obj_t * scrl = lv_page_get_scrollable(list);
     lv_obj_t * e;
     e = lv_list_get_prev_btn(list, NULL);
     while(e != NULL) {
@@ -712,6 +712,11 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
             if(ext->last_sel_btn) lv_list_focus_btn(list, ext->last_sel_btn);
             else lv_list_focus_btn(list, lv_list_get_next_btn(list, NULL));
         }
+        if(indev_type == LV_INDEV_TYPE_ENCODER && lv_group_get_editing(g) == false) {
+            lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+            if(ext->act_sel_btn) lv_obj_clear_state(ext->act_sel_btn, LV_STATE_PRESSED);
+            if(ext->last_sel_btn) lv_obj_clear_state(ext->last_sel_btn, LV_STATE_PRESSED);
+        }
 #endif
     }
     else if(sign == LV_SIGNAL_DEFOCUS) {
@@ -811,8 +816,10 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
     else if(sign == LV_SIGNAL_CLEANUP) {
 #if LV_USE_GROUP
         lv_obj_t * list = lv_obj_get_parent(lv_obj_get_parent(btn));
+        lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
         lv_obj_t * sel  = lv_list_get_btn_selected(list);
         if(sel == btn) lv_list_focus_btn(list, lv_list_get_next_btn(list, btn));
+        if(ext->last_sel_btn == btn) ext->last_sel_btn = NULL;
 #endif
     }
 

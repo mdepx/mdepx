@@ -38,6 +38,10 @@
 
 #include LV_THEME_DEFAULT_INCLUDE
 
+#if LV_USE_GPU_STM32_DMA2D
+#include "../lv_gpu/lv_gpu_stm32_dma2d.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -140,8 +144,13 @@ void lv_init(void)
     _lv_group_init();
 #endif
 
+#if LV_USE_GPU_STM32_DMA2D
+    /*Initialize DMA2D GPU*/
+    lv_gpu_stm32_dma2d_init();
+#endif
+
     _lv_ll_init(&LV_GC_ROOT(_lv_obj_style_trans_ll), sizeof(lv_style_trans_t));
-    
+
     _lv_ll_init(&LV_GC_ROOT(_lv_disp_ll), sizeof(lv_disp_t));
     _lv_ll_init(&LV_GC_ROOT(_lv_indev_ll), sizeof(lv_indev_t));
 
@@ -159,6 +168,14 @@ void lv_init(void)
     _lv_img_decoder_init();
     lv_img_cache_set_size(LV_IMG_CACHE_DEF_SIZE);
 
+    /*Test if the IDE has UTF-8 encoding*/
+    char * txt = "Á";
+
+    uint8_t * txt_u8 = (uint8_t *) txt;
+    if(txt_u8[0] != 0xc3 || txt_u8[1] != 0x81 || txt_u8[2] != 0x00) {
+        LV_LOG_WARN("The strings has no UTF-8 encoding. Some characters won't be displayed.")
+    }
+
     lv_initialized = true;
     LV_LOG_INFO("lv_init ready");
 }
@@ -172,13 +189,13 @@ void lv_init(void)
 void lv_deinit(void)
 {
     _lv_gc_clear_roots();
-	
+
     lv_disp_set_default(NULL);
     _lv_mem_deinit();
     lv_initialized = false;
-	
+
     LV_LOG_INFO("lv_deinit done");
-	
+
 #if LV_USE_LOG
     lv_log_register_print_cb(NULL);
 #endif
@@ -298,6 +315,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
 #if LV_USE_GROUP
     new_obj->group_p = NULL;
+
 #endif
 
     /*Set attributes*/
@@ -312,6 +330,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     new_obj->protect      = LV_PROTECT_NONE;
     new_obj->parent_event = 0;
     new_obj->gesture_parent = parent ? 1 : 0;
+    new_obj->focus_parent  = 0;
     new_obj->state = LV_STATE_DEFAULT;
 
     new_obj->ext_attr = NULL;
@@ -838,7 +857,7 @@ void lv_obj_set_height_fit(lv_obj_t * obj, lv_coord_t h)
 
 /**
  * Set the width of an object by taking the left and right margin into account.
- * The object width will be `obj_w = w - margon_left - margin_right`
+ * The object width will be `obj_w = w - margin_left - margin_right`
  * @param obj pointer to an object
  * @param w new height including margins
  */
@@ -852,7 +871,7 @@ void lv_obj_set_width_margin(lv_obj_t * obj, lv_coord_t w)
 
 /**
  * Set the height of an object by taking the top and bottom margin into account.
- * The object height will be `obj_h = h - margon_top - margin_bottom`
+ * The object height will be `obj_h = h - margin_top - margin_bottom`
  * @param obj pointer to an object
  * @param h new height including margins
  */
@@ -1073,7 +1092,7 @@ void lv_obj_realign(lv_obj_t * obj)
         lv_obj_align(obj, obj->realign.base, obj->realign.align, obj->realign.xofs, obj->realign.yofs);
 #else
     (void)obj;
-    LV_LOG_WARN("lv_obj_realaign: no effect because LV_USE_OBJ_REALIGN = 0");
+    LV_LOG_WARN("lv_obj_realign: no effect because LV_USE_OBJ_REALIGN = 0");
 #endif
 }
 
@@ -1314,7 +1333,7 @@ void _lv_obj_set_style_local_ptr(lv_obj_t * obj, uint8_t part, lv_style_property
  * E.g. `LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
  * @note shouldn't be used directly. Use the specific property remove functions instead.
  *       For example: `lv_obj_style_remove_border_opa()`
- * @return true: the property was found and removed; false: teh property was not found
+ * @return true: the property was found and removed; false: the property was not found
  */
 bool lv_obj_remove_style_local_prop(lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
 {
@@ -1483,7 +1502,7 @@ void lv_obj_set_top(lv_obj_t * obj, bool en)
 /**
  * Enable the dragging of an object
  * @param obj pointer to an object
- * @param en true: make the object dragable
+ * @param en true: make the object draggable
  */
 void lv_obj_set_drag(lv_obj_t * obj, bool en)
 {
@@ -1541,6 +1560,31 @@ void lv_obj_set_drag_parent(lv_obj_t * obj, bool en)
 void lv_obj_set_gesture_parent(lv_obj_t * obj, bool en)
 {
     obj->gesture_parent = (en == true ? 1 : 0);
+}
+
+/**
+* Enable to use parent for focus state.
+* When object is focused the parent will get the state instead (visual only)
+* @param obj pointer to an object
+* @param en true: enable the 'focus parent' for the object
+*/
+void lv_obj_set_focus_parent(lv_obj_t * obj, bool en)
+{
+	if (lv_obj_is_focused(obj)) {
+    	if (en)	{
+    		obj->focus_parent = 1;
+			lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED);
+			lv_obj_set_state(lv_obj_get_focused_obj(obj), LV_STATE_FOCUSED);
+		}
+    	else {
+			lv_obj_clear_state(lv_obj_get_focused_obj(obj), LV_STATE_FOCUSED | LV_STATE_EDITED);
+			lv_obj_set_state(obj, LV_STATE_FOCUSED);
+			obj->focus_parent = 0;
+    	}
+    }
+	else {
+		obj->focus_parent = (en == true ? 1 : 0);
+	}
 }
 
 /**
@@ -2193,7 +2237,7 @@ lv_coord_t lv_obj_get_height_fit(const lv_obj_t * obj)
 
 /**
  * Get the height of an object by taking the top and bottom margin into account.
- * The returned height will be `obj_h + margon_top + margin_bottom`
+ * The returned height will be `obj_h + margin_top + margin_bottom`
  * @param obj pointer to an object
  * @return the height including thee margins
  */
@@ -2207,7 +2251,7 @@ lv_coord_t lv_obj_get_height_margin(lv_obj_t * obj)
 
 /**
  * Get the width of an object by taking the left and right margin into account.
- * The returned width will be `obj_w + margon_left + margin_right`
+ * The returned width will be `obj_w + margin_left + margin_right`
  * @param obj pointer to an object
  * @return the height including thee margins
  */
@@ -2405,7 +2449,7 @@ lv_style_int_t _lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_styl
     lv_style_property_t prop_ori = prop;
 
     lv_style_attr_t attr;
-    attr.full = prop_ori >> 8;
+    attr = prop_ori >> 8;
 
     lv_style_int_t value_act;
     lv_res_t res = LV_RES_INV;
@@ -2419,7 +2463,7 @@ lv_style_int_t _lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_styl
         res = _lv_style_list_get_int(dsc, prop, &value_act);
         if(res == LV_RES_OK) return value_act;
 
-        if(attr.bits.inherit == 0) break;
+        if(LV_STYLE_ATTR_GET_INHERIT(attr) == 0) break;
 
         /*If not found, check the `MAIN` style first*/
         if(part != LV_OBJ_PART_MAIN) {
@@ -2468,7 +2512,7 @@ lv_color_t _lv_obj_get_style_color(const lv_obj_t * obj, uint8_t part, lv_style_
     lv_style_property_t prop_ori = prop;
 
     lv_style_attr_t attr;
-    attr.full = prop_ori >> 8;
+    attr = prop_ori >> 8;
 
     lv_color_t value_act;
     lv_res_t res = LV_RES_INV;
@@ -2482,7 +2526,7 @@ lv_color_t _lv_obj_get_style_color(const lv_obj_t * obj, uint8_t part, lv_style_
         res = _lv_style_list_get_color(dsc, prop, &value_act);
         if(res == LV_RES_OK) return value_act;
 
-        if(attr.bits.inherit == 0) break;
+        if(LV_STYLE_ATTR_GET_INHERIT(attr) == 0) break;
 
         /*If not found, check the `MAIN` style first*/
         if(part != LV_OBJ_PART_MAIN) {
@@ -2524,7 +2568,7 @@ lv_opa_t _lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prop
     lv_style_property_t prop_ori = prop;
 
     lv_style_attr_t attr;
-    attr.full = prop_ori >> 8;
+    attr = prop_ori >> 8;
 
     lv_opa_t value_act;
     lv_res_t res = LV_RES_INV;
@@ -2538,7 +2582,7 @@ lv_opa_t _lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prop
         res = _lv_style_list_get_opa(dsc, prop, &value_act);
         if(res == LV_RES_OK) return value_act;
 
-        if(attr.bits.inherit == 0) break;
+        if(LV_STYLE_ATTR_GET_INHERIT(attr) == 0) break;
 
         /*If not found, check the `MAIN` style first*/
         if(part != LV_OBJ_PART_MAIN) {
@@ -2581,7 +2625,7 @@ const void * _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_
     lv_style_property_t prop_ori = prop;
 
     lv_style_attr_t attr;
-    attr.full = prop_ori >> 8;
+    attr = prop_ori >> 8;
 
     const void * value_act;
     lv_res_t res = LV_RES_INV;
@@ -2595,7 +2639,7 @@ const void * _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_
         res = _lv_style_list_get_ptr(dsc, prop, &value_act);
         if(res == LV_RES_OK)  return value_act;
 
-        if(attr.bits.inherit == 0) break;
+        if(LV_STYLE_ATTR_GET_INHERIT(attr) == 0) break;
 
         /*If not found, check the `MAIN` style first*/
         if(part != LV_OBJ_PART_MAIN) {
@@ -2679,7 +2723,7 @@ bool lv_obj_get_click(const lv_obj_t * obj)
 /**
  * Get the top enable attribute of an object
  * @param obj pointer to an object
- * @return true: the auto top feture is enabled
+ * @return true: the auto top feature is enabled
  */
 bool lv_obj_get_top(const lv_obj_t * obj)
 {
@@ -2691,7 +2735,7 @@ bool lv_obj_get_top(const lv_obj_t * obj)
 /**
  * Get the drag enable attribute of an object
  * @param obj pointer to an object
- * @return true: the object is dragable
+ * @return true: the object is draggable
  */
 bool lv_obj_get_drag(const lv_obj_t * obj)
 {
@@ -2742,6 +2786,16 @@ bool lv_obj_get_drag_parent(const lv_obj_t * obj)
 bool lv_obj_get_gesture_parent(const lv_obj_t * obj)
 {
     return obj->gesture_parent == 0 ? false : true;
+}
+
+/**
+* Get the focus parent attribute of an object
+* @param obj pointer to an object
+* @return true: focus parent is enabled
+*/
+bool lv_obj_get_focus_parent(const lv_obj_t * obj)
+{
+    return obj->focus_parent == 0 ? false : true;
 }
 
 /**
@@ -2810,7 +2864,7 @@ lv_state_t lv_obj_get_state(const lv_obj_t * obj, uint8_t part)
 
     /*If a real part is asked, then use the object's signal to get its state.
      * A real object can be in different state then the main part
-     * and only the object itseld knows who to get it's state. */
+     * and only the object itself knows who to get it's state. */
     lv_get_state_info_t info;
     info.part = part;
     info.result = LV_STATE_DEFAULT;
@@ -3284,7 +3338,7 @@ void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint8_t part, lv_draw_line_dsc_t 
 
 /**
  * Get the required extra size (around the object's part) to draw shadow, outline, value etc.
- * @param obj poinr to an object
+ * @param obj pointer to an object
  * @param part part of the object
  */
 lv_coord_t lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part)
@@ -3638,6 +3692,23 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
     return LV_DESIGN_RES_OK;
 }
 
+
+/**
+ * Get the really focused object by taking `focus_parent` into account.
+ * @param obj the start object
+ * @return the object to really focus
+ */
+lv_obj_t * lv_obj_get_focused_obj(const lv_obj_t * obj)
+{
+    if(obj == NULL) return NULL;
+    const lv_obj_t * focus_obj = obj;
+    while(lv_obj_get_focus_parent(focus_obj) != false && focus_obj != NULL) {
+    	focus_obj = lv_obj_get_parent(focus_obj);
+    }
+
+    return (lv_obj_t*)focus_obj;
+}
+
 /**
  * Signal function of the basic object
  * @param obj pointer to an object
@@ -3686,14 +3757,26 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         if(lv_group_get_editing(lv_obj_get_group(obj))) {
             uint8_t state = LV_STATE_FOCUSED;
             state |= LV_STATE_EDITED;
+
+            /*if using focus mode, change target to parent*/
+            obj = lv_obj_get_focused_obj(obj);
+
             lv_obj_add_state(obj, state);
         }
         else {
+
+            /*if using focus mode, change target to parent*/
+            obj = lv_obj_get_focused_obj(obj);
+
             lv_obj_add_state(obj, LV_STATE_FOCUSED);
             lv_obj_clear_state(obj, LV_STATE_EDITED);
         }
     }
     else if(sign == LV_SIGNAL_DEFOCUS) {
+
+        /*if using focus mode, change target to parent*/
+        obj = lv_obj_get_focused_obj(obj);
+
         lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED);
     }
 #endif
@@ -3796,7 +3879,7 @@ static void base_dir_refr_children(lv_obj_t * obj)
  * @param part the part of the object to apply the transaction
  * @param prev_state the previous state of the objects
  * @param new_state the new state of the object
- * @return pointer to the allocated `the transaction` variable or `NULL` if no transtion created
+ * @return pointer to the allocated `the transaction` variable or `NULL` if no transition created
  */
 static lv_style_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop, uint8_t part, lv_state_t prev_state,
                                        lv_state_t new_state)
@@ -3901,12 +3984,12 @@ static lv_style_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop,
 }
 
 /**
- * Remove the transition from objectt's part's property.
+ * Remove the transition from object's part's property.
  * - Remove the transition from `_lv_obj_style_trans_ll` and free it
  * - Delete pending transitions
  * @param obj pointer to an object which transition(s) should be removed
  * @param part a part of object or 0xFF to remove from all parts
- * @param prop a property or 0xFF to remove all porpeties
+ * @param prop a property or 0xFF to remove all properties
  * @param tr_limit delete transitions only "older" then this. `NULL` is not used
  */
 static void trans_del(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_style_trans_t * tr_limit)
@@ -4062,5 +4145,3 @@ static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_fin
 
     return false;
 }
-
-
