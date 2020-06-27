@@ -436,6 +436,9 @@ static void hci_cmd_complete(struct bt_buf *buf)
 	case BT_HCI_OP_RESET:
 		hci_reset_complete(buf);
 		break;
+	case BT_HCI_OP_LE_SET_ADV_ENABLE:
+		BT_DBG("Unhandled set adv enable\n");
+		break;
 	default:
 		BT_DBG("Unhandled opcode %x\n", opcode);
 		break;
