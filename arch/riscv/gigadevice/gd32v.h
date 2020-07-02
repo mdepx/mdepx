@@ -34,6 +34,7 @@
 #include <riscv/gigadevice/gd32v_gpio.h>
 #include <riscv/gigadevice/gd32v_i2c.h>
 #include <riscv/gigadevice/gd32v_rcu.h>
+#include <riscv/gigadevice/gd32v_rtc.h>
 #include <riscv/gigadevice/gd32v_spi.h>
 #include <riscv/gigadevice/gd32v_timer.h>
 #include <riscv/gigadevice/gd32v_usart.h>
@@ -70,5 +71,6 @@
 #define	BASE_DMA1	0x40020400
 #define	BASE_FMC	0x40022000
 #define	BASE_EXMC	0xA0000000
+#define	BASE_RTC	0x40002800
 
 #endif	/* !_RISCV_GIGADEVICE_GD32V_H_ */
