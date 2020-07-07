@@ -119,8 +119,29 @@ gd32v_i2c_event_intr(void *arg, int irq)
 void
 gd32v_i2c_error_intr(void *arg, int irq)
 {
+	struct gd32v_i2c_softc *sc;
+	mdx_device_t dev;
+	int pending0;
+	int pending1;
 
-	printf("%s\n", __func__);
+	dev = arg;
+	sc = mdx_device_get_softc(dev);
+
+	pending0 = RD4(sc, I2C_STAT0);
+	pending1 = RD4(sc, I2C_STAT1);
+
+#if 0
+	if (pending0 & STAT0_BERR) {
+		pending0 &= ~STAT0_BERR;
+		WR4(sc, I2C_STAT0, pending0);
+	}
+#endif
+	if (pending0)
+		WR4(sc, I2C_STAT0, 0);
+
+	printf("%s: %x %x\n", __func__, pending0, pending1);
+
+	sc->error = 1;
 }
 
 static int
@@ -137,6 +158,7 @@ gd32v_i2c_xfer(mdx_device_t dev, struct i2c_msg *msgs, int len)
 	for (i = 0; i < len; i++) {
 		msg = &msgs[i];
 
+		sc->error = 0;
 		sc->curmsg = msg;
 
 		mdx_sem_init(&sc->sem, 0);
@@ -151,6 +173,8 @@ gd32v_i2c_xfer(mdx_device_t dev, struct i2c_msg *msgs, int len)
 		error = mdx_sem_timedwait(&sc->sem, 1000000);
 		if (error == 0)
 			return (-1);
+		if (sc->error != 0)
+			return (sc->error);
 	}
 
 	return (0);

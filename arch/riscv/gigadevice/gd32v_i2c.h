@@ -47,8 +47,10 @@
 #define	I2C_DATA	0x10	/* Transfer buffer register */
 #define	I2C_STAT0	0x14	/* Transfer status register 0 */
 #define	 STAT0_LOSTARB	(1 << 9) /*  Arbitration Lost in master mode */
+#define	 STAT0_BERR	(1 << 8) /* A bus error occurs */
 #define	 STAT0_TBE	(1 << 7) /* I2C_DATA is Empty during transmitting */
 #define	 STAT0_RBNE	(1 << 6) /* I2C_DATA is not Empty during receiving */
+#define	 STAT0_STPDET	(1 << 4) /* STOP condition detected in slave mode */
 #define	 STAT0_BTC	(1 << 2) /* Byte transmission completed. */
 #define	 STAT0_ADDSEND	(1 << 1) /* Address is sent in master mode or received and matches in slave mode. */
 #define	 STAT0_SBSEND	(1 << 0) /* START condition sent out in master mode */
@@ -64,6 +66,7 @@ struct gd32v_i2c_softc {
 	struct i2c_msg *curmsg;
 	int bufpos;
 	mdx_sem_t sem;
+	int error;
 };
 
 int gd32v_i2c_init(mdx_device_t dev, uint32_t base);
