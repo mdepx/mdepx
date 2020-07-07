@@ -35,6 +35,8 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
+#define	dprintf(fmt, ...)
+
 void
 gd32v_timer_intr(void *arg, int irq)
 {
@@ -43,6 +45,8 @@ gd32v_timer_intr(void *arg, int irq)
 	uint32_t reg;
 
 	dev = arg;
+
+	dprintf("%s\n", __func__);
 
 	sc = mdx_device_get_softc(dev);
 
@@ -66,21 +70,19 @@ gd32v_timer_start(void *arg, uint32_t ticks)
 
 	sc = arg;
 
+	dprintf("%s: %d\n", __func__, ticks);
+
 	val = RD4(sc, TIMER_CNT);
 	val += ticks;
 	WR4(sc, TIMER_CH0CV, val);
-
-	reg = RD4(sc, TIMER_CHCTL2);
-	reg |= CHCTL2_CH0EN;
-	WR4(sc, TIMER_CHCTL2, reg);
 
 	reg = RD4(sc, TIMER_DMAINTEN);
 	reg |= DMAINTEN_CH0IE;
 	WR4(sc, TIMER_DMAINTEN, reg);
 
-	reg = RD4(sc, TIMER_CTL0);
-	reg |= CTL0_CEN;
-	WR4(sc, TIMER_CTL0, reg);
+	reg = RD4(sc, TIMER_CHCTL2);
+	reg |= CHCTL2_CH0EN;
+	WR4(sc, TIMER_CHCTL2, reg);
 }
 
 static void
@@ -91,9 +93,9 @@ gd32v_timer_stop(void *arg)
 
 	sc = arg;
 
-	reg = RD4(sc, TIMER_CTL0);
-	reg &= ~CTL0_CEN;
-	WR4(sc, TIMER_CTL0, reg);
+	reg = RD4(sc, TIMER_CHCTL2);
+	reg &= ~CHCTL2_CH0EN;
+	WR4(sc, TIMER_CHCTL2, reg);
 }
 
 static uint32_t
@@ -113,13 +115,20 @@ int
 gd32v_timer_init(mdx_device_t dev, uint32_t base, int freq)
 {
 	struct gd32v_timer_softc *sc;
+	uint32_t reg;
 
 	sc = mdx_device_alloc_softc(dev, sizeof(struct gd32v_timer_softc));
 	sc->base = base;
 
 	WR4(sc, TIMER_CTL0, 0);
+	WR4(sc, TIMER_INTF, 0);
+	WR4(sc, TIMER_CNT, 0);
 	WR4(sc, TIMER_PSC, (freq / 10000) - 1);
 	WR4(sc, TIMER_CAR, 0xffff);
+
+	reg = RD4(sc, TIMER_CTL0);
+	reg |= CTL0_CEN;
+	WR4(sc, TIMER_CTL0, reg);
 
 	sc->mt.start = gd32v_timer_start;
 	sc->mt.stop = gd32v_timer_stop;
