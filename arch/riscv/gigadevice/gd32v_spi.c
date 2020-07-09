@@ -51,6 +51,7 @@ void
 gd32v_spi_intr(void *arg)
 {
 
+	printf("%s\n", __func__);
 }
 
 int
