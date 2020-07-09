@@ -159,16 +159,4 @@
 #define	SAU_SFSR	0xDE4	/* Secure Fault Status Register */
 #define	SAU_SFAR	0xDE8	/* Secure Fault Address Register */
 
-#if 0
-/* Nested Vectored Interrupt Controller */
-#define	NVIC_ISER(n)	(0x000 + 0x4 * (n)) /* Interrupt Set-enable Regs */
-#define	NVIC_ICER(n)	(0x080 + 0x4 * (n)) /* Interrupt Clear-enable Regs */
-#define	NVIC_ISPR(n)	(0x100 + 0x4 * (n)) /* Interrupt Set-pending Regs */
-#define	NVIC_ICPR(n)	(0x180 + 0x4 * (n)) /* Interrupt Clear-pending Regs */
-#define	NVIC_IABR(n)	(0x200 + 0x4 * (n)) /* Interrupt Active Bit Regs */
-#define	NVIC_ITNS(n)	(0x280 + 0x4 * (n)) /* Interrupt Target Non-secure */
-#define	NVIC_IPR(n)	(0x300 + 0x4 * (n)) /* Interrupt Priority Regs */
-#define	NVIC_STIR	0xE00	/* Software Trigger Interrupt Register */
-#endif
-
 #endif /* !_ARM_ARM_SCS_H_ */
