@@ -1,6 +1,6 @@
 # Introduction
 
-Mdepx is an operating system for embedded applications.
+Mdepx (Machdep Extended) is an operating system for embedded applications.
 
 ## Key features
 - Real-time
@@ -25,7 +25,6 @@ Mdepx is an operating system for embedded applications.
 
 ## Featured applications (external)
   * [LTE 4G Link with nRF9160](https://github.com/machdep/nrf9160)
-  * [Bluetooth LE with nRF5340](https://github.com/machdep/nrf5340)
   * CTSRD CHERI [device-model](https://github.com/CTSRD-CHERI/device-model)
 
 # Getting started
