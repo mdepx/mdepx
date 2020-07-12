@@ -218,7 +218,7 @@ mdx_callout_set_one(struct mdx_callout *c0)
 	    ("%s: Not in critical section.", __func__));
 
 	elapsed = 0;
-	if (mi_tmr->state[cpuid] == MI_TIMER_RUNNING) {
+	if (mi_tmr->state[cpuid] == MI_TIMER_STATE_RUNNING) {
 		elapsed = get_elapsed(NULL);
 		c0->ticks += elapsed;
 	}
@@ -236,16 +236,16 @@ mdx_callout_set_one(struct mdx_callout *c0)
 		list_append(&callouts_list[cpuid], &c0->node);
 
 	switch (mi_tmr->state[cpuid]) {
-	case MI_TIMER_RUNNING:
+	case MI_TIMER_STATE_RUNNING:
 		if (c0 == first(cpuid))
 			mi_tmr_start(c0->ticks - elapsed);
 		break;
-	case MI_TIMER_EXCP:
+	case MI_TIMER_STATE_EXCEPTION:
 		/* We are in the exception handler */
 		break;
-	case MI_TIMER_READY:
+	case MI_TIMER_STATE_READY:
 		/* Start the timer. */
-		mi_tmr->state[cpuid] = MI_TIMER_RUNNING;
+		mi_tmr->state[cpuid] = MI_TIMER_STATE_RUNNING;
 		mi_tmr->count_saved[cpuid] = mi_tmr->count(mi_tmr->arg);
 		mi_tmr_start(first(cpuid)->ticks);
 	}
@@ -384,7 +384,7 @@ mdx_callout_callback(struct mi_timer *mt)
 
 	ticks_elapsed = get_elapsed(&mi_tmr->count_saved[cpuid]);
 
-	mi_tmr->state[cpuid] = MI_TIMER_EXCP;
+	mi_tmr->state[cpuid] = MI_TIMER_STATE_EXCEPTION;
 
 	callout_lock(cpuid);
 	for (c = first(cpuid); c != NULL; ) {
@@ -405,12 +405,12 @@ mdx_callout_callback(struct mi_timer *mt)
 	}
 
 	if ((c = first(cpuid)) != NULL) {
-		if (mi_tmr->state[cpuid] == MI_TIMER_EXCP) {
-			mi_tmr->state[cpuid] = MI_TIMER_RUNNING;
+		if (mi_tmr->state[cpuid] == MI_TIMER_STATE_EXCEPTION) {
+			mi_tmr->state[cpuid] = MI_TIMER_STATE_RUNNING;
 			mi_tmr_start(c->ticks);
 		}
 	} else {
-		mi_tmr->state[cpuid] = MI_TIMER_READY;
+		mi_tmr->state[cpuid] = MI_TIMER_STATE_READY;
 		mi_tmr->stop(mi_tmr->arg);
 	}
 	callout_unlock(cpuid);
@@ -504,7 +504,7 @@ mdx_callout_register(struct mi_timer *mt)
 		sl_init(&l[i]);
 #endif
 		list_init(&callouts_list[i]);
-		mi_tmr->state[i] = MI_TIMER_READY;
+		mi_tmr->state[i] = MI_TIMER_STATE_READY;
 		mi_tmr->count_saved[i] = 0;
 	}
 

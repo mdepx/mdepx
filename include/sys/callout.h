@@ -59,9 +59,9 @@ struct mi_timer {
 	uint32_t (*usec_to_ticks)(uint32_t freq, uint32_t usec);
 	uint32_t (*ticks_to_usec)(uint32_t freq, uint32_t ticks);
 	int state[MDX_CPU_MAX];
-#define	MI_TIMER_READY		0
-#define	MI_TIMER_RUNNING	1
-#define	MI_TIMER_EXCP		2
+#define	MI_TIMER_STATE_READY		0
+#define	MI_TIMER_STATE_RUNNING		1
+#define	MI_TIMER_STATE_EXCEPTION	2
 };
 
 typedef struct mdx_callout mdx_callout_t;
