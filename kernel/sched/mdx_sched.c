@@ -52,8 +52,17 @@
 
 CTASSERT(MDX_SCHED_NPRIO > 1);
 
+/*
+ * Run queue. Only contains threads that are ready to run.
+ * Threads that are sleeping (i.e. waiting for a callout or a mutex)
+ * are not in the run queue.
+ */
 static struct entry runq[MDX_SCHED_NPRIO];
 
+/*
+ * A lock (spin) is only required in SMP case,
+ * otherwise the scheduler is lock-free.
+ */
 #ifdef MDX_SCHED_SMP
 static struct entry pcpu_list = LIST_INIT_STATIC(&pcpu_list);
 struct entry pcpu_all = LIST_INIT_STATIC(&pcpu_all);
