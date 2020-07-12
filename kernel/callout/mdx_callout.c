@@ -487,12 +487,13 @@ mdx_callout_register(struct mi_timer *mt)
 	    mt->stop == NULL ||
 	    mt->frequency == 0 ||
 	    mt->count == NULL) {
-		printf("%s: can't register timer\n", __func__);
+		printf("%s: Error: can't register timer: ",
+		    "invalid configuration.\n", __func__);
 		return (MDX_ERROR);
 	}
 
 	if (mdx_callout_setup(mt) != MDX_OK) {
-		printf("%s: could not register the timer: "
+		printf("%s: Error: could not register the timer: "
 		    "usec_to_ticks() is not set.\n", __func__);
 		return (MDX_ERROR);
 	}
