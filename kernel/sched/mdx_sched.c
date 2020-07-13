@@ -75,7 +75,8 @@ static struct spinlock l;
 #endif
 
 /*
- * Take the next thread from the run queue.
+ * Pick the next thread to run from the queue,
+ * highest priority first.
  */
 static struct thread *
 mdx_sched_pick(void)
