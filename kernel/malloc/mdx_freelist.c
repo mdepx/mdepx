@@ -284,6 +284,9 @@ mdx_fl_realloc(void *ptr, size_t size)
 
 	size += NODE_S;
 
+	while (size & 0x3)
+		size += 1;
+
 	node = (struct node_s *)((char *)ptr - NODE_S);
 	next = (struct node_s *)((uint8_t *)node + node->size);
 
