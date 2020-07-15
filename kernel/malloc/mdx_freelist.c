@@ -302,7 +302,7 @@ mdx_fl_realloc(void *ptr, size_t size)
 			new->flags = size;
 			node->size = size;
 			subs->flags &= FLAG_ALLOCATED;
-			subs->flags |= node->size;
+			subs->flags |= new->size;
 			mdx_fl_add_node(new);
 		} else if (node->size > (size + NODE_S)) {
 			new = (struct node_s *)((uint8_t *)node + size);
@@ -329,7 +329,7 @@ mdx_fl_realloc(void *ptr, size_t size)
 			new->flags = size;
 			node->size = size;
 			subs->flags &= FLAG_ALLOCATED;
-			subs->flags |= node->size;
+			subs->flags |= new->size;
 			mdx_fl_add_node(new);
 
 		} else if (((next->flags & FLAG_ALLOCATED) == 0) &&
