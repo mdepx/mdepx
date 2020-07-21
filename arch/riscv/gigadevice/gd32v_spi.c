@@ -97,7 +97,7 @@ gd32v_spi_setup(mdx_device_t dev, struct gd32v_spi_config *config)
 		reg |= CTL0_PSC_256;
 		break;
 	default:
-		printf("Invalid prescaler: %d", config->prescaler);
+		printf("Invalid prescaler: %d\n", config->prescaler);
 		return (MDX_ERROR);
 	}
 
