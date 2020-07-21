@@ -132,6 +132,8 @@ gd32v_dma_setup(mdx_device_t dev, int chan, struct dma_desc *desc)
 	WR4(sc, DMA_CHCTL(chan), reg);
 
 	mdx_sem_wait(&sc->sem);
+
+	WR4(sc, DMA_CHCTL(chan), 0);
 }
 
 void
