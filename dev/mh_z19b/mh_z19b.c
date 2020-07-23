@@ -83,23 +83,39 @@ mh_z19b_read_co2_reply(uint8_t *reply, uint32_t *co2)
 	uint8_t csum;
 
 	csum = mh_z19b_checksum(reply);
-	if (csum != reply[8])
+	if (csum != reply[8]) {
+		printf("%s: Checksum failed: %x/%x\n",
+		    __func__, csum, reply[8]);
 		return (-1);
+	}
 
 	*co2 = reply[2] * 256 + reply[3];
 
 	return (0);
 }
 
-void
+int
 mh_z19b_cycle(mdx_device_t dev, uint8_t *req,
     uint8_t *reply, int reply_len)
 {
+	int timeout;
 	int i;
 
 	for (i = 0; i < 9; i++)
 		mdx_uart_putc(dev, req[i]);
 
-	for (i = 0; i < reply_len; i++)
+	for (i = 0; i < reply_len; i++) {
+		timeout = 10000;
+		do {
+			if (mdx_uart_rxready(dev))
+				break;
+		} while (timeout--);
+		if (timeout <= 0) {
+			printf("%s: timeout\n", __func__);
+			return (-1);
+		}
 		reply[i] = mdx_uart_getc(dev);
+	}
+
+	return (0);
 }
