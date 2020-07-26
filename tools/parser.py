@@ -52,7 +52,10 @@ def process_kv(d, key, val):
 
 	if v.startswith('{'):
 		f = {}
-		to_json(f, v.strip("{}"))
+		error = to_json(f, v.strip("{}"))
+		if (error == False):
+			print('Can\'t process key "' + k + '" val "' + v + '"')
+			return False
 		if k in d:
 			merge(d[k], f)
 			#for k1 in f:
@@ -77,6 +80,7 @@ def process_kv(d, key, val):
 		else:
 			d[k] = ['']
 
+	return True
 
 #
 # Finds the key value pair and passes it to process_kv().
@@ -94,7 +98,11 @@ def to_json(d, data):
 	while i < len(data):
 		c = data[i]
 
-		if (c == '#' and depth == 0):
+		if (depth < 0):
+			print("Syntax error")
+			return False
+
+		elif (c == '#' and depth == 0):
 			# Single line comment
 			while c != '\n':
 				c = data[i]
@@ -110,7 +118,9 @@ def to_json(d, data):
 				val = tmp
 				tmp = ''
 			if key:
-				process_kv(d, key, val)
+				error = process_kv(d, key, val)
+				if (error == False):
+					return False
 				key = ''
 				val = ''
 			i += 1
@@ -133,3 +143,5 @@ def to_json(d, data):
 
 		tmp += c
 		i += 1
+
+	return True

@@ -58,7 +58,9 @@ def open_modules(root, context, debug):
 					data = f.read()
 					if not el in context:
 						context[el] = {}
-					to_json(context[el], data)
+					error = to_json(context[el], data)
+					if (error == False):
+						return False
 
 	# Now open modules of contexts
 	ky = context.copy()
@@ -71,6 +73,8 @@ def open_modules(root, context, debug):
 				p = k
 			p = os.path.join(root, p)
 			open_modules(p, v, debug)
+
+	return True
 
 def handle_options(root, context):
 	ky = context.copy()
@@ -106,7 +110,9 @@ if __name__ == '__main__':
 		data = f.read()
 
 	config = {}
-	to_json(config, data)
+	error = to_json(config, data)
+	if (error == False):
+		sys.exit(2)
 
 	# Merge-in module's configuration files into the main config
 	root = ''
