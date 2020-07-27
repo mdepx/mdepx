@@ -36,6 +36,23 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
+int
+stm32f4_dsi_read_payload(dsi_device_t *dev, uint32_t *data)
+{
+	struct stm32f4_dsi_softc *sc;
+	uint32_t reg;
+
+	sc = dev->arg;
+
+	reg = RD4(sc, DSI_GPSR);
+	if (reg & GPSR_PRDFE)
+		return (-1);
+
+	*data = RD4(sc, DSI_GPDR);
+
+	return (0);
+}
+
 static void
 stm32f4_dsi_short(dsi_device_t *dev, uint8_t vchid,
     uint8_t data_type, uint8_t data0, uint8_t data1)

@@ -104,6 +104,7 @@
 #define	 GHCR_DT_M	0x3f
 #define	DSI_GPDR	0x0070 /* DSI Host Generic Payload Data Register */
 #define	DSI_GPSR	0x0074 /* DSI Host Generic Packet Status Register */
+#define	 GPSR_PRDFE	(1 << 4) /* Payload Read FIFO Empty */
 #define	 GPSR_CMDFF	(1 << 1) /* Command FIFO Full */
 #define	 GPSR_CMDFE	(1 << 0) /* Command FIFO Empty */
 #define	DSI_TCCR0	0x0078 /* DSI Host Timeout Counter Configuration Register 0 */
@@ -220,5 +221,6 @@ int stm32f4_dsi_init(struct stm32f4_dsi_softc *sc,
 void stm32f4_dsi_setup(struct stm32f4_dsi_softc *sc,
     const struct stm32f4_dsi_config *,
     const struct layer_info *);
+int stm32f4_dsi_read_payload(dsi_device_t *dev, uint32_t *data);
 
 #endif /* !_ARM_STM_STM32F4_DSI_H_ */
