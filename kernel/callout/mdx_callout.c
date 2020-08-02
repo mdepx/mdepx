@@ -457,15 +457,15 @@ mdx_callout_setup(struct mi_timer *mt)
 
 #ifdef MDX_CALLOUT_USEC_TO_TICKS_1MHZ
 	if (mt->frequency == 1000000) {
-		mt->usec_to_ticks = mdx_time_usec_to_ticks_1mhz;
-		mt->ticks_to_usec = mdx_time_ticks_to_usec_1mhz;
+		mt->usec_to_ticks = mdx_cputime_usec_to_ticks_1mhz;
+		mt->ticks_to_usec = mdx_cputime_ticks_to_usec_1mhz;
 		return (MDX_OK);
 	}
 #endif
 
 #ifdef MDX_CALLOUT_USEC_TO_TICKS
 	if (mt->frequency != 1000000) {
-		mt->usec_to_ticks = mdx_time_usec_to_ticks;
+		mt->usec_to_ticks = mdx_cputime_usec_to_ticks;
 		mt->ticks_to_usec = NULL; /* TODO */
 		return (MDX_OK);
 	}

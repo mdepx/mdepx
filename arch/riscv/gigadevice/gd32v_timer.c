@@ -135,7 +135,7 @@ gd32v_timer_init(mdx_device_t dev, uint32_t base, int freq)
 	sc->mt.count = gd32v_timer_count;
 	sc->mt.maxcnt = 0x0000ffff;
 	sc->mt.frequency = 10000;
-	sc->mt.usec_to_ticks = mdx_time_usec_to_ticks;
+	sc->mt.usec_to_ticks = mdx_cputime_usec_to_ticks;
 	sc->mt.arg = sc;
 	mdx_callout_register(&sc->mt);
 

@@ -25,19 +25,29 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/systm.h>
 #include <sys/callout.h>
 
 uint32_t
-mdx_time_usec_to_ticks(uint32_t freq, uint32_t usec)
+mdx_cputime_usec_to_ticks_1mhz(uint32_t freq, uint32_t usec)
 {
-	uint64_t ticks;
+	uint32_t ticks;
 
-	ticks =	freq;
+	KASSERT(freq == 1000000, ("Invalid frequency"));
 
-	ticks <<= 32;
-	ticks /= 1000000;
-	ticks *= usec;
-	ticks >>= 32;
+	ticks = usec;
 
 	return (ticks);
+}
+
+uint32_t
+mdx_cputime_ticks_to_usec_1mhz(uint32_t freq, uint32_t ticks)
+{
+	uint32_t usec;
+
+	KASSERT(freq == 1000000, ("Invalid frequency"));
+
+	usec = ticks;
+
+	return (usec);
 }
