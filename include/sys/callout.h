@@ -83,11 +83,11 @@ int mdx_callout_register(struct mi_timer *);
 int mdx_callout_cancel(struct mdx_callout *c);
 
 uint32_t mdx_cputime_usec_to_ticks(uint32_t freq, uint32_t usec);
+uint32_t mdx_cputime_usec_to_ticks_1mhz(uint32_t freq, uint32_t usec);
+uint32_t mdx_cputime_ticks_to_usec_1mhz(uint32_t freq, uint32_t ticks);
 
 uint32_t mdx_callout_usec_to_ticks(uint32_t usec);
 uint32_t mdx_callout_ticks_to_usec(uint32_t usec);
-uint32_t mdx_cputime_usec_to_ticks_1mhz(uint32_t freq, uint32_t usec);
-uint32_t mdx_cputime_ticks_to_usec_1mhz(uint32_t freq, uint32_t ticks);
 uint32_t mdx_callout_ticks(struct mdx_callout *c);
 uint32_t mdx_callout_usec(struct mdx_callout *c);
 
