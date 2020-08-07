@@ -35,6 +35,9 @@
 #include <machine/frame.h>
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
+#if __has_feature(capabilities)
+#include <machine/cheric.h>
+#endif
 
 #include <mips/mips/trap.h>
 
@@ -144,7 +147,12 @@ handle_exception(struct trapframe *tf, int exc_code)
 		panic("%s: Address error (store) at pc %zx, badvaddr %zx\n",
 		    __func__, tf->tf_pc, tf->tf_badvaddr);
 	case MIPS_CR_EXC_CODE_SYS:
+#if __has_feature(capabilities)
+		tf->tf_pcc = cheri_setoffset(tf->tf_pcc,
+		    cheri_getoffset(tf->tf_pcc) + 4);
+#else
 		tf->tf_pc += 4;
+#endif
 		break;
 	case MIPS_CR_EXC_CODE_RI:
 		dump_frame(tf);
