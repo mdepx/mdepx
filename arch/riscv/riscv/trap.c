@@ -176,7 +176,7 @@ riscv_exception(struct trapframe *tf)
 	/* Switch to the interrupt thread. */
 	if (released)
 		PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
-	critical_enter();
+	curthread->td_critnest++;
 
 	if (intr)
 		riscv_intr(irq);
@@ -204,8 +204,7 @@ riscv_exception(struct trapframe *tf)
 	}
 
 	/* Switch to the new thread. */
-	critical_exit();
-
+	curthread->td_critnest--;
 	if (released)
 		PCPU_SET(curthread, td);
 
