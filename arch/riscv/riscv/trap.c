@@ -178,6 +178,10 @@ riscv_exception(struct trapframe *tf)
 		PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
 	curthread->td_critnest++;
 
+	/*
+	 * Service an interrupt. This includes timer interrupt, which means
+	 * this should be done before call to mdx_sched_park().
+	 */
 	if (intr)
 		riscv_intr(irq);
 
