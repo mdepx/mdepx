@@ -23,6 +23,10 @@ Mdepx (Machdep Extended) is an operating system for embedded applications.
   * QEMU/MIPS64
   * QEMU/CHERI128
 
+## Limitations
+  * Machine-mode supported only
+  * Nested interrupts are not supported
+
 ## Featured applications (external)
   * [LTE 4G Link with nRF9160](https://github.com/machdep/nrf9160)
   * CTSRD CHERI [device-model](https://github.com/CTSRD-CHERI/device-model)
