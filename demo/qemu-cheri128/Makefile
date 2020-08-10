@@ -8,7 +8,7 @@ BASE_ADDR =	0xffffffff80100000
 LDSCRIPT_TPL =	${CURDIR}/ldscript.tpl
 LDSCRIPT =	${OBJDIR}/ldscript
 
-CMD = python3 -B ${OSDIR}/tools/emitter.py -d
+CMD = python3 -B ${OSDIR}/tools/emitter.py
 
 all:	${LDSCRIPT}
 	@${CMD} mdepx.conf
