@@ -210,7 +210,7 @@ main(void)
 {
 	struct thread *td;
 
-	td = mdx_thread_create("test", 1, 100000,
+	td = mdx_thread_create("test", 1, 10000,
 	    4096, test_thr, (void *)0);
 	td->td_index = 0;
 	mdx_sched_add(td);
