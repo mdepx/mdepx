@@ -64,11 +64,9 @@ struct mdx_sysinit {
 		.dri = &driver,			\
 	};
 
-#if 0
 #define	mdx_device_get_softc(dev)	((dev)->sc)
-#endif
 
-void * mdx_device_get_softc(mdx_device_t dev);
+//void * mdx_device_get_softc(mdx_device_t dev);
 void * mdx_device_alloc_softc(mdx_device_t dev, size_t size);
 int mdx_device_probe_and_attach(mdx_device_t dev);
 mdx_device_t mdx_device_lookup_by_name(const char *name, int unit);
