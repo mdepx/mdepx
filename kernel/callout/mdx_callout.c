@@ -471,6 +471,8 @@ mdx_callout_setup(struct mi_timer *mt)
 	}
 #endif
 
+	printf("%s: Error: usec_to_ticks() is not set.\n", __func__);
+
 	return (MDX_ERROR);
 }
 
@@ -493,8 +495,7 @@ mdx_callout_register(struct mi_timer *mt)
 	}
 
 	if (mdx_callout_setup(mt) != MDX_OK) {
-		printf("%s: Error: could not register the timer: "
-		    "usec_to_ticks() is not set.\n", __func__);
+		printf("%s: Error: could not register the timer.", __func__);
 		return (MDX_ERROR);
 	}
 
