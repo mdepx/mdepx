@@ -47,7 +47,7 @@ extern char MipsCache[], MipsCacheEnd[];
 #define	MIPS_DEFAULT_FREQ	1000000
 
 static struct uart_16550_softc uart_sc;
-struct mdx_device dev_uart;
+struct mdx_device uart = {.sc = &uart_sc };
 
 void * __capability kernel_sealcap;
 
@@ -87,12 +87,12 @@ setup_uart(void)
 	cap = cheri_setoffset(cap, MIPS_XKPHYS_UNCACHED_BASE + UART_BASE);
 	cap = cheri_csetbounds(cap, 6);
 
-	uart_16550_init(&dev_uart, &uart_sc, cap, 0, UART_CLOCK_RATE);
-	mdx_uart_setup(&dev_uart, DEFAULT_BAUDRATE,
+	uart_16550_init(&uart, cap, 0, UART_CLOCK_RATE);
+	mdx_uart_setup(&uart, DEFAULT_BAUDRATE,
 	    UART_DATABITS_5,
 	    UART_STOPBITS_1,
 	    UART_PARITY_NONE);
-	mdx_console_register_uart(&dev_uart);
+	mdx_console_register_uart(&uart);
 }
 
 int
