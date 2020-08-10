@@ -99,7 +99,8 @@ def to_json(d, data):
 		c = data[i]
 
 		if (depth < 0):
-			print("Syntax error")
+			print("tools/parser.py: Syntax error detected"
+				" in the configuration file.")
 			return False
 
 		elif (c == '#' and depth == 0):
