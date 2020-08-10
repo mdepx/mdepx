@@ -42,6 +42,8 @@
 ASM_ENTRY(_start)
 	mtc0    zero, CP0_CAUSE
 
+	/* Enable CHERI */
+
 	mfc0	t0, CP0_STATUS
 	li	t1, 0x40000000		/* no float */
 	or	t0, t0, t1
