@@ -33,8 +33,11 @@
  * In a single-threaded environment the idle thread becomes a main thread.
  */
 
+/*
+ * (TODO) Align stack to 16 bytes as CHERI CPU required.
+ */ 
+uint8_t idle_thread_stack[MDX_CPU_MAX][MDX_THREAD_STACK_SIZE] __aligned(16);
 static struct thread idle_thread[MDX_CPU_MAX];
-uint8_t idle_thread_stack[MDX_CPU_MAX][MDX_THREAD_STACK_SIZE];
 
 void
 mdx_thread_init(int cpuid)
