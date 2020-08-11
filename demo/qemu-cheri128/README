@@ -14,7 +14,7 @@ The CHERI hybrid and pure capability system demos.
 
 2a. Hybrid capability system demo
 
-    $ make clean all
+    $ make clean hybrid
 
 2b. Pure capability system demo
 
