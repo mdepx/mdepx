@@ -1,16 +1,16 @@
 The CHERI hybrid and pure capability system demos.
 
-1. Build LLVM and QEMU from here:
+1. Build LLVM and QEMU using cheribuild:
 
-	https://github.com/CTSRD-CHERI/llvm-project
-
-	https://github.com/CTSRD-CHERI/qemu
+    $ git clone https://github.com/CTSRD-CHERI/cheribuild
+    $ ./cheribuild.py llvm
+    $ ./cheribuild.py qemu --qemu/no-use-smbd
 
 2. Setup environment variables
 
     $ cd mdepx/demo/qemu-cheri128
-    $ export CC=clang-cheri
-    $ export LD=ld.lld-cheri
+    $ export CC=${HOME}/cheri/output/sdk/bin/clang
+    $ export LD=${HOME}/cheri/output/sdk/bin/ld.lld
 
 2a. Hybrid capability system demo
 
@@ -18,10 +18,11 @@ The CHERI hybrid and pure capability system demos.
 
 2b. Pure capability system demo
 
-    $ make clean pure all
+    $ make clean pure
 
 3. Run
 
-    $ qemu-system-cheri128 -m 1024 -M malta -kernel obj/qemu-cheri128.elf -nographic
+    $ ~/cheri/build/qemu-build/cheri128-softmmu/qemu-system-cheri128 \
+        -m 1024 -M malta -kernel obj/qemu-cheri128.elf -nographic
 
 4. To quit from QEMU press ctrl-a x
