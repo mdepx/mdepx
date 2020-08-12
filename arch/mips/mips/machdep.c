@@ -137,7 +137,11 @@ md_init(int cpuid)
 	pcpup = &__pcpu[cpuid];
 	pcpup->pc_cpuid = cpuid;
 	list_init(&pcpup->pc_avail);
+#ifdef __CHERI_PURE_CAPABILITY__
+	__asm __volatile("csetkr1c %0" : "=&r"(pcpup));
+#else
 	__asm __volatile("move $28, %0" :: "r"(pcpup));
+#endif
 #endif
 
 #ifdef MDX_THREAD

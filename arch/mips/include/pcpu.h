@@ -36,7 +36,11 @@ get_pcpu(void)
 {
 	struct pcpu *pcpu;
 
+#ifdef __CHERI_PURE_CAPABILITY__
+	__asm __volatile("cgetkr1c %0" : "=&r"(pcpu));
+#else
 	__asm __volatile("move %0, $28" : "=&r"(pcpu));
+#endif
 
 	return (pcpu);
 }
@@ -44,15 +48,20 @@ get_pcpu(void)
 static inline struct thread *
 get_curthread(void)
 {
-	struct thread *td;
 
+#ifdef __CHERI_PURE_CAPABILITY__
+	struct pcpu *pcpu;
+	__asm __volatile("cgetkr1c %0" : "=&r"(pcpu));
+	return (pcpu->pc_curthread);
+#else
+	struct thread *td;
 #if defined(__mips_n64)
 	__asm __volatile("ld %0, 0($28)" : "=&r"(td));
 #else
 	__asm __volatile("lw %0, 0($28)" : "=&r"(td));
 #endif
-
 	return (td);
+#endif
 }
 
 #define	curthread get_curthread()
