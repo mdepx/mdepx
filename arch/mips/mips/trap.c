@@ -162,6 +162,8 @@ handle_exception(struct trapframe *tf, int exc_code)
 		dump_frame(tf);
 		panic("%s: Address error (load) at pc %zx, badvaddr %zx\n",
 		    __func__, tf->tf_pc, tf->tf_badvaddr);
+	case MIPS_CR_EXC_CODE_C2E:
+		panic("Unhandled CR2 exception\n");
 	default:
 		dump_frame(tf);
 		panic("%s: no handler: exc_code %d, pc %zx, badvaddr %zx\n",
@@ -231,6 +233,8 @@ mips_exception(struct trapframe *tf)
 	uint32_t cause;
 	bool intr;
 
+	dprintf("%s\n", __func__);
+
 	intr = false;
 
 	td = curthread;
@@ -257,5 +261,4 @@ mips_exception(struct trapframe *tf)
 
 	return (td->td_tf);
 }
-
 #endif
