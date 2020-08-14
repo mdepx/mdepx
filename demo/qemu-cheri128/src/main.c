@@ -163,6 +163,11 @@ board_init(void)
 	uint32_t status;
 	int malloc_size;
 
+	/* Setup capability-enabled JTAG UART. */
+	setup_uart();
+
+	CHERI_PRINT_PTR(cheri_getpcc());
+
 	mips_install_vectors();
 
 	mips_setup_intr(0, softintr, NULL);
@@ -189,12 +194,7 @@ board_init(void)
 	status |= MIPS_SR_SX;
 	mips_wr_status(status);
 
-	/* Setup capability-enabled JTAG UART. */
-	setup_uart();
-
 	mips_timer_init(&timer_sc, MIPS_DEFAULT_FREQ);
-
-	CHERI_PRINT_PTR(cheri_getpcc());
 }
 
 static void
