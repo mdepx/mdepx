@@ -11,7 +11,7 @@ LDSCRIPT =	${OBJDIR}/ldscript
 CMD = python3 -B ${OSDIR}/tools/emitter.py
 
 hybrid:	${LDSCRIPT}
-	@${CMD} mdepx.conf
+	@${CMD} mdepx-hybrid.conf
 
 pure:	${LDSCRIPT}
 	@${CMD} mdepx-pure.conf
