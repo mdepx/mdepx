@@ -102,7 +102,8 @@ jump_target:
 
 	/* Call into main */
 	cgetpcc		$c12
-	dla		t0, main
+	li		a0, 0
+	dla		t0, md_init
 	csetoffset	$c12, $c12, t0
 	csetbounds	$idc, $c11, zero # need non null
 	cjalr		$c12, $c17
