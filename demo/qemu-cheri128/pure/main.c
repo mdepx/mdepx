@@ -167,6 +167,9 @@ board_init(void)
 {
 	int status;
 
+	/* Setup capability-enabled JTAG UART. */
+	setup_uart();
+
 	mips_install_vectors();
 
 	mips_setup_intr(0, softintr, NULL);
@@ -188,8 +191,15 @@ board_init(void)
 	status |= MIPS_SR_SX;
 	mips_wr_status(status);
 
-	/* Setup capability-enabled JTAG UART. */
-	setup_uart();
+	capability malloc_base;
+	uint32_t malloc_size;
+
+	malloc_base = cheri_getdefault();
+	malloc_base = cheri_setoffset(malloc_base, BASE_ADDR + 0x01000000);
+	malloc_size = 0x01000000;
+
+	malloc_init();
+	malloc_add_region(malloc_base, malloc_size);
 
 	/* Remove default capability */
 	__asm __volatile("csetdefault $cnull");
