@@ -192,7 +192,7 @@ mdx_fl_malloc(size_t size)
 
 	size += NODE_S;
 
-	while (size & 0x1f)
+	while (size & 0xf)
 		size += 1;
 
 	i = size2i(size);
@@ -315,7 +315,7 @@ mdx_fl_realloc(void *ptr, size_t size)
 
 	size += NODE_S;
 
-	while (size & 0x1f)
+	while (size & 0xf)
 		size += 1;
 
 	node = decoffset(ptr, NODE_S);
