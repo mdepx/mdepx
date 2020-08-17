@@ -81,7 +81,7 @@ board_init(void)
 {
 
 	malloc_init();
-	malloc_add_region(0x80800000, 0x7800000);
+	malloc_add_region((void *)0x80800000, 0x7800000);
 
 	e300g_uart_init(&uart_sc, 0x10010000,
 	    500000000, DEFAULT_BAUDRATE);

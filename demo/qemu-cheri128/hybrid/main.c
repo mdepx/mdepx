@@ -182,7 +182,7 @@ board_init(void)
 	malloc_init();
 	malloc_base = BASE_ADDR + 0x01000000;
 	malloc_size = 0x01000000;
-	malloc_add_region(malloc_base, malloc_size);
+	malloc_add_region((void *)malloc_base, malloc_size);
 
 	status = mips_rd_status();
 	status &= ~(MIPS_SR_IM_M);

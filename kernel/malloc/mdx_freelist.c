@@ -32,6 +32,9 @@
 
 #include <string.h>
 #include <stdio.h>
+#ifdef __CHERI_PURE_CAPABILITY__
+#include <machine/cheric.h>
+#endif
 
 struct node_s {
 	struct node_s *next;
@@ -46,6 +49,34 @@ struct node_s {
 #define	NODE_S	sizeof(struct node_s)
 
 static struct node_s nodelist[32];
+
+static void *
+incoffset(void *a, int len)
+{
+	void *result;
+
+#ifdef __CHERI_PURE_CAPABILITY__
+	result = cheri_incoffset(a, len);
+#else
+	result = (void *)((uint8_t *)a + len);
+#endif
+
+	return (result);
+}
+
+static void *
+decoffset(void *a, int len)
+{
+	void *result;
+
+#ifdef __CHERI_PURE_CAPABILITY__
+	result = cheri_incoffset(a, -len);
+#else
+	result = (void *)((uint8_t *)a - len);
+#endif
+
+	return (result);
+}
 
 static int
 size2i(uint32_t size)
@@ -85,20 +116,20 @@ mdx_fl_add_node(struct node_s *node)
 }
 
 void
-mdx_fl_add_region(uintptr_t base, int size)
+mdx_fl_add_region(void *base, int size)
 {
 	struct node_s *node;
 
-	node = (struct node_s *)base;
+	node = base;
 	node->size = NODE_S;
 	node->flags = FLAG_ALLOCATED;
 
-	node = (struct node_s *)(base + NODE_S);
+	node = incoffset(base, NODE_S);
 	node->size = size - 2 * NODE_S;
 	node->flags = NODE_S;
 	mdx_fl_add_node(node);
 
-	node = (struct node_s *)(base + size - NODE_S);
+	node = incoffset(base, size - NODE_S);
 	node->size = NODE_S;
 	node->flags = (size - 2 * NODE_S) | FLAG_ALLOCATED;
 }
@@ -161,7 +192,7 @@ mdx_fl_malloc(size_t size)
 
 	size += NODE_S;
 
-	while (size & 0x3)
+	while (size & 0x1f)
 		size += 1;
 
 	i = size2i(size);
@@ -180,13 +211,13 @@ mdx_fl_malloc(size_t size)
 		avail = (node->size - size);
 		if (avail > NODE_S) {
 			/* Adjust the size of current node */
-			next = (struct node_s *)((uint8_t *)node + node->size);
+			next = incoffset(node, node->size);
 			next->flags &= FLAG_ALLOCATED;
 			next->flags |= avail;
 			node->size = size;
 
 			/* Create new free node */
-			new = (struct node_s *)((uint8_t *)node + size);
+			new = incoffset(node, size);
 			new->size = avail;
 			new->flags = size;
 			mdx_fl_add_node(new);
@@ -196,7 +227,7 @@ mdx_fl_malloc(size_t size)
 		node->next = 0;
 		node->prev = 0;
 
-		return ((void *)((uint8_t *)node + NODE_S));
+		return (incoffset(node, NODE_S));
 	}
 
 	return (NULL);
@@ -284,15 +315,15 @@ mdx_fl_realloc(void *ptr, size_t size)
 
 	size += NODE_S;
 
-	while (size & 0x3)
+	while (size & 0x1f)
 		size += 1;
 
-	node = (struct node_s *)((char *)ptr - NODE_S);
-	next = (struct node_s *)((uint8_t *)node + node->size);
+	node = decoffset(ptr, NODE_S);
+	next = incoffset(node, node->size);
 
 	if (size <= node->size) {
 		if ((next->flags & FLAG_ALLOCATED) == 0) {
-			subs = (struct node_s *)((uint8_t *)next + next->size);
+			subs = incoffset(next, next->size);
 
 			/* Remove node */
 			next->prev->next = next->next;
@@ -300,7 +331,7 @@ mdx_fl_realloc(void *ptr, size_t size)
 				next->next->prev = next->prev;
 
 			/* Merge with next */
-			new = (struct node_s *)((uint8_t *)node + size);
+			new = incoffset(node, size);
 			new->size = next->size + node->size - size;
 			new->flags = size;
 			node->size = size;
@@ -308,7 +339,7 @@ mdx_fl_realloc(void *ptr, size_t size)
 			subs->flags |= new->size;
 			mdx_fl_add_node(new);
 		} else if (node->size > (size + NODE_S)) {
-			new = (struct node_s *)((uint8_t *)node + size);
+			new = incoffset(node, size);
 			new->size = node->size - size;
 			new->flags = size;
 			node->size = size;
@@ -319,7 +350,7 @@ mdx_fl_realloc(void *ptr, size_t size)
 	} else {
 		if (((next->flags & FLAG_ALLOCATED) == 0) &&
 		    (node->size + next->size) > (size + NODE_S)) {
-			subs = (struct node_s *)((uint8_t *)next + next->size);
+			subs = incoffset(next, next->size);
 
 			/* Remove node */
 			next->prev->next = next->next;
@@ -337,7 +368,7 @@ mdx_fl_realloc(void *ptr, size_t size)
 
 		} else if (((next->flags & FLAG_ALLOCATED) == 0) &&
 		    (node->size + next->size) == size) {
-			subs = (struct node_s *)((uint8_t *)next + next->size);
+			subs = incoffset(next, next->size);
 
 			/* Remove node */
 			next->prev->next = next->next;

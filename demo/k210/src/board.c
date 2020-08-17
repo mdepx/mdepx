@@ -246,7 +246,7 @@ board_init(void)
 	 * It could be that the region is used by a peripheral device.
 	 */
 	malloc_init();
-	malloc_add_region(0x80100000, 5 * 1024 * 1024);
+	malloc_add_region((void *)0x80100000, 5 * 1024 * 1024);
 
 #ifdef MDX_SCHED_SMP
 	printf("Send interrupt to CPU1\n");

@@ -71,7 +71,7 @@ board_init(void)
 	/* Initialize malloc */
 
 	malloc_init();
-	malloc_add_region(0x80800000, 0x7800000);
+	malloc_add_region((void *)0x80800000, 0x7800000);
 
 	/* Register UART */
 

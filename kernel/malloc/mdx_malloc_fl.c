@@ -113,7 +113,7 @@ realloc(void *ptr, size_t size)
 }
 
 void            
-malloc_add_region(uintptr_t base, int size)
+malloc_add_region(void *base, int size)
 {
 
 	critical_enter();
