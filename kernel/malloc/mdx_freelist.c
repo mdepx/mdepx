@@ -27,14 +27,12 @@
 /* Free list memory allocator */
 
 #include <sys/cdefs.h>
+#include <sys/cheri.h>
 #include <sys/types.h>
 #include <sys/malloc.h>
 
 #include <string.h>
 #include <stdio.h>
-#ifdef __CHERI_PURE_CAPABILITY__
-#include <machine/cheric.h>
-#endif
 
 struct node_s {
 	struct node_s *next;
@@ -49,48 +47,6 @@ struct node_s {
 #define	NODE_S	sizeof(struct node_s)
 
 static struct node_s nodelist[32];
-
-static inline void *
-mdx_incoffset(void *a, int len)
-{
-	void *result;
-
-#ifdef __CHERI_PURE_CAPABILITY__
-	result = cheri_incoffset(a, len);
-#else
-	result = (void *)((uint8_t *)a + len);
-#endif
-
-	return (result);
-}
-
-static inline void *
-mdx_decoffset(void *a, int len)
-{
-	void *result;
-
-#ifdef __CHERI_PURE_CAPABILITY__
-	result = cheri_incoffset(a, -len);
-#else
-	result = (void *)((uint8_t *)a - len);
-#endif
-
-	return (result);
-}
-
-static inline void *
-mdx_setbounds(void *a, int len)
-{
-	void *result;
-
-#ifdef __CHERI_PURE_CAPABILITY__
-	result = cheri_csetbounds(a, len);
-#else
-	result = a;
-#endif
-
-	return (result);
-}
 
 static int
 size2i(uint32_t size)
