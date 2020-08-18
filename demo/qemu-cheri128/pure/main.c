@@ -231,11 +231,11 @@ main(void)
 	struct thread *td;
 
 	td = mdx_thread_create("test", 1, 1000,
-	    4*4096, test_thr, (void *)0);
+	    4 * 4096, test_thr, (void *)0);
 	mdx_sched_add(td);
 
 	td = mdx_thread_create("test1", 1, 1000,
-	    4*4096, test_thr1, (void *)0);
+	    4 * 4096, test_thr1, (void *)0);
 	mdx_sched_add(td);
 
 	while (1) {
