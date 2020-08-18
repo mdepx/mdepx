@@ -30,6 +30,7 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/cheri.h>
 #include <sys/pcpu.h>
 #include <sys/systm.h>
 #include <sys/thread.h>
@@ -117,7 +118,6 @@ int
 mdx_thread_setup(struct thread *td, const char *name,
     int prio, uint32_t quantum_usec, void *entry, void *arg)
 {
-	uintptr_t stack_top;
 
 	if (td == NULL || td->td_stack == NULL)
 		return (MDX_ERROR);
@@ -128,20 +128,13 @@ mdx_thread_setup(struct thread *td, const char *name,
 	if (entry == NULL)
 		return (MDX_ERROR);
 
-	stack_top = (uintptr_t)td->td_stack + td->td_stack_size;
-
-	/* (TODO) Align the stack as CHERI CPU required. */
-	while (stack_top & 0xf)
-		stack_top--;
-
-	td->td_stack_top = (uint8_t *)stack_top;
+	td->td_stack_top = mdx_incoffset(td->td_stack, td->td_stack_size);
 
 	td->td_name = name;
 	td->td_quantum = quantum_usec ?
 		mdx_callout_usec_to_ticks(quantum_usec) : 0;
 	td->td_state = TD_STATE_READY;
-	td->td_tf = (struct trapframe *)((uint8_t *)td->td_stack_top
-	    - sizeof(struct trapframe));
+	td->td_tf = mdx_decoffset(td->td_stack_top, sizeof(struct trapframe));
 	td->td_prio = prio;
 	md_setup_frame(td->td_tf, entry, arg, mdx_thread_terminate);
 
