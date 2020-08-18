@@ -163,7 +163,7 @@
 	clc		CHERI_REG_C8, zero, (C8)($c11)
 	clc		CHERI_REG_C9, zero, (C9)($c11)
 	clc		CHERI_REG_C10, zero, (C10)($c11)
-	clc		CHERI_REG_STC, zero, (STC)($c11)
+	/* $c11 (sp) is already restored */
 	clc		CHERI_REG_C12, zero, (C12)($c11)
 	clc		CHERI_REG_C13, zero, (C13)($c11)
 	clc		CHERI_REG_C14, zero, (C14)($c11)
