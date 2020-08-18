@@ -165,7 +165,10 @@ setup_uart(void)
 void
 board_init(void)
 {
+	capability malloc_base;
+	uint32_t malloc_size;
 	int status;
+	int error;
 
 	/* Setup capability-enabled JTAG UART. */
 	setup_uart();
@@ -191,9 +194,6 @@ board_init(void)
 	status |= MIPS_SR_SX;
 	mips_wr_status(status);
 
-	capability malloc_base;
-	uint32_t malloc_size;
-
 	malloc_base = cheri_getdefault();
 	malloc_base = cheri_setoffset(malloc_base, BASE_ADDR + 0x01000000);
 	malloc_size = 0x01000000;
@@ -201,18 +201,42 @@ board_init(void)
 	malloc_init();
 	malloc_add_region(malloc_base, malloc_size);
 
+	error = mips_timer_init(&timer_sc, MIPS_DEFAULT_FREQ);
+	if (error)
+		printf("can't register the timer\n");
+
 	/* Remove default capability */
 	__asm __volatile("csetdefault $cnull");
+}
+
+static void
+test_thr(void)
+{
+
+	while (1)
+		printf("hi\n");
+}
+
+static void
+test_thr1(void)
+{
+
+	while (1)
+		printf("hi1\n");
 }
 
 int
 main(void)
 {
-	int error;
+	struct thread *td;
 
-	error = mips_timer_init(&timer_sc, MIPS_DEFAULT_FREQ);
-	if (error)
-		printf("can't register the timer\n");
+	td = mdx_thread_create("test", 1, 1000,
+	    4*4096, test_thr, (void *)0);
+	mdx_sched_add(td);
+
+	td = mdx_thread_create("test1", 1, 1000,
+	    4*4096, test_thr1, (void *)0);
+	mdx_sched_add(td);
 
 	while (1) {
 		printf("Hello Pure Capability World\n");
