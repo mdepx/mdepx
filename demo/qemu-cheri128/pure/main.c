@@ -240,7 +240,7 @@ main(void)
 
 	while (1) {
 		printf("Hello Pure Capability World\n");
-		mdx_usleep(1000000);
+		mdx_usleep(1000);
 	}
 
 	return (0);
