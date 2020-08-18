@@ -78,15 +78,18 @@ static inline uint8_t
 mips_cap_ioread_uint8(capability cap, size_t offset)
 {
 	uint8_t v;
+
 	__asm__ __volatile__ ("clb %[v], %[offset],  0(%[cap])"
 		: [v] "=r" (v)
 		: [cap] "C" (cap), [offset] "r" (offset));
+
 	return (v);
 }
 
 static inline void
 mips_cap_iowrite_uint8(capability cap, size_t offset, uint8_t v)
 {
+
 	__asm__ __volatile__ ("csb %[v], %[offset],  0(%[cap])"
 		:: [cap] "C" (cap), [offset] "r" (offset), [v] "r" (v));
 }
