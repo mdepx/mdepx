@@ -75,7 +75,7 @@ board_init(void)
 
 	/* Register UART */
 
-	uart_16550_init(&dev_uart, UART_BASE, 0, UART_CLOCK_RATE);
+	uart_16550_init(&dev_uart, (void *)UART_BASE, 0, UART_CLOCK_RATE);
 	mdx_uart_setup(&dev_uart, DEFAULT_BAUDRATE,
 	    UART_DATABITS_5,
 	    UART_STOPBITS_1,

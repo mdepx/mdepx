@@ -120,7 +120,7 @@ board_init(void)
 	uint32_t status;
 	int malloc_size;
 
-	uart_16550_init(&dev_uart, UART_BASE | 0xffffffffa0000000, 0,
+	uart_16550_init(&dev_uart, (void *)(UART_BASE | 0xffffffffa0000000), 0,
 	    UART_CLOCK_RATE);
 	mdx_uart_setup(&dev_uart, DEFAULT_BAUDRATE,
 	    UART_DATABITS_5,

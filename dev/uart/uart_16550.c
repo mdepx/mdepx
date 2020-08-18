@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2019-2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,51 +25,34 @@
  */
 
 #include <sys/types.h>
+#include <sys/cheri.h>
 
 #include <dev/uart/uart_16550.h>
 
 #if __has_feature(capabilities)
-static inline uint8_t
-mips_cap_ioread_uint8(capability cap, size_t offset)
-{
-	uint8_t v;
-	__asm__ __volatile__ ("clb %[v], %[offset],  0(%[cap])"
-		: [v] "=r" (v)
-		: [cap] "C" (cap), [offset] "r" (offset));
-	return (v);
-}
 
-static inline void
-mips_cap_iowrite_uint8(capability cap, size_t offset, uint8_t v)
-{
-	__asm__ __volatile__ ("csb %[v], %[offset],  0(%[cap])"
-		:: [cap] "C" (cap), [offset] "r" (offset), [v] "r" (v));
-}
-
-#define	RD1(_sc, _reg)		\
-	mips_cap_ioread_uint8((_sc)->base, _reg)
-#define	WR1(_sc, _reg, _val)	\
-	mips_cap_iowrite_uint8((_sc)->base, _reg, _val)
-
+#define	RD1(_sc, _reg)		mips_cap_ioread_uint8((_sc)->base, _reg)
+#define	WR1(_sc, _reg, _val)	mips_cap_iowrite_uint8((_sc)->base, _reg, _val)
 #define	UART_READ(_sc, _reg)		RD1((_sc), (_reg))
 #define	UART_WRITE(_sc, _reg, _val)	WR1((_sc), (_reg), (_val))
 
 #else
 
-#define	RD1(_sc, _reg)		\
-	*(volatile uint8_t *)((_sc)->base + (_reg << (_sc)->reg_shift))
-#define	WR1(_sc, _reg, _val)	\
-	*(volatile uint8_t *)((_sc)->base + (_reg << (_sc)->reg_shift)) = _val
+#define	RD1(_sc, _reg)		*(volatile uint8_t *)((uint8_t *)((_sc)->base)\
+	+ (_reg << (_sc)->reg_shift))
+#define	WR1(_sc, _reg, _val)	*(volatile uint8_t *)((uint8_t *)((_sc)->base)\
+	+ (_reg << (_sc)->reg_shift)) = _val
 
-#define	RD4(_sc, _reg)		\
-	*(volatile uint32_t *)((_sc)->base + (_reg << (_sc)->reg_shift))
-#define	WR4(_sc, _reg, _val)	\
-	*(volatile uint32_t *)((_sc)->base + (_reg << (_sc)->reg_shift)) = _val
+#define	RD4(_sc, _reg)		*(volatile uint32_t *)((uint8_t *)((_sc)->base)\
+	+ (_reg << (_sc)->reg_shift))
+#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((uint8_t *)((_sc)->base)\
+	+ (_reg << (_sc)->reg_shift)) = _val
 
 #define	UART_READ(_sc, _reg)	(_sc)->reg_shift == 2 ?	\
 	RD4((_sc), (_reg)) : RD1((_sc), (_reg))
 #define	UART_WRITE(_sc, _reg, _val)	(_sc)->reg_shift == 2 ?	\
 	(WR4((_sc), (_reg), (_val))) : (WR1((_sc), (_reg), (_val)))
+
 #endif
 
 static bool

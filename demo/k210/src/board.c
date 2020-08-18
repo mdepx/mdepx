@@ -237,7 +237,7 @@ board_init(void)
 	k210_i2c_init(&dev_i2c, BASE_I2C0);
 	k210_i2c_configure_master(&i2c_sc, 790000000, 400000);
 
-	uart_16550_init(&dev_uart, BASE_UART1, 2, 200000000);
+	uart_16550_init(&dev_uart, (void *)BASE_UART1, 2, 200000000);
 	mdx_uart_setup(&dev_uart, 9600, UART_DATABITS_8,
 	    UART_STOPBITS_1, UART_PARITY_NONE);
 

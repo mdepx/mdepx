@@ -104,16 +104,10 @@ typedef	_Bool		bool;
 typedef	void * __capability capability;
 typedef	void * __capability otype_t;
 #else
-typedef	__size_t capability;
+typedef	void * capability;
 #endif
 
-#if __has_feature(capabilities)
-#ifdef __CHERI_PURE_CAPABILITY__
 typedef	__uintptr_t	vaddr_t;
-#else
-typedef	__uint64_t	vaddr_t;
-#endif
-#endif
 
 typedef	__ptrdiff_t	ptrdiff_t;
 
