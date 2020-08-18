@@ -50,8 +50,8 @@ struct node_s {
 
 static struct node_s nodelist[32];
 
-static void *
-incoffset(void *a, int len)
+static inline void *
+mdx_incoffset(void *a, int len)
 {
 	void *result;
 
@@ -64,8 +64,8 @@ incoffset(void *a, int len)
 	return (result);
 }
 
-static void *
-decoffset(void *a, int len)
+static inline void *
+mdx_decoffset(void *a, int len)
 {
 	void *result;
 
@@ -73,6 +73,20 @@ decoffset(void *a, int len)
 	result = cheri_incoffset(a, -len);
 #else
 	result = (void *)((uint8_t *)a - len);
+#endif
+
+	return (result);
+}
+
+static inline void *
+mdx_setbounds(void *a, int len)
+{
+	void *result;
+
+#ifdef __CHERI_PURE_CAPABILITY__
+	result = cheri_csetbounds(a, len);
+#else
+	result = a;
 #endif
 
 	return (result);
@@ -124,12 +138,12 @@ mdx_fl_add_region(void *base, int size)
 	node->size = NODE_S;
 	node->flags = FLAG_ALLOCATED;
 
-	node = incoffset(base, NODE_S);
+	node = mdx_incoffset(base, NODE_S);
 	node->size = size - 2 * NODE_S;
 	node->flags = NODE_S;
 	mdx_fl_add_node(node);
 
-	node = incoffset(base, size - NODE_S);
+	node = mdx_incoffset(base, size - NODE_S);
 	node->size = NODE_S;
 	node->flags = (size - 2 * NODE_S) | FLAG_ALLOCATED;
 }
@@ -211,13 +225,13 @@ mdx_fl_malloc(size_t size)
 		avail = (node->size - size);
 		if (avail > NODE_S) {
 			/* Adjust the size of current node */
-			next = incoffset(node, node->size);
+			next = mdx_incoffset(node, node->size);
 			next->flags &= FLAG_ALLOCATED;
 			next->flags |= avail;
 			node->size = size;
 
 			/* Create new free node */
-			new = incoffset(node, size);
+			new = mdx_incoffset(node, size);
 			new->size = avail;
 			new->flags = size;
 			mdx_fl_add_node(new);
@@ -227,7 +241,9 @@ mdx_fl_malloc(size_t size)
 		node->next = 0;
 		node->prev = 0;
 
-		return (incoffset(node, NODE_S));
+		node = mdx_incoffset(node, NODE_S);
+		node = mdx_setbounds(node, size);
+		return ((void *)node);
 	}
 
 	return (NULL);
@@ -318,12 +334,12 @@ mdx_fl_realloc(void *ptr, size_t size)
 	while (size & 0xf)
 		size += 1;
 
-	node = decoffset(ptr, NODE_S);
-	next = incoffset(node, node->size);
+	node = mdx_decoffset(ptr, NODE_S);
+	next = mdx_incoffset(node, node->size);
 
 	if (size <= node->size) {
 		if ((next->flags & FLAG_ALLOCATED) == 0) {
-			subs = incoffset(next, next->size);
+			subs = mdx_incoffset(next, next->size);
 
 			/* Remove node */
 			next->prev->next = next->next;
@@ -331,7 +347,7 @@ mdx_fl_realloc(void *ptr, size_t size)
 				next->next->prev = next->prev;
 
 			/* Merge with next */
-			new = incoffset(node, size);
+			new = mdx_incoffset(node, size);
 			new->size = next->size + node->size - size;
 			new->flags = size;
 			node->size = size;
@@ -339,7 +355,7 @@ mdx_fl_realloc(void *ptr, size_t size)
 			subs->flags |= new->size;
 			mdx_fl_add_node(new);
 		} else if (node->size > (size + NODE_S)) {
-			new = incoffset(node, size);
+			new = mdx_incoffset(node, size);
 			new->size = node->size - size;
 			new->flags = size;
 			node->size = size;
@@ -350,7 +366,7 @@ mdx_fl_realloc(void *ptr, size_t size)
 	} else {
 		if (((next->flags & FLAG_ALLOCATED) == 0) &&
 		    (node->size + next->size) > (size + NODE_S)) {
-			subs = incoffset(next, next->size);
+			subs = mdx_incoffset(next, next->size);
 
 			/* Remove node */
 			next->prev->next = next->next;
@@ -368,7 +384,7 @@ mdx_fl_realloc(void *ptr, size_t size)
 
 		} else if (((next->flags & FLAG_ALLOCATED) == 0) &&
 		    (node->size + next->size) == size) {
-			subs = incoffset(next, next->size);
+			subs = mdx_incoffset(next, next->size);
 
 			/* Remove node */
 			next->prev->next = next->next;
