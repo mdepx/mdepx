@@ -90,11 +90,12 @@ cpu_idle(void)
 }
 #endif
 
+#if __has_feature(capabilities)
+
 void
 md_setup_frame(struct trapframe *tf, void *entry,
     void *arg, void *terminate)
 {
-#if __has_feature(capabilities)
 
 #ifdef __CHERI_PURE_CAPABILITY__
 	tf->tf_pcc = entry;
@@ -111,12 +112,21 @@ md_setup_frame(struct trapframe *tf, void *entry,
 	tf->tf_c[0] = cap;
 #endif
 
+}
+
 #else /* !__has_feature(capabilities) */
+
+void
+md_setup_frame(struct trapframe *tf, void *entry,
+    void *arg, void *terminate)
+{
+
 	tf->tf_ra = (uintptr_t)terminate;
 	tf->tf_pc = (uintptr_t)entry;
 	tf->tf_a[0] = (uintptr_t)arg;
-#endif
 }
+
+#endif
 
 void
 md_thread_yield(void)
