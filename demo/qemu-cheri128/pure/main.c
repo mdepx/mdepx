@@ -209,33 +209,46 @@ board_init(void)
 	__asm __volatile("csetdefault $cnull");
 }
 
+struct token {
+	int a;
+};
+
 static void
-test_thr(void)
+test_thr(void *arg)
 {
+	struct token *t;
+
+	t = arg;
 
 	while (1)
-		printf("hi\n");
+		printf("hi %d\n", t->a);
 }
 
 static void
-test_thr1(void)
+test_thr1(void *arg)
 {
+	struct token *t;
+
+	t = arg;
 
 	while (1)
-		printf("hi1\n");
+		printf("hi1 %d\n", t->a);
 }
 
 int
 main(void)
 {
 	struct thread *td;
+	struct token *t;
 
-	td = mdx_thread_create("test", 1, 1000,
-	    4 * 4096, test_thr, (void *)0);
+	t = malloc(sizeof(struct token));
+	t->a = 1;
+	td = mdx_thread_create("test", 1, 1000, 4 * 4096, test_thr, t);
 	mdx_sched_add(td);
 
-	td = mdx_thread_create("test1", 1, 1000,
-	    4 * 4096, test_thr1, (void *)0);
+	t = malloc(sizeof(struct token));
+	t->a = 2;
+	td = mdx_thread_create("test1", 1, 1000, 4 * 4096, test_thr1, t);
 	mdx_sched_add(td);
 
 	while (1) {
