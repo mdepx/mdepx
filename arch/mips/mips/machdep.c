@@ -98,6 +98,7 @@ md_setup_frame(struct trapframe *tf, void *entry,
 
 #ifdef __CHERI_PURE_CAPABILITY__
 	tf->tf_pcc = entry;
+	tf->tf_c[3] = arg;
 #else
 	capability cap;
 	cap = cheri_getkcc();
