@@ -110,6 +110,7 @@ md_setup_frame(struct trapframe *tf, void *entry,
 	/* Set some default data capability for this thread. */
 	cap = cheri_getdefault();
 	tf->tf_c[0] = cap;
+	tf->tf_a[0] = (uintptr_t)arg;
 #endif
 
 }
