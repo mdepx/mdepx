@@ -24,11 +24,12 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_MDX_CHERI_H_
-#define	_MDX_CHERI_H_
+#ifndef	_SYS_CHERI_H_
+#define	_SYS_CHERI_H_
 
 #if __has_feature(capabilities)
 #include <machine/cheric.h>
+#include <machine/cheri.h>
 #endif
 
 static inline void *
@@ -73,86 +74,4 @@ mdx_setbounds(void *a, int len)
 	return (result);
 }
 
-#if __has_feature(capabilities)
-static inline uint8_t
-mips_cap_ioread_uint8(capability cap, size_t offset)
-{
-	uint8_t v;
-
-	__asm__ __volatile__ ("clb %[v], %[offset],  0(%[cap])"
-		: [v] "=r" (v)
-		: [cap] "C" (cap), [offset] "r" (offset));
-
-	return (v);
-}
-
-static inline uint16_t
-mips_cap_ioread_uint16(capability cap, size_t offset)
-{
-	uint16_t v;
-
-	__asm__ __volatile__ ("clh %[v], %[offset],  0(%[cap])"
-		: [v] "=r" (v)
-		: [cap] "C" (cap), [offset] "r" (offset));
-
-	return (v);
-}
-
-static inline uint32_t
-mips_cap_ioread_uint32(capability cap, size_t offset)
-{
-	uint32_t v;
-
-	__asm__ __volatile__ ("clw %[v], %[offset],  0(%[cap])"
-		: [v] "=r" (v)
-		: [cap] "C" (cap), [offset] "r" (offset));
-
-	return (v);
-}
-
-static inline uint64_t
-mips_cap_ioread_uint64(capability cap, size_t offset)
-{
-	uint64_t v;
-
-	__asm__ __volatile__ ("cld %[v], %[offset],  0(%[cap])"
-		: [v] "=r" (v)
-		: [cap] "C" (cap), [offset] "r" (offset));
-
-	return (v);
-}
-
-static inline void
-mips_cap_iowrite_uint8(capability cap, size_t offset, uint8_t v)
-{
-
-	__asm__ __volatile__ ("csb %[v], %[offset],  0(%[cap])"
-		:: [cap] "C" (cap), [offset] "r" (offset), [v] "r" (v));
-}
-
-static inline void
-mips_cap_iowrite_uint16(capability cap, size_t offset, uint16_t v)
-{
-
-	__asm__ __volatile__ ("csh %[v], %[offset],  0(%[cap])"
-		:: [cap] "C" (cap), [offset] "r" (offset), [v] "r" (v));
-}
-
-static inline void
-mips_cap_iowrite_uint32(capability cap, size_t offset, uint32_t v)
-{
-
-	__asm__ __volatile__ ("csw %[v], %[offset],  0(%[cap])"
-		:: [cap] "C" (cap), [offset] "r" (offset), [v] "r" (v));
-}
-
-static inline void
-mips_cap_iowrite_uint64(capability cap, size_t offset, uint64_t v)
-{
-
-	__asm__ __volatile__ ("csd %[v], %[offset],  0(%[cap])"
-		:: [cap] "C" (cap), [offset] "r" (offset), [v] "r" (v));
-}
-#endif
-
-#endif /* !_MDX_CHERI_H_ */
+#endif /* !_SYS_CHERI_H_ */
