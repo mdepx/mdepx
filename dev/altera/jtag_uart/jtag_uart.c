@@ -27,20 +27,14 @@
 #include <sys/types.h>
 #include <sys/endian.h>
 #include <sys/cheri.h>
+#include <sys/io.h>
 
 #include <dev/altera/jtag_uart/jtag_uart.h>
 
 #include <machine/cpuregs.h>
 
-#if __has_feature(capabilities)
-#define	RD4(_sc, _reg)		cap_ioread_uint32((_sc)->base, _reg)
-#define	WR4(_sc, _reg, _val)	cap_iowrite_uint32((_sc)->base, _reg, _val)
-#else
-#define	RD4(_sc, _reg)		\
-	*(volatile uint32_t *)((_sc)->base + _reg)
-#define	WR4(_sc, _reg, _val)	\
-	*(volatile uint32_t *)((_sc)->base + _reg) = _val
-#endif
+#define	RD4(_sc, _reg)		mdx_ioread_uint32((_sc)->base, _reg)
+#define	WR4(_sc, _reg, _val)	mdx_iowrite_uint32((_sc)->base, _reg, _val)
 
 void
 aju_putc(struct aju_softc *sc, int c)
