@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2018-2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * This software was developed by SRI International and the University of
@@ -114,7 +114,7 @@ beripic_disable(mdx_device_t dev, uint32_t beripic_irq)
 
 	sc = mdx_device_get_softc(dev);
 
-	tid = 0;
+	tid = 0; /* thread ID */
 
 	WR_CFG(sc, (beripic_irq + tid) * 8, 0);
 
@@ -130,15 +130,9 @@ beripic_enable(mdx_device_t dev, uint32_t beripic_irq, uint32_t hard_irq)
 
 	sc = mdx_device_get_softc(dev);
 
-	tid = 0;
+	tid = 0; /* thread ID */
 
 	printf("%s: enabling IRQ %d\n", __func__, beripic_irq);
-
-#if 0
-	printf("beripic_enable\n");
-	printf("beripic_enable: excp vector[0] %x\n",
-	    *(uint32_t *)(0x80000180 | MIPS_XKPHYS_UNCACHED_BASE));
-#endif
 
 	WR_IP_CLEAR(sc, 0, (1 << beripic_irq));
 
@@ -156,11 +150,6 @@ beripic_init(mdx_device_t dev, struct beripic_resource *res)
 
 	sc = mdx_device_get_softc(dev);
 	sc->res = res;
-
-	res->cfg |= MIPS_XKPHYS_UNCACHED_BASE;
-	res->ip_set |= MIPS_XKPHYS_UNCACHED_BASE;
-	res->ip_clear |= MIPS_XKPHYS_UNCACHED_BASE;
-	res->ip_read |= MIPS_XKPHYS_UNCACHED_BASE;
 
 	for (i = 0; i < BERIPIC_NIRQS; i++)
 		WR_CFG(sc, i * 8, 0);
