@@ -56,12 +56,11 @@ struct beripic_softc {
 	const struct beripic_intr_entry *map;
 };
 
-int beripic_init(struct beripic_softc *sc, struct beripic_resource *res);
-void beripic_enable(struct beripic_softc *sc,
-    uint32_t beripic_irq, uint32_t hard_irq);
+int beripic_init(mdx_device_t dev, struct beripic_resource *res);
+void beripic_enable(mdx_device_t dev, uint32_t beripic_irq, uint32_t hard_irq);
+void beripic_disable(mdx_device_t dev, uint32_t beripic_irq);
 void beripic_intr(void *arg, struct trapframe *frame, int i);
-void beripic_install_intr_map(struct beripic_softc *sc,
+void beripic_install_intr_map(mdx_device_t dev,
     const struct beripic_intr_entry *map);
-void beripic_disable(struct beripic_softc *sc, uint32_t beripic_irq);
 
 #endif /* !_MIPS_BERI_BERIPIC_H_ */

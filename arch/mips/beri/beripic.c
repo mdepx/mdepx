@@ -62,11 +62,14 @@ beripic_intr(void *arg, struct trapframe *frame, int irq)
 {
 	struct beripic_softc *sc;
 	uint32_t hard_irq;
+	mdx_device_t dev;
 	uint64_t reg;
 	uint64_t intr;
 	int i;
 
-	sc = arg;
+	dev = arg;
+
+	sc = mdx_device_get_softc(dev);
 
 	hard_irq = (irq - 2);
 
@@ -93,18 +96,23 @@ beripic_intr(void *arg, struct trapframe *frame, int irq)
 }
 
 void
-beripic_install_intr_map(struct beripic_softc *sc,
+beripic_install_intr_map(mdx_device_t dev,
     const struct beripic_intr_entry *map)
 {
+	struct beripic_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
 
 	sc->map = map;
 }
 
 void
-beripic_disable(struct beripic_softc *sc,
-    uint32_t beripic_irq)
+beripic_disable(mdx_device_t dev, uint32_t beripic_irq)
 {
+	struct beripic_softc *sc;
 	int tid;
+
+	sc = mdx_device_get_softc(dev);
 
 	tid = 0;
 
@@ -114,11 +122,13 @@ beripic_disable(struct beripic_softc *sc,
 }
 
 void
-beripic_enable(struct beripic_softc *sc,
-    uint32_t beripic_irq, uint32_t hard_irq)
+beripic_enable(mdx_device_t dev, uint32_t beripic_irq, uint32_t hard_irq)
 {
+	struct beripic_softc *sc;
 	uint64_t reg;
 	int tid;
+
+	sc = mdx_device_get_softc(dev);
 
 	tid = 0;
 
@@ -139,11 +149,12 @@ beripic_enable(struct beripic_softc *sc,
 }
 
 int
-beripic_init(struct beripic_softc *sc,
-    struct beripic_resource *res)
+beripic_init(mdx_device_t dev, struct beripic_resource *res)
 {
+	struct beripic_softc *sc;
 	int i;
 
+	sc = mdx_device_get_softc(dev);
 	sc->res = res;
 
 	res->cfg |= MIPS_XKPHYS_UNCACHED_BASE;
