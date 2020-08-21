@@ -62,5 +62,7 @@ void beripic_disable(mdx_device_t dev, uint32_t beripic_irq);
 void beripic_intr(void *arg, struct trapframe *frame, int i);
 void beripic_install_intr_map(mdx_device_t dev,
     const struct beripic_intr_entry *map);
+void beripic_ip_set(mdx_device_t dev, uint32_t irq);
+void beripic_ip_clear(mdx_device_t dev, uint32_t irq);
 
 #endif /* !_MIPS_BERI_BERIPIC_H_ */

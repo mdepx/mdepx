@@ -143,6 +143,26 @@ beripic_enable(mdx_device_t dev, uint32_t beripic_irq, uint32_t hard_irq)
 	WR_CFG(sc, (beripic_irq + tid) * 8, reg);
 }
 
+void
+beripic_ip_set(mdx_device_t dev, uint32_t irq)
+{
+	struct beripic_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
+
+	WR_IP_SET(sc, 0, (1 << irq));
+}
+
+void
+beripic_ip_clear(mdx_device_t dev, uint32_t irq)
+{
+	struct beripic_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
+
+	WR_IP_CLEAR(sc, 0, (1 << irq));
+}
+
 int
 beripic_init(mdx_device_t dev, struct beripic_resource *res)
 {
