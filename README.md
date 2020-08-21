@@ -15,7 +15,7 @@ Mdepx (Machdep Extended) is an operating system for embedded applications.
 
 ## Supported platforms
 - ARM Cortex-M family (ARMv7-M, ARMv8-M)
-- CHERI128 Hybrid and Pure ABI capabilities system models.
+- CHERI128 Hybrid and Pure ABI capability system models
 - MIPS32, MIPS64
 - RISC-V rv32, rv64
 
