@@ -24,11 +24,11 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_MACHINE_CHERI_
-#define	_MACHINE_CHERI_
+#ifndef	_MACHINE_CHERI_H_
+#define	_MACHINE_CHERI_H_
 
 static inline uint8_t
-mips_cap_ioread_uint8(capability cap, size_t offset)
+cap_ioread_uint8(capability cap, size_t offset)
 {
 	uint8_t v;
 
@@ -40,7 +40,7 @@ mips_cap_ioread_uint8(capability cap, size_t offset)
 }
 
 static inline uint16_t
-mips_cap_ioread_uint16(capability cap, size_t offset)
+cap_ioread_uint16(capability cap, size_t offset)
 {
 	uint16_t v;
 
@@ -52,7 +52,7 @@ mips_cap_ioread_uint16(capability cap, size_t offset)
 }
 
 static inline uint32_t
-mips_cap_ioread_uint32(capability cap, size_t offset)
+cap_ioread_uint32(capability cap, size_t offset)
 {
 	uint32_t v;
 
@@ -64,7 +64,7 @@ mips_cap_ioread_uint32(capability cap, size_t offset)
 }
 
 static inline uint64_t
-mips_cap_ioread_uint64(capability cap, size_t offset)
+cap_ioread_uint64(capability cap, size_t offset)
 {
 	uint64_t v;
 
@@ -76,7 +76,7 @@ mips_cap_ioread_uint64(capability cap, size_t offset)
 }
 
 static inline void
-mips_cap_iowrite_uint8(capability cap, size_t offset, uint8_t v)
+cap_iowrite_uint8(capability cap, size_t offset, uint8_t v)
 {
 
 	__asm__ __volatile__ ("csb %[v], %[offset],  0(%[cap])"
@@ -84,7 +84,7 @@ mips_cap_iowrite_uint8(capability cap, size_t offset, uint8_t v)
 }
 
 static inline void
-mips_cap_iowrite_uint16(capability cap, size_t offset, uint16_t v)
+cap_iowrite_uint16(capability cap, size_t offset, uint16_t v)
 {
 
 	__asm__ __volatile__ ("csh %[v], %[offset],  0(%[cap])"
@@ -92,7 +92,7 @@ mips_cap_iowrite_uint16(capability cap, size_t offset, uint16_t v)
 }
 
 static inline void
-mips_cap_iowrite_uint32(capability cap, size_t offset, uint32_t v)
+cap_iowrite_uint32(capability cap, size_t offset, uint32_t v)
 {
 
 	__asm__ __volatile__ ("csw %[v], %[offset],  0(%[cap])"
@@ -100,11 +100,11 @@ mips_cap_iowrite_uint32(capability cap, size_t offset, uint32_t v)
 }
 
 static inline void
-mips_cap_iowrite_uint64(capability cap, size_t offset, uint64_t v)
+cap_iowrite_uint64(capability cap, size_t offset, uint64_t v)
 {
 
 	__asm__ __volatile__ ("csd %[v], %[offset],  0(%[cap])"
 		:: [cap] "C" (cap), [offset] "r" (offset), [v] "r" (v));
 }
 
-#endif /* !_MACHINE_CHERI_ */
+#endif /* !_MACHINE_CHERI_H_ */

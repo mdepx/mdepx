@@ -31,10 +31,10 @@
 
 #if __has_feature(capabilities)
 
-#define	RD1(_sc, _reg)		mips_cap_ioread_uint8((_sc)->base, _reg)
-#define	WR1(_sc, _reg, _val)	mips_cap_iowrite_uint8((_sc)->base, _reg, _val)
-#define	UART_READ(_sc, _reg)		RD1((_sc), (_reg))
-#define	UART_WRITE(_sc, _reg, _val)	WR1((_sc), (_reg), (_val))
+#define	UART_READ(_sc, _reg)		\
+	cap_ioread_uint8((_sc)->base, _reg)
+#define	UART_WRITE(_sc, _reg, _val)	\
+	cap_iowrite_uint8((_sc)->base, _reg, _val)
 
 #else
 

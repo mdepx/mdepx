@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2018-2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,33 +26,15 @@
 
 #include <sys/types.h>
 #include <sys/endian.h>
+#include <sys/cheri.h>
 
 #include <dev/altera/jtag_uart/jtag_uart.h>
 
 #include <machine/cpuregs.h>
 
 #if __has_feature(capabilities)
-static inline uint32_t
-mips_cap_ioread_uint32(capability cap, size_t offset)
-{
-	uint32_t v;
-	__asm__ __volatile__ ("clw %[v], %[offset],  0(%[cap])"
-		: [v] "=r" (v)
-		: [cap] "C" (cap), [offset] "r" (offset));
-	return (v);
-}
-
-static inline void
-mips_cap_iowrite_uint32(capability cap, size_t offset, uint32_t v)
-{
-	__asm__ __volatile__ ("csw %[v], %[offset],  0(%[cap])"
-		:: [cap] "C" (cap), [offset] "r" (offset), [v] "r" (v));
-}
-
-#define	RD4(_sc, _reg)		\
-	mips_cap_ioread_uint32((_sc)->base, _reg)
-#define	WR4(_sc, _reg, _val)	\
-	mips_cap_iowrite_uint32((_sc)->base, _reg, _val)
+#define	RD4(_sc, _reg)		cap_ioread_uint32((_sc)->base, _reg)
+#define	WR4(_sc, _reg, _val)	cap_iowrite_uint32((_sc)->base, _reg, _val)
 #else
 #define	RD4(_sc, _reg)		\
 	*(volatile uint32_t *)((_sc)->base + _reg)
