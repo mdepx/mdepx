@@ -30,6 +30,7 @@
 
 #include <sys/cdefs.h>
 #include <sys/endian.h>
+#include <sys/io.h>
 
 #include <machine/frame.h>
 #include <machine/cpuregs.h>
@@ -47,15 +48,15 @@
 #endif
 
 #define	WR_CFG(_sc, _reg, _val)		\
-    *(volatile uint64_t *)((_sc)->res->cfg + _reg) = _val
+    mdx_iowrite_uint64((_sc)->res->cfg, _reg, _val)
 #define	WR_IP_SET(_sc, _reg, _val)	\
-    *(volatile uint64_t *)((_sc)->res->ip_set + _reg) = _val
+    mdx_iowrite_uint64((_sc)->res->ip_set, _reg, _val)
 #define	WR_IP_CLEAR(_sc, _reg, _val)	\
-    *(volatile uint64_t *)((_sc)->res->ip_clear + _reg) = _val
+    mdx_iowrite_uint64((_sc)->res->ip_clear, _reg, _val)
 #define	RD_CFG(_sc, _reg)		\
-    *(volatile uint64_t *)((_sc)->res->cfg + _reg)
+    mdx_ioread_uint64((_sc)->res->cfg, _reg)
 #define	RD_IP_READ(_sc, _reg)		\
-    *(volatile uint64_t *)((_sc)->res->ip_read + _reg)
+    mdx_ioread_uint64((_sc)->res->ip_read, _reg)
 
 void
 beripic_intr(void *arg, struct trapframe *frame, int irq)

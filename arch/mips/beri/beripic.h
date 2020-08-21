@@ -40,10 +40,10 @@
 #define	BERIPIC_NIRQS	32
 
 struct beripic_resource {
-	uint64_t cfg;
-	uint64_t ip_read;
-	uint64_t ip_set;
-	uint64_t ip_clear;
+	capability cfg;
+	capability ip_read;
+	capability ip_set;
+	capability ip_clear;
 };
 
 struct beripic_intr_entry {
