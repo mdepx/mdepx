@@ -26,34 +26,24 @@
 
 #include <sys/types.h>
 #include <sys/cheri.h>
+#include <sys/io.h>
 
 #include <dev/uart/uart_16550.h>
 
-#if __has_feature(capabilities)
+#define	RD1(_sc, _reg)		\
+	mdx_ioread_uint8((_sc)->base, (_reg << (_sc)->reg_shift))
+#define	WR1(_sc, _reg, _val)	\
+	mdx_iowrite_uint8((_sc)->base, (_reg << (_sc)->reg_shift), _val)
 
-#define	UART_READ(_sc, _reg)		\
-	cap_ioread_uint8((_sc)->base, _reg)
-#define	UART_WRITE(_sc, _reg, _val)	\
-	cap_iowrite_uint8((_sc)->base, _reg, _val)
-
-#else
-
-#define	RD1(_sc, _reg)		*(volatile uint8_t *)((uint8_t *)((_sc)->base)\
-	+ (_reg << (_sc)->reg_shift))
-#define	WR1(_sc, _reg, _val)	*(volatile uint8_t *)((uint8_t *)((_sc)->base)\
-	+ (_reg << (_sc)->reg_shift)) = _val
-
-#define	RD4(_sc, _reg)		*(volatile uint32_t *)((uint8_t *)((_sc)->base)\
-	+ (_reg << (_sc)->reg_shift))
-#define	WR4(_sc, _reg, _val)	*(volatile uint32_t *)((uint8_t *)((_sc)->base)\
-	+ (_reg << (_sc)->reg_shift)) = _val
+#define	RD4(_sc, _reg)		\
+	mdx_ioread_uint32((_sc)->base, (_reg << (_sc)->reg_shift))
+#define	WR4(_sc, _reg, _val)	\
+	mdx_iowrite_uint32((_sc)->base, (_reg << (_sc)->reg_shift), _val)
 
 #define	UART_READ(_sc, _reg)	(_sc)->reg_shift == 2 ?	\
 	RD4((_sc), (_reg)) : RD1((_sc), (_reg))
 #define	UART_WRITE(_sc, _reg, _val)	(_sc)->reg_shift == 2 ?	\
 	(WR4((_sc), (_reg), (_val))) : (WR1((_sc), (_reg), (_val)))
-
-#endif
 
 static bool
 uart_16550_rxready(mdx_device_t dev)

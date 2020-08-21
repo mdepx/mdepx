@@ -24,53 +24,17 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_SYS_CHERI_H_
-#define	_SYS_CHERI_H_
+#ifndef _SYS_IO_H_
+#define	_SYS_IO_H_
 
-#if __has_feature(capabilities)
-#include <machine/cheric.h>
-#endif
+uint8_t mdx_ioread_uint8(capability, size_t);
+uint16_t mdx_ioread_uint16(capability, size_t);
+uint32_t mdx_ioread_uint32(capability, size_t);
+uint64_t mdx_ioread_uint64(capability, size_t);
 
-static inline void *
-mdx_incoffset(void *a, int len)
-{
-	void *result;
+void mdx_iowrite_uint8(capability, size_t, size_t);
+void mdx_iowrite_uint16(capability, size_t, size_t);
+void mdx_iowrite_uint32(capability, size_t, size_t);
+void mdx_iowrite_uint64(capability, size_t, size_t);
 
-#ifdef __CHERI_PURE_CAPABILITY__
-	result = cheri_incoffset(a, len);
-#else
-	result = (void *)((uint8_t *)a + len);
-#endif
-
-	return (result);
-}
-
-static inline void *
-mdx_decoffset(void *a, int len)
-{
-	void *result;
-
-#ifdef __CHERI_PURE_CAPABILITY__
-	result = cheri_incoffset(a, -len);
-#else
-	result = (void *)((uint8_t *)a - len);
-#endif
-
-	return (result);
-}
-
-static inline void *
-mdx_setbounds(void *a, int len)
-{
-	void *result;
-
-#ifdef __CHERI_PURE_CAPABILITY__
-	result = cheri_csetbounds(a, len);
-#else
-	result = a;
-#endif
-
-	return (result);
-}
-
-#endif /* !_SYS_CHERI_H_ */
+#endif /* !_SYS_IO_H_ */

@@ -77,6 +77,12 @@
 #define	MFC0		dmfc0
 #endif
 
+#ifdef __CHERI_PURE_CAPABILITY__
+#define	RET	cjr	$c17
+#else
+#define	RET	jr	ra
+#endif
+
 /*
  * See Chapter 8. MIPS® Architecture For Programmers Vol. III:
  * MIPS32® / microMIPS32™ Privileged Resource Architecture.
