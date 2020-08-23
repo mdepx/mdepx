@@ -48,8 +48,13 @@ typedef	__int64_t		__ptrdiff_t;
 typedef	__int64_t		__segsz_t;
 typedef	__uint64_t		__size_t;
 typedef	__int64_t		__ssize_t;
+#ifdef __CHERI_PURE_CAPABILITY__
+typedef	__uintcap_t		__uintfptr_t;
+typedef	__uintcap_t		__uintptr_t;
+#else
 typedef	__uint64_t		__uintfptr_t;
 typedef	__uint64_t		__uintptr_t;
+#endif
 typedef	__int64_t		__intptr_t;
 typedef	__uint64_t		__register_t;
 typedef	__uint64_t		__vm_paddr_t;
