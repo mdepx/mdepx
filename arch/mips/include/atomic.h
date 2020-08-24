@@ -36,6 +36,14 @@
 #error this file needs sys/cdefs.h as a prerequisite
 #endif
 
+#if 0
+#include <sys/atomic_common.h>
+#endif
+
+#if !defined(__mips_n64) && !defined(__mips_n32)
+#include <sys/_atomic64e.h>
+#endif
+
 /*
  * Note: All the 64-bit atomic operations are only atomic when running
  * in 64-bit mode.  It is assumed that code compiled for n32 and n64
@@ -79,19 +87,54 @@ void atomic_clear_16(__volatile uint16_t *, uint16_t);
 void atomic_add_16(__volatile uint16_t *, uint16_t);
 void atomic_subtract_16(__volatile uint16_t *, uint16_t);
 
+#if 0
+static __inline int atomic_cmpset_8(__volatile uint8_t *, uint8_t, uint8_t);
+static __inline int atomic_fcmpset_8(__volatile uint8_t *, uint8_t *, uint8_t);
+static __inline int atomic_cmpset_16(__volatile uint16_t *, uint16_t, uint16_t);
+static __inline int atomic_fcmpset_16(__volatile uint16_t *, uint16_t *, uint16_t);
+#endif
+
 static __inline void
+/* Work around https://github.com/CTSRD-CHERI/qemu/issues/4 */
+#define QEMU_TLB_WORKAROUND32(register) \
+	"clw $zero, $zero, 0(" register ")\n\t"
+#define QEMU_TLB_WORKAROUND64(register) \
+	"cld $zero, $zero, 0(" register ")\n\t"
+
+/*
+ * Avoid an error if the compiler decides to use $at as one of the registers.
+ * This only seems to happen in the CHERI purecap case so far
+ */
+#define __INLINE_ASM_PUSH_NOAT	".set push\n\t.set noat\n\t"
+#define __INLINE_ASM_POP_NOAT	".set pop"
+
 atomic_set_32(__volatile uint32_t *p, uint32_t v)
 {
 	uint32_t temp;
 
+#ifndef __CHERI_PURE_CAPABILITY__
 	__asm __volatile (
-		"1:\tll	%0, %3\n\t"		/* load old value */
+		"1:\tll	%0, %1\n\t"		/* load old value */
 		"or	%0, %2, %0\n\t"		/* calculate new value */
 		"sc	%0, %1\n\t"		/* attempt to store */
 		"beqz	%0, 1b\n\t"		/* spin if failed */
-		: "=&r" (temp), "=m" (*p)
-		: "r" (v), "m" (*p)
+		: "=&r" (temp), "+m" (*p)
+		: "r" (v)
 		: "memory");
+#else
+	__asm __volatile (
+		__INLINE_ASM_PUSH_NOAT
+		"1:\n\t"
+		QEMU_TLB_WORKAROUND32("%1")
+		"cllw	%0, %1\n\t"		/* load old value */
+		"or	%0, %2, %0\n\t"		/* calculate new value */
+		"cscw	%0, %0, %1\n\t"		/* attempt to store */
+		"beqz	%0, 1b\n\t"		/* spin if failed */
+		__INLINE_ASM_POP_NOAT
+		: "=&r" (temp), "+C" (p)
+		: "r" (v)
+		: "memory");
+#endif
 
 }
 
@@ -101,14 +144,29 @@ atomic_clear_32(__volatile uint32_t *p, uint32_t v)
 	uint32_t temp;
 	v = ~v;
 
+#ifndef __CHERI_PURE_CAPABILITY__
 	__asm __volatile (
-		"1:\tll	%0, %3\n\t"		/* load old value */
+		"1:\tll	%0, %1\n\t"		/* load old value */
 		"and	%0, %2, %0\n\t"		/* calculate new value */
 		"sc	%0, %1\n\t"		/* attempt to store */
 		"beqz	%0, 1b\n\t"		/* spin if failed */
-		: "=&r" (temp), "=m" (*p)
-		: "r" (v), "m" (*p)
+		: "=&r" (temp), "+m" (*p)
+		: "r" (v)
 		: "memory");
+#else
+	__asm __volatile (
+		__INLINE_ASM_PUSH_NOAT
+		"1:\n\t"
+		QEMU_TLB_WORKAROUND32("%1")
+		"cllw	%0, %1\n\t"		/* load old value */
+		"and	%0, %2, %0\n\t"		/* calculate new value */
+		"cscw	%0, %0, %1\n\t"		/* attempt to store */
+		"beqz	%0, 1b\n\t"		/* spin if failed */
+		__INLINE_ASM_POP_NOAT
+		: "=&r" (temp), "+C" (p)
+		: "r" (v)
+		: "memory");
+#endif
 }
 
 static __inline void
@@ -116,14 +174,29 @@ atomic_add_32(__volatile uint32_t *p, uint32_t v)
 {
 	uint32_t temp;
 
+#ifndef __CHERI_PURE_CAPABILITY__
 	__asm __volatile (
-		"1:\tll	%0, %3\n\t"		/* load old value */
+		"1:\tll	%0, %1\n\t"		/* load old value */
 		"addu	%0, %2, %0\n\t"		/* calculate new value */
 		"sc	%0, %1\n\t"		/* attempt to store */
 		"beqz	%0, 1b\n\t"		/* spin if failed */
-		: "=&r" (temp), "=m" (*p)
-		: "r" (v), "m" (*p)
+		: "=&r" (temp), "+m" (*p)
+		: "r" (v)
 		: "memory");
+#else
+	__asm __volatile (
+		__INLINE_ASM_PUSH_NOAT
+		"1:\n\t"
+		QEMU_TLB_WORKAROUND32("%1")
+		"cllw	%0, %1\n\t"	/* load old value */
+		"addu	%0, %2, %0\n\t"		/* calculate new value */
+		"cscw	%0, %0, %1\n\t"		/* attempt to store */
+		"beqz	%0, 1b\n\t"		/* spin if failed */
+		__INLINE_ASM_POP_NOAT
+		: "=&r" (temp), "+C" (p)
+		: "r" (v)
+		: "memory");
+#endif
 }
 
 static __inline void
@@ -131,14 +204,29 @@ atomic_subtract_32(__volatile uint32_t *p, uint32_t v)
 {
 	uint32_t temp;
 
+#ifndef __CHERI_PURE_CAPABILITY__
 	__asm __volatile (
-		"1:\tll	%0, %3\n\t"		/* load old value */
+		"1:\tll	%0, %1\n\t"		/* load old value */
 		"subu	%0, %2\n\t"		/* calculate new value */
 		"sc	%0, %1\n\t"		/* attempt to store */
 		"beqz	%0, 1b\n\t"		/* spin if failed */
-		: "=&r" (temp), "=m" (*p)
-		: "r" (v), "m" (*p)
+		: "=&r" (temp), "+m" (*p)
+		: "r" (v)
 		: "memory");
+#else
+	__asm __volatile (
+		__INLINE_ASM_PUSH_NOAT
+		"1:\n\t"
+		QEMU_TLB_WORKAROUND32("%1")
+		"cllw	%0, %1\n\t"		/* load old value */
+		"subu	%0, %2\n\t"		/* calculate new value */
+		"cscw	%0, %0, %1\n\t"		/* attempt to store */
+		"beqz	%0, 1b\n\t"		/* spin if failed */
+		__INLINE_ASM_POP_NOAT
+		: "=&r" (temp), "+C" (p)
+		: "r" (v)
+		: "memory");
+#endif
 }
 
 static __inline uint32_t
@@ -146,14 +234,29 @@ atomic_readandclear_32(__volatile uint32_t *addr)
 {
 	uint32_t result,temp;
 
+#ifndef __CHERI_PURE_CAPABILITY__
 	__asm __volatile (
-		"1:\tll	 %0,%3\n\t"	/* load current value, asserting lock */
+		"1:\tll	 %0,%2\n\t"	/* load current value, asserting lock */
 		"li	 %1,0\n\t"		/* value to store */
 		"sc	 %1,%2\n\t"	/* attempt to store */
 		"beqz	 %1, 1b\n\t"		/* if the store failed, spin */
-		: "=&r"(result), "=&r"(temp), "=m" (*addr)
-		: "m" (*addr)
+		: "=&r"(result), "=&r"(temp), "+m" (*addr)
+		:
 		: "memory");
+#else
+	__asm __volatile (
+		__INLINE_ASM_PUSH_NOAT
+		"1:\n\t"
+		QEMU_TLB_WORKAROUND32("%2")
+		"cllw	%0, %2\n\t"	/* load current value, asserting lock */
+		"li	%1, 0\n\t"	/* value to store */
+		"cscw	%1, %1, %2\n\t"	/* attempt to store */
+		"beqz	%1, 1b\n\t"	/* if the store failed, spin */
+		__INLINE_ASM_POP_NOAT
+		: "=&r"(result), "=&r"(temp), "+C" (addr)
+		:
+		: "memory");
+#endif
 
 	return result;
 }
@@ -163,14 +266,29 @@ atomic_readandset_32(__volatile uint32_t *addr, uint32_t value)
 {
 	uint32_t result,temp;
 
+#ifndef __CHERI_PURE_CAPABILITY__
 	__asm __volatile (
-		"1:\tll	 %0,%3\n\t"	/* load current value, asserting lock */
-		"or      %1,$0,%4\n\t"
+		"1:\tll	 %0,%2\n\t"	/* load current value, asserting lock */
+		"or      %1,$0,%3\n\t"
 		"sc	 %1,%2\n\t"	/* attempt to store */
 		"beqz	 %1, 1b\n\t"		/* if the store failed, spin */
-		: "=&r"(result), "=&r"(temp), "=m" (*addr)
-		: "m" (*addr), "r" (value)
+		: "=&r"(result), "=&r"(temp), "+m" (*addr)
+		: "r" (value)
 		: "memory");
+#else
+	__asm __volatile (
+		__INLINE_ASM_PUSH_NOAT
+		"1:\n\t"
+		QEMU_TLB_WORKAROUND32("%2")
+		"cllw	%0, %2\n\t"	/* load current value, asserting lock */
+		"or	%1, $0, %3\n\t"
+		"cscw	%1, %1, %2\n\t"	/* attempt to store */
+		"beqz	%1, 1b\n\t"	/* if the store failed, spin */
+		__INLINE_ASM_POP_NOAT
+		: "=&r"(result), "=&r"(temp), "+C" (addr)
+		: "r" (value)
+		: "memory");
+#endif
 
 	return result;
 }
@@ -181,15 +299,30 @@ atomic_set_64(__volatile uint64_t *p, uint64_t v)
 {
 	uint64_t temp;
 
+#ifndef __CHERI_PURE_CAPABILITY__
 	__asm __volatile (
 		"1:\n\t"
-		"lld	%0, %3\n\t"		/* load old value */
+		"lld	%0, %1\n\t"		/* load old value */
 		"or	%0, %2, %0\n\t"		/* calculate new value */
 		"scd	%0, %1\n\t"		/* attempt to store */
 		"beqz	%0, 1b\n\t"		/* spin if failed */
-		: "=&r" (temp), "=m" (*p)
-		: "r" (v), "m" (*p)
+		: "=&r" (temp), "+m" (*p)
+		: "r" (v)
 		: "memory");
+#else
+	__asm __volatile (
+		__INLINE_ASM_PUSH_NOAT
+		"1:\n\t"
+		QEMU_TLB_WORKAROUND64("%1")
+		"clld	%0, %1\n\t"		/* load old value */
+		"or	%0, %2, %0\n\t"		/* calculate new value */
+		"cscd	%0, %0, %1\n\t"		/* attempt to store */
+		"beqz	%0, 1b\n\t"		/* spin if failed */
+		__INLINE_ASM_POP_NOAT
+		: "=&r" (temp), "+C" (p)
+		: "r" (v)
+		: "memory");
+#endif
 
 }
 
@@ -199,15 +332,30 @@ atomic_clear_64(__volatile uint64_t *p, uint64_t v)
 	uint64_t temp;
 	v = ~v;
 
+#ifndef __CHERI_PURE_CAPABILITY__
 	__asm __volatile (
 		"1:\n\t"
-		"lld	%0, %3\n\t"		/* load old value */
+		"lld	%0, %1\n\t"		/* load old value */
 		"and	%0, %2, %0\n\t"		/* calculate new value */
 		"scd	%0, %1\n\t"		/* attempt to store */
 		"beqz	%0, 1b\n\t"		/* spin if failed */
-		: "=&r" (temp), "=m" (*p)
-		: "r" (v), "m" (*p)
+		: "=&r" (temp), "+m" (*p)
+		: "r" (v)
 		: "memory");
+#else
+	__asm __volatile (
+		__INLINE_ASM_PUSH_NOAT
+		"1:\n\t"
+		QEMU_TLB_WORKAROUND64("%1")
+		"clld	%0, %1\n\t"		/* load old value */
+		"and	%0, %2, %0\n\t"		/* calculate new value */
+		"cscd	%0, %0, %1\n\t"		/* attempt to store */
+		"beqz	%0, 1b\n\t"		/* spin if failed */
+		__INLINE_ASM_POP_NOAT
+		: "=&r" (temp), "+C" (p)
+		: "r" (v)
+		: "memory");
+#endif
 }
 
 static __inline void
@@ -215,15 +363,30 @@ atomic_add_64(__volatile uint64_t *p, uint64_t v)
 {
 	uint64_t temp;
 
+#ifndef __CHERI_PURE_CAPABILITY__
 	__asm __volatile (
 		"1:\n\t"
-		"lld	%0, %3\n\t"		/* load old value */
+		"lld	%0, %1\n\t"		/* load old value */
 		"daddu	%0, %2, %0\n\t"		/* calculate new value */
 		"scd	%0, %1\n\t"		/* attempt to store */
 		"beqz	%0, 1b\n\t"		/* spin if failed */
-		: "=&r" (temp), "=m" (*p)
-		: "r" (v), "m" (*p)
+		: "=&r" (temp), "+m" (*p)
+		: "r" (v)
 		: "memory");
+#else
+	__asm __volatile (
+		__INLINE_ASM_PUSH_NOAT
+		"1:\n\t"
+		QEMU_TLB_WORKAROUND64("%1")
+		"clld	%0, %1\n\t"		/* load old value */
+		"daddu	%0, %2, %0\n\t"		/* calculate new value */
+		"cscd	%0, %0, %1\n\t"		/* attempt to store */
+		"beqz	%0, 1b\n\t"		/* spin if failed */
+		__INLINE_ASM_POP_NOAT
+		: "=&r" (temp), "+C" (p)
+		: "r" (v)
+		: "memory");
+#endif
 }
 
 static __inline void
@@ -231,15 +394,30 @@ atomic_subtract_64(__volatile uint64_t *p, uint64_t v)
 {
 	uint64_t temp;
 
+#ifndef __CHERI_PURE_CAPABILITY__
 	__asm __volatile (
 		"1:\n\t"
-		"lld	%0, %3\n\t"		/* load old value */
+		"lld	%0, %1\n\t"		/* load old value */
 		"dsubu	%0, %2\n\t"		/* calculate new value */
 		"scd	%0, %1\n\t"		/* attempt to store */
 		"beqz	%0, 1b\n\t"		/* spin if failed */
-		: "=&r" (temp), "=m" (*p)
-		: "r" (v), "m" (*p)
+		: "=&r" (temp), "+m" (*p)
+		: "r" (v)
 		: "memory");
+#else
+	__asm __volatile (
+		__INLINE_ASM_PUSH_NOAT
+		"1:\n\t"
+		QEMU_TLB_WORKAROUND64("%1")
+		"clld	%0, %1\n\t"		/* load old value */
+		"dsubu	%0, %2\n\t"		/* calculate new value */
+		"cscd	%0, %0, %1\n\t"		/* attempt to store */
+		"beqz	%0, 1b\n\t"		/* spin if failed */
+		__INLINE_ASM_POP_NOAT
+		: "=&r" (temp), "+C" (p)
+		: "r" (v)
+		: "memory");
+#endif
 }
 
 static __inline uint64_t
@@ -247,15 +425,30 @@ atomic_readandclear_64(__volatile uint64_t *addr)
 {
 	uint64_t result,temp;
 
+#ifndef __CHERI_PURE_CAPABILITY__
 	__asm __volatile (
 		"1:\n\t"
-		"lld	 %0, %3\n\t"		/* load old value */
+		"lld	 %0, %2\n\t"		/* load old value */
 		"li	 %1, 0\n\t"		/* value to store */
 		"scd	 %1, %2\n\t"		/* attempt to store */
 		"beqz	 %1, 1b\n\t"		/* if the store failed, spin */
-		: "=&r"(result), "=&r"(temp), "=m" (*addr)
-		: "m" (*addr)
+		: "=&r"(result), "=&r"(temp), "+m" (*addr)
+		:
 		: "memory");
+#else
+	__asm __volatile (
+		__INLINE_ASM_PUSH_NOAT
+		"1:\n\t"
+		QEMU_TLB_WORKAROUND64("%2")
+		"clld	 %0, %2\n\t"		/* load old value */
+		"li	 %1, 0\n\t"		/* value to store */
+		"cscd	 %1, %1, %2\n\t"	/* attempt to store */
+		"beqz	 %1, 1b\n\t"		/* if the store failed, spin */
+		__INLINE_ASM_POP_NOAT
+		: "=&r"(result), "=&r"(temp), "+C" (addr)
+		:
+		: "memory");
+#endif
 
 	return result;
 }
@@ -265,15 +458,30 @@ atomic_readandset_64(__volatile uint64_t *addr, uint64_t value)
 {
 	uint64_t result,temp;
 
+#ifndef __CHERI_PURE_CAPABILITY__
 	__asm __volatile (
 		"1:\n\t"
-		"lld	 %0,%3\n\t"		/* Load old value*/
-		"or      %1,$0,%4\n\t"
+		"lld	 %0,%2\n\t"		/* Load old value*/
+		"or      %1,$0,%3\n\t"
 		"scd	 %1,%2\n\t"		/* attempt to store */
 		"beqz	 %1, 1b\n\t"		/* if the store failed, spin */
-		: "=&r"(result), "=&r"(temp), "=m" (*addr)
-		: "m" (*addr), "r" (value)
+		: "=&r"(result), "=&r"(temp), "+m" (*addr)
+		: "r" (value)
 		: "memory");
+#else
+	__asm __volatile (
+		__INLINE_ASM_PUSH_NOAT
+		"1:\n\t"
+		QEMU_TLB_WORKAROUND64("%2")
+		"clld	 %0, %2\n\t"		/* load old value*/
+		"or      %1, $0, %3\n\t"
+		"cscd	 %1, %1, %2\n\t"	/* attempt to store */
+		"beqz	 %1, 1b\n\t"		/* if the store failed, spin */
+		__INLINE_ASM_POP_NOAT
+		: "=&r"(result), "=&r"(temp), "+C" (addr)
+		: "r" (value)
+		: "memory");
+#endif
 
 	return result;
 }
@@ -338,21 +546,32 @@ atomic_store_rel_##WIDTH(__volatile uint##WIDTH##_t *p, uint##WIDTH##_t v)\
 }
 
 ATOMIC_STORE_LOAD(32)
+#if defined(__mips_n64) || defined(__mips_n32)
 ATOMIC_STORE_LOAD(64)
+#endif
 #undef ATOMIC_STORE_LOAD
+
+/*
+ * MIPS n32 is not a LP64 API, so atomic_load_64 isn't defined there. Define it
+ * here since n32 is an oddball !LP64 but that can do 64-bit atomics.
+ */
+#if defined(__mips_n32)
+#define	atomic_load_64	atomic_load_acq_64
+#endif
 
 /*
  * Atomically compare the value stored at *p with cmpval and if the
  * two values are equal, update the value of *p with newval. Returns
  * zero if the compare failed, nonzero otherwise.
  */
-static __inline uint32_t
+static __inline int
 atomic_cmpset_32(__volatile uint32_t *p, uint32_t cmpval, uint32_t newval)
 {
-	uint32_t ret;
+	int ret;
 
+#ifndef __CHERI_PURE_CAPABILITY__
 	__asm __volatile (
-		"1:\tll	%0, %4\n\t"		/* load old value */
+		"1:\tll	%0, %1\n\t"		/* load old value */
 		"bne %0, %2, 2f\n\t"		/* compare */
 		"move %0, %3\n\t"		/* value to store */
 		"sc %0, %1\n\t"			/* attempt to store */
@@ -361,9 +580,28 @@ atomic_cmpset_32(__volatile uint32_t *p, uint32_t cmpval, uint32_t newval)
 		"2:\n\t"
 		"li	%0, 0\n\t"
 		"3:\n"
-		: "=&r" (ret), "=m" (*p)
-		: "r" (cmpval), "r" (newval), "m" (*p)
+		: "=&r" (ret), "+m" (*p)
+		: "r" (cmpval), "r" (newval)
 		: "memory");
+#else
+	__asm __volatile (
+		__INLINE_ASM_PUSH_NOAT
+		"1:\n\t"
+		QEMU_TLB_WORKAROUND32("%1")
+		"cllw	%0, %1\n\t"		/* load old value */
+		"bne	%0, %2, 2f\n\t"		/* compare */
+		"move	%0, %3\n\t"		/* value to store */
+		"cscw	%0, %0, %1\n\t"		/* attempt to store */
+		"beqz	%0, 1b\n\t"		/* if it failed, spin */
+		"b 3f\n\t"
+		"2:\n\t"
+		"li	%0, 0\n\t"
+		"3:\n"
+		__INLINE_ASM_POP_NOAT
+		: "=&r" (ret), "+C" (p)
+		: "r" (cmpval), "r" (newval)
+		: "memory");
+#endif
 
 	return ret;
 }
@@ -373,62 +611,114 @@ atomic_cmpset_32(__volatile uint32_t *p, uint32_t cmpval, uint32_t newval)
  * two values are equal, update the value of *p with newval. Returns
  * zero if the compare failed, nonzero otherwise.
  */
-static __inline uint32_t
-atomic_cmpset_acq_32(__volatile uint32_t *p, uint32_t cmpval, uint32_t newval)
-{
-	int retval;
-
-	retval = atomic_cmpset_32(p, cmpval, newval);
-	mips_sync();
-	return (retval);
-}
-
-static __inline uint32_t
-atomic_cmpset_rel_32(__volatile uint32_t *p, uint32_t cmpval, uint32_t newval)
-{
-	mips_sync();
-	return (atomic_cmpset_32(p, cmpval, newval));
-}
-
-static __inline uint32_t
+static __inline int
 atomic_fcmpset_32(__volatile uint32_t *p, uint32_t *cmpval, uint32_t newval)
 {
-	uint32_t ret;
+	int ret;
 
+#ifndef __CHERI_PURE_CAPABILITY__
+	/*
+	 * The following sequence (similar to that in atomic_fcmpset_64) will
+	 * attempt to update the value of *p with newval if the comparison
+	 * succeeds.  Note that they'll exit regardless of whether the store
+	 * actually succeeded, leaving *cmpval untouched.  This is in line with
+	 * the documentation of atomic_fcmpset_<type>() in atomic(9) for ll/sc
+	 * architectures.
+	 */
 	__asm __volatile (
-		"1:\n\t"
 		"ll	%0, %1\n\t"		/* load old value */
-		"bne	%0, %4, 2f\n\t"		/* compare */
+		"bne	%0, %4, 1f\n\t"		/* compare */
 		"move	%0, %3\n\t"		/* value to store */
 		"sc	%0, %1\n\t"		/* attempt to store */
-		"beqz	%0, 1b\n\t"		/* if it failed, spin */
-		"j	3f\n\t"
-		"2:\n\t"
+		"j	2f\n\t"			/* exit regardless of success */
+		"nop\n\t"			/* avoid delay slot accident */
+		"1:\n\t"
 		"sw	%0, %2\n\t"		/* save old value */
 		"li	%0, 0\n\t"
-		"3:\n"
+		"2:\n"
 		: "=&r" (ret), "+m" (*p), "=m" (*cmpval)
 		: "r" (newval), "r" (*cmpval)
 		: "memory");
+#else
+	uint32_t tmp;
+	uint32_t expected = *cmpval;
+
+	__asm __volatile (
+		__INLINE_ASM_PUSH_NOAT
+		"cllw	%[tmp], %[ptr]\n\t"		/* load old value */
+		"bne	%[tmp], %[expected], 1f\n\t"	/* compare */
+		"nop\n\t"
+		"cscw	%[ret], %[newval], %[ptr]\n\t"	/* attempt to store */
+		"j	2f\n\t"			/* exit regardless of success */
+		"nop\n\t"			/* avoid delay slot accident */
+		"1:\n\t"
+		"csw	%[tmp], $0, 0(%[cmpval])\n\t"	/* store loaded value */
+		"li	%[ret], 0\n\t"
+		"2:\n"
+		__INLINE_ASM_POP_NOAT
+		: [ret] "=&r" (ret), [tmp] "=&r" (tmp), [ptr]"+C" (p),
+		    [cmpval]"+C" (cmpval)
+		: [newval] "r" (newval), [expected] "r" (expected)
+		: "memory");
+#endif
 	return ret;
 }
 
-static __inline uint32_t
-atomic_fcmpset_acq_32(__volatile uint32_t *p, uint32_t *cmpval, uint32_t newval)
-{
-	int retval;
-
-	retval = atomic_fcmpset_32(p, cmpval, newval);
-	mips_sync();
-	return (retval);
+#define	ATOMIC_CMPSET_ACQ_REL(WIDTH)					\
+static __inline  int							\
+atomic_cmpset_acq_##WIDTH(__volatile uint##WIDTH##_t *p,		\
+    uint##WIDTH##_t cmpval, uint##WIDTH##_t newval)			\
+{									\
+	int retval;							\
+									\
+	retval = atomic_cmpset_##WIDTH(p, cmpval, newval);		\
+	mips_sync();							\
+	return (retval);						\
+}									\
+									\
+static __inline  int							\
+atomic_cmpset_rel_##WIDTH(__volatile uint##WIDTH##_t *p,		\
+    uint##WIDTH##_t cmpval, uint##WIDTH##_t newval)			\
+{									\
+	mips_sync();							\
+	return (atomic_cmpset_##WIDTH(p, cmpval, newval));		\
 }
 
-static __inline uint32_t
-atomic_fcmpset_rel_32(__volatile uint32_t *p, uint32_t *cmpval, uint32_t newval)
-{
-	mips_sync();
-	return (atomic_fcmpset_32(p, cmpval, newval));
+#define	ATOMIC_FCMPSET_ACQ_REL(WIDTH)					\
+static __inline  int							\
+atomic_fcmpset_acq_##WIDTH(__volatile uint##WIDTH##_t *p,		\
+    uint##WIDTH##_t *cmpval, uint##WIDTH##_t newval)			\
+{									\
+	int retval;							\
+									\
+	retval = atomic_fcmpset_##WIDTH(p, cmpval, newval);		\
+	mips_sync();							\
+	return (retval);						\
+}									\
+									\
+static __inline  int							\
+atomic_fcmpset_rel_##WIDTH(__volatile uint##WIDTH##_t *p,		\
+    uint##WIDTH##_t *cmpval, uint##WIDTH##_t newval)			\
+{									\
+	mips_sync();							\
+	return (atomic_fcmpset_##WIDTH(p, cmpval, newval));		\
 }
+
+/*
+ * Atomically compare the value stored at *p with cmpval and if the
+ * two values are equal, update the value of *p with newval. Returns
+ * zero if the compare failed, nonzero otherwise.
+ */
+#if 0
+ATOMIC_CMPSET_ACQ_REL(8);
+ATOMIC_CMPSET_ACQ_REL(16);
+#endif
+ATOMIC_CMPSET_ACQ_REL(32);
+#if 0
+ATOMIC_FCMPSET_ACQ_REL(8);
+ATOMIC_FCMPSET_ACQ_REL(16);
+#endif
+ATOMIC_FCMPSET_ACQ_REL(32);
 
 /*
  * Atomically add the value of v to the integer pointed to by p and return
@@ -439,13 +729,27 @@ atomic_fetchadd_32(__volatile uint32_t *p, uint32_t v)
 {
 	uint32_t value, temp;
 
+#ifndef __CHERI_PURE_CAPABILITY__
 	__asm __volatile (
 		"1:\tll %0, %1\n\t"		/* load old value */
 		"addu %2, %3, %0\n\t"		/* calculate new value */
 		"sc %2, %1\n\t"			/* attempt to store */
 		"beqz %2, 1b\n\t"		/* spin if failed */
-		: "=&r" (value), "=m" (*p), "=&r" (temp)
-		: "r" (v), "m" (*p));
+		: "=&r" (value), "+m" (*p), "=&r" (temp)
+		: "r" (v));
+#else
+	__asm __volatile (
+		__INLINE_ASM_PUSH_NOAT
+		"1:\n\t"
+		QEMU_TLB_WORKAROUND32("%1")
+		"cllw	%0, %1\n\t"		/* load old value */
+		"addu	%2, %3, %0\n\t"		/* calculate new value */
+		"cscw	%2, %2, %1\n\t"		/* attempt to store */
+		"beqz %2, 1b\n\t"		/* spin if failed */
+		__INLINE_ASM_POP_NOAT
+		: "=&r" (value), "+C" (p), "=&r" (temp)
+		: "r" (v));
+#endif
 	return (value);
 }
 
@@ -455,14 +759,15 @@ atomic_fetchadd_32(__volatile uint32_t *p, uint32_t v)
  * two values are equal, update the value of *p with newval. Returns
  * zero if the compare failed, nonzero otherwise.
  */
-static __inline uint64_t
+static __inline int
 atomic_cmpset_64(__volatile uint64_t *p, uint64_t cmpval, uint64_t newval)
 {
-	uint64_t ret;
+	int ret;
 
+#ifndef __CHERI_PURE_CAPABILITY__
 	__asm __volatile (
 		"1:\n\t"
-		"lld	%0, %4\n\t"		/* load old value */
+		"lld	%0, %1\n\t"		/* load old value */
 		"bne	%0, %2, 2f\n\t"		/* compare */
 		"move	%0, %3\n\t"		/* value to store */
 		"scd	%0, %1\n\t"		/* attempt to store */
@@ -471,10 +776,74 @@ atomic_cmpset_64(__volatile uint64_t *p, uint64_t cmpval, uint64_t newval)
 		"2:\n\t"
 		"li	%0, 0\n\t"
 		"3:\n"
-		: "=&r" (ret), "=m" (*p)
-		: "r" (cmpval), "r" (newval), "m" (*p)
+		: "=&r" (ret), "+m" (*p)
+		: "r" (cmpval), "r" (newval)
 		: "memory");
+#else
+	__asm __volatile (
+		__INLINE_ASM_PUSH_NOAT
+		"1:\n\t"
+		QEMU_TLB_WORKAROUND64("%1")
+		"clld	%0, %1\n\t"		/* load old value */
+		"bne	%0, %2, 2f\n\t"		/* compare */
+		"move	%0, %3\n\t"		/* value to store */
+		"cscd	%0, %0, %1\n\t"		/* attempt to store */
+		"beqz	%0, 1b\n\t"		/* if it failed, spin */
+		"j	3f\n\t"
+		"2:\n\t"
+		"li	%0, 0\n\t"
+		"3:\n"
+		__INLINE_ASM_POP_NOAT
+		: "=&r" (ret), "+C" (p)
+		: "r" (cmpval), "r" (newval)
+		: "memory");
+#endif
 
+	return ret;
+}
+
+static __inline int
+atomic_fcmpset_64(__volatile uint64_t *p, uint64_t *cmpval, uint64_t newval)
+{
+        int ret;
+
+#ifndef __CHERI_PURE_CAPABILITY__
+        __asm __volatile (
+		"lld	%0, %1\n\t"		/* load old value */
+                "bne	%0, %4, 1f\n\t"		/* compare */
+                "move	%0, %3\n\t"		/* value to store */
+                "scd	%0, %1\n\t"		/* attempt to store */
+		"j	2f\n\t"			/* exit regardless of success */
+		"nop\n\t"			/* avoid delay slot accident */
+                "1:\n\t"
+                "sd	%0, %2\n\t"		/* save old value */
+                "li	%0, 0\n\t"
+                "2:\n"
+                : "=&r" (ret), "+m" (*p), "=m" (*cmpval)
+                : "r" (newval), "r" (*cmpval)
+                : "memory");
+#else
+	uint64_t tmp;
+	uint64_t expected = *cmpval;
+
+	__asm __volatile (
+		__INLINE_ASM_PUSH_NOAT
+		"clld	%[tmp], %[ptr]\n\t"		/* load old value */
+		"bne	%[tmp], %[expected], 1f\n\t"	/* compare */
+		"nop\n\t"			/* avoid delay slot accident */
+		"cscd	%[ret], %[newval], %[ptr]\n\t"	/* attempt to store */
+		"j	2f\n\t"			/* exit regardless of success */
+		"nop\n\t"			/* avoid delay slot accident */
+		"1:\n\t"
+		"csd	%[tmp], $0, 0(%[cmpval])\n\t"	/* store loaded value */
+		"li	%[ret], 0\n\t"
+		"2:\n"
+		__INLINE_ASM_POP_NOAT
+		: [ret] "=&r" (ret), [tmp] "=&r" (tmp), [ptr]"+C" (p),
+		    [cmpval]"+C" (cmpval)
+		: [newval] "r" (newval), [expected] "r" (expected)
+		: "memory");
+#endif
 	return ret;
 }
 
@@ -483,63 +852,8 @@ atomic_cmpset_64(__volatile uint64_t *p, uint64_t cmpval, uint64_t newval)
  * two values are equal, update the value of *p with newval. Returns
  * zero if the compare failed, nonzero otherwise.
  */
-static __inline uint64_t
-atomic_cmpset_acq_64(__volatile uint64_t *p, uint64_t cmpval, uint64_t newval)
-{
-	int retval;
-
-	retval = atomic_cmpset_64(p, cmpval, newval);
-	mips_sync();
-	return (retval);
-}
-
-static __inline uint64_t
-atomic_cmpset_rel_64(__volatile uint64_t *p, uint64_t cmpval, uint64_t newval)
-{
-	mips_sync();
-	return (atomic_cmpset_64(p, cmpval, newval));
-}
-
-static __inline uint32_t
-atomic_fcmpset_64(__volatile uint64_t *p, uint64_t *cmpval, uint64_t newval)
-{
-        uint32_t ret;
-
-        __asm __volatile (
-                "1:\n\t"
-		"lld	%0, %1\n\t"		/* load old value */
-                "bne	%0, %4, 2f\n\t"		/* compare */
-                "move	%0, %3\n\t"		/* value to store */
-                "scd	%0, %1\n\t"		/* attempt to store */
-                "beqz	%0, 1b\n\t"		/* if it failed, spin */
-                "j	3f\n\t"
-                "2:\n\t"
-                "sd	%0, %2\n\t"		/* save old value */
-                "li	%0, 0\n\t"
-                "3:\n"
-                : "=&r" (ret), "+m" (*p), "=m" (*cmpval)
-                : "r" (newval), "r" (*cmpval)
-                : "memory");
-
-	return ret;
-}
-
-static __inline uint64_t
-atomic_fcmpset_acq_64(__volatile uint64_t *p, uint64_t *cmpval, uint64_t newval)
-{
-	int retval;
-
-	retval = atomic_fcmpset_64(p, cmpval, newval);
-	mips_sync();
-	return (retval);
-}
-
-static __inline uint64_t
-atomic_fcmpset_rel_64(__volatile uint64_t *p, uint64_t *cmpval, uint64_t newval)
-{
-	mips_sync();
-	return (atomic_fcmpset_64(p, cmpval, newval));
-}
+ATOMIC_CMPSET_ACQ_REL(64);
+ATOMIC_FCMPSET_ACQ_REL(64);
 
 /*
  * Atomically add the value of v to the integer pointed to by p and return
@@ -550,14 +864,28 @@ atomic_fetchadd_64(__volatile uint64_t *p, uint64_t v)
 {
 	uint64_t value, temp;
 
+#ifndef __CHERI_PURE_CAPABILITY__
 	__asm __volatile (
 		"1:\n\t"
 		"lld	%0, %1\n\t"		/* load old value */
 		"daddu	%2, %3, %0\n\t"		/* calculate new value */
 		"scd	%2, %1\n\t"		/* attempt to store */
 		"beqz	%2, 1b\n\t"		/* spin if failed */
-		: "=&r" (value), "=m" (*p), "=&r" (temp)
-		: "r" (v), "m" (*p));
+		: "=&r" (value), "+m" (*p), "=&r" (temp)
+		: "r" (v));
+#else
+	__asm __volatile (
+		__INLINE_ASM_PUSH_NOAT
+		"1:\n\t"
+		QEMU_TLB_WORKAROUND64("%1")
+		"clld	%0, %1\n\t"		/* load old value */
+		"daddu	%2, %3, %0\n\t"		/* calculate new value */
+		"cscd	%2, %2, %1\n\t"		/* attempt to store */
+		"beqz	%2, 1b\n\t"		/* spin if failed */
+		__INLINE_ASM_POP_NOAT
+		: "=&r" (value), "+C" (p), "=&r" (temp)
+		: "r" (v));
+#endif
 	return (value);
 }
 #endif
@@ -603,6 +931,12 @@ atomic_thread_fence_seq_cst(void)
 #define	atomic_subtract_char	atomic_subtract_8
 #define	atomic_subtract_acq_char	atomic_subtract_acq_8
 #define	atomic_subtract_rel_char	atomic_subtract_rel_8
+#define	atomic_cmpset_char	atomic_cmpset_8
+#define	atomic_cmpset_acq_char	atomic_cmpset_acq_8
+#define	atomic_cmpset_rel_char	atomic_cmpset_rel_8
+#define	atomic_fcmpset_char	atomic_fcmpset_8
+#define	atomic_fcmpset_acq_char	atomic_fcmpset_acq_8
+#define	atomic_fcmpset_rel_char	atomic_fcmpset_rel_8
 
 /* Operations on shorts. */
 #define	atomic_set_short	atomic_set_16
@@ -617,6 +951,12 @@ atomic_thread_fence_seq_cst(void)
 #define	atomic_subtract_short	atomic_subtract_16
 #define	atomic_subtract_acq_short	atomic_subtract_acq_16
 #define	atomic_subtract_rel_short	atomic_subtract_rel_16
+#define	atomic_cmpset_short	atomic_cmpset_16
+#define	atomic_cmpset_acq_short	atomic_cmpset_acq_16
+#define	atomic_cmpset_rel_short	atomic_cmpset_rel_16
+#define	atomic_fcmpset_short	atomic_fcmpset_16
+#define	atomic_fcmpset_acq_short	atomic_fcmpset_acq_16
+#define	atomic_fcmpset_rel_short	atomic_fcmpset_rel_16
 
 /* Operations on ints. */
 #define	atomic_set_int		atomic_set_32
@@ -730,6 +1070,7 @@ atomic_thread_fence_seq_cst(void)
 
 #endif /* __mips_n64 */
 
+#ifndef __CHERI_PURE_CAPABILITY__
 /* Operations on pointers. */
 #define	atomic_set_ptr		atomic_set_long
 #define	atomic_set_acq_ptr	atomic_set_acq_long
@@ -752,5 +1093,77 @@ atomic_thread_fence_seq_cst(void)
 #define	atomic_load_acq_ptr	atomic_load_acq_long
 #define	atomic_store_rel_ptr	atomic_store_rel_long
 #define	atomic_readandclear_ptr	atomic_readandclear_long
+#endif
+
+static __inline unsigned int
+atomic_swap_int(volatile unsigned int *ptr, const unsigned int value)
+{
+	unsigned int retval;
+
+	retval = *ptr;
+
+	while (!atomic_fcmpset_int(ptr, &retval, value))
+		;
+	return (retval);
+}
+
+static __inline uint32_t
+atomic_swap_32(volatile uint32_t *ptr, const uint32_t value)
+{
+	uint32_t retval;
+
+	retval = *ptr;
+
+	while (!atomic_fcmpset_32(ptr, &retval, value))
+		;
+	return (retval);
+}
+
+#if defined(__mips_n64) || defined(__mips_n32)
+static __inline uint64_t
+atomic_swap_64(volatile uint64_t *ptr, const uint64_t value)
+{
+	uint64_t retval;
+
+	retval = *ptr;
+
+	while (!atomic_fcmpset_64(ptr, &retval, value))
+		;
+	return (retval);
+}
+#endif
+
+#ifdef __mips_n64
+static __inline unsigned long
+atomic_swap_long(volatile unsigned long *ptr, const unsigned long value)
+{
+	unsigned long retval;
+
+	retval = *ptr;
+
+	while (!atomic_fcmpset_64((volatile uint64_t *)ptr,
+	    (uint64_t *)&retval, value))
+		;
+	return (retval);
+}
+#else
+static __inline unsigned long
+atomic_swap_long(volatile unsigned long *ptr, const unsigned long value)
+{
+	unsigned long retval;
+
+	retval = *ptr;
+
+	while (!atomic_fcmpset_32((volatile uint32_t *)ptr,
+	    (uint32_t *)&retval, value))
+		;
+	return (retval);
+}
+#endif
+#define	atomic_swap_ptr(ptr, value) atomic_swap_long((unsigned long *)(ptr), value)
+
+#if 0
+#include <sys/_atomic_subword.h>
+#endif
 
 #endif /* ! _MACHINE_ATOMIC_H_ */
