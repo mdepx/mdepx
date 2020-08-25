@@ -218,7 +218,7 @@ mips_timer_init(struct mips_timer_softc *sc, uint32_t freq)
 	 * of ticks that we need between reading current val and scheduling
 	 * new val.
 	 */
-	sc->minticks = mdx_callout_usec_to_ticks(1);
+	sc->minticks = mdx_callout_usec_to_ticks(2);
 
 	return (MDX_OK);
 }
