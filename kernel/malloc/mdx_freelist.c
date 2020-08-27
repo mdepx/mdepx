@@ -93,15 +93,18 @@ mdx_fl_add_region(void *base, int size)
 	node = base;
 	node->size = NODE_S;
 	node->flags = FLAG_ALLOCATED;
+	mdx_setbounds(node, NODE_S);
 
 	node = mdx_incoffset(base, NODE_S);
 	node->size = size - 2 * NODE_S;
+	mdx_setbounds(node, node->size);
 	node->flags = NODE_S;
 	mdx_fl_add_node(node);
 
 	node = mdx_incoffset(base, size - NODE_S);
 	node->size = NODE_S;
 	node->flags = (size - 2 * NODE_S) | FLAG_ALLOCATED;
+	mdx_setbounds(node, node->size);
 }
 
 void
@@ -198,7 +201,7 @@ mdx_fl_malloc(size_t size)
 		node->prev = 0;
 
 		node = mdx_incoffset(node, NODE_S);
-		node = mdx_setbounds(node, size);
+		node = mdx_setbounds(node, size - NODE_S);
 		return ((void *)node);
 	}
 
@@ -216,7 +219,13 @@ mdx_fl_free(void *ptr)
 	if (ptr == NULL)
 		return;
 
+#ifdef __CHERI_PURE_CAPABILITY__
+	node = cheri_setoffset(cheri_getdefault(),
+	    cheri_getaddress(ptr) - NODE_S);
+#else
 	node = (struct node_s *)((char *)ptr - NODE_S);
+#endif
+
 	node->flags &= ~FLAG_ALLOCATED;
 
 	next = (struct node_s *)((uint8_t *)node + node->size);
