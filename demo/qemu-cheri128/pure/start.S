@@ -98,8 +98,8 @@ jump_target:
 	dmtc0  zero, MIPS_CP0_REG_REVOKE, MIPS_CP0_REG_REVOKE_BASE
 	dmtc0  zero, MIPS_CP0_REG_REVOKE, MIPS_CP0_REG_REVOKE_BOUND
 
-	dla	t0, __start_boot_stack
-	dla	t1, __size_boot_stack
+	dla	t0, idle_thread_stack
+	dla	t1, MDX_THREAD_STACK_SIZE
 
 	cgetdefault	$c11
 	cincoffset	$c11, $c11, t0
