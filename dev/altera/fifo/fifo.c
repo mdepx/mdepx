@@ -28,6 +28,8 @@
 #include <sys/systm.h>
 #include <sys/endian.h>
 #include <sys/uio.h>
+#include <sys/io.h>
+#include <sys/cheri.h>
 
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
@@ -46,8 +48,27 @@
 #define	dprintf(fmt, ...)
 #endif
 
-#define	CACHE_FIFO_MEM_INV(_sc, _reg)		\
-	mipsNN_pdcache_inv_range_128(((_sc)->fifo_base_mem + _reg), 4);
+#define	CACHE_FIFO_MEM_INV(_sc, _reg)			\
+({							\
+	vm_offset_t _offs;				\
+	_offs = cheri_getaddress((_sc)->fifo_base_mem);	\
+	mipsNN_pdcache_inv_range_128(_offs + _reg, 4);	\
+})
+
+#define	WR4_FIFO_MEMC(sc, _reg, _val)	\
+	mdx_iowrite_uint32((sc)->fifo_base_ctrl, _reg, _val)
+#define	RD4_FIFO_MEMC(sc, _reg)		\
+	mdx_ioread_uint32((sc)->fifo_base_ctrl, _reg)
+
+#define	WR4_FIFO_MEM(sc, _reg, _val)	\
+	mdx_iowrite_uint32((sc)->fifo_base_mem, _reg, _val)
+#define	RD4_FIFO_MEM(sc, _reg)		\
+	mdx_ioread_uint32((sc)->fifo_base_mem, _reg)
+
+#define	WR4_FIFO_MEM_CACHED(sc, _reg, _val)	\
+	mdx_iowrite_uint32((sc)->fifo_base_mem_cached, _reg, _val)
+#define	RD4_FIFO_MEM_CACHED(sc, _reg)		\
+	mdx_ioread_uint32((sc)->fifo_base_mem_cached, _reg)
 
 void
 fifo_interrupts_disable(struct altera_fifo_softc *sc)
@@ -123,7 +144,7 @@ fifo_process_tx(struct altera_fifo_softc *sc,
     struct iovec *iov, int iovcnt)
 {
 	uint32_t fill_level;
-	uint64_t read_lo;
+	uint8_t *read_lo;
 	uint64_t read_buf;
 	uint32_t missing;
 	uint32_t word;
@@ -140,23 +161,23 @@ fifo_process_tx(struct altera_fifo_softc *sc,
 	got_bits = 0;
 
 	for (i = 0; i < iovcnt; i++) {
-		read_lo = (uint64_t)iov[i].iov_base;
+		read_lo = iov[i].iov_base;
 		len = iov[i].iov_len;
 
-		dprintf("%s: copy %lx -> 0, %d bytes\n",
+		dprintf("%s: copy %p -> 0, %d bytes\n",
 		    __func__, read_lo, len);
 
-		if (read_lo & 1) {
+		if (mdx_getaddress(read_lo) & 1) {
 			read_buf = (read_buf << 8) | *(uint8_t *)read_lo;
 			got_bits += 8;
-			read_lo += 1;
+			read_lo = mdx_incoffset(read_lo, 1);
 			len -= 1;
 		}
 
-		if (len >= 2 && read_lo & 2) {
+		if (len >= 2 && mdx_getaddress(read_lo) & 2) {
 			read_buf = (read_buf << 16) | *(uint16_t *)read_lo;
 			got_bits += 16;
-			read_lo += 2;
+			read_lo = mdx_incoffset(read_lo, 2);
 			len -= 2;
 		}
 
@@ -174,7 +195,7 @@ fifo_process_tx(struct altera_fifo_softc *sc,
 		while (len >= 4) {
 			read_buf = (read_buf << 32) |
 			    (uint64_t)*(uint32_t *)read_lo;
-			read_lo += 4;
+			read_lo = mdx_incoffset(read_lo, 4);
 			len -= 4;
 			word = (uint32_t)((read_buf >> got_bits) & 0xffffffff);
 			fill_level = fifo_fill_level_wait(sc);
@@ -188,14 +209,14 @@ fifo_process_tx(struct altera_fifo_softc *sc,
 		if (len & 2) {
 			read_buf = (read_buf << 16) | *(uint16_t *)read_lo;
 			got_bits += 16;
-			read_lo += 2;
+			read_lo = mdx_incoffset(read_lo, 2);
 			len -= 2;
 		}
 
 		if (len & 1) {
 			read_buf = (read_buf << 8) | *(uint8_t *)read_lo;
 			got_bits += 8;
-			read_lo += 1;
+			read_lo = mdx_incoffset(read_lo, 1);
 			len -= 1;
 		}
 
@@ -232,7 +253,7 @@ int
 fifo_process_rx(struct altera_fifo_softc *sc,
     struct iovec *iov, int iovcnt, int strip_len)
 {
-	uint64_t write_lo;
+	void *write_lo;
 	uint64_t read_buf;
 	uint32_t word;
 	uint32_t data;
@@ -252,7 +273,7 @@ fifo_process_rx(struct altera_fifo_softc *sc,
 
 	dprintf("%s(%d): fill_level %d\n", __func__, sc->unit, fill_level);
 
-	write_lo = (uint64_t)iov->iov_base;
+	write_lo = iov->iov_base;
 	error = 0;
 	sop_rcvd = 0;
 	eop_rcvd = 0;
@@ -329,7 +350,7 @@ fifo_process_rx(struct altera_fifo_softc *sc,
 			word = (uint32_t)((read_buf >> got_bits) & 0xffffffff);
 			dprintf("%s5: writing word %x\n", __func__, word);
 			*(uint32_t *)(write_lo) = word;
-			write_lo += 4;
+			write_lo = mdx_incoffset(write_lo, 4);
 			transferred += 4;
 		}
 

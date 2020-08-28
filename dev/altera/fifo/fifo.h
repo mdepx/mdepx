@@ -98,8 +98,9 @@
 	    A_ONCHIP_FIFO_MEM_CORE_INTR_UNDERFLOW)
 
 struct altera_fifo_softc {
-	uint64_t fifo_base_mem;
-	uint64_t fifo_base_ctrl;
+	capability fifo_base_mem;
+	capability fifo_base_mem_cached;
+	capability fifo_base_ctrl;
 	void (*cb)(void *arg);
 	void *cb_arg;
 	int unit;
@@ -114,47 +115,6 @@ int fifo_process_rx(struct altera_fifo_softc *sc,
     struct iovec *iov, int iovcnt, int strip_len);
 void fifo_interrupts_disable(struct altera_fifo_softc *sc);
 void fifo_interrupts_enable(struct altera_fifo_softc *sc, int mask);
-
-#define	WR4_FIFO_MEM(_sc, _reg, _val) ({	\
-	uint64_t _r;				\
-	_r = MIPS_XKPHYS_UNCACHED_BASE;		\
-	_r |= (_sc)->fifo_base_mem + _reg;	\
-	*(volatile uint32_t *)(_r) = _val;	\
-});
-
-#define	RD4_FIFO_MEM(_sc, _reg) ({		\
-	uint64_t _r;				\
-	uint64_t _val;				\
-	_r = MIPS_XKPHYS_UNCACHED_BASE;		\
-	_r |= (_sc)->fifo_base_mem + _reg;	\
-	_val = *(volatile uint32_t *)(_r);	\
-	_val;					\
-});
-
-#define	RD4_FIFO_MEM_CACHED(_sc, _reg) ({	\
-	uint64_t _r;				\
-	uint64_t _val;				\
-	_r = MIPS_XKPHYS_CACHED_BASE;		\
-	_r |= (_sc)->fifo_base_mem + _reg;	\
-	_val = *(volatile uint32_t *)(_r);	\
-	_val;					\
-});
-
-#define	WR4_FIFO_MEMC(_sc, _reg, _val) ({	\
-	uint64_t _r;				\
-	_r = MIPS_XKPHYS_UNCACHED_BASE;		\
-	_r |= (_sc)->fifo_base_ctrl + _reg;	\
-	*(volatile uint32_t *)(_r) = _val;	\
-});
-
-#define	RD4_FIFO_MEMC(_sc, _reg) ({		\
-	uint64_t _r;				\
-	uint64_t _val;				\
-	_r = MIPS_XKPHYS_UNCACHED_BASE;		\
-	_r |= (_sc)->fifo_base_ctrl + _reg;	\
-	_val = *(volatile uint32_t *)(_r);	\
-	_val;					\
-});
 
 #define	AVALON_FIFO_TX_BASIC_OPTS_DEPTH	16
 
