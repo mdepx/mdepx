@@ -95,6 +95,13 @@ dump_frame(struct trapframe *tf)
 	printf("tf->tf_badvaddr == %zx\n", tf->tf_badvaddr);
 	printf("tf->tf_cause == %zx\n", tf->tf_cause);
 	printf("tf->tf_pc == %zx\n", tf->tf_pc);
+
+#if __has_feature(capabilities)
+	for (i = 0; i < 32; i++)
+		CHERI_PRINT_PTR(tf->tf_c[i]);
+	CHERI_PRINT_PTR(tf->tf_pcc);
+	CHERI_PRINT_PTR(tf->tf_capcause);
+#endif
 }
 
 int
@@ -163,6 +170,7 @@ handle_exception(struct trapframe *tf, int exc_code)
 		panic("%s: Address error (load) at pc %zx, badvaddr %zx\n",
 		    __func__, tf->tf_pc, tf->tf_badvaddr);
 	case MIPS_CR_EXC_CODE_C2E:
+		dump_frame(tf);
 		panic("Unhandled CR2 exception\n");
 	default:
 		dump_frame(tf);
@@ -181,6 +189,8 @@ mips_exception(struct trapframe *tf)
 	uint32_t cause;
 	bool released;
 	bool intr;
+
+	dprintf("%s\n", __func__);
 
 	td = curthread;
 	released = false;
