@@ -73,4 +73,18 @@ mdx_setbounds(void *a, int len)
 	return (result);
 }
 
+static inline size_t
+mdx_getaddress(void *a)
+{
+	size_t result;
+
+#ifdef __CHERI_PURE_CAPABILITY__
+	result = cheri_getaddress(a);
+#else
+	result = (size_t)a;
+#endif
+
+	return (result);
+}
+
 #endif /* !_SYS_CHERI_H_ */
