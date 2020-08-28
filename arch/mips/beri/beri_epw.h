@@ -55,11 +55,11 @@ struct epw_request {
 };
 
 struct epw_softc {
-	uint64_t base;
-	uint64_t window;
+	capability base;
+	capability window;
 };
 
-void epw_init(struct epw_softc *sc, uint64_t base, uint64_t window);
+void epw_init(struct epw_softc *sc, capability base, capability window);
 void epw_control(struct epw_softc *sc, uint8_t enable);
 int epw_request(struct epw_softc *sc, struct epw_request *req);
 void epw_reply(struct epw_softc *sc, struct epw_request *req);

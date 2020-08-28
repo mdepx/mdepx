@@ -31,6 +31,7 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 #include <sys/endian.h>
+#include <sys/io.h>
 
 #include <machine/cpuregs.h>
 
@@ -45,19 +46,19 @@
 #define	dprintf(fmt, ...)
 #endif
 
-#define	RD8(_sc, _reg)		*(volatile uint64_t *)((_sc)->base + _reg)
-#define	RD4(_sc, _reg)		*(volatile uint32_t *)((_sc)->base + _reg)
-#define	RD2(_sc, _reg)		*(volatile uint16_t *)((_sc)->base + _reg)
-#define	RD1(_sc, _reg)		*(volatile uint8_t *)((_sc)->base + _reg)
+#define	RD8(_sc, _reg)		mdx_ioread_uint64((_sc)->base, _reg)
+#define	RD4(_sc, _reg)		mdx_ioread_uint32((_sc)->base, _reg)
+#define	RD2(_sc, _reg)		mdx_ioread_uint16((_sc)->base, _reg)
+#define	RD1(_sc, _reg)		mdx_ioread_uint8((_sc)->base, _reg)
 
 #define	WR8(_sc, _reg, _val)	\
-	*(volatile uint64_t *)((_sc)->base + _reg) = _val
+	mdx_iowrite_uint64((_sc)->base, _reg, _val)
 #define	WR4(_sc, _reg, _val)	\
-	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+	mdx_iowrite_uint32((_sc)->base, _reg, _val)
 #define	WR2(_sc, _reg, _val)	\
-	*(volatile uint16_t *)((_sc)->base + _reg) = _val
+	mdx_iowrite_uint16((_sc)->base, _reg, _val)
 #define	WR1(_sc, _reg, _val)	\
-	*(volatile uint8_t *)((_sc)->base + _reg) = _val
+	mdx_iowrite_uint8((_sc)->base, _reg, _val)
 
 int
 epw_request(struct epw_softc *sc, struct epw_request *req)
@@ -161,9 +162,9 @@ epw_control(struct epw_softc *sc, uint8_t enable)
 }
 
 void
-epw_init(struct epw_softc *sc, uint64_t base, uint64_t window)
+epw_init(struct epw_softc *sc, capability base, capability window)
 {
 
-	sc->base = base | MIPS_XKPHYS_UNCACHED_BASE;
-	sc->window = window | MIPS_XKPHYS_UNCACHED_BASE;
+	sc->base = base;
+	sc->window = window;
 }
