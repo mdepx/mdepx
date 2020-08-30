@@ -96,21 +96,27 @@ void
 md_setup_frame(struct trapframe *tf, void *entry,
     void *arg, void *terminate)
 {
-	capability cap;
 
 #ifdef __CHERI_PURE_CAPABILITY__
 	tf->tf_pcc = entry;
 	tf->tf_c[3] = arg;
 #else
-	cap = cheri_getkcc();
-	cap = cheri_setoffset(cap, (uintptr_t)entry);
 	/* TODO: set bounds. */
-	tf->tf_pcc = cap;
+	tf->tf_pcc = cheri_setoffset(cheri_getkcc(), (uintptr_t)entry);
 	tf->tf_a[0] = (uintptr_t)arg;
 #endif
+}
 
-	/* Set some default data capability (DDC) for this thread. */
-	cap = cheri_getdefault();
+/*
+ * Set default data capability (DDC) for a thread.
+ */
+void
+md_set_ddc(struct thread *td, capability cap)
+{
+	struct trapframe *tf;
+
+	tf = td->td_tf;
+
 	tf->tf_c[0] = cap;
 }
 

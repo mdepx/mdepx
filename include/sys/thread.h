@@ -96,6 +96,9 @@ void md_setup_frame(struct trapframe *tf, void *entry,
     void *arg, void *terminate);
 void md_thread_terminate(struct thread *td);
 void md_init_secondary(int cpuid);
+#if __has_feature(capabilities)
+void md_set_ddc(struct thread *td, capability cap);
+#endif
 
 int main(void);
 void board_init(void);
