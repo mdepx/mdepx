@@ -34,9 +34,10 @@
  */
 
 /*
- * (TODO) Align stack to 16 bytes as CHERI CPU required.
+ * Used early by assembly code to setup a stack before calling to md_init().
  */ 
-uint8_t idle_thread_stack[MDX_CPU_MAX][MDX_THREAD_STACK_SIZE] __aligned(16);
+uint8_t idle_thread_stack[MDX_CPU_MAX][MDX_THREAD_STACK_SIZE]
+    __aligned(MDX_THREAD_STACK_ALIGN);
 static struct thread idle_thread[MDX_CPU_MAX];
 
 void
