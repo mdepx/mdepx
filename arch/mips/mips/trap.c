@@ -98,7 +98,8 @@ dump_frame(struct trapframe *tf)
 
 #if __has_feature(capabilities)
 	for (i = 0; i < 32; i++)
-		CHERI_PRINT_PTR(tf->tf_c[i]);
+		printf("tf_c[%d] == " _CHERI_PRINTF_CAP_FMT "\n",
+		    i, _CHERI_PRINTF_CAP_ARG(tf->tf_c[i]));
 	CHERI_PRINT_PTR(tf->tf_pcc);
 	CHERI_PRINT_PTR(tf->tf_capcause);
 #endif
