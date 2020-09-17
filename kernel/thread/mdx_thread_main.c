@@ -28,7 +28,6 @@
 #include <sys/pcpu.h>
 #include <sys/systm.h>
 #include <sys/thread.h>
-#include <sys/cheri.h>
 
 #ifdef MDX_SCHED
 
@@ -55,12 +54,6 @@ mdx_thread_main(void)
 	if (td == NULL)
 		panic("can't create the main thread\n");
 #endif
-
-#if __has_feature(capabilities)
-	/* Pass CHERI default data capability to the main thread. */
-	md_set_ddc(td, cheri_getdefault());
-#endif
-
 	mdx_sched_add(td);
 	mdx_sched_enter();
 }

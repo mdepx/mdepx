@@ -105,19 +105,9 @@ md_setup_frame(struct trapframe *tf, void *entry,
 	tf->tf_pcc = cheri_setoffset(cheri_getkcc(), (uintptr_t)entry);
 	tf->tf_a[0] = (uintptr_t)arg;
 #endif
-}
 
-/*
- * Set default data capability (DDC) for a thread.
- */
-void
-md_set_ddc(struct thread *td, capability cap)
-{
-	struct trapframe *tf;
-
-	tf = td->td_tf;
-
-	tf->tf_c[0] = cap;
+	/* Set some default data capability (DDC) for this thread. */
+	tf->tf_c[0] = cheri_getdefault();
 }
 
 #else /* !__has_feature(capabilities) */
