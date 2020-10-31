@@ -47,6 +47,7 @@ char * strcpy(char * restrict dst, const char * restrict src);
 size_t strcspn(const char *s, const char *charset);
 size_t strlcpy(char * restrict dst, const char * restrict src, size_t dstsize);
 size_t strlcat(char * restrict dst, const char * restrict src, size_t dstsize);
+char * strncpy(char *dest, const char *src, size_t n);
 char * strrchr(const char *s, int c);
 size_t strspn(const char *s, const char *accept);
 
