@@ -67,7 +67,7 @@ nrf_ipc_configure_send(mdx_device_t dev,
 
 void
 nrf_ipc_configure_recv(mdx_device_t dev,
-    int ev, int chanmask, void (*cb)(void *arg), void *user)
+    int ev, int chanmask, void (*cb)(void *arg, int ev_id), void *user)
 {
 	struct nrf_ipc_softc *sc;
 
@@ -93,6 +93,19 @@ nrf_ipc_inten(mdx_device_t dev, int ev, bool set)
 }
 
 void
+nrf_ipc_inten_chanmask(mdx_device_t dev, int mask, bool set)
+{
+	struct nrf_ipc_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
+
+	if (set)
+		WR4(sc, IPC_INTENSET, mask);
+	else
+		WR4(sc, IPC_INTENCLR, mask);
+}
+
+void
 nrf_ipc_intr(void *arg, int irq)
 {
 	struct nrf_ipc_softc *sc;
@@ -109,7 +122,7 @@ nrf_ipc_intr(void *arg, int irq)
 			WR4(sc, IPC_EVENTS_RECEIVE(i), 0);
 			dprintf("%s: ev %d\n", __func__, i);
 			if (ev->cb != NULL)
-				ev->cb(ev->user);
+				ev->cb(ev->user, i);
 		}
 	}
 }

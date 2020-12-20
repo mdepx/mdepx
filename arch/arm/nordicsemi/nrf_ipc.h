@@ -45,7 +45,7 @@
 #define	IPC_GPMEM(n)		(0x610 + (n) * 0x4)	/* General purpose memory. */
 
 struct ipc_event {
-	void (*cb)(void *arg);
+	void (*cb)(void *arg, int ev_id);
 	void *user;
 };
 
@@ -61,7 +61,8 @@ void nrf_ipc_trigger(mdx_device_t dev, int ev);
 void nrf_ipc_configure_send(mdx_device_t dev,
     int ev, int chanmask);
 void nrf_ipc_configure_recv(mdx_device_t dev,
-    int ev, int chanmask, void (*cb)(void *arg), void *user);
+    int ev, int chanmask, void (*cb)(void *arg, int ev_id), void *user);
 void nrf_ipc_inten(mdx_device_t dev, int ev, bool set);
+void nrf_ipc_inten_chanmask(mdx_device_t dev, int mask, bool set);
 
 #endif /* !_ARM_NORDICSEMI_NRF_IPC_H_ */
