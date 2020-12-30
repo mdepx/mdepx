@@ -56,7 +56,8 @@ mdx_tsleep(uint32_t ticks)
 	KASSERT(td->td_idle == 0,
 	    ("%s: called from idle thread.", __func__));
 	KASSERT(td->td_critnest == 0,
-	    ("%s: sleeping in critical section is not allowed", __func__));
+	    ("%s: sleeping in critical section is not allowed"
+	    " (critnest %d)", __func__, td->td_critnest));
 
 	mdx_callout_init(&c);
 	mdx_callout_set_ticks(&c, ticks, mdx_tsleep_cb, td);
