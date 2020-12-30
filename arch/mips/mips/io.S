@@ -45,7 +45,7 @@ END(mdx_ioread_uint16)
 
 ENTRY(mdx_ioread_uint32)
 	PTR_ADDU	a3, a0, a1
-	lwu		v0, 0(a3)
+	REG_LWU		v0, 0(a3)
 	jr		ra
 	nop
 END(mdx_ioread_uint32)
