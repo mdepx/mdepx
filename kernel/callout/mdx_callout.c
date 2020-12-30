@@ -495,7 +495,8 @@ mdx_callout_register(struct mi_timer *mt)
 	}
 
 	if (mdx_callout_setup(mt) != MDX_OK) {
-		printf("%s: Error: could not register the timer.", __func__);
+		printf("%s: Error: could not register the timer.\n",
+		    __func__);
 		return (MDX_ERROR);
 	}
 
