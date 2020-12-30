@@ -154,6 +154,9 @@ handle_exception(struct trapframe *tf, int exc_code)
 		dump_frame(tf);
 		panic("%s: Address error (store) at pc %zx, badvaddr %zx\n",
 		    __func__, tf->tf_pc, tf->tf_badvaddr);
+	case MIPS_CR_EXC_CODE_DBE:
+		dump_frame(tf);
+		panic("Bus error\n");
 	case MIPS_CR_EXC_CODE_SYS:
 #if __has_feature(capabilities)
 		tf->tf_pcc = cheri_setoffset(tf->tf_pcc,
