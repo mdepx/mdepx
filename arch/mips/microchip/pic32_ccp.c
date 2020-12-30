@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2018-2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,6 +25,8 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/systm.h>
+#include <sys/callout.h>
 
 #include <machine/frame.h>
 
@@ -45,51 +47,7 @@ pic32_ccp_intr(void *arg, struct trapframe *frame,
 
 	WR4(sc, CCPPR, 0);
 
-	if (sc->cb != NULL)
-		sc->cb(sc->arg);
-}
-
-uint32_t
-pic32_ccp_counts(struct pic32_ccp_softc *sc)
-{
-	uint32_t counts;
-
-	counts = RD4(sc, CCPTMR);
-
-	return (counts);
-}
-
-void
-pic32_ccp_sched(struct pic32_ccp_softc *sc, uint32_t val,
-    void (*cb)(void *), void *arg)
-{
-	int counts;
-
-	counts = pic32_ccp_counts(sc);
-
-	sc->cb = cb;
-	sc->arg = arg;
-
-	WR4(sc, CCPPR, (val + counts));
-}
-
-void
-pic32_ccp_init(struct pic32_ccp_softc *sc,
-    uint32_t base)
-{
-	uint32_t reg;
-
-	sc->base = base;
-
-	WR4(sc, CCPCON1, 0);
-	WR4(sc, CCPTMR, 0);
-
-	WR4(sc, CCPRA, 0);
-	WR4(sc, CCPRB, 0);
-
-	reg = CCPCON1_T32 | CCPCON1_TMRPS_64;
-	reg |= CCPCON1_ON;
-	WR4(sc, CCPCON1, reg);
+	mdx_callout_callback(&sc->mt);
 }
 
 void
@@ -111,7 +69,85 @@ pic32_ccp_delay(struct pic32_ccp_softc *sc, uint32_t usec)
 #else
 		counts -= (int32_t)(last - first);
 #endif
-		
+
 		first = last;
 	}
+}
+
+static void
+timer_start(void *arg, uint32_t ticks)
+{
+	struct pic32_ccp_softc *sc;
+	uint32_t reg;
+	int counts;
+
+	sc = arg;
+
+	/* Disable the timer. */
+	reg = RD4(sc, CCPCON1);
+	reg &= ~CCPCON1_ON;
+	WR4(sc, CCPCON1, reg);
+
+	WR4(sc, CCPRA, 0);
+	WR4(sc, CCPRB, 0);
+
+	/* Enable the timer. */
+	counts = RD4(sc, CCPTMR);
+	WR4(sc, CCPPR, (ticks + counts));
+
+	reg |= CCPCON1_ON;
+	WR4(sc, CCPCON1, reg);
+}
+
+static void
+timer_stop(void *arg)
+{
+
+	/* Don't stop so pic32_ccp_delay() works. */
+}
+
+static uint32_t
+timer_count(void *arg)
+{
+	struct pic32_ccp_softc *sc;
+	uint32_t counts;
+
+	sc = arg;
+
+	counts = RD4(sc, CCPTMR);
+
+	return (counts);
+}
+
+int
+pic32_ccp_init(struct pic32_ccp_softc *sc, uint32_t base, uint32_t freq)
+{
+	uint32_t reg;
+	int error;
+
+	sc->base = base;
+
+	WR4(sc, CCPCON1, 0);
+	WR4(sc, CCPTMR, 0);
+
+	WR4(sc, CCPRA, 0);
+	WR4(sc, CCPRB, 0);
+
+	reg = CCPCON1_T32 | CCPCON1_TMRPS_64;
+	reg |= CCPCON1_ON;
+	WR4(sc, CCPCON1, reg);
+
+	sc->frequency = freq;
+	sc->mt.start = timer_start;
+	sc->mt.stop = timer_stop;
+	sc->mt.count = timer_count;
+	sc->mt.maxcnt = 0xffffffff;
+	sc->mt.frequency = freq;
+	sc->mt.arg = sc;
+
+	error = mdx_callout_register(&sc->mt);
+	if (error != MDX_OK)
+		return (error);
+
+	return (MDX_OK);
 }

@@ -47,16 +47,15 @@
 
 struct pic32_ccp_softc {
 	uint32_t base;
-	void (*cb)(void *);
-	void *arg;
+	uint32_t frequency;
+	struct mi_timer mt;
 };
 
-void pic32_ccp_init(struct pic32_ccp_softc *sc, uint32_t base);
+/* OS Timer only. */
+int pic32_ccp_init(struct pic32_ccp_softc *sc, uint32_t base,
+    uint32_t freq);
 void pic32_ccp_delay(struct pic32_ccp_softc *sc, uint32_t usec);
-uint32_t pic32_ccp_counts(struct pic32_ccp_softc *sc);
 void pic32_ccp_intr(void *arg, struct trapframe *frame,
     int mips_irq, int intc_irq);
-void pic32_ccp_sched(struct pic32_ccp_softc *sc,
-    uint32_t val, void (*cb)(void *), void *arg);
 
 #endif /* !_MIPS_MICROCHIP_PIC32_CCP_H_ */
