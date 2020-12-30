@@ -38,10 +38,10 @@
 
 #if 0
 #include <sys/atomic_common.h>
-#endif
 
 #if !defined(__mips_n64) && !defined(__mips_n32)
 #include <sys/_atomic64e.h>
+#endif
 #endif
 
 /*
