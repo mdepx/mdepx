@@ -54,6 +54,7 @@
 #define	REG_L		lw
 #define	REG_LI		li
 #define	PTR_L		lw
+#define	REG_LWU		lw	/* No bits to sign-extend, needed for o32. */
 #define	PTR_LA		la
 #define	PTR_SRL		srl
 #define	PTR_SLL		sll
@@ -66,6 +67,7 @@
 #define	REG_S		sd
 #define	REG_L		ld
 #define	REG_LI		dli
+#define	REG_LWU		lwu
 #define	PTR_L		ld
 #define	PTR_LA		dla
 #define	PTR_SRL		dsrl
