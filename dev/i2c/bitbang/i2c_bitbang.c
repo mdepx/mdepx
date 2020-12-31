@@ -160,8 +160,6 @@ i2c_bitbang_xfer(mdx_device_t dev, struct i2c_msg *msgs, int len)
 
 	sc = mdx_device_get_softc(dev);
 
-	printf("len %d\n", len);
-
 	error = 0;
 
 	critical_enter();
