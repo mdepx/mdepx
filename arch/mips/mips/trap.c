@@ -203,11 +203,8 @@ mips_exception(struct trapframe *tf)
 	td->td_tf = tf;
 
 	cause = mips_rd_cause();
-	exc_code = (cause & MIPS_CR_EXC_CODE_M) >> \
-	    MIPS_CR_EXC_CODE_S;
-
-	dprintf("%s: cause %x, exc_code %d\n",
-	    __func__, cause, exc_code);
+	exc_code = (cause & MIPS_CR_EXC_CODE_M) >> MIPS_CR_EXC_CODE_S;
+	dprintf("%s: cause %x, exc_code %d\n", __func__, cause, exc_code);
 
 	if (exc_code == MIPS_CR_EXC_CODE_INT)
 		intr = true;
@@ -256,11 +253,8 @@ mips_exception(struct trapframe *tf)
 	curthread->td_critnest++;
 
 	cause = mips_rd_cause();
-	exc_code = (cause & MIPS_CR_EXC_CODE_M) >> \
-	    MIPS_CR_EXC_CODE_S;
-
-	dprintf("%s: cause %x, exc_code %d\n",
-	    __func__, cause, exc_code);
+	exc_code = (cause & MIPS_CR_EXC_CODE_M) >> MIPS_CR_EXC_CODE_S;
+	dprintf("%s: cause %x, exc_code %d\n", __func__, cause, exc_code);
 
 	if (exc_code == MIPS_CR_EXC_CODE_INT)
 		intr = true;
