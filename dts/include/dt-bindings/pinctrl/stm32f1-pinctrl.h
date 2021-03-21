@@ -9,6 +9,35 @@
 
 #include <dt-bindings/pinctrl/stm32-pinctrl-common.h>
 
+/* Adapted from Linux: include/dt-bindings/pinctrl/stm32-pinfunc.h */
+
+/**
+ * @brief Macro to generate pinmux int using port, pin number and mode arguments
+ * This is adapted from Linux equivalent st,stm32f429-pinctrl binding
+ */
+
+#define PIN_NO(port, line)	(((port) - 'A') * 0x10 + (line))
+#define STM32F1_PINMUX(port, line, mode, remap) \
+			(((PIN_NO(port, line)) << 8) | (mode << 6) | (remap))
+
+/**
+ * @brief Pin modes
+ */
+
+#define ALTERNATE	0x0  /* Alternate function output */
+#define GPIO_IN		0x1  /* Input */
+#define ANALOG		0x2  /* Analog */
+
+/**
+ * @brief Pin remapping configurations
+ */
+
+#define NO_REMAP	0x0  /* No remapping */
+#define REMAP_1		0x1  /* Partial remapping 1 */
+#define REMAP_2		0x2  /* Partial remapping 2 */
+#define REMAP_3		0x3  /* Partial remapping 3 */
+#define REMAP_FULL	0x4  /* Full remapping */
+
 /**
  * @brief PIN configuration bitfield
  *
@@ -74,18 +103,19 @@
  * done implicitly by setting specific mode and config in MODE and CNF
  * registers for particular pin.
  */
+#define STM32_ALTERNATE			(STM32_MODE_OUTPUT | STM32_CNF_ALT_FUNC)
 
-#define STM32_PIN_USART_TX		(STM32_MODE_OUTPUT | STM32_CNF_ALT_FUNC | STM32_CNF_PUSH_PULL | STM32_PUPD_PULL_UP)
+#define STM32_PIN_USART_TX		(STM32_ALTERNATE | STM32_CNF_PUSH_PULL)
 #define STM32_PIN_USART_RX		(STM32_MODE_INPUT | STM32_CNF_IN_FLOAT)
-#define STM32_PIN_I2C			(STM32_MODE_OUTPUT | STM32_CNF_ALT_FUNC | STM32_CNF_OPEN_DRAIN)
-#define STM32_PIN_PWM			(STM32_MODE_OUTPUT | STM32_CNF_ALT_FUNC | STM32_CNF_PUSH_PULL)
-#define STM32_PIN_SPI_MASTER_SCK	(STM32_MODE_OUTPUT | STM32_CNF_ALT_FUNC | STM32_CNF_PUSH_PULL)
+#define STM32_PIN_I2C			(STM32_ALTERNATE | STM32_CNF_OPEN_DRAIN)
+#define STM32_PIN_PWM			(STM32_ALTERNATE | STM32_CNF_PUSH_PULL)
+#define STM32_PIN_SPI_MASTER_SCK	(STM32_ALTERNATE | STM32_CNF_PUSH_PULL)
 #define STM32_PIN_SPI_SLAVE_SCK		(STM32_MODE_INPUT | STM32_CNF_IN_FLOAT)
-#define STM32_PIN_SPI_MASTER_MOSI	(STM32_MODE_OUTPUT | STM32_CNF_ALT_FUNC | STM32_CNF_PUSH_PULL)
+#define STM32_PIN_SPI_MASTER_MOSI	(STM32_ALTERNATE | STM32_CNF_PUSH_PULL)
 #define STM32_PIN_SPI_SLAVE_MOSI	(STM32_MODE_INPUT | STM32_CNF_IN_FLOAT)
 #define STM32_PIN_SPI_MASTER_MISO	(STM32_MODE_INPUT | STM32_CNF_IN_FLOAT)
-#define STM32_PIN_SPI_SLAVE_MISO	(STM32_MODE_OUTPUT | STM32_CNF_ALT_FUNC | STM32_CNF_PUSH_PULL)
-#define STM32_PIN_CAN_TX		(STM32_MODE_OUTPUT | STM32_CNF_ALT_FUNC | STM32_CNF_PUSH_PULL)
+#define STM32_PIN_SPI_SLAVE_MISO	(STM32_ALTERNATE | STM32_CNF_PUSH_PULL)
+#define STM32_PIN_CAN_TX		(STM32_ALTERNATE | STM32_CNF_PUSH_PULL)
 #define STM32_PIN_CAN_RX		(STM32_MODE_INPUT  | STM32_PUPD_PULL_UP)
 
 /*
@@ -107,8 +137,7 @@
 /* Hardware master NSS output enabled */
 #define STM32_PIN_SPI_MASTER_NSS_OE	(STM32_MODE_OUTPUT | \
 						STM32_CNF_ALT_FUNC | \
-						STM32_CNF_PUSH_PULL | \
-						STM32_PUPD_PULL_UP)
+						STM32_CNF_PUSH_PULL)
 #define STM32_PIN_SPI_SLAVE_NSS		(STM32_MODE_INPUT | STM32_CNF_IN_FLOAT)
 #define STM32_PIN_USB			(STM32_MODE_INPUT | STM32_CNF_IN_PUPD)
 

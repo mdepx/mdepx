@@ -53,11 +53,17 @@
 			compatible = "st,stm32-rcc";
 			#clock-cells = <2>;
 			reg = <0x40021000 0x400>;
-			label = "STM32_CLK_RCC";
+		};
+
+		exti: interrupt-controller@40010400 {
+			compatible = "st,stm32-exti";
+			interrupt-controller;
+			#interrupt-cells = <1>;
+			reg = <0x40010400 0x400>;
 		};
 
 		pinctrl: pin-controller@48000000 {
-			compatible = "st,stm32-pinmux";
+			compatible = "st,stm32-pinctrl";
 			#address-cells = <1>;
 			#size-cells = <1>;
 			reg = <0x48000000 0x1800>;
@@ -163,6 +169,16 @@
 			label = "SPI_1";
 		};
 
+		rtc: rtc@40002800 {
+			compatible = "st,stm32-rtc";
+			reg = <0x40002800 0x400>;
+			clocks = <&rcc STM32_CLOCK_BUS_APB1 0x10000000>;
+			interrupts = <2 0>;
+			prescaler = <32768>;
+			status = "disabled";
+			label = "RTC_0";
+		};
+
 		iwdg: watchdog@40003000 {
 			compatible = "st,stm32-watchdog";
 			reg = <0x40003000 0x400>;
@@ -183,7 +199,7 @@
 			reg = <0x40012c00 0x400>;
 			clocks = <&rcc STM32_CLOCK_BUS_APB1_2 0x00000800>;
 			interrupts = <13 0>, <14 0>;
-			interrupt-names = "brk", "cc";
+			interrupt-names = "brk_up_trg_com", "cc";
 			status = "disabled";
 			label = "TIMERS_1";
 
@@ -333,7 +349,7 @@
 		};
 
 		dma1: dma@40020000 {
-			compatible = "st,stm32-dma";
+			compatible = "st,stm32-dma-v2";
 			#dma-cells = <4>;
 			reg = <0x40020000 0x400>;
 			clocks = <&rcc STM32_CLOCK_BUS_AHB1 0x1>;
