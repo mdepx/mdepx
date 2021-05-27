@@ -164,6 +164,7 @@ static void virtio_process_cap(struct virtio_device *dev, uint8_t cap_ptr)
 }
 #endif
 
+#if 0
 #ifdef VIRTIO_USE_MMIO
 static void virtio_mmio_print_configs(uint32_t* device_base)
 {
@@ -205,6 +206,7 @@ static void virtio_mmio_print_configs(uint32_t* device_base)
 	printf("ConfigGeneration:\t 0x%x\n", virtio_mmio_read32(device_base, VIRTIO_MMIO_CONFIG_GENERATION));
 	printf("Config:\t 0x%x\n", virtio_mmio_read32(device_base,VIRTIO_MMIO_CONFIG));
 }
+#endif
 #endif
 
 /**
