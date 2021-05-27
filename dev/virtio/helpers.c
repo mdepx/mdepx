@@ -1,66 +1,91 @@
-/******************************************************************************
- * Copyright (c) 2020 Hesham Almatary
- * See LICENSE_CHERI for license details.
- *****************************************************************************/
-
-/******************************************************************************
- * Copyright (c) 2007, 2012, 2013 IBM Corporation
+/*-
+ * Copyright (c) 2021 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
- * This program and the accompanying materials
- * are made available under the terms of the BSD License
- * which accompanies this distribution, and is available at
- * http://www.opensource.org/licenses/bsd-license.php
  *
- * Contributors:
- *     IBM Corporation - initial implementation
- *****************************************************************************/
-/*
- * All functions concerning interface to slof
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "helpers.h"
 
-#include <FreeRTOS.h>
-#include "task.h"
+#include <sys/systm.h>
+#include <sys/malloc.h>
 
-#define pdUS_TO_TICKS( xTimeInUs ) ( ( TickType_t ) ( ( ( TickType_t ) ( xTimeInUs ) * ( TickType_t ) configTICK_RATE_HZ ) / ( TickType_t ) 1000000 ) )
-
-void *SLOF_alloc_mem(size_t size)
+void *
+SLOF_alloc_mem_aligned(size_t size, size_t alignment)
 {
-	return pvPortMalloc(size);
+	uint8_t *address;
+	uint32_t offset;
+	void **ptr;
+
+	offset = alignment - 1 + sizeof(void *);
+
+	address = malloc(size + offset);
+
+	ptr = (void **)((uintptr_t)(address + offset) & ~(alignment - 1));
+	ptr[-1] = address;
+
+	return (ptr);
 }
 
-void* SLOF_alloc_mem_aligned(size_t size, size_t alignment) {
-  void* address = NULL;
-  size_t new_size = (size + alignment + sizeof(void*));
+void *
+SLOF_alloc_mem(size_t size)
+{
+	void *ret;
 
-  if (alignment < portBYTE_ALIGNMENT)
-    alignment = portBYTE_ALIGNMENT;
+	ret = SLOF_alloc_mem_aligned(size, sizeof(uintptr_t));
 
-  address = pvPortMalloc(new_size);
-
-  void **ptr = (void**)((uintptr_t)(address + alignment + sizeof(void*)) & ~(alignment - 1));
-  ptr[-1] = address;
-  return ptr;
+	return (ret);
 }
 
-void SLOF_free_mem(void *addr, long size)
+void
+SLOF_free_mem(void *addr, long size)
 {
-	vPortFree(addr);
+
+	free(((void**)addr)[-1]);
 }
 
-long SLOF_dma_map_in(void *virt, long size, int cacheable)
+long
+SLOF_dma_map_in(void *virt, long size, int cacheable)
 {
-	// FIXME Empty as only used if IOMMU and VIRTIO_VERSION1 are supported
+
+	/*
+	 * TODO:
+	 *  Empty as only used if IOMMU and VIRTIO_VERSION1 are supported.
+	 */
 	(void) size;
 	(void) cacheable;
-	return (long) virt;
+
+	return (long)virt;
 }
 
-void SLOF_dma_map_out(long phys, void *virt, long size)
+void
+SLOF_dma_map_out(long phys, void *virt, long size)
 {
-	// FIXME Empty as only used if IOMMU and VIRTIO_VERSION1 are supported
+	/*
+	 * TODO:
+	 *  Empty as only used if IOMMU and VIRTIO_VERSION1 are supported.
+	 */
 	(void) size;
 	(void) phys;
 	(void) virt;
@@ -74,18 +99,27 @@ void SLOF_dma_map_out(long phys, void *virt, long size)
  * @param   -
  * @return  actual timer value in ms as 32bit
  */
-uint32_t SLOF_GetTimer(void)
+uint32_t
+SLOF_GetTimer(void)
 {
-    uint64_t us = portGET_RUN_TIME_COUNTER_VALUE();
-    return (uint32_t) (us / 1000);
+
+	/* TODO */
+
+	panic("Implement me");
+
+	return (0);
 }
 
-void SLOF_msleep(uint32_t time)
+void
+SLOF_msleep(uint32_t time)
 {
-  vTaskDelay( pdMS_TO_TICKS ( time ) );
+
+	mdx_usleep(time * 1000);
 }
 
-void SLOF_usleep(uint32_t time)
+void
+SLOF_usleep(uint32_t time)
 {
-  vTaskDelay( pdUS_TO_TICKS ( time ) );
+
+	mdx_usleep(time);
 }
