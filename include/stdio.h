@@ -43,11 +43,13 @@ int puts(const char *str);
 
 int sscanf(const char *str, const char *format, ...);
 
-#define	stdin	0
-#define	stdout	1
-#define	EOF	(-1)
-
 typedef void * FILE;
+
+extern FILE *stdin;
+extern FILE *stdout;
+extern FILE *stderr;
+
+#define	EOF	(-1)
 
 FILE * fopen(const char * restrict path, const char * restrict mode);
 int fclose(FILE *stream);

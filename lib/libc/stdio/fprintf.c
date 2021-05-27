@@ -26,6 +26,10 @@
 
 #include <sys/cdefs.h>
 
+FILE * stdin;
+FILE * stdout;
+FILE * stderr;
+
 int
 fprintf(FILE * restrict stream, const char * restrict format, ...)
 {
