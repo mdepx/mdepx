@@ -105,9 +105,12 @@ struct virtq {
 	struct virtq_used *used;
 };
 
-static inline int virtq_need_event(uint16_t event_idx, uint16_t new_idx, uint16_t old_idx)
+static inline int virtq_need_event(uint16_t event_idx, uint16_t new_idx,
+    uint16_t old_idx)
 {
-	return (uint16_t)(new_idx - event_idx - 1) < (uint16_t)(new_idx - old_idx);
+
+	return (uint16_t)(new_idx - event_idx - 1) <
+	    (uint16_t)(new_idx - old_idx);
 }
 
 /* Get location of event indices (only with VIRTIO_F_EVENT_IDX) */
