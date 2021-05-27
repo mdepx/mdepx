@@ -74,6 +74,7 @@ struct virtio_net_hdr_v1 {
 static uint16_t last_rx_idx;	/* Last index in RX "used" ring */
 static uint16_t last_tx_idx;	/* Last index in TX "used" ring */
 
+#ifdef VIRTIO_USE_PCI
 /**
  * Module init for virtio via PCI.
  * Checks whether we're reponsible for the given device and set up
@@ -99,6 +100,7 @@ static int virtionet_init_pci(struct virtio_net *vnet, struct virtio_device *dev
 
 	return 0;
 }
+#endif
 
 /**
  * Module init for virtio via MMIO.
@@ -292,9 +294,11 @@ static int virtionet_xmit(struct virtio_net *vnet, char *buf, int len)
 	int id, idx;
 	const static struct virtio_net_hdr_v1 nethdr_v1 = {0};
 	const static struct virtio_net_hdr nethdr_legacy = {0};
-	void *nethdr = &nethdr_legacy;
+	const void *nethdr = &nethdr_legacy;
 	struct virtio_device *vdev = &vnet->vdev;
 	struct vqs *vq_tx = &vdev->vq[VQ_TX];
+	uint8_t *buf_addr;
+	uint32_t buf_index;
 
 	if (len > BUFFER_ENTRY_SIZE) {
 		printf("virtionet: Packet too big!\n");
@@ -309,9 +313,9 @@ static int virtionet_xmit(struct virtio_net *vnet, char *buf, int len)
 	/* Determine descriptor index */
 	idx = virtio_modern16_to_cpu(vdev, vq_tx->avail->idx);
 	id = (idx * 2) % vq_tx->size;
-	uint32_t buf_index = (idx * 2) % (vq_tx->size / 2);
 
-	uint8_t *buf_addr = vq_tx->buf_mem + ((buf_index / 2) * (BUFFER_ENTRY_SIZE));
+	buf_index = (idx * 2) % (vq_tx->size / 2);
+	buf_addr = (uint8_t *)vq_tx->buf_mem + ((buf_index / 2) * (BUFFER_ENTRY_SIZE));
 	memcpy(buf_addr, buf, len);
 
 	virtio_free_desc(vq_tx, id, vdev->features);
