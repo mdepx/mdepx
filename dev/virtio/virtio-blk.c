@@ -140,7 +140,7 @@ virtioblk_transfer(struct virtio_device *dev, char *buf, uint64_t blocknum,
 			offset_of(struct virtio_blk_cfg, capacity),
 			sizeof(capacity));
 	if (blocknum + cnt - 1 > capacity) {
-		puts("virtioblk_transfer: Access beyond end of device!");
+		printf("virtioblk_transfer: Access beyond end of device!");
 		return 0;
 	}
 
