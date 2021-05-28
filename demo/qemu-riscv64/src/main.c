@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019-2020 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2019-2021 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,8 +40,11 @@
 
 #include <app/fpu_test/fpu_test.h>
 #include <app/callout_test/callout_test.h>
+#include <app/virtio_test/virtio_test.h>
 
 #include "board.h"
+
+#define	VIRTIO_BLOCK_MMIO_BASE	0x10007000
 
 static void __unused
 hello(void *arg)
@@ -54,6 +57,10 @@ hello(void *arg)
 int
 main(void)
 {
+
+#ifdef	MDX_DEV_VIRTIO
+	virtio_test((void *)VIRTIO_BLOCK_MMIO_BASE);
+#endif
 
 	callout_test();
 
