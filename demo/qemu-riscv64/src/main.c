@@ -58,9 +58,13 @@ int
 main(void)
 {
 
-#ifdef	MDX_DEV_VIRTIO
-	virtio_test((void *)VIRTIO_BLOCK_MMIO_BASE);
+#ifdef MDX_VIRTIO
+	int error;
+	error = virtio_test((void *)VIRTIO_BLOCK_MMIO_BASE);
+	printf("%s: Virtio test completed with error %d\n", __func__, error);
 #endif
+
+	mdx_usleep(1000000);
 
 	callout_test();
 
