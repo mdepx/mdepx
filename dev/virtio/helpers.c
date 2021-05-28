@@ -105,7 +105,10 @@ SLOF_GetTimer(void)
 
 	/* TODO */
 
-	panic("Implement me");
+	/*
+	 * This means the virtio block will wait
+	 * a transaction to complete forever.
+	 */
 
 	return (0);
 }
