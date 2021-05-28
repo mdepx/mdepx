@@ -15,6 +15,8 @@ virtio_test(void *mmio_base)
 	struct virtio_device *vd;
 	int err;
 
+	printf("%s\n", __func__);
+
 	vd = virtio_setup_vd(mmio_base);
 	if (vd == NULL) {
 		printf("%s: could not setup virtio device\n", __func__);
@@ -37,11 +39,6 @@ virtio_test(void *mmio_base)
 	err = virtioblk_transfer(vd, (void *)buf, 0, 1, 1 /* write */);
 
 	printf("%s: Transferred %d blocks.\n", __func__, err);
-
-	while (1) {
-		printf("Hello World\n");
-		mdx_usleep(1000000);
-	};
 
 	return (0);
 }
