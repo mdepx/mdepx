@@ -21,13 +21,13 @@ RUN_CMD = qemu-system-riscv64						\
 	-bios none -nographic						\
 	-device virtio-serial-device					\
 	-nodefaults							\
-	-drive if=none,id=sda,format=raw,file=qemu.img			\
+	-drive if=none,id=sda,format=raw,file=${OBJDIR}/qemu.img	\
 	-device virtio-blk-device,drive=sda				\
 	-chardev socket,path=/tmp/virtio,server,nowait,id=virtiocon0	\
 	-device virtconsole,chardev=virtiocon0
 
 run:
-	truncate -s 12m qemu.img
+	truncate -s 12m ${OBJDIR}/qemu.img
 	${RUN_CMD}
 
 dtb:
