@@ -62,9 +62,9 @@ main(void)
 	int error;
 	error = virtio_test((void *)VIRTIO_BLOCK_MMIO_BASE);
 	printf("%s: Virtio test completed with error %d\n", __func__, error);
-#endif
 
 	mdx_usleep(1000000);
+#endif
 
 	callout_test();
 
