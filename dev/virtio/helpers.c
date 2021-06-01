@@ -30,6 +30,7 @@
 
 #include <sys/systm.h>
 #include <sys/malloc.h>
+#include <sys/tick.h>
 
 void *
 SLOF_alloc_mem_aligned(size_t size, size_t alignment)
@@ -102,15 +103,11 @@ SLOF_dma_map_out(long phys, void *virt, long size)
 uint32_t
 SLOF_GetTimer(void)
 {
+	uint32_t ms;
 
-	/* TODO */
+	ms = mdx_uptime();
 
-	/*
-	 * This means the virtio block will wait
-	 * a transaction to complete forever.
-	 */
-
-	return (0);
+	return (ms);
 }
 
 void
