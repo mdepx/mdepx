@@ -175,7 +175,7 @@ callout_test(void)
 	size_t i;
 	for (i = 0; i < 20; i++) {
 		td = mdx_thread_create("test", 1, 1000,
-		    4096, test_thr, (void *)i);
+		    8192, test_thr, (void *)i);
 		if (td == NULL)
 			break;
 		printf("td %p created\n", td);
@@ -188,7 +188,7 @@ callout_test(void)
 	size_t i;
 	for (i = 1; i < 500; i++) {
 		td = mdx_thread_create("test", 1, 1000 * i,
-		    4096, test_thr, (void *)i);
+		    8192, test_thr, (void *)i);
 		if (td == NULL)
 			break;
 		td->td_index = i;
@@ -199,32 +199,32 @@ callout_test(void)
 #if 0
 	struct thread *td;
 	td = mdx_thread_create("test", 1, 1000,
-	    4096, test_thr1, (void *)0);
+	    8192, test_thr1, (void *)0);
 	mdx_sched_add(td);
 
 	td = mdx_thread_create("test", 1, 2000,
-	    4096, test_thr2, (void *)1);
+	    8192, test_thr2, (void *)1);
 	mdx_sched_add(td);
 
 	td = mdx_thread_create("test", 1, 2000,
-	    4096, test_thr2, (void *)2);
+	    8192, test_thr2, (void *)2);
 	mdx_sched_add(td);
 #endif
 
 #if 0
 	struct thread *td;
 	td = mdx_thread_create("test1", 1, 500,
-	    4096, test_m0, (void *)0);
+	    8192, test_m0, (void *)0);
 	td->td_index = 0;
 	mdx_sched_add(td);
 
 	td = mdx_thread_create("test2", 1, 500,
-	    4096, test_m1, (void *)1);
+	    8192, test_m1, (void *)1);
 	td->td_index = 1;
 	mdx_sched_add(td);
 
 	td = mdx_thread_create("test3", 1, 500,
-	    4096, test_m2, (void *)2);
+	    8192, test_m2, (void *)2);
 	td->td_index = 2;
 	mdx_sched_add(td);
 #endif
