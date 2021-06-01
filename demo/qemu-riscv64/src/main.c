@@ -34,6 +34,7 @@
 #include <sys/sem.h>
 #include <sys/list.h>
 #include <sys/smp.h>
+#include <sys/tick.h>
 
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
@@ -60,6 +61,10 @@ main(void)
 
 #ifdef MDX_VIRTIO
 	int error;
+
+	/* Start system ticker that is needed for virtio. */
+	mdx_tick_start();
+
 	error = virtio_test((void *)VIRTIO_BLOCK_MMIO_BASE);
 	printf("%s: Virtio test completed with error %d\n", __func__, error);
 
