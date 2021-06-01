@@ -158,7 +158,7 @@ riscv_exception(struct trapframe *tf)
 	fpe_check_and_save(td);
 #endif
 
-	/* Check the trapframe first before we release this thread. */
+	/* Process the trapframe first before we release this thread. */
 	if (tf->tf_mcause & EXCP_INTR) {
 		irq = (tf->tf_mcause & EXCP_MASK);
 		intr = true;
@@ -173,14 +173,17 @@ riscv_exception(struct trapframe *tf)
 	 */
 	released = mdx_sched_ack(td);
 
-	/* Switch to the interrupt thread. */
+	/*
+	 * Switch to the interrupt thread if we don't have one anymore
+	 * (stack is already replaced).
+	 */
 	if (released)
 		PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
 	curthread->td_critnest++;
 
 	/*
-	 * Service an interrupt. This includes timer interrupt, which means
-	 * this should be done before call to mdx_sched_park().
+	 * Service the interrupt. This includes timer interrupt, which means
+	 * this should be done before the call to mdx_sched_park().
 	 */
 	if (intr)
 		riscv_intr(irq);
