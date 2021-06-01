@@ -48,9 +48,6 @@ mdx_tick(void *arg)
 	mdx_callout_set_locked(&c, MDX_TICK_PERIOD_US, mdx_tick, NULL);
 }
 
-/*
- * Sleep given amount of ticks in multi-threaded environment.
- */
 int
 mdx_tick_start(void)
 {
