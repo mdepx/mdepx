@@ -103,11 +103,11 @@ SLOF_dma_map_out(long phys, void *virt, long size)
 uint32_t
 SLOF_GetTimer(void)
 {
-	uint32_t ms;
+	uint64_t usec;
 
-	ms = mdx_uptime();
+	usec = mdx_uptime();
 
-	return (ms);
+	return (usec / 1000);
 }
 
 void

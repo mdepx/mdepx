@@ -33,57 +33,22 @@
 
 #include <machine/atomic.h>
 
-static void
-mdx_timer_tick(void *arg)
-{
-	struct mdx_timer *timer;
-
-	KASSERT(curthread->td_critnest > 0,
-	    ("%s: Not in critical section.", __func__));
-
-	timer = arg;
-	timer->count_us += timer->period_us;
-
-	mdx_callout_set_locked(&timer->c, timer->period_us,
-	    mdx_timer_tick, timer);
-}
-
-struct mdx_timer *
-mdx_timer_create(void)
-{
-	struct mdx_timer *timer;
-
-	timer = malloc(sizeof(struct mdx_timer));
-	if (timer == NULL)
-		return (NULL);
-
-	mdx_callout_init(&timer->c);
-
-	return (timer);
-}
+static struct mdx_timer uptime_timer;
 
 int
-mdx_timer_start(struct mdx_timer *timer, int period_us)
+mdx_uptime_init(void)
 {
-	int res;
 
-	res = atomic_cmpset_32(&timer->started, 0, 1);
-	if (!res)
-		return (MDX_ERROR);
-
-	timer->period_us = period_us;
-
-	mdx_callout_set(&timer->c, timer->period_us, mdx_timer_tick, timer);
+	bzero(&uptime_timer, sizeof(struct mdx_timer));
+	mdx_callout_init(&uptime_timer.c);
+	mdx_timer_start(&uptime_timer, MDX_TICK_PERIOD_US);
 
 	return (0);
 }
 
-/*
- * Returns time in microseconds passed since timer started.
- */
 uint64_t
-mdx_timer_count(struct mdx_timer *timer)
+mdx_uptime(void)
 {
 
-	return (timer->count_us);
+	return (mdx_timer_count(&uptime_timer));
 }

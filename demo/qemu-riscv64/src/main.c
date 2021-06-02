@@ -63,7 +63,7 @@ main(void)
 	int error;
 
 	/* Start system ticker that is needed for virtio. */
-	mdx_tick_start();
+	mdx_uptime_init();
 
 	error = virtio_test((void *)VIRTIO_BLOCK_MMIO_BASE);
 	printf("%s: Virtio test completed with error %d\n", __func__, error);

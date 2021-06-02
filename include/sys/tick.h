@@ -27,7 +27,20 @@
 #ifndef _SYS_TICK_H_
 #define	_SYS_TICK_H_
 
-int mdx_tick_start(void);
+#include <sys/callout.h>
+
+struct mdx_timer {
+	struct mdx_callout c;
+	uint64_t count_us;
+	uint32_t started;
+	uint32_t period_us;
+};
+
+struct mdx_timer * mdx_timer_create(void);
+int mdx_timer_start(struct mdx_timer *timer, int period_ms);
+uint64_t mdx_timer_count(struct mdx_timer *timer);
+
 uint64_t mdx_uptime(void);
+int mdx_uptime_init(void);
 
 #endif /* !_SYS_TICK_H_ */
