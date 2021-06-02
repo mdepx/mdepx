@@ -196,6 +196,9 @@ arm_exception(struct trapframe *tf, int exc_code)
 	/*
 	 * Switch to the interrupt thread if we don't have
 	 * a thread anymore.
+	 *
+	 * TODO: for SMP this should be done unconditionally.
+	 * see riscv/trap.c
 	 */
 	if (released)
 		PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);

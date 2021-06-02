@@ -130,7 +130,7 @@ fpe_check_and_save(struct thread *td)
 struct trapframe *
 riscv_exception(struct trapframe *tf)
 {
-	struct thread *td;
+	struct thread *td, *old_td;
 	bool released;
 	bool intr;
 	int irq;
@@ -138,7 +138,7 @@ riscv_exception(struct trapframe *tf)
 	struct pcb *pcb;
 #endif
 
-	td = curthread;
+	old_td = td = curthread;
 	released = false;
 	intr = false;
 
@@ -174,11 +174,9 @@ riscv_exception(struct trapframe *tf)
 	released = mdx_sched_ack(td);
 
 	/*
-	 * Switch to the interrupt thread if we don't have one anymore
-	 * (stack is already replaced).
+	 * Switch to the interrupt thread (stack is already replaced).
 	 */
-	if (released)
-		PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
+	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
 	curthread->td_critnest++;
 
 	/*
@@ -214,6 +212,8 @@ riscv_exception(struct trapframe *tf)
 	curthread->td_critnest--;
 	if (released)
 		PCPU_SET(curthread, td);
+	else
+		PCPU_SET(curthread, old_td);
 
 	return (td->td_tf);
 }
