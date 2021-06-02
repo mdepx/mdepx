@@ -26,7 +26,7 @@ Mdepx (Machdep Extended) is an operating system for embedded applications.
 
 ## Limitations
   * Machine-mode supported only
-  * Nested interrupts are not supported
+  * Generic exception handlers are not re-entrant
 
 ## Featured applications (external)
   * [LTE 4G Link with nRF9160](https://github.com/machdep/nrf9160)
