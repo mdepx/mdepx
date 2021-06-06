@@ -1,0 +1,53 @@
+/*-
+ * Copyright (c) 2021 Ruslan Bukin <br@bsdpad.com>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
+#ifndef	_RP2040_UART_H_
+#define	_RP2040_UART_H_
+
+#define	RP2040_UART_UARTDR		0x000
+#define	RP2040_UART_UARTRSR		0x004
+#define	RP2040_UART_UARTFR		0x018
+#define	RP2040_UART_UARTILPR		0x020
+#define	RP2040_UART_UARTIBRD		0x024
+#define	RP2040_UART_UARTFBRD		0x028
+#define	RP2040_UART_UARTLCR_H		0x02c
+#define	RP2040_UART_UARTCR		0x030
+#define	RP2040_UART_UARTIFLS		0x034
+#define	RP2040_UART_UARTIMSC		0x038
+#define	RP2040_UART_UARTRIS		0x03c
+#define	RP2040_UART_UARTMIS		0x040
+#define	RP2040_UART_UARTICR		0x044
+#define	RP2040_UART_UARTDMACR		0x048
+#define	RP2040_UART_UARTPERIPHID0	0xfe0
+#define	RP2040_UART_UARTPERIPHID1	0xfe4
+#define	RP2040_UART_UARTPERIPHID2	0xfe8
+#define	RP2040_UART_UARTPERIPHID3	0xfec
+#define	RP2040_UART_UARTPCELLID0	0xff0
+#define	RP2040_UART_UARTPCELLID1	0xff4
+#define	RP2040_UART_UARTPCELLID2	0xff8
+#define	RP2040_UART_UARTPCELLID3	0xffc
+
+#endif /* !_RP2040_UART_H_ */
