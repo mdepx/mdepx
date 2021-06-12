@@ -27,6 +27,8 @@
 #ifndef	_RP2040_TIMER_H_
 #define	_RP2040_TIMER_H_
 
+#include <sys/callout.h>
+
 #define	RP2040_TIMER_TIMEHW	0x00
 #define	RP2040_TIMER_TIMELW	0x04
 #define	RP2040_TIMER_TIMEHR	0x08
@@ -44,5 +46,16 @@
 #define	RP2040_TIMER_INTE	0x38
 #define	RP2040_TIMER_INTF	0x3c
 #define	RP2040_TIMER_INTS	0x40
+
+struct rp2040_timer_softc {
+	uint32_t base;
+	uint32_t freq;
+	struct mi_timer mt;
+};
+
+int rp2040_timer_init(struct rp2040_timer_softc *sc,
+    uint32_t base, uint32_t freq);
+void rp2040_timer_intr(void *arg, int irq);
+void rp2040_timer_udelay(struct rp2040_timer_softc *sc, uint32_t ticks);
 
 #endif /* !_RP2040_TIMER_H_ */
