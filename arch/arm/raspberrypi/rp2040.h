@@ -34,6 +34,7 @@
 #include <arm/raspberrypi/rp2040_sio.h>
 #include <arm/raspberrypi/rp2040_timer.h>
 #include <arm/raspberrypi/rp2040_uart.h>
+#include <arm/raspberrypi/rp2040_xosc.h>
 
 #define	RP2040_ROM_BASE			0x00000000
 #define	RP2040_XIP_BASE			0x10000000
