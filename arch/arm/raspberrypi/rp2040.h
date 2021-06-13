@@ -27,6 +27,14 @@
 #ifndef	_ARM_RASPBERRYPI_RP2040_H_
 #define	_ARM_RASPBERRYPI_RP2040_H_
 
+#include <arm/raspberrypi/rp2040_clocks.h>
+#include <arm/raspberrypi/rp2040_io_bank0.h>
+#include <arm/raspberrypi/rp2040_pads_bank0.h>
+#include <arm/raspberrypi/rp2040_resets.h>
+#include <arm/raspberrypi/rp2040_sio.h>
+#include <arm/raspberrypi/rp2040_timer.h>
+#include <arm/raspberrypi/rp2040_uart.h>
+
 #define	RP2040_ROM_BASE			0x00000000
 #define	RP2040_XIP_BASE			0x10000000
 #define	RP2040_XIP_MAIN_BASE		0x10000000
