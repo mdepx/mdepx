@@ -24,32 +24,42 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_RP2040_IO_BANK0_H_
-#define	_RP2040_IO_BANK0_H_
+#include <sys/cdefs.h>
+#include <sys/systm.h>
+#include <sys/callout.h>
 
-#define	RP2040_IO_BANK0_GPIO_STATUS(n)	(0x000 + 0x8 * (n))	/* n: 0..29 */
-#define	RP2040_IO_BANK0_GPIO_CTRL(n)	(0x004 + 0x8 * (n))
-#define	 IO_BANK0_GPIO_CTRL_FUNCSEL_S	0
-#define	 IO_BANK0_GPIO_CTRL_FUNCSEL_M	(0x1f << IO_BANK0_GPIO_CTRL_FUNCSEL_S)
-#define	 IO_BANK0_GPIO0_CTRL_FUNCSEL_UART_TX	2
-#define	 IO_BANK0_GPIO1_CTRL_FUNCSEL_UART_RX	2
-#define	RP2040_IO_BANK0_INTR(n)		(0x0f0 + 0x4 * (n))	/* n: 0..3 */
-#define	RP2040_IO_BANK0_PROC0_INTE(n)	(0x100 * 0x4 * (n))
-#define	RP2040_IO_BANK0_PROC0_INTF(n)	(0x110 * 0x4 * (n))
-#define	RP2040_IO_BANK0_PROC0_INTS(n)	(0x120 * 0x4 * (n))
-#define	RP2040_IO_BANK0_PROC1_INTE(n)	(0x130 * 0x4 * (n))
-#define	RP2040_IO_BANK0_PROC1_INTF(n)	(0x140 * 0x4 * (n))
-#define	RP2040_IO_BANK0_PROC1_INTS(n)	(0x150 * 0x4 * (n))
-#define	RP2040_IO_BANK0_DORMANT_WAKE_INTE(n)	(0x160 * 0x4 * (n))
-#define	RP2040_IO_BANK0_DORMANT_WAKE_INTF(n)	(0x170 * 0x4 * (n))
-#define	RP2040_IO_BANK0_DORMANT_WAKE_INTS(n)	(0x180 * 0x4 * (n))
+#include <arm/raspberrypi/rp2040_io_bank0.h>
 
-struct rp2040_io_bank0_softc {
-	uint32_t base;
-};
+#define	RP2040_IO_BANK0_DEBUG
+#undef	RP2040_IO_BANK0_DEBUG
 
-void rp2040_io_bank0_init(struct rp2040_io_bank0_softc *sc, uint32_t base);
-void rp2040_io_bank0_funcsel(struct rp2040_io_bank0_softc *sc, int pin,
-    int funcsel);
+#ifdef	RP2040_IO_BANK0_DEBUG
+#define	dprintf(fmt, ...)	printf(fmt, ##__VA_ARGS__)
+#else
+#define	dprintf(fmt, ...)
+#endif
 
-#endif /* !_RP2040_IO_BANK0_H_ */
+#define	RD4(_sc, _reg)		\
+	*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	\
+	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+
+void
+rp2040_io_bank0_funcsel(struct rp2040_io_bank0_softc *sc,
+    int pin, int funcsel)
+{
+	uint32_t reg;
+
+	reg = RD4(sc, RP2040_IO_BANK0_GPIO_CTRL(pin));
+	reg &= ~IO_BANK0_GPIO_CTRL_FUNCSEL_M;
+	reg |= funcsel;
+	WR4(sc, RP2040_IO_BANK0_GPIO_CTRL(pin), reg);
+}
+
+void
+rp2040_io_bank0_init(struct rp2040_io_bank0_softc *sc,
+    uint32_t base)
+{
+
+	sc->base = base;
+}
