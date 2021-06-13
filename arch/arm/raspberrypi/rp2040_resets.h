@@ -56,4 +56,12 @@
 #define	RP2040_RESETS_WDSEL		0x04		/* Watchdog select. */
 #define	RP2040_RESETS_DONE		0x08		/* 1: ready */
 
+struct rp2040_resets_softc {
+	uint32_t base;
+};
+
+void rp2040_resets_init(struct rp2040_resets_softc *sc, uint32_t base);
+int rp2040_resets_reset(struct rp2040_resets_softc *sc,
+    int periph_id, int reset);
+
 #endif /* !_RP2040_RESETS_H_ */
