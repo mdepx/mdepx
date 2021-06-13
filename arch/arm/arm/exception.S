@@ -24,7 +24,11 @@
  * SUCH DAMAGE.
  */
 
+#ifdef MDX_ARM_THUMB_CM0
+	.cpu cortex-m0
+#else
 	.cpu cortex-m4
+#endif
 	.syntax unified
 	.thumb
 
@@ -35,17 +39,44 @@
 exception:
 	mrs	r1, ipsr		/* r1 = exception number. */
 	mrs	r3, primask		/* r3 = primask. */
+#ifndef MDX_ARM_THUMB_CM0
 	stmdb	sp!, {r3-r11, r14}	/* Save primask, r4-r11 and r14. */
+#else
+	sub	sp, sp, 24
+	str	r3, [sp, #0]
+	str	r4, [sp, #4]
+	str	r5, [sp, #8]
+	str	r6, [sp, #12]
+	str	r7, [sp, #16]
+	mov	r7, r14
+	str	r7, [sp, #20]
+#endif
 	cpsid	i			/* Disable interrupts. */
 	mov	r0, sp			/* r0 = trapframe. */
 
 	/* Setup interrupt stack. */
 	ldr	r4, =intr_stack		/* r4 = interrupt stack (bottom) */
+#ifndef MDX_ARM_THUMB_CM0
 	add	r4, r4, MDX_ARM_INTR_STACK_SIZE	/* interrupt stack (top) */
+#else
+	ldr	r5, =MDX_ARM_INTR_STACK_SIZE	/* interrupt stack (top) */
+	add	r4, r4, r5
+#endif
 	msr	msp, r4
 
 	bl	arm_exception		/* Branch link to arm_exception() */
+#ifndef MDX_ARM_THUMB_CM0
 	ldmia	r0!, {r3-r11, r14}	/* Load primask, r4-r11 and r14. */
+#else
+	ldr	r3, [r0, #0]
+	ldr	r4, [r0, #4]
+	ldr	r5, [r0, #8]
+	ldr	r6, [r0, #12]
+	ldr	r7, [r0, #20]
+	mov	lr, r7
+	ldr	r7, [r0, #16]
+	adds	r0, r0, 24
+#endif
 	msr 	msp, r0			/* Restore sp. */
 	msr	primask, r3		/* Restore interrupts. */
 	bx	r14
@@ -59,11 +90,20 @@ __start:
 	/* Clear BSS */
 	ldr	r1, =_sbss
 	ldr	r2, =_ebss
+#ifndef MDX_ARM_THUMB_CM0
 	mov	r3, 0
+#else
+	movs	r3, 0
+#endif
 1:
 	cmp	r1, r2
 	beq	2f
+#ifndef MDX_ARM_THUMB_CM0
 	strb	r3, [r1], #1
+#else
+	strb	r3, [r1]
+	adds	r1, #1
+#endif
 	b	1b
 2:
 
@@ -74,12 +114,24 @@ __start:
 1:
 	cmp	r1, r2
 	beq	2f
+#ifndef MDX_ARM_THUMB_CM0
 	ldrb	r3, [r0], #1
 	strb	r3, [r1], #1
+#else
+	ldrb	r3, [r0]
+	adds	r0, #1
+	strb	r3, [r1]
+	adds	r1, #1
+#endif
 	b	1b
 2:
 
+#ifndef MDX_ARM_THUMB_CM0
 	mov	r0, 0	/* cpuid */
+#else
+	movs	r0, 0	/* cpuid */
+#endif
+
 	bl	md_init
 
 	/* NOT REACHED */

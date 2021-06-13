@@ -17,6 +17,7 @@
  */
 
 
+#ifndef MDX_ARM_THUMB_CM0
 
 	.syntax unified
 	.text
@@ -69,3 +70,5 @@ L_neg_result:
 	sbcs	r4, r1
 	mov	r1, r4
 	pop	{r4, pc}
+
+#endif /* !MDX_ARM_THUMB_CM0 */

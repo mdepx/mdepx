@@ -45,10 +45,12 @@ struct trapframe {
 	register_t	tf_r5;
 	register_t	tf_r6;
 	register_t	tf_r7;
+#ifndef MDX_ARM_THUMB_CM0
 	register_t	tf_r8;
 	register_t	tf_r9;
 	register_t	tf_r10;
 	register_t	tf_r11;
+#endif
 	register_t	tf_r14;
 	struct hwregs	hwregs;
 };

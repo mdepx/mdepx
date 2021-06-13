@@ -42,10 +42,15 @@ static __inline void
 intr_restore(register_t reg)
 {
 
+#ifndef MDX_ARM_THUMB_CM0
 	__asm __volatile("tst %0, #1\n"
 			"bne.n 1f\n"
 			"cpsie i\n"
 			"1:" :: "r" (reg) : "memory");
+#else
+	if ((reg & 1) == 0)
+		__asm __volatile("cpsie i");
+#endif
 }
 
 #endif /* !_MACHINE_CPUFUNC_H_ */

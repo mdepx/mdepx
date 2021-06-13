@@ -68,10 +68,12 @@ dump_frame(struct trapframe *tf)
 	printf("tf->tf_r5 == %x\n", tf->tf_r5);
 	printf("tf->tf_r6 == %x\n", tf->tf_r6);
 	printf("tf->tf_r7 == %x\n", tf->tf_r7);
+#ifndef MDX_ARM_THUMB_CM0
 	printf("tf->tf_r8 == %x\n", tf->tf_r8);
 	printf("tf->tf_r9 == %x\n", tf->tf_r9);
 	printf("tf->tf_r10 == %x\n", tf->tf_r10);
 	printf("tf->tf_r11 == %x\n", tf->tf_r11);
+#endif
 	printf("tf->tf_r14 == %x\n", tf->tf_r14);
 }
 
