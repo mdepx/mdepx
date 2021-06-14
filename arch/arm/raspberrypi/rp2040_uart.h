@@ -30,11 +30,19 @@
 #define	RP2040_UART_UARTDR		0x000
 #define	RP2040_UART_UARTRSR		0x004
 #define	RP2040_UART_UARTFR		0x018
+#define	 UART_UARTFR_TXFF		(1 << 5) /* Transmit FIFO full */
 #define	RP2040_UART_UARTILPR		0x020
 #define	RP2040_UART_UARTIBRD		0x024
 #define	RP2040_UART_UARTFBRD		0x028
 #define	RP2040_UART_UARTLCR_H		0x02c
+#define	 UART_UARTLCR_H_WLEN_S		5
+#define	 UART_UARTLCR_H_WLEN_M		(0x3 << UART_UARTLCR_H_WLEN_S)
+#define	 UART_UARTLCR_H_WLEN_8BIT	(0x3 << UART_UARTLCR_H_WLEN_S)
+#define	 UART_UARTLCR_H_FEN		(1 << 4) /* RX/TX fifos are enabled */
 #define	RP2040_UART_UARTCR		0x030
+#define	 UART_UARTCR_RXE		(1 << 9) /* Receive enable */
+#define	 UART_UARTCR_TXE		(1 << 8) /* Transmit enable */
+#define	 UART_UARTCR_UARTEN		(1 << 0)
 #define	RP2040_UART_UARTIFLS		0x034
 #define	RP2040_UART_UARTIMSC		0x038
 #define	RP2040_UART_UARTRIS		0x03c
@@ -49,5 +57,13 @@
 #define	RP2040_UART_UARTPCELLID1	0xff4
 #define	RP2040_UART_UARTPCELLID2	0xff8
 #define	RP2040_UART_UARTPCELLID3	0xffc
+
+struct rp2040_uart_softc {
+	uint32_t base;
+	uint32_t baudrate;
+};
+
+void rp2040_uart_intr(void *arg, int irq);
+void rp2040_uart_init(mdx_device_t dev, uint32_t base);
 
 #endif /* !_RP2040_UART_H_ */
