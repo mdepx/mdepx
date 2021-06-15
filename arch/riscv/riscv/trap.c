@@ -71,10 +71,10 @@ dump_frame(struct trapframe *tf)
 	for (i = 0; i < 8; i++)
 		printf("tf->tf_a%d %zx\n", i, tf->tf_a[i]);
 
-	printf("tf->tf_mepc %zx\n", tf->tf_mepc);
-	printf("tf->tf_mstatus %zx\n", tf->tf_mstatus);
-	printf("tf->tf_mtval %zx\n", tf->tf_mtval);
-	printf("tf->tf_mcause %zx\n", tf->tf_mcause);
+	printf("tf->tf_epc %zx\n", tf->tf_epc);
+	printf("tf->tf_status %zx\n", tf->tf_status);
+	printf("tf->tf_tval %zx\n", tf->tf_tval);
+	printf("tf->tf_cause %zx\n", tf->tf_cause);
 }
 
 static void
@@ -84,27 +84,28 @@ handle_exception(struct trapframe *tf)
 	struct pcb *pcb;
 #endif
 
-	switch (tf->tf_mcause & EXCP_MASK) {
+	switch (tf->tf_cause & EXCP_MASK) {
 	case EXCP_MACHINE_ECALL:
-		tf->tf_mepc += 4;
+	case EXCP_BREAKPOINT:
+		tf->tf_epc += 4;
 		break;
 	case EXCP_ILLEGAL_INSTRUCTION:
 #ifdef MDX_RISCV_FPE
 		pcb = &curthread->td_pcb;
 		if ((pcb->pcb_flags & PCB_FLAGS_FPE_ENABLED) == 0) {
 			fpe_state_clear();
-			tf->tf_mstatus &= ~MSTATUS_FS_MASK;
-			tf->tf_mstatus |= MSTATUS_FS_CLEAN;
+			tf->tf_status &= ~SSTATUS_FS_MASK;
+			tf->tf_status |= SSTATUS_FS_CLEAN;
 			pcb->pcb_flags |= PCB_FLAGS_FPE_ENABLED;
 			break;
 		}
 #endif
 		printf("%s: illegal instruction at %zx\n",
-		    __func__, tf->tf_mepc);
+		    __func__, tf->tf_epc);
 	default:
 		dump_frame(tf);
 		panic("%s: unhandled exception 0x%zx\n",
-		    __func__, tf->tf_mcause);
+		    __func__, tf->tf_cause);
 	}
 }
 
@@ -159,8 +160,8 @@ riscv_exception(struct trapframe *tf)
 #endif
 
 	/* Process the trapframe first before we release this thread. */
-	if (tf->tf_mcause & EXCP_INTR) {
-		irq = (tf->tf_mcause & EXCP_MASK);
+	if (tf->tf_cause & EXCP_INTR) {
+		irq = (tf->tf_cause & EXCP_MASK);
 		intr = true;
 	} else
 		handle_exception(tf);
