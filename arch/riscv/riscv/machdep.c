@@ -102,7 +102,7 @@ void
 md_thread_yield(void)
 {
 
-#ifdef MDX_SUPERVISOR_MODE
+#ifdef MDX_RISCV_SUPERVISOR_MODE
 	__asm __volatile("ebreak");
 #else
 	__asm __volatile("ecall");
