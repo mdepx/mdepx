@@ -26,14 +26,6 @@ RUN_CMD = qemu-system-riscv64						\
 	-chardev socket,path=/tmp/virtio,server,nowait,id=virtiocon0	\
 	-device virtconsole,chardev=virtiocon0
 
-run:
-	truncate -s 12m ${OBJDIR}/qemu.img
-	${RUN_CMD}
-
-dtb:
-	${RUN_CMD} -machine dumpdtb=dtb.dtb
-	dtc -I dtb -O dts dtb.dtb | less
-
 # Multi-threaded, multi-processor
 all:
 	@${CMD} -j mdepx.conf
@@ -47,6 +39,14 @@ st:
 # Multi-threaded, uni-processor
 up:
 	@${CMD} -j mdepx-up.conf
+
+run:
+	truncate -s 12m ${OBJDIR}/qemu.img
+	${RUN_CMD}
+
+dtb:
+	${RUN_CMD} -machine dumpdtb=dtb.dtb
+	dtc -I dtb -O dts dtb.dtb | less
 
 clean:
 	@rm -rf obj/*
