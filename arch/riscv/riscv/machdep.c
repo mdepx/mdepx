@@ -88,8 +88,12 @@ md_setup_frame(struct trapframe *tf, void *entry,
 {
 
 	bzero(tf, sizeof(struct trapframe));
+#ifdef MDX_RISCV_SUPERVISOR_MODE
+	tf->tf_status = SSTATUS_SPIE | (SSTATUS_SPP);
+#else
 	tf->tf_mstatus = MSTATUS_MPIE | (MSTATUS_MPP_MASK << MSTATUS_MPP_SHIFT);
-	tf->tf_mepc = (register_t)entry;
+#endif
+	tf->tf_epc = (register_t)entry;
 	tf->tf_a[0] = (register_t)arg;
 	tf->tf_ra = (register_t)terminate;
 }
@@ -98,7 +102,11 @@ void
 md_thread_yield(void)
 {
 
+#ifdef MDX_SUPERVISOR_MODE
+	__asm __volatile("ebreak");
+#else
 	__asm __volatile("ecall");
+#endif
 }
 
 void
@@ -122,7 +130,11 @@ md_init_secondary(int hart)
 	    MDX_RISCV_INTR_STACK_SIZE;
 	list_init(&pcpup->pc_avail);
 	__asm __volatile("mv gp, %0" :: "r"(pcpup));
+#ifdef MDX_RISCV_SUPERVISOR_MODE
+	csr_write(sscratch, pcpup->pc_stack);
+#else
 	csr_write(mscratch, pcpup->pc_stack);
+#endif
 
 	csr_set(mie, MIE_MSIE);
 
@@ -157,7 +169,11 @@ md_init(int hart)
 	    MDX_RISCV_INTR_STACK_SIZE;
 	list_init(&pcpup->pc_avail);
 	__asm __volatile("mv gp, %0" :: "r"(pcpup));
+#ifdef MDX_RISCV_SUPERVISOR_MODE
+	csr_write(sscratch, pcpup->pc_stack);
+#else
 	csr_write(mscratch, pcpup->pc_stack);
+#endif
 #endif
 
 #ifdef MDX_THREAD
@@ -171,8 +187,14 @@ md_init(int hart)
 #endif
 #endif
 
-	/* Enable supervisor interrupts. */
+	/* Enable supervisor software interrupts. */
+#ifdef MDX_SCHED_SMP
+#ifdef MDX_RISCV_SUPERVISOR_MODE
+	csr_set(sie, SIE_SSIE);
+#else
 	csr_set(mie, MIE_MSIE);
+#endif
+#endif
 
 	/* Initialize the board (register timer and/or malloc if required). */
 	board_init();
