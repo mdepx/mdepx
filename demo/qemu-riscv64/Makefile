@@ -37,6 +37,8 @@ dtb:
 # Multi-threaded, multi-processor
 all:
 	@${CMD} -j mdepx.conf
+	${CROSS_COMPILE}objcopy -O binary ${OBJDIR}/${APP}.elf	\
+		${OBJDIR}/${APP}.bin
 
 # Single-threaded, uni-processor
 st:
