@@ -65,21 +65,21 @@
 	REG_S	a6, (29 * REG_SIZE)(sp)
 	REG_S	a7, (30 * REG_SIZE)(sp)
 
-	csrr	t0, mepc
+	csrr	t0, REG_EPC
 	REG_S	t0, (31 * REG_SIZE)(sp)
-	csrr	t0, mstatus
+	csrr	t0, REG_STATUS
 	REG_S	t0, (32 * REG_SIZE)(sp)
-	csrr	t0, mbadaddr
+	csrr	t0, REG_BADADDR
 	REG_S	t0, (33 * REG_SIZE)(sp)
-	csrr	t0, mcause
+	csrr	t0, REG_CAUSE
 	REG_S	t0, (34 * REG_SIZE)(sp)
 .endm
 
 .macro load_registers el
 	REG_L	t0, (31 * REG_SIZE)(sp)
-	csrw	mepc, t0
+	csrw	REG_EPC, t0
 	REG_L	t0, (32 * REG_SIZE)(sp)
-	csrw	mstatus, t0
+	csrw	REG_STATUS, t0
 
 	REG_L	ra, (0 * REG_SIZE)(sp)
 	REG_L	tp, (3 * REG_SIZE)(sp)
@@ -126,11 +126,11 @@
 ASM_ENTRY(cpu_exception_handler)
 	save_registers 1
 	mv	a0, sp
-	csrr	sp, mscratch
+	csrr	sp, REG_SCRATCH
 	jal	riscv_exception
 	mv	sp, a0
 	load_registers 1
-	mret
+	RET
 END(cpu_exception_handler)
 
 #ifdef MDX_RISCV_FPE
@@ -141,7 +141,7 @@ END(cpu_exception_handler)
 ASM_ENTRY(fpe_state_clear)
 	/* Enable FPE */
 	li	t0, MSTATUS_FS_INITIAL
-	csrs	mstatus, t0
+	csrs	REG_STATUS, t0
 
 	fscsr	zero
 	fcvt.d.l f0, zero
@@ -179,7 +179,7 @@ ASM_ENTRY(fpe_state_clear)
 
 	/* Disable FPE */
 	li	t0, MSTATUS_FS_MASK
-	csrc	mstatus, t0
+	csrc	REG_STATUS, t0
 	ret
 END(fpe_state_clear)
 
@@ -232,7 +232,7 @@ END(fpe_state_save)
 ASM_ENTRY(fpe_state_restore)
 	/* Enable FPE */
 	li	t0, MSTATUS_FS_INITIAL
-	csrs	mstatus, t0
+	csrs	REG_STATUS, t0
 
 	ld	t0, (32 * 16)(a0)
 	fscsr	t0
@@ -271,7 +271,7 @@ ASM_ENTRY(fpe_state_restore)
 
 	/* Disable FPE */
 	li	t0, MSTATUS_FS_MASK
-	csrc	mstatus, t0
+	csrc	REG_STATUS, t0
 	ret
 END(fpe_state_restore)
 #endif /* !MDX_RISCV_FPE */
