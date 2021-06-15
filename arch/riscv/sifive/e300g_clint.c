@@ -33,6 +33,7 @@
 
 #include <machine/atomic.h>
 #include <machine/cpuregs.h>
+#include <machine/sbi.h>
 
 #include <riscv/sifive/e300g_clint.h>
 
@@ -113,7 +114,11 @@ clint_intr(void)
 
 	sc = clint_sc;
 
+#ifndef MDX_RISCV_SUPERVISOR_MODE
 	csr_clear(mie, MIE_MTIE);
+#else
+	csr_clear(sie, SIE_STIE);
+#endif
 
 	mdx_callout_callback(&sc->mt);
 }
@@ -122,8 +127,24 @@ static void
 clint_stop(void *arg)
 {
 
+#ifndef MDX_RISCV_SUPERVISOR_MODE
 	csr_clear(mie, MIE_MTIE);
 	csr_clear(mip, MIP_MTIP);
+#else
+	csr_clear(sie, SIE_STIE);
+	csr_clear(sip, SIP_STIP);
+#endif
+}
+
+static void
+clint_set_timer(struct clint_softc *sc, int cpuid, uint64_t new)
+{
+
+#ifndef MDX_RISCV_SUPERVISOR_MODE
+	WR8(sc, MTIMECMP(cpuid), new);
+#else
+	sbi_set_timer(new);
+#endif
 }
 
 static void
@@ -145,7 +166,7 @@ clint_start(void *arg, uint32_t ticks)
 
 	val = RD8(sc, MTIME);
 	new = val + ticks;
-	WR8(sc, MTIMECMP(cpuid), new);
+	clint_set_timer(sc, cpuid, new);
 #else
 	uint32_t low, high;
 	uint32_t new;
@@ -161,7 +182,12 @@ clint_start(void *arg, uint32_t ticks)
 	WR4(sc, MTIMECMP(cpuid), new);
 #endif
 
+#ifndef MDX_RISCV_SUPERVISOR_MODE
 	csr_set(mie, MIE_MTIE);
+#else
+	csr_set(sie, SIE_STIE);
+#endif
+
 }
 
 static uint32_t
@@ -260,8 +286,7 @@ e300g_clint_init(struct clint_softc *sc, uint32_t base,
 
 	mdx_callout_register(&sc->mt);
 
-	csr_clear(mie, MIE_MTIE);
-	csr_clear(mip, MIP_MTIP);
+	clint_stop(sc);
 
 	return (0);
 }
