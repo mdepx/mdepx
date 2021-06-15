@@ -41,7 +41,7 @@ mdx_uptime_init(void)
 
 	bzero(&uptime_timer, sizeof(struct mdx_timer));
 	mdx_callout_init(&uptime_timer.c);
-	mdx_timer_start(&uptime_timer, MDX_TICK_PERIOD_US);
+	mdx_timer_start(&uptime_timer, MDX_TIMER_UPTIME_PERIOD_US);
 
 	return (0);
 }
