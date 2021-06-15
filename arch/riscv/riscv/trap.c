@@ -233,8 +233,8 @@ riscv_exception(struct trapframe *tf)
 
 	curthread->td_critnest++;
 
-	if (tf->tf_mcause & EXCP_INTR) {
-		irq = (tf->tf_mcause & EXCP_MASK);
+	if (tf->tf_cause & EXCP_INTR) {
+		irq = (tf->tf_cause & EXCP_MASK);
 		intr = true;
 	} else
 		handle_exception(tf);
