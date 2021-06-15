@@ -91,7 +91,7 @@ md_setup_frame(struct trapframe *tf, void *entry,
 #ifdef MDX_RISCV_SUPERVISOR_MODE
 	tf->tf_status = SSTATUS_SPIE | (SSTATUS_SPP);
 #else
-	tf->tf_mstatus = MSTATUS_MPIE | (MSTATUS_MPP_MASK << MSTATUS_MPP_SHIFT);
+	tf->tf_status = MSTATUS_MPIE | (MSTATUS_MPP_MASK << MSTATUS_MPP_SHIFT);
 #endif
 	tf->tf_epc = (register_t)entry;
 	tf->tf_a[0] = (register_t)arg;
