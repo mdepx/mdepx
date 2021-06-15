@@ -25,8 +25,7 @@ Mdepx (Machdep Extended) is an operating system for embedded applications.
   * QEMU/RISC-V rv64gc (SMP)
 
 ## Limitations
-  * Machine-mode supported only
-  * Generic exception handlers are not re-entrant
+  * Generic exception handlers are not re-entrant (have your own vectors for nested traps if needed)
 
 ## Featured applications (external)
   * [LTE 4G Link with nRF9160](https://github.com/machdep/nrf9160)
