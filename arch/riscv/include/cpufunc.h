@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2019-2021 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,43 @@
 #define	_MACHINE_CPUFUNC_H_
 
 #include <machine/cpuregs.h>
+
+#ifdef MDX_RISCV_SUPERVISOR_MODE
+
+static __inline register_t
+intr_disable(void)
+{
+	register_t reg;
+
+	__asm __volatile(
+		"csrrci %0, sstatus, %1"
+		: "=&r" (reg) : "i" (SSTATUS_SIE)
+	);
+
+	return (reg & (SSTATUS_SIE));
+}
+
+static __inline void
+intr_restore(register_t reg)
+{
+
+	__asm __volatile(
+		"csrs sstatus, %0"
+		:: "r" (reg)
+	);
+}
+
+static __inline void
+intr_enable(void)
+{
+
+	__asm __volatile(
+		"csrsi sstatus, %0"
+		:: "i" (SSTATUS_SIE)
+	);
+}
+
+#else /* !MDX_RISCV_SUPERVISOR_MODE */
 
 static __inline register_t
 intr_disable(void)
@@ -61,5 +98,7 @@ intr_enable(void)
 		:: "i" (MSTATUS_MIE)
 	);
 }
+
+#endif
 
 #endif /* !_MACHINE_CPUFUNC_H_ */

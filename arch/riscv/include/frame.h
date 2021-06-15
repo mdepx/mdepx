@@ -40,10 +40,17 @@ struct trapframe {
 	register_t tf_t[7];
 	register_t tf_s[12];
 	register_t tf_a[8];
+#ifdef MDX_RISCV_SUPERVISOR_MODE
+	register_t tf_sepc;
+	register_t tf_sstatus;
+	register_t tf_stval;
+	register_t tf_scause;
+#else
 	register_t tf_mepc;
 	register_t tf_mstatus;
 	register_t tf_mtval;
 	register_t tf_mcause;
+#endif
 };
 #endif
 
