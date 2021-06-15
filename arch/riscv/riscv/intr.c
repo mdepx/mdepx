@@ -58,6 +58,7 @@ riscv_intr(int irq)
 #endif
 
 	switch (irq) {
+	case IRQ_TIMER_SUPERVISOR:
 	case IRQ_TIMER_MACHINE:
 		clint_intr();
 		break;
