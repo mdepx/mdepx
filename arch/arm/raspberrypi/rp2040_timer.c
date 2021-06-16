@@ -27,6 +27,7 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 #include <sys/callout.h>
+#include <sys/thread.h>
 
 #include <arm/raspberrypi/rp2040_timer.h>
 
@@ -72,6 +73,13 @@ rp2040_timer_start(void *arg, uint32_t ticks)
 	sc = arg;
 
 	dprintf("%s: %d\n", __func__, ticks);
+
+	KASSERT(curthread->td_critnest > 0,
+	    ("%s: Not in critical section.", __func__));
+
+	/* At least 2 ticks needed to avoid the race (based on experiments). */
+	if (ticks < 10)
+		ticks = 10;
 
 	val = RD4(sc, RP2040_TIMER_TIMERAWL);
 	val += ticks;
