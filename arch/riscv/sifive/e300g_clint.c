@@ -114,11 +114,7 @@ clint_intr(void)
 
 	sc = clint_sc;
 
-#ifndef MDX_RISCV_SUPERVISOR_MODE
-	csr_clear(mie, MIE_MTIE);
-#else
-	csr_clear(sie, SIE_STIE);
-#endif
+	csr_clear_tie();
 
 	mdx_callout_callback(&sc->mt);
 }
@@ -127,13 +123,8 @@ static void
 clint_stop(void *arg)
 {
 
-#ifndef MDX_RISCV_SUPERVISOR_MODE
-	csr_clear(mie, MIE_MTIE);
-	csr_clear(mip, MIP_MTIP);
-#else
-	csr_clear(sie, SIE_STIE);
-	csr_clear(sip, SIP_STIP);
-#endif
+	csr_clear_tie();
+	csr_clear_tip();
 }
 
 static void
@@ -182,12 +173,7 @@ clint_start(void *arg, uint32_t ticks)
 	WR4(sc, MTIMECMP(cpuid), new);
 #endif
 
-#ifndef MDX_RISCV_SUPERVISOR_MODE
-	csr_set(mie, MIE_MTIE);
-#else
-	csr_set(sie, SIE_STIE);
-#endif
-
+	csr_set_tie();
 }
 
 static uint32_t

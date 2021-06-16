@@ -33,6 +33,7 @@
 #define _SYS_RISCV_SIFIVE_E300G_CLINT_H_
 
 #include <sys/callout.h>
+#include <machine/cpuregs.h>
 
 /* MSIP Registers (16 KiB) */
 #define	MSIP(hart)	(0x4 * (hart))
@@ -53,5 +54,38 @@ void clint_udelay(struct clint_softc *sc, uint32_t usec, uint32_t osc_freq);
 void clint_intr(void);
 void clint_set_sip(int hart_id);
 void clint_intr_software(void);
+
+static inline void
+csr_clear_tie(void)
+{
+
+#ifdef MDX_RISCV_SUPERVISOR_MODE
+	csr_clear(sie, SIE_STIE);
+#else
+	csr_clear(mie, MIE_MTIE);
+#endif
+}
+
+static inline void
+csr_clear_tip(void)
+{
+
+#ifdef MDX_RISCV_SUPERVISOR_MODE
+	csr_clear(sip, SIP_STIP);
+#else
+	csr_clear(mip, MIP_MTIP);
+#endif
+}
+
+static inline void
+csr_set_tie(void)
+{
+
+#ifdef MDX_RISCV_SUPERVISOR_MODE
+	csr_set(sie, SIE_STIE);
+#else
+	csr_set(mie, MIE_MTIE);
+#endif
+}
 
 #endif /* !_SYS_RISCV_SIFIVE_E300G_CLINT_H_ */
