@@ -73,6 +73,9 @@ void
 board_init(void)
 {
 
+	malloc_init();
+	malloc_add_region((void *)0x20020000, 0x20000);
+
 	rp2040_xosc_init(&xosc_sc, RP2040_XOSC_BASE);
 	rp2040_clocks_init(&clocks_sc, RP2040_CLOCKS_BASE);
 
