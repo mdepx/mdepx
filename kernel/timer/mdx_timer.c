@@ -67,7 +67,7 @@ mdx_timer_start(struct mdx_timer *timer, int period_us)
 {
 	int res;
 
-	res = atomic_cmpset_32(&timer->started, 0, 1);
+	res = atomic_cmpset_int(&timer->started, 0, 1);
 	if (!res)
 		return (MDX_ERROR);
 
