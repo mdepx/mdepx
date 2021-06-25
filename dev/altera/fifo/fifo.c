@@ -30,12 +30,15 @@
 #include <sys/uio.h>
 #include <sys/io.h>
 #include <sys/cheri.h>
+#include <sys/cheric.h>
 
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
 #include <machine/frame.h>
+#ifdef __mips__
 #include <machine/cache_mipsNN.h>
 #include <machine/cache_r4k.h>
+#endif
 
 #include "fifo.h"
 
@@ -48,12 +51,16 @@
 #define	dprintf(fmt, ...)
 #endif
 
+#ifdef __mips__
 #define	CACHE_FIFO_MEM_INV(_sc, _reg)			\
 ({							\
 	vm_offset_t _offs;				\
 	_offs = cheri_getaddress((_sc)->fifo_base_mem);	\
 	mipsNN_pdcache_inv_range_128(_offs + _reg, 4);	\
 })
+#else
+#define	CACHE_FIFO_MEM_INV(_sc, _reg)
+#endif
 
 #define	WR4_FIFO_MEMC(sc, _reg, _val)	\
 	mdx_iowrite_uint32((sc)->fifo_base_ctrl, _reg, _val)
@@ -114,7 +121,7 @@ altera_fifo_intr(void *arg)
 	struct altera_fifo_softc *sc;
 	uint32_t reg0;
 	uint32_t reg;
-	uint32_t err;
+	uint32_t err __unused;
 
 	sc = arg;
 
@@ -143,7 +150,7 @@ int
 fifo_process_tx(struct altera_fifo_softc *sc,
     struct iovec *iov, int iovcnt)
 {
-	uint32_t fill_level;
+	uint32_t fill_level __unused;
 	uint8_t *read_lo;
 	uint64_t read_buf;
 	uint32_t missing;
@@ -262,7 +269,7 @@ fifo_process_rx(struct altera_fifo_softc *sc,
 	uint32_t meta;
 	int error;
 	int sop_rcvd;
-	int eop_rcvd;
+	int eop_rcvd __unused;
 	int empty;
 	int got_bits;
 	int data_bits;
