@@ -30,6 +30,7 @@
 #include <arm/raspberrypi/rp2040_clocks.h>
 #include <arm/raspberrypi/rp2040_io_bank0.h>
 #include <arm/raspberrypi/rp2040_pads_bank0.h>
+#include <arm/raspberrypi/rp2040_psm.h>
 #include <arm/raspberrypi/rp2040_resets.h>
 #include <arm/raspberrypi/rp2040_sio.h>
 #include <arm/raspberrypi/rp2040_timer.h>
@@ -92,5 +93,32 @@
 #define	RP2040_XIP_AUX_BASE		0x50400000
 #define	RP2040_SIO_BASE			0xd0000000
 #define	RP2040_PPB_BASE			0xe0000000
+
+#define	RP2040_TIMER_IRQ_0	0
+#define	RP2040_TIMER_IRQ_1	1
+#define	RP2040_TIMER_IRQ_2	2
+#define	RP2040_TIMER_IRQ_3	3
+#define	RP2040_PWM_IRQ_WRAP	4
+#define	RP2040_USBCTRL_IRQ	5
+#define	RP2040_XIP_IRQ		6
+#define	RP2040_PIO0_IRQ_0	7
+#define	RP2040_PIO0_IRQ_1	8
+#define	RP2040_PIO1_IRQ_0	9
+#define	RP2040_PIO1_IRQ_1	10
+#define	RP2040_DMA_IRQ_0	11
+#define	RP2040_DMA_IRQ_1	12
+#define	RP2040_IO_IRQ_BANK0	13
+#define	RP2040_IO_IRQ_QSPI	14
+#define	RP2040_SIO_IRQ_PROC0	15
+#define	RP2040_SIO_IRQ_PROC1	16
+#define	RP2040_CLOCKS_IRQ	17
+#define	RP2040_SPI0_IRQ		18
+#define	RP2040_SPI1_IRQ		19
+#define	RP2040_UART0_IRQ	20
+#define	RP2040_UART1_IRQ	21
+#define	RP2040_ADC_IRQ_FIFO	22
+#define	RP2040_I2C0_IRQ		23
+#define	RP2040_I2C1_IRQ		24
+#define	RP2040_RTC_IRQ		25
 
 #endif /* !_ARM_RASPBERRYPI_RP2040_H_ */
