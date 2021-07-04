@@ -44,18 +44,149 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
+static inline bool
+has_glitchless_mux(int clk_index)
+{
+
+	return (clk_index == RP2040_CLOCKS_NDX_SYS ||
+	    clk_index == RP2040_CLOCKS_NDX_REF);
+}
+
+static int
+rp2040_clocks_configure(struct rp2040_clocks_softc *sc,
+    int clk_index, uint32_t src, uint32_t auxsrc, uint32_t src_freq,
+    uint32_t freq)
+{
+	int delay_cycles;
+	uint32_t reg;
+	uint32_t div;
+	int i;
+
+	div = (uint32_t)(((uint64_t)src_freq << 8) / freq);
+	if (div > RD4(sc, RP2040_CLOCKS_CLK_NDX_DIV(clk_index)))
+		WR4(sc, RP2040_CLOCKS_CLK_NDX_DIV(clk_index), div);
+
+	if (has_glitchless_mux(clk_index) &&
+	    src == CLOCKS_CLK_SYS_CTRL_SRC_CLKSRC_CLK_SYS_AUX) {
+		reg = RD4(sc, RP2040_CLOCKS_CLK_NDX_CTRL(clk_index));
+		reg &= ~CLOCKS_CLK_SYS_CTRL_SRC_M;
+		WR4(sc, RP2040_CLOCKS_CLK_NDX_CTRL(clk_index), reg);
+
+		while (RD4(sc, RP2040_CLOCKS_CLK_NDX_SELECTED(clk_index)) !=
+		    1) ;
+	} else {
+		reg = RD4(sc, RP2040_CLOCKS_CLK_NDX_CTRL(clk_index));
+		reg &= ~CLOCKS_CLK_GPOUT0_CTRL_ENABLE;
+		WR4(sc, RP2040_CLOCKS_CLK_NDX_CTRL(clk_index), reg);
+
+		if (sc->clock_freq[clk_index] > 0) {
+			delay_cycles = sc->clock_freq[RP2040_CLOCKS_NDX_SYS] /
+			    sc->clock_freq[clk_index] + 1;
+			for (i = 0; i < delay_cycles; i++)
+				__asm __volatile ("nop");
+		}
+	}
+
+	reg = RD4(sc, RP2040_CLOCKS_CLK_NDX_CTRL(clk_index));
+	reg &= ~CLOCKS_CLK_SYS_CTRL_AUXSRC_M;
+	reg |= auxsrc;
+	WR4(sc, RP2040_CLOCKS_CLK_NDX_CTRL(clk_index), reg);
+
+	if (has_glitchless_mux(clk_index)) {
+		reg = RD4(sc, RP2040_CLOCKS_CLK_NDX_CTRL(clk_index));
+		reg &= ~CLOCKS_CLK_SYS_CTRL_SRC_M;
+		reg |= src;
+		WR4(sc, RP2040_CLOCKS_CLK_NDX_CTRL(clk_index), reg);
+		while (RD4(sc, RP2040_CLOCKS_CLK_NDX_SELECTED(clk_index)) !=
+		    (1 << src)) ;
+	}
+
+	reg = RD4(sc, RP2040_CLOCKS_CLK_NDX_CTRL(clk_index));
+	reg |= CLOCKS_CLK_GPOUT0_CTRL_ENABLE;
+	WR4(sc, RP2040_CLOCKS_CLK_NDX_CTRL(clk_index), reg);
+
+	WR4(sc, RP2040_CLOCKS_CLK_NDX_DIV(clk_index), div);
+	sc->clock_freq[clk_index] = freq;
+
+	return (0);
+}
+
 void
 rp2040_clocks_init(struct rp2040_clocks_softc *sc,
     uint32_t base)
 {
+	uint32_t reg;
 
 	sc->base = base;
 
 	WR4(sc, RP2040_CLOCKS_CLK_SYS_RESUS_CTRL, 0);
-	WR4(sc, RP2040_CLOCKS_CLK_REF_CTRL,
-	    CLOCKS_CLK_REF_CTRL_SRC_XOSC_CLKSRC);
-	WR4(sc, RP2040_CLOCKS_CLK_SYS_CTRL, 0);
 
-	WR4(sc,	RP2040_CLOCKS_CLK_PERI_CTRL,
-	    CLOCKS_CLK_PERI_CTRL_ENABLE | CLOCKS_CLK_PERI_CTRL_XOSC_CLKSRC);
+	reg = RD4(sc, RP2040_CLOCKS_CLK_SYS_CTRL);
+	reg &= ~CLOCKS_CLK_SYS_CTRL_SRC_M;
+	WR4(sc, RP2040_CLOCKS_CLK_SYS_CTRL, reg);
+	while (RD4(sc, RP2040_CLOCKS_CLK_SYS_SELECTED) != 1)
+		;
+
+	reg = RD4(sc, RP2040_CLOCKS_CLK_REF_CTRL);
+	reg &= ~CLOCKS_CLK_REF_CTRL_SRC_M;
+	WR4(sc, RP2040_CLOCKS_CLK_REF_CTRL, reg);
+	while (RD4(sc, RP2040_CLOCKS_CLK_REF_SELECTED) != 1)
+		;
+}
+
+void
+rp2040_clocks_setup(struct rp2040_clocks_softc *sc)
+{
+
+	/* CLK_REF <= XOSC (12MHz) */
+	rp2040_clocks_configure(sc, RP2040_CLOCKS_NDX_REF,
+				CLOCKS_CLK_REF_CTRL_SRC_XOSC_CLKSRC,
+				0,
+				12000000,
+				12000000);
+
+#if 0
+	/* TODO: picoprobe could not reset pico with this. */
+	/* CLK_SYS <= PLL SYS (125MHz) */
+	rp2040_clocks_configure(sc, RP2040_CLOCKS_NDX_SYS,
+				CLOCKS_CLK_SYS_CTRL_SRC_CLKSRC_CLK_SYS_AUX,
+				CLOCKS_CLK_SYS_CTRL_AUXSRC_CLKSRC_PLL_SYS,
+				12000000,
+				12000000);
+#else
+	/* CLK_SYS <= CLK_REF (12MHz) */
+	rp2040_clocks_configure(sc, RP2040_CLOCKS_NDX_SYS,
+				0,
+				0,
+				12000000,
+				12000000);
+#endif
+
+	/* CLK USB <= PLL USB (48MHz) */
+	rp2040_clocks_configure(sc, RP2040_CLOCKS_NDX_USB,
+				0,
+				CLOCKS_CLK_USB_CTRL_AUXSRC_CLKSRC_PLL_USB,
+				48000000,
+				48000000);
+
+	/* CLK ADC <= PLL USB (48MHz) */
+	rp2040_clocks_configure(sc, RP2040_CLOCKS_NDX_ADC,
+				0,
+				CLOCKS_CLK_ADC_CTRL_AUXSRC_CLKSRC_PLL_USB,
+				48000000,
+				48000000);
+
+	/* CLK RTC <= PLL USB (48MHz) */
+	rp2040_clocks_configure(sc, RP2040_CLOCKS_NDX_RTC,
+				0,
+				CLOCKS_CLK_RTC_CTRL_AUXSRC_CLKSRC_PLL_USB,
+				48000000,
+				46875);
+
+	/* CLK PERI <= CLK_SYS (125MHz) */
+	rp2040_clocks_configure(sc, RP2040_CLOCKS_NDX_PERI,
+				0,
+				CLOCKS_CLK_PERI_CTRL_AUXSRC_CLK_SYS,
+				12000000,
+				12000000);
 }
