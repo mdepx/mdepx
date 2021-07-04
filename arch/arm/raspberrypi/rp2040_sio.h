@@ -47,6 +47,8 @@
 #define	RP2040_SIO_GPIO_HI_OE_CLR	0x48
 #define	RP2040_SIO_GPIO_HI_OE_XOR	0x4c
 #define	RP2040_SIO_FIFO_ST		0x50
+#define	 SIO_FIFO_ST_VLD		(1 << 0)
+#define	 SIO_FIFO_ST_RDY		(1 << 1)
 #define	RP2040_SIO_FIFO_WR		0x54
 #define	RP2040_SIO_FIFO_RD		0x58
 #define	RP2040_SIO_SPINLOCK_ST		0x5c
@@ -90,5 +92,13 @@
 #define	RP2040_SIO_INTERP1_ACCUM1_ADD	0xf8
 #define	RP2040_SIO_INTERP1_BASE_1AND0	0xfc
 #define	RP2040_SIO_SPINLOCK(n)		(0x100 + 0x4 * (n))
+
+struct rp2040_sio_softc {
+	uint32_t base;
+};
+
+void rp2040_sio_init(struct rp2040_sio_softc *sc, uint32_t base);
+void rp2040_sio_fifo_drain(struct rp2040_sio_softc *sc);
+int rp2040_sio_fifo_comm(struct rp2040_sio_softc *sc, uint32_t msg);
 
 #endif /* !_RP2040_SIO_H_ */
