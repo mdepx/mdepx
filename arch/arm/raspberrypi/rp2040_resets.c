@@ -65,8 +65,11 @@ rp2040_resets_reset(struct rp2040_resets_softc *sc,
 			break;
 	} while (timeout--);
 
-	if (timeout <= 0)
+	if (timeout <= 0) {
+		printf("%s: could not reset periph %d\n",
+		    __func__, periph_bit);
 		return (MDX_ERROR);
+	}
 
 	return (0);
 }
