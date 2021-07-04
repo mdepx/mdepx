@@ -183,7 +183,7 @@ rp2040_clocks_setup(struct rp2040_clocks_softc *sc)
 				48000000,
 				46875);
 
-	/* CLK PERI <= CLK_SYS (125MHz) */
+	/* CLK PERI <= CLK_SYS (12MHz) */
 	rp2040_clocks_configure(sc, RP2040_CLOCKS_NDX_PERI,
 				0,
 				CLOCKS_CLK_PERI_CTRL_AUXSRC_CLK_SYS,
