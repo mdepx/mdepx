@@ -55,7 +55,7 @@ rp2040_psm_reset_core1(struct rp2040_psm_softc *sc)
 	while (!(RD4(sc, RP2040_PSM_FRCE_OFF) & FRCE_PROC1))
 		;
 
-	reg &= FRCE_PROC1;
+	reg &= ~FRCE_PROC1;
 	WR4(sc, RP2040_PSM_FRCE_OFF, reg);
 }
 
