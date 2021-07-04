@@ -1,0 +1,355 @@
+diff --git a/arch/arm/arm/machdep.c b/arch/arm/arm/machdep.c
+index df57e503..8b4d09aa 100644
+--- a/arch/arm/arm/machdep.c
++++ b/arch/arm/arm/machdep.c
+@@ -33,6 +33,8 @@
+ #include <machine/cpuregs.h>
+ #include <machine/cpufunc.h>
+ 
++int sl_cnt = 0;
++
+ void
+ critical_enter(void)
+ {
+@@ -115,6 +117,7 @@ md_thread_terminate(struct thread *td)
+ void
+ md_init(int cpuid)
+ {
++	cpuid = 0;
+ #ifdef MDX_CPU
+ 	struct pcpu *pcpup;
+ 
+@@ -138,6 +141,7 @@ md_init(int cpuid)
+ 	mdx_sched_cpu_add(pcpup);
+ #endif
+ 
++	printf("call to main\n");
+ #ifdef MDX_THREAD
+ 	mdx_thread_main();
+ #endif
+diff --git a/arch/arm/arm/trap.c b/arch/arm/arm/trap.c
+index cf141850..e025adcb 100644
+--- a/arch/arm/arm/trap.c
++++ b/arch/arm/arm/trap.c
+@@ -42,10 +42,6 @@ struct trapframe *arm_exception(struct trapframe *tf, int irq);
+ static struct thread intr_thread[MDX_CPU_MAX];
+ #endif
+ 
+-#ifdef MDX_SCHED_SMP
+-#error Add support
+-#endif
+-
+ uint8_t intr_stack[MDX_CPU_MAX][MDX_ARM_INTR_STACK_SIZE];
+ 
+ void save_fpu_context(struct vfp_state *vfp);
+@@ -171,6 +167,12 @@ arm_exception(struct trapframe *tf, int exc_code)
+ 	released = false;
+ 	intr = false;
+ 
++#ifdef MDX_SCHED_SMP
++	/* This CPU could not pick up new threads for a moment. */
++	if (td->td_idle)
++		mdx_sched_cpu_avail(curpcpu, false);
++#endif
++
+ 	/*
+ 	 * Save the frame address.
+ 	 * TODO: compare thread's stack base and tf.
+diff --git a/arch/arm/include/atomic.h b/arch/arm/include/atomic.h
+index 520465a9..70397d97 100644
+--- a/arch/arm/include/atomic.h
++++ b/arch/arm/include/atomic.h
+@@ -825,6 +825,7 @@ atomic_thread_fence_seq_cst(void)
+ 	dmb();
+ }
+ 
++#if 0
+ #define atomic_clear_ptr		atomic_clear_32
+ #define atomic_clear_acq_ptr		atomic_clear_acq_32
+ #define atomic_clear_rel_ptr		atomic_clear_rel_32
+@@ -865,5 +866,6 @@ atomic_thread_fence_seq_cst(void)
+ #define atomic_load_acq_int		atomic_load_acq_32
+ #define atomic_store_rel_int		atomic_store_rel_32
+ #define atomic_swap_int			atomic_swap_32
++#endif
+ 
+ #endif /* _MACHINE_ATOMIC_H_ */
+diff --git a/arch/arm/include/pcpu.h b/arch/arm/include/pcpu.h
+index 2a8eb2c1..c89445e1 100644
+--- a/arch/arm/include/pcpu.h
++++ b/arch/arm/include/pcpu.h
+@@ -27,16 +27,15 @@
+ #ifndef	_MACHINE_PCPU_H_
+ #define	_MACHINE_PCPU_H_
+ 
+-#ifdef MDX_SCHED_SMP
+-#error SMP is not supported on arm
+-#endif
+-
+ static inline struct pcpu *
+ get_pcpu(void)
+ {
+ 	struct pcpu *p;
++	int cpuid;
++
++	cpuid = *(volatile uint32_t *)0xd0000000;
+ 
+-	p = __pcpu;
++	p = &__pcpu[cpuid];
+ 
+ 	return (p);
+ }
+@@ -45,9 +44,12 @@ static inline struct thread *
+ get_curthread(void)
+ {
+ 	struct thread *td;
++	struct pcpu *pcpu;
++
++	pcpu = get_pcpu();
+ 
+ 	/* pc_curthread is the first member of struct pcpu. */
+-	td = (struct thread *)*(uintptr_t *)__pcpu;
++	td = (struct thread *)*(uintptr_t *)pcpu;
+ 
+ 	return (td);
+ }
+diff --git a/arch/arm/module.conf b/arch/arm/module.conf
+index 258e3a2d..5de557c0 100644
+--- a/arch/arm/module.conf
++++ b/arch/arm/module.conf
+@@ -35,7 +35,9 @@ stm32f4 {
+ rp2040 {
+ 	objects raspberrypi/rp2040_clocks.o
+ 		raspberrypi/rp2040_io_bank0.o
++		raspberrypi/rp2040_psm.o
+ 		raspberrypi/rp2040_resets.o
++		raspberrypi/rp2040_sio.o
+ 		raspberrypi/rp2040_timer.o
+ 		raspberrypi/rp2040_uart.o
+ 		raspberrypi/rp2040_xosc.o;
+diff --git a/arch/arm/raspberrypi/rp2040_sio.h b/arch/arm/raspberrypi/rp2040_sio.h
+index 87db764d..7014c679 100644
+--- a/arch/arm/raspberrypi/rp2040_sio.h
++++ b/arch/arm/raspberrypi/rp2040_sio.h
+@@ -47,6 +47,8 @@
+ #define	RP2040_SIO_GPIO_HI_OE_CLR	0x48
+ #define	RP2040_SIO_GPIO_HI_OE_XOR	0x4c
+ #define	RP2040_SIO_FIFO_ST		0x50
++#define	 SIO_FIFO_ST_VLD		(1 << 0)
++#define	 SIO_FIFO_ST_RDY		(1 << 1)
+ #define	RP2040_SIO_FIFO_WR		0x54
+ #define	RP2040_SIO_FIFO_RD		0x58
+ #define	RP2040_SIO_SPINLOCK_ST		0x5c
+@@ -91,4 +93,12 @@
+ #define	RP2040_SIO_INTERP1_BASE_1AND0	0xfc
+ #define	RP2040_SIO_SPINLOCK(n)		(0x100 + 0x4 * (n))
+ 
++struct rp2040_sio_softc {
++	uint32_t base;
++};
++
++void rp2040_sio_init(struct rp2040_sio_softc *sc, uint32_t base);
++void rp2040_sio_fifo_drain(struct rp2040_sio_softc *sc);
++int rp2040_sio_fifo_comm(struct rp2040_sio_softc *sc, uint32_t msg);
++
+ #endif /* !_RP2040_SIO_H_ */
+diff --git a/demo/rpi-pico/mdepx.conf b/demo/rpi-pico/mdepx.conf
+index 2ec0f742..a6bc19c8 100644
+--- a/demo/rpi-pico/mdepx.conf
++++ b/demo/rpi-pico/mdepx.conf
+@@ -70,12 +70,16 @@ mdepx {
+ 		};
+ 
+ 		cpu {
+-			max 1;
++			max 2;
+ 		};
+ 
+ 		systm {
+ 			options console device;
+ 		};
++
++		sched {
++			options smp;
++		};
+ 	};
+ 
+ 	lib {
+diff --git a/demo/rpi-pico/src/main.c b/demo/rpi-pico/src/main.c
+index 45ddf602..4b827f96 100644
+--- a/demo/rpi-pico/src/main.c
++++ b/demo/rpi-pico/src/main.c
+@@ -7,6 +7,7 @@ int
+ main(void)
+ {
+ 
++	printf("hello world\n");
+ 	callout_test();
+ 
+ 	while (1) {
+diff --git a/include/sys/spinlock.h b/include/sys/spinlock.h
+index 4cf2327b..bad10abd 100644
+--- a/include/sys/spinlock.h
++++ b/include/sys/spinlock.h
+@@ -32,8 +32,15 @@
+ 
+ #include <machine/atomic.h>
+ 
++extern int sl_cnt;
++
++#define	SIO_BASE	0xd0000000
++#define	SL_BASE		(SIO_BASE + 0x100)
++#define	SL_LOCK(n)	(SL_BASE + 0x4 * (n))
++
+ struct spinlock {
+ 	uintptr_t v;
++	int n;
+ };
+ 
+ static inline void
+@@ -41,17 +48,31 @@ sl_init(struct spinlock *l)
+ {
+ 
+ 	l->v = 0;
++	l->n = sl_cnt++;
++	if (sl_cnt > 30)
++		panic("too many");
++	*(volatile uint32_t *)(SL_LOCK(l->n)) = 1;
++	printf("%s: inited %d\n", __func__, l->n);
+ }
+ 
+ static inline void
+ sl_lock(struct spinlock *l)
+ {
++	uint32_t reg;
+ 
+ 	KASSERT(curthread->td_critnest > 0,
+ 	    ("%s: Not in critical section", __func__));
+ 
+ #ifdef MDX_SCHED_SMP
+-	while (atomic_cmpset_acq_ptr(&l->v, 0, 1) == 0);
++	//while (atomic_cmpset_acq_ptr(&l->v, 0, 1) == 0);
++
++	do {
++		reg = *(volatile uint32_t *)(SL_LOCK(l->n));
++		//printf("reg %x\n", reg);
++	} while (reg == 0);
++	l->v = 1;
++	//printf("OK");
++
+ #else
+ 	KASSERT(l->v == 0,
+ 	    ("%s: lock is already held", __func__));
+@@ -60,6 +81,7 @@ sl_lock(struct spinlock *l)
+ #endif
+ }
+ 
++#if 0
+ static inline int
+ sl_trylock(struct spinlock *l)
+ {
+@@ -68,7 +90,8 @@ sl_trylock(struct spinlock *l)
+ 	    ("%s: Not in critical section", __func__));
+ 
+ #ifdef MDX_SCHED_SMP
+-	return (atomic_cmpset_acq_ptr(&l->v, 0, 1));
++	//return (atomic_cmpset_acq_ptr(&l->v, 0, 1));
++	return (1);
+ #else
+ 	KASSERT(l->v == 0,
+ 	    ("%s: lock is already held", __func__));
+@@ -78,6 +101,7 @@ sl_trylock(struct spinlock *l)
+ 	return (1);
+ #endif
+ }
++#endif
+ 
+ static inline void
+ sl_unlock(struct spinlock *l)
+@@ -87,8 +111,10 @@ sl_unlock(struct spinlock *l)
+ 	    ("%s: Not in critical section", __func__));
+ 
+ #ifdef MDX_SCHED_SMP
+-	if (!atomic_cmpset_rel_ptr(&l->v, 1, 0))
+-		panic("lock is not taken");
++	//if (!atomic_cmpset_rel_ptr(&l->v, 1, 0))
++	//	panic("lock is not taken");
++	*(volatile uint32_t *)(SL_LOCK(l->n)) = 1;
++	l->v = 0;
+ #else
+ 	KASSERT(l->v == 1,
+ 	    ("%s: lock is not taken", __func__));
+diff --git a/kernel/sched/mdx_sched.c b/kernel/sched/mdx_sched.c
+index 6536d740..da6f0761 100644
+--- a/kernel/sched/mdx_sched.c
++++ b/kernel/sched/mdx_sched.c
+@@ -131,7 +131,8 @@ mdx_sched_cpu_notify(void)
+ 		p = CONTAINER_OF(pcpu_list.next, struct pcpu, pc_avail);
+ 		KASSERT(curpcpu != p,
+ 		    ("Found myself in the list of available CPUs."));
+-		send_ipi((1 << p->pc_cpuid), IPI_IPI);
++		//send_ipi((1 << p->pc_cpuid), IPI_IPI);
++		printf("sending ipi\n");
+ 	}
+ }
+ #endif
+diff --git a/kernel/sched/mdx_smp.c b/kernel/sched/mdx_smp.c
+index bcd31151..2e7e4dd2 100644
+--- a/kernel/sched/mdx_smp.c
++++ b/kernel/sched/mdx_smp.c
+@@ -35,16 +35,19 @@
+ #include <machine/cpuregs.h>
+ #include <machine/cpufunc.h>
+ 
++#if 0
+ static void (*smp_rendezvous_func)(void *arg);
+ static void *smp_rendezvous_arg;
+ static int smp_rendezvous_ncpus;
+ static uint32_t smp_rendezvous_room[2];
++#endif
+ static struct spinlock smp_lock;
+ 
+ #if !defined(MDX_SCHED)
+ #error "Invalid configuration"
+ #endif
+ 
++#if 0
+ static void
+ smp_rendezvous_action(void)
+ {
+@@ -134,6 +137,7 @@ ipi_handler(void)
+ 		}
+ 	}
+ }
++#endif
+ 
+ void
+ smp_init(void)
+diff --git a/kernel/systm/mdx_panic.c b/kernel/systm/mdx_panic.c
+index 49aeec05..532bc360 100644
+--- a/kernel/systm/mdx_panic.c
++++ b/kernel/systm/mdx_panic.c
+@@ -37,12 +37,14 @@ vpanic(const char *fmt, va_list ap)
+ 	printf("\n");
+ }
+ 
++#if 0
+ static void
+ panic_stop(void *arg)
+ {
+ 
+ 	while (1);
+ }
++#endif
+ 
+ void 
+ panic(const char *fmt, ...)
+@@ -58,7 +60,7 @@ panic(const char *fmt, ...)
+ 
+ #ifdef MDX_SCHED_SMP
+ 	/* Stop all the CPUs. */
+-	smp_rendezvous_cpus(0xff, panic_stop, NULL);
++	//smp_rendezvous_cpus(0xff, panic_stop, NULL);
+ #else
+ 	panic_stop(NULL);
+ #endif

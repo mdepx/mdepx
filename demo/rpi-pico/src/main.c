@@ -7,7 +7,9 @@ int
 main(void)
 {
 
+#if 0
 	callout_test();
+#endif
 
 	while (1) {
 		printf("Hello world\n");

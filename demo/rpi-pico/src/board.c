@@ -46,10 +46,19 @@ static struct rp2040_clocks_softc clocks_sc;
 static struct rp2040_resets_softc resets_sc;
 static struct rp2040_io_bank0_softc io_bank0_sc;
 static struct rp2040_uart_softc uart_sc;
+static struct rp2040_uart_softc uart1_sc;
+static struct rp2040_pll_softc pll_sys_sc;
+static struct rp2040_pll_softc pll_usb_sc;
+static struct rp2040_psm_softc psm_sc;
+static struct rp2040_sio_softc sio_sc;
+static struct rp2040_watchdog_softc watchdog_sc;
 static struct arm_nvic_softc nvic_sc;
 
 struct mdx_device dev_nvic = { .sc = &nvic_sc };
 struct mdx_device dev_uart = { .sc = &uart_sc };
+struct mdx_device dev_uart1 = { .sc = &uart1_sc };
+
+extern uint8_t idle_thread_stack[MDX_CPU_MAX][MDX_THREAD_STACK_SIZE];
 
 void
 udelay(uint32_t usec)
@@ -69,6 +78,68 @@ usleep(uint32_t usec)
 	mdx_usleep(usec);
 }
 
+static void
+rp2040_sio_proc1(void *arg, int irq)
+{
+
+	printf("intr\n");
+	rp2040_sio_fifo_drain(&sio_sc);
+}
+
+static void
+core1_boot(void)
+{
+	struct pcpu *pcpup;
+	int i;
+
+	rp2040_sio_fifo_drain(&sio_sc);
+
+	pcpup = &__pcpu[1];
+	pcpup->pc_cpuid = 1;
+	list_init(&pcpup->pc_avail);
+	mdx_thread_init(1);
+
+	mdx_intc_setup(&dev_nvic, RP2040_SIO_IRQ_PROC1, rp2040_sio_proc1,
+	    NULL);
+	mdx_intc_enable(&dev_nvic, RP2040_SIO_IRQ_PROC1);
+
+	while (1) {
+		for (i = 0; i < 50000; i++)
+			;
+		printf("f");
+	}
+}
+
+static void __unused
+secondary_start(void)
+{
+	uint32_t core1_boot_msg[5];
+	uint32_t *sp;
+	int i;
+
+	rp2040_psm_reset_core1(&psm_sc);
+
+	sp = (void *)(idle_thread_stack[1] + MDX_THREAD_STACK_SIZE);
+
+	core1_boot_msg[0] = 0;
+	core1_boot_msg[1] = 1;
+	core1_boot_msg[2] = *(volatile uint32_t *)0xe000ed08;
+	core1_boot_msg[3] = (uint32_t)sp;
+	core1_boot_msg[4] = (uint32_t)core1_boot;
+
+	rp2040_sio_fifo_drain(&sio_sc);
+
+	for (i = 0; i < 5; i++)
+		if (!rp2040_sio_fifo_comm(&sio_sc, core1_boot_msg[i])) {
+			printf("could not start CPU1\n");
+			return;
+		}
+
+	rp2040_sio_fifo_drain(&sio_sc);
+
+	__asm __volatile ("wfe");
+}
+
 void
 board_init(void)
 {
@@ -76,30 +147,59 @@ board_init(void)
 	malloc_init();
 	malloc_add_region((void *)0x20020000, 0x20000);
 
+	rp2040_watchdog_init(&watchdog_sc, RP2040_WATCHDOG_BASE);
 	rp2040_xosc_init(&xosc_sc, RP2040_XOSC_BASE);
-	rp2040_clocks_init(&clocks_sc, RP2040_CLOCKS_BASE);
+	rp2040_sio_init(&sio_sc, RP2040_SIO_BASE);
+	rp2040_psm_init(&psm_sc, RP2040_PSM_BASE);
 
 	rp2040_resets_init(&resets_sc, RP2040_RESETS_BASE);
+	rp2040_resets_reset(&resets_sc, RESETS_RESET_UART0, 1);
+	rp2040_resets_reset(&resets_sc, RESETS_RESET_PLL_SYS, 1);
+	rp2040_resets_reset(&resets_sc, RESETS_RESET_PLL_USB, 1);
+	rp2040_resets_reset(&resets_sc, RESETS_RESET_PLL_SYS, 0);
+	rp2040_resets_reset(&resets_sc, RESETS_RESET_PLL_USB, 0);
+
+	rp2040_clocks_init(&clocks_sc, RP2040_CLOCKS_BASE);
+
+	/* 1500 MHz / 6 / 2 = 125 MHz */
+	rp2040_pll_init(&pll_sys_sc,  RP2040_PLL_SYS_BASE,
+		1, 1500000000, 6, 2);
+
+	/* 480 MHz / 5 / 2 = 48 MHz */
+	rp2040_pll_init(&pll_usb_sc,  RP2040_PLL_USB_BASE,
+		1, 480000000, 5, 2);
+
+	rp2040_clocks_setup(&clocks_sc);
+
 	rp2040_resets_reset(&resets_sc, RESETS_RESET_IOBANK0, 0);
 	rp2040_resets_reset(&resets_sc, RESETS_RESET_UART0, 0);
+	rp2040_resets_reset(&resets_sc, RESETS_RESET_UART1, 0);
 	rp2040_resets_reset(&resets_sc, RESETS_RESET_TIMER, 0);
 
 	rp2040_io_bank0_init(&io_bank0_sc, RP2040_IO_BANK0_BASE);
 	rp2040_io_bank0_funcsel(&io_bank0_sc, 0,
-	    IO_BANK0_GPIO0_CTRL_FUNCSEL_UART_TX);
+	    IO_BANK0_GPIO0_CTRL_FUNCSEL_UART0_TX);
 	rp2040_io_bank0_funcsel(&io_bank0_sc, 1,
-	    IO_BANK0_GPIO1_CTRL_FUNCSEL_UART_RX);
+	    IO_BANK0_GPIO1_CTRL_FUNCSEL_UART0_RX);
+	rp2040_io_bank0_funcsel(&io_bank0_sc, 4,
+	    IO_BANK0_GPIO4_CTRL_FUNCSEL_UART1_TX);
+	rp2040_io_bank0_funcsel(&io_bank0_sc, 5,
+	    IO_BANK0_GPIO5_CTRL_FUNCSEL_UART1_RX);
 
 	arm_nvic_init(&dev_nvic, BASE_NVIC);
-	mdx_intc_setup(&dev_nvic, 0, rp2040_timer_intr, &timer_sc);
-	mdx_intc_enable(&dev_nvic, 0);
+	mdx_intc_setup(&dev_nvic, RP2040_TIMER_IRQ_0, rp2040_timer_intr,
+	    &timer_sc);
+	mdx_intc_enable(&dev_nvic, RP2040_TIMER_IRQ_0);
 
 	rp2040_uart_init(&dev_uart, RP2040_UART0_BASE);
+	rp2040_uart_init(&dev_uart1, RP2040_UART1_BASE);
 	mdx_uart_setup(&dev_uart, 115200, UART_DATABITS_8, UART_STOPBITS_1,
+	    UART_PARITY_NONE);
+	mdx_uart_setup(&dev_uart1, 115200, UART_DATABITS_8, UART_STOPBITS_1,
 	    UART_PARITY_NONE);
 	mdx_console_register_uart(&dev_uart);
 
-	rp2040_timer_init(&timer_sc, RP2040_TIMER_BASE, 20000);
+	rp2040_timer_init(&timer_sc, RP2040_TIMER_BASE, 1000000);
 
-	printf("%s: initialized\n", __func__);
+	printf("%s: board initialized\n", __func__);
 }
