@@ -30,12 +30,14 @@
 #include <arm/raspberrypi/rp2040_clocks.h>
 #include <arm/raspberrypi/rp2040_io_bank0.h>
 #include <arm/raspberrypi/rp2040_pads_bank0.h>
+#include <arm/raspberrypi/rp2040_pll.h>
 #include <arm/raspberrypi/rp2040_psm.h>
 #include <arm/raspberrypi/rp2040_resets.h>
 #include <arm/raspberrypi/rp2040_sio.h>
 #include <arm/raspberrypi/rp2040_timer.h>
 #include <arm/raspberrypi/rp2040_uart.h>
 #include <arm/raspberrypi/rp2040_xosc.h>
+#include <arm/raspberrypi/rp2040_watchdog.h>
 
 #define	RP2040_ROM_BASE			0x00000000
 #define	RP2040_XIP_BASE			0x10000000
