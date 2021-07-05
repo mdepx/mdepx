@@ -27,16 +27,20 @@
 #ifndef	_MACHINE_PCPU_H_
 #define	_MACHINE_PCPU_H_
 
-#ifdef MDX_SCHED_SMP
-#error SMP is not supported on arm
-#endif
+#include <sys/smp.h>
 
 static inline struct pcpu *
 get_pcpu(void)
 {
 	struct pcpu *p;
+	int cpuid;
 
-	p = __pcpu;
+#ifdef MDX_SCHED_SMP
+	cpuid = get_coreid();
+	p = &__pcpu[cpuid];
+#else
+	p = &__pcpu[0];
+#endif
 
 	return (p);
 }
@@ -45,9 +49,12 @@ static inline struct thread *
 get_curthread(void)
 {
 	struct thread *td;
+	struct pcpu *pcpu;
+
+	pcpu = get_pcpu();
 
 	/* pc_curthread is the first member of struct pcpu. */
-	td = (struct thread *)*(uintptr_t *)__pcpu;
+	td = (struct thread *)*(uintptr_t *)pcpu;
 
 	return (td);
 }
