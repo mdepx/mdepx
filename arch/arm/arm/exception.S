@@ -37,32 +37,22 @@
 	.thumb_func
 	.type exception, function
 exception:
+	mrs	r0, psp
 	mrs	r1, ipsr		/* r1 = exception number. */
 	mrs	r3, primask		/* r3 = primask. */
 #ifndef MDX_ARM_THUMB_CM0
-	stmdb	sp!, {r3-r11, r14}	/* Save primask, r4-r11 and r14. */
+	stmdb	r0!, {r3-r11, r14}	/* Save primask, r4-r11 and r14. */
 #else
-	sub	sp, sp, 24
-	str	r3, [sp, #0]
-	str	r4, [sp, #4]
-	str	r5, [sp, #8]
-	str	r6, [sp, #12]
-	str	r7, [sp, #16]
+	subs	r0, r0, 24
+	str	r3, [r0, #0]
+	str	r4, [r0, #4]
+	str	r5, [r0, #8]
+	str	r6, [r0, #12]
+	str	r7, [r0, #16]
 	mov	r7, r14
-	str	r7, [sp, #20]
+	str	r7, [r0, #20]
 #endif
 	cpsid	i			/* Disable interrupts. */
-	mov	r0, sp			/* r0 = trapframe. */
-
-	/* Setup interrupt stack. */
-	ldr	r4, =intr_stack		/* r4 = interrupt stack (bottom) */
-#ifndef MDX_ARM_THUMB_CM0
-	add	r4, r4, MDX_ARM_INTR_STACK_SIZE	/* interrupt stack (top) */
-#else
-	ldr	r5, =MDX_ARM_INTR_STACK_SIZE	/* interrupt stack (top) */
-	add	r4, r4, r5
-#endif
-	msr	msp, r4
 
 	bl	arm_exception		/* Branch link to arm_exception() */
 #ifndef MDX_ARM_THUMB_CM0
@@ -77,7 +67,7 @@ exception:
 	ldr	r7, [r0, #16]
 	adds	r0, r0, 24
 #endif
-	msr 	msp, r0			/* Restore sp. */
+	msr 	psp, r0			/* Restore sp. */
 	msr	primask, r3		/* Restore interrupts. */
 	bx	r14
 
@@ -125,6 +115,12 @@ __start:
 #endif
 	b	1b
 2:
+
+	/* Move msp to psp and switch thread mode to use psp. */
+	mrs	r0, msp
+	msr	psp, r0
+	movs	r0, 2
+	msr	control, r0
 
 #ifndef MDX_ARM_THUMB_CM0
 	mov	r0, 0	/* cpuid */

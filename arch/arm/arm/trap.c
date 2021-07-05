@@ -46,8 +46,6 @@ static struct thread intr_thread[MDX_CPU_MAX];
 #error Add support
 #endif
 
-uint8_t intr_stack[MDX_CPU_MAX][MDX_ARM_INTR_STACK_SIZE];
-
 void save_fpu_context(struct vfp_state *vfp);
 void restore_fpu_context(struct vfp_state *vfp);
 
@@ -170,6 +168,12 @@ arm_exception(struct trapframe *tf, int exc_code)
 	td = curthread;
 	released = false;
 	intr = false;
+
+#ifdef MDX_SCHED_SMP
+	/* This CPU could not pick up new threads for a moment. */
+	if (td->td_idle)
+		mdx_sched_cpu_avail(curpcpu, false);
+#endif
 
 	/*
 	 * Save the frame address.

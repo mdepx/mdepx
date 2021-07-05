@@ -33,6 +33,8 @@
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
 
+uint8_t intr_stack[MDX_CPU_MAX][MDX_ARM_INTR_STACK_SIZE];
+
 void
 critical_enter(void)
 {
@@ -79,6 +81,7 @@ md_setup_frame(struct trapframe *tf, void *entry,
 	struct hwregs *hw;
 
 	tf->tf_r14 = EXCP_RET | EXCP_RET_FTYPE | EXCP_RET_MODE_THREAD;
+	tf->tf_r14 |= EXCP_RET_SPSEL_PSP;
 
 	/* Security Extensions only. Ignored on non-trustzone devices. */
 	tf->tf_r14 |= EXCP_RET_DCRS;
@@ -121,6 +124,9 @@ md_init(int cpuid)
 	pcpup = &__pcpu[cpuid];
 	pcpup->pc_cpuid = cpuid;
 	list_init(&pcpup->pc_avail);
+	pcpup->pc_stack = (uintptr_t)&intr_stack[cpuid] +
+	    MDX_ARM_INTR_STACK_SIZE;
+	__asm __volatile("msr msp, %0" :: "r"(pcpup->pc_stack));
 #endif
 
 #ifdef MDX_THREAD
