@@ -29,6 +29,7 @@
 #include <sys/systm.h>
 #include <sys/malloc.h>
 #include <sys/thread.h>
+#include <sys/smp.h>
 
 #include <machine/cpufunc.h>
 #include <machine/cpuregs.h>
@@ -59,6 +60,17 @@ struct mdx_device dev_uart = { .sc = &uart_sc };
 struct mdx_device dev_uart1 = { .sc = &uart1_sc };
 
 extern uint8_t idle_thread_stack[MDX_CPU_MAX][MDX_THREAD_STACK_SIZE];
+
+int
+get_coreid(void)
+{
+	int cpuid;
+
+	cpuid = *(volatile uint32_t *)0xd0000000;
+	cpuid &= 1;
+
+	return (cpuid);
+}
 
 void
 udelay(uint32_t usec)
