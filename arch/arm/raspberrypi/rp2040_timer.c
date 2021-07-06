@@ -69,8 +69,11 @@ rp2040_timer_start(void *arg, uint32_t ticks)
 {
 	struct rp2040_timer_softc *sc;
 	uint32_t val;
+	int cpuid;
 
 	sc = arg;
+
+	cpuid = PCPU_GET(cpuid);
 
 	dprintf("%s: %d\n", __func__, ticks);
 
@@ -83,10 +86,13 @@ rp2040_timer_start(void *arg, uint32_t ticks)
 
 	val = RD4(sc, RP2040_TIMER_TIMERAWL);
 	val += ticks;
-	WR4(sc, RP2040_TIMER_ALARM0, val);
+	if (cpuid == 0)
+		WR4(sc, RP2040_TIMER_ALARM0, val);
+	else
+		WR4(sc, RP2040_TIMER_ALARM1, val);
 
-	WR4(sc, RP2040_TIMER_INTE, 1);
-	WR4(sc, RP2040_TIMER_INTR, 1);
+	WR4(sc, RP2040_TIMER_INTE, (1 << cpuid));
+	WR4(sc, RP2040_TIMER_INTR, (1 << cpuid));
 }
 
 static void
