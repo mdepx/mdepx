@@ -41,7 +41,7 @@
 
 static struct spinlock smp_lock;
 
-#ifndef MDX_ARM_THUMB_CM0
+#ifndef MDX_ARM_THUMB_CM0	/* No atomics support for some architectures.*/
 static void (*smp_rendezvous_func)(void *arg);
 static void *smp_rendezvous_arg;
 static int smp_rendezvous_ncpus;
