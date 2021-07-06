@@ -60,6 +60,9 @@ struct mdx_device dev_uart = { .sc = &uart_sc };
 struct mdx_device dev_uart1 = { .sc = &uart1_sc };
 
 extern uint8_t idle_thread_stack[MDX_CPU_MAX][MDX_THREAD_STACK_SIZE];
+extern uint8_t intr_stack[MDX_CPU_MAX][MDX_ARM_INTR_STACK_SIZE];
+void core1_startup(void);
+void core1_boot(void);
 
 void
 send_ipi(int mask, int ipi)
@@ -105,7 +108,7 @@ rp2040_sio_proc1(void *arg, int irq)
 	rp2040_sio_fifo_drain(&sio_sc);
 }
 
-static void
+void
 core1_boot(void)
 {
 	struct pcpu *pcpup;
@@ -117,15 +120,18 @@ core1_boot(void)
 	pcpup->pc_cpuid = 1;
 	list_init(&pcpup->pc_avail);
 	mdx_thread_init(1);
+	pcpup->pc_stack = (uintptr_t)&intr_stack[1] +
+	    MDX_ARM_INTR_STACK_SIZE;
+	__asm __volatile("msr msp, %0" :: "r"(pcpup->pc_stack));
 
 	mdx_intc_setup(&dev_nvic, RP2040_SIO_IRQ_PROC1, rp2040_sio_proc1,
 	    NULL);
 	mdx_intc_enable(&dev_nvic, RP2040_SIO_IRQ_PROC1);
 
 	while (1) {
+		printf("f");
 		for (i = 0; i < 50000; i++)
 			;
-		printf("f");
 	}
 }
 
@@ -144,7 +150,7 @@ secondary_start(void)
 	core1_boot_msg[1] = 1;
 	core1_boot_msg[2] = *(volatile uint32_t *)0xe000ed08;
 	core1_boot_msg[3] = (uint32_t)sp;
-	core1_boot_msg[4] = (uint32_t)core1_boot;
+	core1_boot_msg[4] = (uint32_t)core1_startup;
 
 	rp2040_sio_fifo_drain(&sio_sc);
 
