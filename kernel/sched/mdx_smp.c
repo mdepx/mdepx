@@ -35,15 +35,17 @@
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
 
+#if !defined(MDX_SCHED)
+#error "Invalid configuration"
+#endif
+
+static struct spinlock smp_lock;
+
+#ifndef MDX_ARM_THUMB_CM0
 static void (*smp_rendezvous_func)(void *arg);
 static void *smp_rendezvous_arg;
 static int smp_rendezvous_ncpus;
 static uint32_t smp_rendezvous_room[2];
-static struct spinlock smp_lock;
-
-#if !defined(MDX_SCHED)
-#error "Invalid configuration"
-#endif
 
 static void
 smp_rendezvous_action(void)
@@ -134,6 +136,7 @@ ipi_handler(void)
 		}
 	}
 }
+#endif
 
 void
 smp_init(void)

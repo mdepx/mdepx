@@ -56,7 +56,7 @@ panic(const char *fmt, ...)
 	va_start(ap, fmt);
 	vpanic(fmt, ap);
 
-#ifdef MDX_SCHED_SMP
+#if defined(MDX_SCHED_SMP) && !defined(MDX_ARM_THUMB_CM0)
 	/* Stop all the CPUs. */
 	smp_rendezvous_cpus(0xff, panic_stop, NULL);
 #else
