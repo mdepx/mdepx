@@ -153,7 +153,7 @@ restore_fpu(struct thread *td, bool fpu_was_enabled)
 struct trapframe *
 arm_exception(struct trapframe *tf, int exc_code)
 {
-	struct thread *td;
+	struct thread *td, *old_td;
 	bool released;
 	uint32_t irq;
 	bool intr;
@@ -161,7 +161,7 @@ arm_exception(struct trapframe *tf, int exc_code)
 	bool fpu_was_enabled;
 #endif
 
-	td = curthread;
+	old_td = td = curthread;
 	released = false;
 	intr = false;
 
@@ -198,12 +198,8 @@ arm_exception(struct trapframe *tf, int exc_code)
 	/*
 	 * Switch to the interrupt thread if we don't have
 	 * a thread anymore.
-	 *
-	 * TODO: for SMP this should be done unconditionally.
-	 * see riscv/trap.c
 	 */
-	if (released)
-		PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
+	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
 	curthread->td_critnest++;
 
 	if (intr)
@@ -228,6 +224,8 @@ arm_exception(struct trapframe *tf, int exc_code)
 	curthread->td_critnest--;
 	if (released)
 		PCPU_SET(curthread, td);
+	else
+		PCPU_SET(curthread, old_td);
 
 	return (td->td_tf);
 }
