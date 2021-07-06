@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019-2021 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2021 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,63 +24,57 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_SYS_SPINLOCK_H_
-#define	_SYS_SPINLOCK_H_
-
+#include <sys/cdefs.h>
 #include <sys/systm.h>
 #include <sys/thread.h>
+#include <sys/spinlock.h>
 
-#ifndef MDX_ARM_THUMB_CM0	/* No atomics support for some architectures.*/
-#include <machine/atomic.h>
+#include <arm/raspberrypi/rp2040.h>
 
-struct spinlock {
-	uintptr_t v;
-};
+#ifdef MDX_SCHED_SMP
+static int sl_cnt = 0;
+#endif
 
-static inline void
+#define	SL_BASE		(RP2040_SIO_BASE + 0x100)
+#define	SL_LOCK(n)	(SL_BASE + 0x4 * (n))
+
+void
 sl_init(struct spinlock *l)
 {
 
 	l->v = 0;
+
+#ifdef MDX_SCHED_SMP
+	l->n = sl_cnt++;
+
+	if (sl_cnt > 31)
+		panic("No spinlocks available.");
+
+	*(volatile uint32_t *)(SL_LOCK(l->n)) = 1;
+#endif
 }
 
-static inline void
+void
 sl_lock(struct spinlock *l)
 {
+	uint32_t reg;
 
 	KASSERT(curthread->td_critnest > 0,
 	    ("%s: Not in critical section", __func__));
 
 #ifdef MDX_SCHED_SMP
-	while (atomic_cmpset_acq_ptr(&l->v, 0, 1) == 0);
+	do
+		reg = *(volatile uint32_t *)(SL_LOCK(l->n));
+	while (reg == 0);
 #else
 	KASSERT(l->v == 0,
 	    ("%s: lock is already held", __func__));
+#endif
 
 	l->v = 1;
-#endif
 }
 
-static inline int
-sl_trylock(struct spinlock *l)
-{
-
-	KASSERT(curthread->td_critnest > 0,
-	    ("%s: Not in critical section", __func__));
-
-#ifdef MDX_SCHED_SMP
-	return (atomic_cmpset_acq_ptr(&l->v, 0, 1));
-#else
-	KASSERT(l->v == 0,
-	    ("%s: lock is already held", __func__));
-
-	l->v = 1;
-
-	return (1);
-#endif
-}
-
-static inline void
+void
 sl_unlock(struct spinlock *l)
 {
 
@@ -88,28 +82,11 @@ sl_unlock(struct spinlock *l)
 	    ("%s: Not in critical section", __func__));
 
 #ifdef MDX_SCHED_SMP
-	if (!atomic_cmpset_rel_ptr(&l->v, 1, 0))
-		panic("lock is not taken");
+	*(volatile uint32_t *)(SL_LOCK(l->n)) = 1;
 #else
 	KASSERT(l->v == 1,
 	    ("%s: lock is not taken", __func__));
+#endif
 
 	l->v = 0;
-#endif
-}
-
-#else /* MDX_ARM_THUMB_CM0 */
-
-struct spinlock {
-	uintptr_t v;
-	int n;
 };
-
-void sl_init(struct spinlock *l);
-void sl_lock(struct spinlock *l);
-void sl_unlock(struct spinlock *l);
-int sl_trylock(struct spinlock *l);
-
-#endif
-
-#endif /* _SYS_SPINLOCK_H_ */
