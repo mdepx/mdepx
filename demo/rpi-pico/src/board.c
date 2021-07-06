@@ -61,6 +61,13 @@ struct mdx_device dev_uart1 = { .sc = &uart1_sc };
 
 extern uint8_t idle_thread_stack[MDX_CPU_MAX][MDX_THREAD_STACK_SIZE];
 
+void
+send_ipi(int mask, int ipi)
+{
+
+	printf("%s\n", __func__);
+}
+
 int
 get_coreid(void)
 {
