@@ -42,10 +42,6 @@ struct trapframe *arm_exception(struct trapframe *tf, int irq);
 static struct thread intr_thread[MDX_CPU_MAX];
 #endif
 
-#ifdef MDX_SCHED_SMP
-#error Add support
-#endif
-
 void save_fpu_context(struct vfp_state *vfp);
 void restore_fpu_context(struct vfp_state *vfp);
 
