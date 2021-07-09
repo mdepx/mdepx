@@ -130,7 +130,8 @@ mdx_sched_cpu_notify(void)
 	if (!list_empty(&pcpu_list)) {
 		p = CONTAINER_OF(pcpu_list.next, struct pcpu, pc_avail);
 		KASSERT(curpcpu != p,
-		    ("Found myself in the list of available CPUs."));
+		    ("Found myself (cpu%d) in the list of available CPUs.",
+		    PCPU_GET(cpuid)));
 		send_ipi((1 << p->pc_cpuid), IPI_IPI);
 	}
 }
@@ -152,7 +153,8 @@ mdx_sched_add(struct thread *td)
 	list_append(&runq[td->td_prio], &td->td_node);
 
 #ifdef MDX_SCHED_SMP
-	mdx_sched_cpu_notify();
+	if (!td->td_idle)
+		mdx_sched_cpu_notify();
 #endif
 
 	mdx_sched_unlock();
