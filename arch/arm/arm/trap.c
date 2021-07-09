@@ -153,7 +153,7 @@ restore_fpu(struct thread *td, bool fpu_was_enabled)
 struct trapframe *
 arm_exception(struct trapframe *tf, int exc_code)
 {
-	struct thread *td, *old_td;
+	struct thread *td;
 	bool released;
 	uint32_t irq;
 	bool intr;
@@ -161,7 +161,7 @@ arm_exception(struct trapframe *tf, int exc_code)
 	bool fpu_was_enabled;
 #endif
 
-	old_td = td = curthread;
+	td = curthread;
 	released = false;
 	intr = false;
 
@@ -220,12 +220,9 @@ arm_exception(struct trapframe *tf, int exc_code)
 #endif
 	}
 
-	/* Switch to the new thread. */
+	/* Switch to the new(old) thread. */
 	curthread->td_critnest--;
-	if (released)
-		PCPU_SET(curthread, td);
-	else
-		PCPU_SET(curthread, old_td);
+	PCPU_SET(curthread, td);
 
 	return (td->td_tf);
 }
