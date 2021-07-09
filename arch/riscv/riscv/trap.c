@@ -131,7 +131,7 @@ fpe_check_and_save(struct thread *td)
 struct trapframe *
 riscv_exception(struct trapframe *tf)
 {
-	struct thread *td, *old_td;
+	struct thread *td;
 	bool released;
 	bool intr;
 	int irq;
@@ -139,7 +139,7 @@ riscv_exception(struct trapframe *tf)
 	struct pcb *pcb;
 #endif
 
-	old_td = td = curthread;
+	td = curthread;
 	released = false;
 	intr = false;
 
@@ -211,10 +211,7 @@ riscv_exception(struct trapframe *tf)
 
 	/* Switch to the new thread. */
 	curthread->td_critnest--;
-	if (released)
-		PCPU_SET(curthread, td);
-	else
-		PCPU_SET(curthread, old_td);
+	PCPU_SET(curthread, td);
 
 	return (td->td_tf);
 }
