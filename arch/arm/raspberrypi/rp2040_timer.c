@@ -49,10 +49,15 @@ void
 rp2040_timer_intr(void *arg, int irq)
 {
 	struct rp2040_timer_softc *sc;
+	int cpuid;
 
 	sc = arg;
 
-	dprintf("%s\n", __func__);
+	cpuid = PCPU_GET(cpuid);
+
+	dprintf("%s%d\n", __func__, cpuid);
+
+	WR4(sc, RP2040_TIMER_INTR, (1 << cpuid));
 
 	mdx_callout_callback(&sc->mt);
 }
@@ -73,16 +78,16 @@ rp2040_timer_start(void *arg, uint32_t ticks)
 
 	sc = arg;
 
-	cpuid = PCPU_GET(cpuid);
-
-	dprintf("%s: %d\n", __func__, ticks);
-
 	KASSERT(curthread->td_critnest > 0,
 	    ("%s: Not in critical section.", __func__));
 
+	cpuid = PCPU_GET(cpuid);
+
+	dprintf("%s%d: %d\n", __func__, PCPU_GET(cpuid), ticks);
+
 	/* At least 2 ticks needed to avoid the race (based on experiments). */
-	if (ticks < 10)
-		ticks = 10;
+	if (ticks < 100)
+		ticks = 100;
 
 	val = RD4(sc, RP2040_TIMER_TIMERAWL);
 	val += ticks;
@@ -90,21 +95,24 @@ rp2040_timer_start(void *arg, uint32_t ticks)
 		WR4(sc, RP2040_TIMER_ALARM0, val);
 	else
 		WR4(sc, RP2040_TIMER_ALARM1, val);
-
-	WR4(sc, RP2040_TIMER_INTE, (1 << cpuid));
-	WR4(sc, RP2040_TIMER_INTR, (1 << cpuid));
 }
 
 static void
 rp2040_timer_stop(void *arg)
 {
 	struct rp2040_timer_softc *sc;
+	int cpuid;
+
+	KASSERT(curthread->td_critnest > 0,
+	    ("%s: Not in critical section.", __func__));
 
 	sc = arg;
 
-	WR4(sc, RP2040_TIMER_INTE, 0);
-	WR4(sc, RP2040_TIMER_INTR, 0);
-	WR4(sc, RP2040_TIMER_ARMED, 1);
+	cpuid = PCPU_GET(cpuid);
+
+	dprintf("%s%d\n", __func__, PCPU_GET(cpuid));
+
+	WR4(sc, RP2040_TIMER_ARMED, (1 << cpuid));
 }
 
 static uint32_t
@@ -136,6 +144,10 @@ rp2040_timer_init(struct rp2040_timer_softc *sc,
 	sc->mt.frequency = freq;
 	sc->mt.arg = sc;
 	mdx_callout_register(&sc->mt);
+
+	WR4(sc, RP2040_TIMER_ALARM0, 0);
+	WR4(sc, RP2040_TIMER_ALARM1, 0);
+	WR4(sc, RP2040_TIMER_INTE, 0x3);
 
 	return (0);
 }
