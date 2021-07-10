@@ -15,7 +15,7 @@ test_thr(void *arg)
 	n = (int)arg;
 
 	while (1) {
-		printf("%s%d (%d)\n", __func__, n, PCPU_GET(cpuid));
+		printf("cpu%d: %s%d\n", PCPU_GET(cpuid), __func__, n);
 		mdx_usleep(100000 + 100000 * n);
 	}
 }
@@ -37,7 +37,7 @@ main(void)
 	mdx_sched_add(td);
 
 	while (1) {
-		printf("Hello world (%d)\n", PCPU_GET(cpuid));
+		printf("cpu%d: Hello world\n", PCPU_GET(cpuid));
 		mdx_usleep(1500000);
 	}
 
