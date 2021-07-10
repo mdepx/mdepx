@@ -64,11 +64,20 @@ extern uint8_t intr_stack[MDX_CPU_MAX][MDX_ARM_INTR_STACK_SIZE];
 void core1_startup(void);
 void core1_boot(void);
 
+static int cpu_started;
+
 void
 send_ipi(int mask, int ipi)
 {
 
-	printf("%s\n", __func__);
+	rp2040_sio_ipi(&sio_sc, 1);
+}
+
+static void
+rp2040_sio_intr(void *arg, int irq)
+{
+
+	rp2040_sio_ipi_rcvd(&sio_sc);
 }
 
 int
@@ -100,19 +109,10 @@ usleep(uint32_t usec)
 	mdx_usleep(usec);
 }
 
-static void
-rp2040_sio_proc1(void *arg, int irq)
-{
-
-	printf("intr\n");
-	rp2040_sio_fifo_drain(&sio_sc);
-}
-
 void
 core1_boot(void)
 {
 	struct pcpu *pcpup;
-	int i;
 
 	rp2040_sio_fifo_drain(&sio_sc);
 
@@ -124,15 +124,22 @@ core1_boot(void)
 	    MDX_ARM_INTR_STACK_SIZE;
 	__asm __volatile("msr msp, %0" :: "r"(pcpup->pc_stack));
 
-	mdx_intc_setup(&dev_nvic, RP2040_SIO_IRQ_PROC1, rp2040_sio_proc1,
+	mdx_sched_cpu_add(pcpup);
+	mdx_sched_cpu_avail(pcpup, true);
+
+	mdx_intc_setup(&dev_nvic, RP2040_TIMER_IRQ_1, rp2040_timer_intr,
+	    &timer_sc);
+	mdx_intc_enable(&dev_nvic, RP2040_TIMER_IRQ_1);
+
+	mdx_intc_setup(&dev_nvic, RP2040_SIO_IRQ_PROC1, rp2040_sio_intr,
 	    NULL);
 	mdx_intc_enable(&dev_nvic, RP2040_SIO_IRQ_PROC1);
 
-	while (1) {
-		printf("f");
-		for (i = 0; i < 50000; i++)
-			;
-	}
+	cpu_started = 1;
+
+	mdx_sched_enter();
+
+	panic("reached unreachable place");
 }
 
 static void __unused
@@ -144,7 +151,7 @@ secondary_start(void)
 
 	rp2040_psm_reset_core1(&psm_sc);
 
-	sp = (void *)(idle_thread_stack[1] + MDX_THREAD_STACK_SIZE);
+	sp = (void *)((uint32_t)&idle_thread_stack[1] + MDX_THREAD_STACK_SIZE);
 
 	core1_boot_msg[0] = 0;
 	core1_boot_msg[1] = 1;
@@ -161,7 +168,6 @@ secondary_start(void)
 		}
 
 	rp2040_sio_fifo_drain(&sio_sc);
-
 	__asm __volatile ("wfe");
 }
 
@@ -227,4 +233,13 @@ board_init(void)
 	rp2040_timer_init(&timer_sc, RP2040_TIMER_BASE, 1000000);
 
 	printf("%s: board initialized\n", __func__);
+
+	cpu_started = 0;
+	secondary_start();
+	while (cpu_started == 0)
+		cpu_nullop();
+
+	mdx_intc_setup(&dev_nvic, RP2040_SIO_IRQ_PROC0, rp2040_sio_intr,
+	    NULL);
+	mdx_intc_enable(&dev_nvic, RP2040_SIO_IRQ_PROC0);
 }
