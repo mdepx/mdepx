@@ -29,18 +29,23 @@
 
 #include <sys/smp.h>
 
+#ifdef MDX_SCHED_SMP
+
 static inline struct pcpu *
 get_pcpu(void)
 {
 	struct pcpu *p;
 	int cpuid;
 
-#ifdef MDX_SCHED_SMP
 	cpuid = get_coreid();
+
+	/*
+	 * Note that an interrupt could fire here, we appear on another CPU
+	 * and return wrong pcpu. Disable interrupts if needed before call
+	 * to this function.
+	 */
+
 	p = &__pcpu[cpuid];
-#else
-	p = &__pcpu[0];
-#endif
 
 	return (p);
 }
@@ -50,14 +55,56 @@ get_curthread(void)
 {
 	struct thread *td;
 	struct pcpu *pcpu;
+	uint32_t reg;
+	int cpuid;
 
-	pcpu = get_pcpu();
+	/*
+	 * Since we can't get curthread from curpcpu in a single instruction
+	 * we have to disable interrupts.
+	 * Otherwise an interrupt between these lines could lead us to return
+	 * the current thread of another CPU.
+	 */
+	__asm __volatile("mrs %0, primask\n"
+			 "cpsid i" : "=r" (reg) :: "memory");
+
+	cpuid = get_coreid();
+
+	pcpu = &__pcpu[cpuid];
 
 	/* pc_curthread is the first member of struct pcpu. */
 	td = (struct thread *)*(uintptr_t *)pcpu;
 
+	/* Restore interrupts. */
+	if ((reg & 1) == 0)
+		__asm __volatile("cpsie i");
+
 	return (td);
 }
+
+#else
+
+static inline struct pcpu *
+get_pcpu(void)
+{
+	struct pcpu *p;
+
+	p = &__pcpu[0];
+
+	return (p);
+}
+
+static inline struct thread *
+get_curthread(void)
+{
+	struct thread *td;
+
+	/* pc_curthread is the first member of struct pcpu. */
+	td = (struct thread *)*(uintptr_t *)&__pcpu[0];
+
+	return (td);
+}
+
+#endif
 
 #define	curthread get_curthread()
 #define	curpcpu get_pcpu()
