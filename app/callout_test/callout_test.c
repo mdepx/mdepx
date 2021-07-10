@@ -55,8 +55,8 @@ test_thr(void *arg)
 	while (1) {
 		if (!mdx_mutex_timedlock(&m0, 1000))
 			continue;
-		printf("cpu%d: hello from thread%04d cn %d\n",
-		    PCPU_GET(cpuid), (size_t)arg, curthread->td_critnest);
+		printf("cpu%d: hello from thread%04d\n", PCPU_GET(cpuid),
+		    (size_t)arg);
 		mdx_mutex_unlock(&m0);
 
 		mdx_tsleep(1000);
