@@ -75,6 +75,13 @@ cpu_idle(void)
 }
 
 void
+cpu_nullop(void)
+{
+
+	__asm __volatile("nop");
+}
+
+void
 md_setup_frame(struct trapframe *tf, void *entry,
     void *arg, void *terminate)
 {

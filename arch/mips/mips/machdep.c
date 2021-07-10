@@ -90,6 +90,13 @@ cpu_idle(void)
 }
 #endif
 
+void
+cpu_nullop(void)
+{
+
+	__asm __volatile("nop");
+}
+
 #if __has_feature(capabilities)
 
 void

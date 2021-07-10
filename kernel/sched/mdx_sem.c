@@ -194,7 +194,8 @@ mdx_sem_post(mdx_sem_t *sem)
 	list_remove(&td->td_node);
 
 	/* Ensure td left CPU after adding itself to the td_list. */
-	while (td->td_state != TD_STATE_ACK);
+	while (td->td_state != TD_STATE_ACK)
+		cpu_nullop();
 
 	/*
 	 * Ensure sem_cb will not pick up this thread just

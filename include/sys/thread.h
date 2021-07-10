@@ -78,6 +78,7 @@ void mdx_thread_terminate_cleanup(struct thread *td);
 void mdx_thread_yield(void);
 
 void cpu_idle(void);
+void cpu_nullop(void);
 
 /* Scheduler */
 struct thread * mdx_sched_next(void);
