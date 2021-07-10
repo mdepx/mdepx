@@ -40,9 +40,9 @@ get_pcpu(void)
 	cpuid = get_coreid();
 
 	/*
-	 * Note that an interrupt could fire here, we appear on another CPU
-	 * and return wrong pcpu. Disable interrupts if needed before call
-	 * to this function.
+	 * Note that an interrupt could fire right here, then we appear
+	 * on another CPU and return wrong pcpu.
+	 * Disable interrupts if needed before call to this function.
 	 */
 
 	p = &__pcpu[cpuid];
