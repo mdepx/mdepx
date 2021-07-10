@@ -70,14 +70,9 @@ void
 send_ipi(int mask, int ipi)
 {
 
-	rp2040_sio_ipi(&sio_sc, 1);
-}
+	/* Ignore the cpu mask since we have two cpu only on rp2040. */
 
-static void
-rp2040_sio_intr(void *arg, int irq)
-{
-
-	rp2040_sio_ipi_rcvd(&sio_sc);
+	rp2040_sio_ipi(&sio_sc, ipi);
 }
 
 int
@@ -132,7 +127,7 @@ core1_boot(void)
 	mdx_intc_enable(&dev_nvic, RP2040_TIMER_IRQ_1);
 
 	mdx_intc_setup(&dev_nvic, RP2040_SIO_IRQ_PROC1, rp2040_sio_intr,
-	    NULL);
+	    &sio_sc);
 	mdx_intc_enable(&dev_nvic, RP2040_SIO_IRQ_PROC1);
 
 	cpu_started = 1;
@@ -239,6 +234,6 @@ board_init(void)
 		cpu_nullop();
 
 	mdx_intc_setup(&dev_nvic, RP2040_SIO_IRQ_PROC0, rp2040_sio_intr,
-	    NULL);
+	    &sio_sc);
 	mdx_intc_enable(&dev_nvic, RP2040_SIO_IRQ_PROC0);
 }

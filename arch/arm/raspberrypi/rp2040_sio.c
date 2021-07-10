@@ -44,7 +44,7 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-int
+static int
 rp2040_sio_ipi_rcvd(struct rp2040_sio_softc *sc)
 {
 	uint32_t data;
@@ -69,6 +69,16 @@ rp2040_sio_ipi(struct rp2040_sio_softc *sc, uint32_t msg)
 	while (!(RD4(sc, RP2040_SIO_FIFO_ST) & SIO_FIFO_ST_RDY))
 		cpu_nullop();
 	WR4(sc, RP2040_SIO_FIFO_WR, msg);
+}
+
+void
+rp2040_sio_intr(void *arg, int irq)
+{
+	struct rp2040_sio_softc *sc;
+
+	sc = arg;
+
+	rp2040_sio_ipi_rcvd(sc);
 }
 
 /*

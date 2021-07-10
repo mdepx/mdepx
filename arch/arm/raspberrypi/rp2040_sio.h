@@ -103,6 +103,6 @@ void rp2040_sio_init(struct rp2040_sio_softc *sc, uint32_t base);
 void rp2040_sio_fifo_drain(struct rp2040_sio_softc *sc);
 int rp2040_sio_fifo_comm(struct rp2040_sio_softc *sc, uint32_t msg);
 void rp2040_sio_ipi(struct rp2040_sio_softc *sc, uint32_t msg);
-int rp2040_sio_ipi_rcvd(struct rp2040_sio_softc *sc);
+void rp2040_sio_intr(void *arg, int irq);
 
 #endif /* !_RP2040_SIO_H_ */
