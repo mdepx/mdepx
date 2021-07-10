@@ -31,9 +31,9 @@ main(void)
 
 	td = mdx_thread_create("test", 1, 1000, 4096, test_thr, (void *)0);
 	mdx_sched_add(td);
-	td = mdx_thread_create("test1", 1, 1000, 4096, test_thr, (void *)1);
+	td = mdx_thread_create("test1", 1, 2000, 4096, test_thr, (void *)1);
 	mdx_sched_add(td);
-	td = mdx_thread_create("test1", 1, 1000, 4096, test_thr, (void *)2);
+	td = mdx_thread_create("test1", 1, 3000, 4096, test_thr, (void *)2);
 	mdx_sched_add(td);
 
 	while (1) {
