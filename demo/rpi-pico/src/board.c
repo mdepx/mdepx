@@ -168,7 +168,6 @@ secondary_start(void)
 		}
 
 	rp2040_sio_fifo_drain(&sio_sc);
-	__asm __volatile ("wfe");
 }
 
 void
