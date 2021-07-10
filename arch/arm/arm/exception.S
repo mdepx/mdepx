@@ -43,14 +43,22 @@ exception:
 #ifndef MDX_ARM_THUMB_CM0
 	stmdb	r0!, {r3-r11, r14}	/* Save primask, r4-r11 and r14. */
 #else
-	subs	r0, r0, 24
+	subs	r0, r0, 40
 	str	r3, [r0, #0]
 	str	r4, [r0, #4]
 	str	r5, [r0, #8]
 	str	r6, [r0, #12]
 	str	r7, [r0, #16]
-	mov	r7, r14
+	mov	r7, r8
 	str	r7, [r0, #20]
+	mov	r7, r9
+	str	r7, [r0, #24]
+	mov	r7, r10
+	str	r7, [r0, #28]
+	mov	r7, r11
+	str	r7, [r0, #32]
+	mov	r7, r14
+	str	r7, [r0, #36]
 #endif
 	cpsid	i			/* Disable interrupts. */
 
@@ -63,9 +71,17 @@ exception:
 	ldr	r5, [r0, #8]
 	ldr	r6, [r0, #12]
 	ldr	r7, [r0, #20]
-	mov	lr, r7
+	mov	r8, r7
+	ldr	r7, [r0, #24]
+	mov	r9, r7
+	ldr	r7, [r0, #28]
+	mov	r10, r7
+	ldr	r7, [r0, #32]
+	mov	r11, r7
+	ldr	r7, [r0, #36]
+	mov	r14, r7
 	ldr	r7, [r0, #16]
-	adds	r0, r0, 24
+	adds	r0, r0, 40
 #endif
 	msr 	psp, r0			/* Restore sp. */
 	msr	primask, r3		/* Restore interrupts. */
