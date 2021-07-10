@@ -25,7 +25,7 @@ main(void)
 {
 	struct thread *td;
 
-#if 1
+#if 0
 	callout_test();
 #endif
 
