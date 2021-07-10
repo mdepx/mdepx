@@ -27,6 +27,7 @@
 #include <sys/cdefs.h>
 #include <sys/of.h>
 #include <sys/systm.h>
+#include <sys/thread.h>
 
 #include <dev/uart/uart.h>
 
@@ -80,7 +81,7 @@ rp2040_uart_putc(mdx_device_t dev, int c)
 	sc = mdx_device_get_softc(dev);
 
 	while (RD4(sc, RP2040_UART_UARTFR) & UART_UARTFR_TXFF)
-		;
+		cpu_nullop();
 
 	WR4(sc, RP2040_UART_UARTDR, c);
 }
