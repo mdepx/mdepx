@@ -26,6 +26,7 @@
 
 #include <sys/cdefs.h>
 #include <sys/systm.h>
+#include <sys/thread.h>
 
 #include <arm/raspberrypi/rp2040_sio.h>
 
@@ -43,6 +44,36 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
+int
+rp2040_sio_ipi_rcvd(struct rp2040_sio_softc *sc)
+{
+	uint32_t data;
+	int stat;
+
+	stat = RD4(sc, RP2040_SIO_FIFO_ST);
+	if (stat & (SIO_FIFO_ST_ROE | SIO_FIFO_ST_WOF))
+		WR4(sc, RP2040_SIO_FIFO_ST, 0);
+
+	if (RD4(sc, RP2040_SIO_FIFO_ST) & SIO_FIFO_ST_VLD) {
+		data = RD4(sc, RP2040_SIO_FIFO_RD);
+		return (data);
+	}
+
+	return (-1);
+}
+
+void
+rp2040_sio_ipi(struct rp2040_sio_softc *sc, uint32_t msg)
+{
+
+	while (!(RD4(sc, RP2040_SIO_FIFO_ST) & SIO_FIFO_ST_RDY))
+		cpu_nullop();
+	WR4(sc, RP2040_SIO_FIFO_WR, msg);
+}
+
+/*
+ * Needed to boot secondary core on rp2040 only.
+ */
 void
 rp2040_sio_fifo_drain(struct rp2040_sio_softc *sc)
 {
@@ -52,9 +83,12 @@ rp2040_sio_fifo_drain(struct rp2040_sio_softc *sc)
 	while (RD4(sc, RP2040_SIO_FIFO_ST) & SIO_FIFO_ST_VLD)
 		RD4(sc, RP2040_SIO_FIFO_RD);
 
-	__asm volatile("sev");
+	__asm __volatile("sev");
 }
 
+/*
+ * Needed to boot secondary core on rp2040 only.
+ */
 int
 rp2040_sio_fifo_comm(struct rp2040_sio_softc *sc, uint32_t msg)
 {
@@ -62,12 +96,12 @@ rp2040_sio_fifo_comm(struct rp2040_sio_softc *sc, uint32_t msg)
 
 	while (!(RD4(sc, RP2040_SIO_FIFO_ST) & SIO_FIFO_ST_RDY))
 		;
-
 	WR4(sc, RP2040_SIO_FIFO_WR, msg);
-	__asm volatile("sev");
+
+	__asm __volatile("sev");
 
 	while (!(RD4(sc, RP2040_SIO_FIFO_ST) & SIO_FIFO_ST_VLD))
-		__asm volatile("wfe");
+		__asm __volatile("wfe");
 
 	rcv = RD4(sc, RP2040_SIO_FIFO_RD);
 
