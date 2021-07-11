@@ -123,4 +123,6 @@
 #define	RP2040_I2C1_IRQ		24
 #define	RP2040_RTC_IRQ		25
 
+#define	cpu_coreid()	(*(volatile uint32_t *)RP2040_SIO_BASE & 1)
+
 #endif /* !_ARM_RASPBERRYPI_RP2040_H_ */

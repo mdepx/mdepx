@@ -27,7 +27,7 @@
 #ifndef	_MACHINE_PCPU_H_
 #define	_MACHINE_PCPU_H_
 
-#include <sys/smp.h>
+#include <sys/cpu.h>
 
 #ifdef MDX_SCHED_SMP
 
@@ -37,7 +37,7 @@ get_pcpu(void)
 	struct pcpu *p;
 	int cpuid;
 
-	cpuid = get_coreid();
+	cpuid = cpu_coreid();
 
 	/*
 	 * Note that an interrupt could fire right here, then we appear
@@ -67,7 +67,7 @@ get_curthread(void)
 	__asm __volatile("mrs %0, primask\n"
 			 "cpsid i" : "=r" (reg) :: "memory");
 
-	cpuid = get_coreid();
+	cpuid = cpu_coreid();
 
 	pcpu = &__pcpu[cpuid];
 

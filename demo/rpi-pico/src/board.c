@@ -75,17 +75,6 @@ send_ipi(int mask, int ipi)
 	rp2040_sio_ipi(&sio_sc, ipi);
 }
 
-int
-get_coreid(void)
-{
-	int cpuid;
-
-	cpuid = *(volatile uint32_t *)0xd0000000;
-	cpuid &= 1;
-
-	return (cpuid);
-}
-
 void
 udelay(uint32_t usec)
 {

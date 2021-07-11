@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2021 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,15 +24,12 @@
  * SUCH DAMAGE.
  */
 
-#ifndef	_SYS_SMP_H_
-#define	_SYS_SMP_H_
+#ifndef _SYS_CPU_H_
+#define _SYS_CPU_H_
 
-#define	IPI_IPI		(1 << 0)
-#define	IPI_TRYST	(1 << 1)
+#ifdef MDX_ARM_RASPBERRYPI_RP2040
+/* for cpu_coreid() only */
+#include <arm/raspberrypi/rp2040.h>
+#endif
 
-void smp_rendezvous_cpus(uint32_t cpus, void (*fn), void *arg);
-void send_ipi(int mask, int ipi);
-void smp_init(void);
-void ipi_handler(void);
-
-#endif /* _SYS_SMP_H_ */
+#endif /* !_SYS_CPU_H_ */
