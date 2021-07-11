@@ -13,6 +13,10 @@ all:
 	@${EMITTER} -j mdepx.conf
 	@${OBJCOPY} -O binary obj/${APP}.elf obj/${APP}.bin
 
+debug:
+	@${EMITTER} -d -j mdepx.conf
+	@${OBJCOPY} -O binary obj/${APP}.elf obj/${APP}.bin
+
 clean:
 	@rm -rf obj/*
 
