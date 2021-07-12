@@ -66,7 +66,7 @@ mdx_thread_alloc(uint32_t stack_size)
 		free(td);
 		return (NULL);
 	}
-	td->td_flags = TD_FLAGS_DYN_ALLOC_SP;
+	td->td_flags |= TD_FLAGS_DYN_ALLOC_SP;
 	td->td_stack_size = stack_size;
 
 	return (td);
