@@ -35,9 +35,11 @@
 #define	EPW_READ_FLIT_SIZE		0x0008	/* read only */
 #define	EPW_READ_BURST_COUNT		0x000C	/* read only */
 #define	EPW_READ_RESPONSE_DATA		0x0040	/* read/write */
+#define	EPW_READ_SIZE			0x0048	/* read only */
 #define	EPW_WRITE_ADDRESS		0x1000	/* read only */
 #define	EPW_WRITE_BYTE_ENABLE		0x1008	/* read only */
 #define	EPW_WRITE_DATA			0x1040	/* read only */
+#define	EPW_WRITE_SIZE			0x1048	/* read only */
 #define	EPW_TIME_STAMP			0x2000	/* read only */
 #define	EPW_REQUEST_ID			0x2004	/* read only */
 #define	EPW_REQUEST_IS_WRITE		0x2006	/* read only */
@@ -47,10 +49,14 @@
 struct epw_request {
 	uint64_t addr;
 	uint8_t is_write;
+#ifdef __mips__
 	uint64_t flit_size;
 	uint32_t burst_count;
 	uint32_t byte_enable;
 	uint8_t data[32];
+#else
+	uint64_t data;
+#endif
 	uint8_t data_len;
 };
 
