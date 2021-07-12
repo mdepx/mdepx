@@ -48,15 +48,11 @@ static inline void
 sl_lock(struct spinlock *l)
 {
 
-	KASSERT(curthread->td_critnest > 0,
-	    ("%s: Not in critical section", __func__));
-
 #ifdef MDX_SCHED_SMP
 	while (atomic_cmpset_acq_ptr(&l->v, 0, 1) == 0);
 #else
 	KASSERT(l->v == 0,
 	    ("%s: lock is already held", __func__));
-
 	l->v = 1;
 #endif
 }
@@ -65,15 +61,11 @@ static inline int
 sl_trylock(struct spinlock *l)
 {
 
-	KASSERT(curthread->td_critnest > 0,
-	    ("%s: Not in critical section", __func__));
-
 #ifdef MDX_SCHED_SMP
 	return (atomic_cmpset_acq_ptr(&l->v, 0, 1));
 #else
 	KASSERT(l->v == 0,
 	    ("%s: lock is already held", __func__));
-
 	l->v = 1;
 
 	return (1);
@@ -84,16 +76,12 @@ static inline void
 sl_unlock(struct spinlock *l)
 {
 
-	KASSERT(curthread->td_critnest > 0,
-	    ("%s: Not in critical section", __func__));
-
 #ifdef MDX_SCHED_SMP
 	if (!atomic_cmpset_rel_ptr(&l->v, 1, 0))
 		panic("lock is not taken");
 #else
 	KASSERT(l->v == 1,
 	    ("%s: lock is not taken", __func__));
-
 	l->v = 0;
 #endif
 }

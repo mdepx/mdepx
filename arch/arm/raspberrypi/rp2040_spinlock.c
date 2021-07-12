@@ -42,8 +42,6 @@ void
 sl_init(struct spinlock *l)
 {
 
-	l->v = 0;
-
 #ifdef MDX_SCHED_SMP
 	l->n = sl_cnt++;
 
@@ -51,6 +49,8 @@ sl_init(struct spinlock *l)
 		panic("No spinlocks available.");
 
 	*(volatile uint32_t *)(SL_LOCK(l->n)) = 1;
+#else
+	l->v = 0;
 #endif
 }
 
@@ -59,9 +59,6 @@ sl_lock(struct spinlock *l)
 {
 	uint32_t reg;
 
-	KASSERT(curthread->td_critnest > 0,
-	    ("%s: Not in critical section", __func__));
-
 #ifdef MDX_SCHED_SMP
 	do
 		reg = *(volatile uint32_t *)(SL_LOCK(l->n));
@@ -69,24 +66,19 @@ sl_lock(struct spinlock *l)
 #else
 	KASSERT(l->v == 0,
 	    ("%s: lock is already held", __func__));
-#endif
-
 	l->v = 1;
+#endif
 }
 
 void
 sl_unlock(struct spinlock *l)
 {
 
-	KASSERT(curthread->td_critnest > 0,
-	    ("%s: Not in critical section", __func__));
-
 #ifdef MDX_SCHED_SMP
 	*(volatile uint32_t *)(SL_LOCK(l->n)) = 1;
 #else
 	KASSERT(l->v == 1,
 	    ("%s: lock is not taken", __func__));
-#endif
-
 	l->v = 0;
+#endif
 };
