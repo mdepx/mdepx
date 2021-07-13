@@ -161,10 +161,6 @@
 #define	MIPS_KSEG0_TO_PHYS(x)		((uintptr_t)(x) & MIPS_KSEG0_PHYS_MASK)
 #define	MIPS_KSEG1_TO_PHYS(x)		((uintptr_t)(x) & MIPS_KSEG0_PHYS_MASK)
 
-#ifdef __CHERI_PURE_CAPABILITY__
-#define	MIPS_KSEG0(x)	(mips_kseg0_cap + ((x) - (vm_offset_t)MIPS_KSEG0_START))
-#else
 #define	MIPS_KSEG0(x)	((char *)(x))
-#endif
 
 #endif /* !_MACHINE_CPUREGS_H_ */
