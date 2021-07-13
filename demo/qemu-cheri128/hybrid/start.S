@@ -24,10 +24,11 @@
  * SUCH DAMAGE.
  */
 
+#include <sys/cherireg.h>
+
 #include <machine/regdef.h>
 #include <machine/cpuregs.h>
 #include <machine/asm.h>
-#include <machine/cherireg.h>
 #include <machine/cheriasm.h>
 
 #define	MIPS_CP0_REG_REVOKE		$30
