@@ -30,11 +30,11 @@
 #include <sys/systm.h>
 #include <sys/malloc.h>
 #include <sys/thread.h>
+#include <sys/cheri.h>
 
 #include <machine/frame.h>
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
-#include <machine/cheric.h>
 
 #include <mips/mips/trap.h>
 #include <mips/mips/timer.h>
@@ -49,6 +49,10 @@ extern char MipsCache[], MipsCacheEnd[];
 #define	UART_CLOCK_RATE		3686400
 #define	DEFAULT_BAUDRATE	115200
 #define	MIPS_DEFAULT_FREQ	50000000 /* 50MHz clock */
+
+typedef __intcap_t              intcap_t;
+
+char *mips_kseg0_cap = (char *)(intcap_t)-1;
 
 static struct mips_timer_softc timer_sc;
 static struct uart_16550_softc uart_sc;
@@ -105,11 +109,14 @@ mips_install_vectors(void)
 	 */
 	cap = cheri_getdefault();
 	b = cheri_setoffset(cap, MIPS_EXC_VEC_GENERAL);
-	b = cheri_csetbounds(b, 8);
+	b = cheri_setbounds(b, 8);
 	bcopy(a, b, 8);
 
-	b = cheri_setoffset(cap, CHERI_CCALL_EXC_VEC);
-	b = cheri_csetbounds(b, 8);
+	mips_kseg0_cap = cheri_setoffset(cheri_getdefault(),
+	    MIPS_KSEG0_START);
+
+	b = cheri_setoffset(cap, (long)CHERI_CCALL_EXC_VEC);
+	b = cheri_setbounds(b, 8);
 	bcopy(a, b, 8);
 
 #if 0
@@ -152,7 +159,7 @@ setup_uart(void)
 
 	cap = cheri_getdefault();
 	cap = cheri_setoffset(cap, MIPS_XKPHYS_UNCACHED_BASE + UART_BASE);
-	cap = cheri_csetbounds(cap, 6);
+	cap = cheri_setbounds(cap, 6);
 
 	uart_16550_init(&uart, cap, 0, UART_CLOCK_RATE);
 	mdx_uart_setup(&uart, DEFAULT_BAUDRATE,
