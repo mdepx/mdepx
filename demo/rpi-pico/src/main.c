@@ -1,11 +1,14 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 #include <sys/thread.h>
+#include <sys/spinlock.h>
 #include <dev/intc/intc.h>
 
 #include <arm/raspberrypi/rp2040.h>
 
 #include <app/callout_test/callout_test.h>
+
+struct spinlock l;
 
 static void __unused
 test_thr(void *arg)
@@ -15,8 +18,10 @@ test_thr(void *arg)
 	n = (int)arg;
 
 	while (1) {
+		sl_lock(&l);
 		printf("cpu%d: %s%d\n", PCPU_GET(cpuid), __func__, n);
-		mdx_usleep(100000 + 100000 * n);
+		sl_unlock(&l);
+		mdx_usleep(10000 + 100000 * n);
 	}
 }
 
@@ -25,20 +30,27 @@ main(void)
 {
 	struct thread *td;
 
+	sl_init(&l);
+
 #if 0
 	callout_test();
 #endif
 
 	td = mdx_thread_create("test", 1, 1000, 4096, test_thr, (void *)0);
-	mdx_sched_add(td);
+	if (td)
+		mdx_sched_add(td);
 	td = mdx_thread_create("test1", 1, 2000, 4096, test_thr, (void *)1);
-	mdx_sched_add(td);
+	if (td)
+		mdx_sched_add(td);
 	td = mdx_thread_create("test1", 1, 3000, 4096, test_thr, (void *)2);
-	mdx_sched_add(td);
+	if (td)
+		mdx_sched_add(td);
 
 	while (1) {
+		sl_lock(&l);
 		printf("cpu%d: Hello world\n", PCPU_GET(cpuid));
-		mdx_usleep(1500000);
+		sl_unlock(&l);
+		mdx_usleep(50000);
 	}
 
 	return (0);

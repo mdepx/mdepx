@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2020-2021 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,7 @@
 #define	_SYS_CHERI_H_
 
 #if __has_feature(capabilities)
-#include <machine/cheric.h>
+#include <sys/cheric.h>
 #endif
 
 static inline void *
@@ -65,7 +65,7 @@ mdx_setbounds(void *a, int len)
 	void *result;
 
 #ifdef __CHERI_PURE_CAPABILITY__
-	result = cheri_csetbounds(a, len);
+	result = cheri_setbounds(a, len);
 #else
 	result = a;
 #endif

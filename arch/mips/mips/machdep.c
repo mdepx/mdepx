@@ -28,13 +28,10 @@
 #include <sys/pcpu.h>
 #include <sys/systm.h>
 #include <sys/thread.h>
+#include <sys/cheric.h>
 
 #include <machine/frame.h>
 #include <machine/cpufunc.h>
-
-#if __has_feature(capabilities)
-#include <machine/cheric.h>
-#endif
 
 void
 critical_enter(void)

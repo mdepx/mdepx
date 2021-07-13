@@ -30,11 +30,11 @@
 #include <sys/systm.h>
 #include <sys/malloc.h>
 #include <sys/thread.h>
+#include <sys/cheric.h>
 
 #include <machine/frame.h>
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
-#include <machine/cheric.h>
 
 #include <mips/mips/timer.h>
 #include <mips/mips/trap.h>
@@ -115,7 +115,7 @@ setup_uart(void)
 
 	cap = cheri_getdefault();
 	cap = cheri_setoffset(cap, MIPS_XKPHYS_UNCACHED_BASE + UART_BASE);
-	cap = cheri_csetbounds(cap, 6);
+	cap = cheri_setbounds(cap, 6);
 
 	uart_16550_init(&uart, cap, 0, UART_CLOCK_RATE);
 	mdx_uart_setup(&uart, DEFAULT_BAUDRATE,
@@ -166,7 +166,7 @@ board_init(void)
 	/* Setup capability-enabled JTAG UART. */
 	setup_uart();
 
-	CHERI_PRINT_PTR(cheri_getpcc());
+	printf("pcc == %#lp\n", cheri_getpcc());
 
 	mips_install_vectors();
 

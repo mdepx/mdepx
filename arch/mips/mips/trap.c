@@ -31,13 +31,11 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 #include <sys/thread.h>
+#include <sys/cheric.h>
 
 #include <machine/frame.h>
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
-#if __has_feature(capabilities)
-#include <machine/cheric.h>
-#endif
 
 #include <mips/mips/trap.h>
 
@@ -98,10 +96,9 @@ dump_frame(struct trapframe *tf)
 
 #if __has_feature(capabilities)
 	for (i = 0; i < 32; i++)
-		printf("tf_c[%d] == " _CHERI_PRINTF_CAP_FMT "\n",
-		    i, _CHERI_PRINTF_CAP_ARG(tf->tf_c[i]));
-	CHERI_PRINT_PTR(tf->tf_pcc);
-	CHERI_PRINT_PTR(tf->tf_capcause);
+		printf("tf_c[%d] == %#lp\n", i, tf->tf_c[i]);
+	printf("tf_pcc == %#lp\n", tf->tf_pcc);
+	printf("tf_capcause == %#lp\n", tf->tf_capcause);
 #endif
 }
 

@@ -161,4 +161,6 @@
 #define	MIPS_KSEG0_TO_PHYS(x)		((uintptr_t)(x) & MIPS_KSEG0_PHYS_MASK)
 #define	MIPS_KSEG1_TO_PHYS(x)		((uintptr_t)(x) & MIPS_KSEG0_PHYS_MASK)
 
+#define	MIPS_KSEG0(x)	((char *)(x))
+
 #endif /* !_MACHINE_CPUREGS_H_ */
