@@ -4,7 +4,7 @@ Mdepx (Machdep Extended) is an operating system for embedded applications.
 
 ## Key features
 - Real-time
-- Priority based time sliced round-robin scheduling
+- Priority-based time-sliced round-robin scheduling
 - Fully preemptible
 - Cooperative scheduling
 - Tickless operation
@@ -28,8 +28,9 @@ Mdepx (Machdep Extended) is an operating system for embedded applications.
   * Generic exception handlers are not re-entrant (have your own vectors for nested traps if needed)
 
 ## Featured applications (external)
+  * [SMP on Raspberry Pi Pico](https://github.com/machdep/raspberrypi-pico)
   * [LTE 4G Link with nRF9160](https://github.com/machdep/nrf9160)
-  * CTSRD CHERI [device-model](https://github.com/CTSRD-CHERI/device-model)
+  * CTSRD-CHERI [device-model](https://github.com/CTSRD-CHERI/device-model)
 
 # Getting started
 
