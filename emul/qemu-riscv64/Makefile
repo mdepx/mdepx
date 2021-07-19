@@ -1,6 +1,12 @@
 APP = qemu-riscv64
 
 OSDIR = ../../
+OBJDIR = obj
+
+CROSS_COMPILE ?= riscv64-unknown-elf-
+OBJCOPY = ${CROSS_COMPILE}objcopy
+
+export CROSS_COMPILE
 
 export CFLAGS = -march=rv64gc -mabi=lp64 -mcmodel=medany		\
 	-nostdinc -fno-builtin-printf -ffreestanding -Wall		\
