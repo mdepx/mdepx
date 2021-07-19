@@ -81,7 +81,7 @@ e300g_spi_setup(mdx_device_t dev, uint8_t cs)
 	struct spi_softc *sc;
 	uint32_t reg;
 
-	sc = arg;
+	sc = mdx_device_get_softc(dev);
 	sc->cs = cs;	/* Chip Select. */
 
 	WR4(sc, SPI_SCKDIV, 8);
@@ -111,6 +111,7 @@ static struct mdx_spi_ops e300g_spi_ops = {
 int
 e300g_spi_init(mdx_device_t dev, uint32_t base)
 {
+	struct spi_softc *sc;
 
 	sc = mdx_device_get_softc(dev);
 	sc->base = base;
