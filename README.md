@@ -38,7 +38,7 @@ mdepx (Machdep X) is an operating system for embedded applications.
 ## Featured applications (external)
   * [SMP on Raspberry Pi Pico](https://github.com/machdep/raspberrypi-pico)
   * [LTE 4G Link with nRF9160](https://github.com/machdep/nrf9160)
-  * CTSRD-CHERI [device-model](https://github.com/CTSRD-CHERI/device-model) [device-model-riscv](https://github.com/CTSRD-CHERI/device-model-riscv)
+  * CTSRD-CHERI [device-model](https://github.com/CTSRD-CHERI/device-model) and [device-model-riscv](https://github.com/CTSRD-CHERI/device-model-riscv)
   * Other [example apps](https://github.com/machdep/)
 
 # Getting started
