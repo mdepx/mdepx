@@ -1,23 +1,31 @@
 # Introduction
 
-mdepx (Machdep Extended) is an operating system for embedded applications.
+mdepx (Machdep X) is an operating system for embedded applications.
 
 ## Key features
-- Real-time
-- Priority-based time-sliced round-robin scheduling
-- Fully preemptible, optionally cooperative scheduling
-- Tickless operation
-- Static/Dynamic memory allocation
-- Timed Mutexes, Semaphores
-- Symmetric Multiprocessing (SMP)
-- BSD libc included
-- Flat address space
+  * Real-time
+  * Priority-based time-sliced round-robin scheduling
+  * Fully preemptible, cooperative scheduling optional
+  * Tickless operation
+  * Static/Dynamic memory allocation
+  * Timed Mutexes, Semaphores
+  * Symmetric Multiprocessing (SMP)
+  * BSD libc included
+  * Flat address space
 
-## Supported platforms
-- ARM Cortex-M family (ARMv7-M, ARMv8-M) SMP
-- CHERI128 Hybrid and Pure ABI capability system models
-- MIPS32, MIPS64
-- RISC-V rv32, rv64 SMP
+## ISA supported
+  * ARM Cortex-M family (ARMv7-M, ARMv8-M) SMP
+  * CHERI128 Hybrid and Pure ABI capability system models
+  * MIPS32, MIPS64
+  * RISC-V rv32, rv64 SMP
+
+## Platforms supported
+  * Raspberry Pi
+  * Nordic Semiconductor
+  * STMicroelectronics
+  * Microchip
+  * SiFive
+  * some others...
 
 ## Emulators support (see emul/)
   * QEMU/CHERI128 hybrid and pure capability modes
