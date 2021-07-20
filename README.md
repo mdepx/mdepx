@@ -28,9 +28,9 @@ mdepx (Machdep X) is an operating system for embedded applications.
   * some others...
 
 ## Emulators support (see emul/)
-  * QEMU/CHERI128 hybrid and pure capability modes
-  * QEMU/MIPS64
-  * QEMU/RISC-V rv64gc SMP
+  * qemu/cheri128 hybrid and pure capability modes
+  * qemu/mips64
+  * qemu/riscv rv64gc SMP
 
 ## Limitations
   * Generic exception handlers are not re-entrant (have your own vectors for nested traps if needed)
