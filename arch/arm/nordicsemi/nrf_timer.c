@@ -75,6 +75,31 @@ nrf_timer_count(void *arg)
 	return (count);
 }
 
+void
+nrf_timer_udelay(struct nrf_timer_softc *sc, uint32_t usec)
+{
+	uint32_t first, last;
+	uint32_t delta;
+	uint32_t counts;
+	uint32_t v;
+
+	v = 1000000 / sc->mt.frequency;
+
+	counts = 0;
+	first = nrf_timer_count(sc);
+	while (counts < usec) {
+		last = nrf_timer_count(sc);
+		if (last > first)
+			delta = last - first;
+		else
+			delta = last + (0xffffffff - first) + 1;
+
+		counts += (delta * v);
+
+		first = last;
+	}
+}
+
 static void
 nrf_timer_stop(void *arg)
 {
@@ -98,8 +123,8 @@ nrf_timer_start(void *arg, uint32_t ticks)
 
 	sc = arg;
 
-	if (ticks == 1)
-		ticks++;
+	if (ticks < 3)
+		ticks = 3;
 	WR4(sc, TIMER_TASKS_CAPTURE(3), 1);
 	reg = RD4(sc, TIMER_CC(3));
 	WR4(sc, TIMER_CC(sc->cc_idx), reg + ticks);
