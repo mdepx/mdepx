@@ -196,8 +196,7 @@ arm_exception(struct trapframe *tf, int exc_code)
 	released = mdx_sched_ack(td);
 
 	/*
-	 * Switch to the interrupt thread if we don't have
-	 * a thread anymore.
+	 * Switch to the interrupt thread (we are on msp stack).
 	 */
 	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
 	curthread->td_critnest++;
