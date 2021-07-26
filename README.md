@@ -32,9 +32,6 @@ mdepx (Machdep X) is an operating system for embedded applications.
   * qemu/mips64
   * qemu/riscv64 SMP
 
-## Limitations
-  * Generic exception handlers are not re-entrant (have your own vectors for nested traps if needed)
-
 ## Featured applications (external)
   * [SMP on Raspberry Pi Pico](https://github.com/machdep/raspberrypi-pico)
   * [LTE 4G Link with nRF9160](https://github.com/machdep/nrf9160)
