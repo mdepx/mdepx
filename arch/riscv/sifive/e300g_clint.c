@@ -127,6 +127,7 @@ clint_stop(void *arg)
 	csr_clear_tip();
 }
 
+#if __riscv_xlen == 64
 static void
 clint_set_timer(struct clint_softc *sc, int cpuid, uint64_t new)
 {
@@ -137,6 +138,7 @@ clint_set_timer(struct clint_softc *sc, int cpuid, uint64_t new)
 	sbi_set_timer(new);
 #endif
 }
+#endif
 
 static void
 clint_start(void *arg, uint32_t ticks)

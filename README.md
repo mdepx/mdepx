@@ -1,35 +1,42 @@
 # Introduction
 
-Mdepx (Machdep Extended) is an operating system for embedded applications.
+mdepx (Machdep X) is an operating system for embedded applications.
 
 ## Key features
-- Real-time
-- Priority based time sliced round-robin scheduling
-- Fully preemptible
-- Cooperative scheduling
-- Tickless operation
-- Static/Dynamic memory allocation
-- Timed Mutexes, Semaphores
-- Symmetric Multiprocessing (SMP)
-- BSD libc included
+  * Real-time
+  * Priority-based time-sliced round-robin scheduling
+  * Fully preemptible, cooperative scheduling optional
+  * Tickless operation
+  * Static/Dynamic memory allocation
+  * Timed Mutexes, Semaphores
+  * Symmetric Multiprocessing (SMP)
+  * BSD libc included
+  * Flat address space
 
-## Supported platforms
-- ARM Cortex-M family (ARMv7-M, ARMv8-M)
-- CHERI128 Hybrid and Pure ABI capability system models
-- MIPS32, MIPS64
-- RISC-V rv32, rv64
+## ISA supported
+  * ARM Cortex-M family (ARMv7-M, ARMv8-M) SMP
+  * CHERI128 Hybrid and Pure ABI capability system models
+  * MIPS32, MIPS64
+  * RISC-V rv32, rv64 SMP
 
-## Emulators support
-  * QEMU/CHERI128
-  * QEMU/MIPS64
-  * QEMU/RISC-V rv64gc (SMP)
+## Platforms supported
+  * Raspberry Pi
+  * Nordic Semiconductor
+  * STMicroelectronics
+  * Microchip
+  * SiFive
+  * some others...
 
-## Limitations
-  * Generic exception handlers are not re-entrant (have your own vectors for nested traps if needed)
+## Emulators support (see emul/)
+  * qemu/cheri128 Hybrid and Pure Capability modes
+  * qemu/mips64
+  * qemu/riscv64 SMP
 
 ## Featured applications (external)
+  * [SMP on Raspberry Pi Pico](https://github.com/machdep/raspberrypi-pico)
   * [LTE 4G Link with nRF9160](https://github.com/machdep/nrf9160)
-  * CTSRD CHERI [device-model](https://github.com/CTSRD-CHERI/device-model)
+  * CTSRD-CHERI [device-model](https://github.com/CTSRD-CHERI/device-model) and [device-model-riscv](https://github.com/CTSRD-CHERI/device-model-riscv)
+  * Other [example apps](https://github.com/machdep/)
 
 # Getting started
 

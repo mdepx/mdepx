@@ -44,11 +44,13 @@ ASM_ENTRY(mdx_ioread_uint32)
 	ret
 END(mdx_ioread_uint32)
 
+#ifdef __riscv64
 ASM_ENTRY(mdx_ioread_uint64)
 	add	a2, a0, a1
 	ld	a0, 0(a2)
 	ret
 END(mdx_ioread_uint64)
+#endif
 
 ASM_ENTRY(mdx_iowrite_uint8)
 	add	a3, a0, a1
@@ -68,8 +70,10 @@ ASM_ENTRY(mdx_iowrite_uint32)
 	ret
 END(mdx_iowrite_uint32)
 
+#ifdef __riscv64
 ASM_ENTRY(mdx_iowrite_uint64)
 	add	a3, a0, a1
 	sd	a2, 0(a3)
 	ret
 END(mdx_iowrite_uint64)
+#endif
