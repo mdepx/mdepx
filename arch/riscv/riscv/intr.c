@@ -35,6 +35,7 @@
 #include <riscv/riscv/trap.h>
 #include <riscv/include/intr.h>
 #include <riscv/include/clic.h>
+#include <riscv/include/plic.h>
 #include <riscv/sifive/e300g_clint.h>
 
 #define	INTR_DEBUG
@@ -65,6 +66,11 @@ riscv_intr(int irq)
 #ifdef MDX_SCHED_SMP
 	case IRQ_SOFTWARE_MACHINE:
 		clint_intr_software();
+		break;
+#endif
+#ifdef MDX_RISCV_PLIC
+	case IRQ_EXTERNAL_SUPERVISOR:
+		plic_intr();
 		break;
 #endif
 	default:
