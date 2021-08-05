@@ -59,6 +59,7 @@ plic_intr(void)
 			intr_map[irq].handler(intr_map[irq].arg, irq);
 		else
 			printf("%s: stray interrupt %d\n", __func__, irq);
+		WR4(sc, reg, irq);
 	}
 }
 
