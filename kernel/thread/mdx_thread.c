@@ -101,7 +101,10 @@ mdx_thread_yield(void)
 	struct thread *td;
 
 	td = curthread;
+
+	critical_enter();
 	td->td_state = TD_STATE_YIELDING;
+	critical_exit();
 
 	/*
 	 * Note that an interrupt could fire right here.
