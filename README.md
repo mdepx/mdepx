@@ -17,13 +17,13 @@ mdepx (Machdep X) is an operating system for embedded applications.
   * ARM Cortex-M family (ARMv7-M, ARMv8-M) SMP
   * CHERI128 Hybrid and Pure ABI capability system models
   * MIPS32, MIPS64
-  * RISC-V rv32, rv64 SMP
+  * RISC-V machine or supervisor modes, rv32, rv64, SMP
 
 ## Platforms supported
-  * Raspberry Pi
-  * Nordic Semiconductor
-  * STMicroelectronics
-  * Microchip
+  * Raspberry Pi Pico
+  * Nordic Semiconductor nRF5, nRF9
+  * STMicroelectronics STM32
+  * Microchip PIC32
   * SiFive
   * some others...
 
