@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2019-2021 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,15 @@
 #define	REG_SIZE	8
 #else
 #define	REG_SIZE	4
+#endif
+
+/* Capabilities */
+#ifdef __has_feature
+#if __has_feature(capabilities)
+#define	CREG_SIZE	__SIZEOF_CHERI_CAPABILITY__
+#endif
+#else
+#define	__has_feature(x)	0
 #endif
 
 #endif	/* !_MACHINE_ABI_H_ */
