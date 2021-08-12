@@ -8,11 +8,11 @@ OBJCOPY = ${CROSS_COMPILE}objcopy
 
 export CROSS_COMPILE
 
-export CFLAGS = -march=rv64gc -mabi=lp64 -mcmodel=medany		\
+export CFLAGS = -march=rv64imafdcxcheri -mabi=l64pc128d -mno-relax	\
 	-nostdinc -fno-builtin-printf -ffreestanding -Wall		\
 	-Wredundant-decls -Wnested-externs -Wstrict-prototypes		\
 	-Wmissing-prototypes -Wpointer-arith -Winline -Wcast-qual	\
-	-Wundef -Wmissing-include-dirs -Werror -mno-relax
+	-Wundef -Wmissing-include-dirs -Werror
 
 export AFLAGS = ${CFLAGS}
 
