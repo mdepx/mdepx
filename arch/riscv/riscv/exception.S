@@ -69,7 +69,7 @@
 	REG_S	t0, (31 * REG_SIZE)(sp)
 	csrr	t0, REG_STATUS
 	REG_S	t0, (32 * REG_SIZE)(sp)
-	csrr	t0, REG_BADADDR
+	csrr	t0, REG_TVAL
 	REG_S	t0, (33 * REG_SIZE)(sp)
 	csrr	t0, REG_CAUSE
 	REG_S	t0, (34 * REG_SIZE)(sp)

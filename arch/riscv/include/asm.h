@@ -54,14 +54,14 @@
 #define	REG_EPC		sepc
 #define	REG_CAUSE	scause
 #define	REG_STATUS	sstatus
-#define	REG_BADADDR	sbadaddr
+#define	REG_TVAL	stval
 #define	REG_SCRATCH	sscratch
 #define	RET		sret
 #else
 #define	REG_EPC		mepc
 #define	REG_CAUSE	mcause
 #define	REG_STATUS	mstatus
-#define	REG_BADADDR	mbadaddr
+#define	REG_TVAL	mtval
 #define	REG_SCRATCH	mscratch
 #define	RET		mret
 #endif
