@@ -71,10 +71,7 @@ main(void)
 	mdx_usleep(1000000);
 #endif
 
-	while (1) {
-		printf("Hello World\n");
-		mdx_usleep(1000000);
-	}
+	callout_test();
 
 	/* NOT REACHED */
 
