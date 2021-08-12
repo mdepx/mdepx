@@ -26,6 +26,8 @@
 
 #include <machine/asm.h>
 
+#if !__has_feature(capabilities)
+
 ASM_ENTRY(mdx_ioread_uint8)
 	add	a2, a0, a1
 	lbu	a0, 0(a2)
@@ -76,4 +78,10 @@ ASM_ENTRY(mdx_iowrite_uint64)
 	sd	a2, 0(a3)
 	ret
 END(mdx_iowrite_uint64)
+#endif
+
+#else
+
+	/* TODO */
+
 #endif
