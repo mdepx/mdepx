@@ -30,6 +30,7 @@
 #include <sys/pcpu.h>
 #include <sys/smp.h>
 #include <sys/systm.h>
+#include <sys/io.h>
 
 #include <machine/atomic.h>
 #include <machine/cpuregs.h>
@@ -38,13 +39,14 @@
 #include <riscv/sifive/e300g_clint.h>
 
 #define	RD4(_sc, _reg)		\
-	*(volatile uint32_t *)((_sc)->base + _reg)
+	mdx_ioread_uint32((_sc)->base, _reg)
 #define	RD8(_sc, _reg)		\
-	*(volatile uint64_t *)((_sc)->base + _reg)
+	mdx_ioread_uint64((_sc)->base, _reg)
+
 #define	WR4(_sc, _reg, _val)	\
-	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+	mdx_iowrite_uint32((_sc)->base, _reg, _val)
 #define	WR8(_sc, _reg, _val)	\
-	*(volatile uint64_t *)((_sc)->base + _reg) = _val
+	mdx_iowrite_uint64((_sc)->base, _reg, _val)
 
 #define	CLINT_DEBUG
 #undef	CLINT_DEBUG
@@ -258,7 +260,7 @@ clint_get_cpu_freq(struct clint_softc *sc, uint32_t osc_freq)
 }
 
 int
-e300g_clint_init(struct clint_softc *sc, uint32_t base,
+e300g_clint_init(struct clint_softc *sc, capability base,
     uint32_t frequency)
 {
 

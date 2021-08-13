@@ -84,7 +84,7 @@ board_init(void)
 
 	/* Timer */
 
-	e300g_clint_init(&clint_sc, CLINT_BASE, BOARD_CPU_FREQ);
+	e300g_clint_init(&clint_sc, (void *)CLINT_BASE, BOARD_CPU_FREQ);
 
 	/* Release secondary core(s) */
 

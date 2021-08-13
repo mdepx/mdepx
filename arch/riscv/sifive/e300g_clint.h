@@ -43,11 +43,11 @@
 #define	MTIME		0xBFF8
 
 struct clint_softc {
-	size_t base;
+	capability base;
 	struct mi_timer mt;
 };
 
-int e300g_clint_init(struct clint_softc *sc, uint32_t base,
+int e300g_clint_init(struct clint_softc *sc, capability base,
     uint32_t frequency);
 int clint_get_cpu_freq(struct clint_softc *sc, uint32_t osc_freq);
 void clint_udelay(struct clint_softc *sc, uint32_t usec, uint32_t osc_freq);
