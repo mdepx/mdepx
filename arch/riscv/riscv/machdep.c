@@ -136,7 +136,13 @@ md_init_secondary(int hart)
 	pcpup->pc_stack = (uintptr_t)&intr_stack[hart] +
 	    MDX_RISCV_INTR_STACK_SIZE;
 	list_init(&pcpup->pc_avail);
+
+#ifdef __CHERI_PURE_CAPABILITY__
+	__asm __volatile("cmove cgp, %0" :: "C"(pcpup));
+#else
 	__asm __volatile("mv gp, %0" :: "r"(pcpup));
+#endif
+
 #ifdef MDX_RISCV_SUPERVISOR_MODE
 	csr_write(sscratch, pcpup->pc_stack);
 #else
@@ -175,7 +181,12 @@ md_init(int hart)
 	pcpup->pc_stack = (uintptr_t)&intr_stack[hart] +
 	    MDX_RISCV_INTR_STACK_SIZE;
 	list_init(&pcpup->pc_avail);
+#ifdef __CHERI_PURE_CAPABILITY__
+	__asm __volatile("cmove cgp, %0" :: "C"(pcpup));
+#else
 	__asm __volatile("mv gp, %0" :: "r"(pcpup));
+#endif
+
 #ifdef MDX_RISCV_SUPERVISOR_MODE
 	csr_write(sscratch, pcpup->pc_stack);
 #else

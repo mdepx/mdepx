@@ -32,7 +32,11 @@ get_pcpu(void)
 {
 	struct pcpu *pcpu;
 
+#ifdef __CHERI_PURE_CAPABILITY__
+	__asm __volatile("cmove %0, cgp" : "=&C"(pcpu));
+#else
 	__asm __volatile("mv %0, gp" : "=&r"(pcpu));
+#endif
 
 	return (pcpu);
 }
@@ -42,10 +46,16 @@ get_curthread(void)
 {
 	struct thread *td;
 
+#ifdef __CHERI_PURE_CAPABILITY__
+	__asm __volatile("clc %0, 0(cgp)" : "=&C"(td));
+#else
+
 #if __riscv_xlen == 64
 	__asm __volatile("ld %0, 0(gp)" : "=&r"(td));
 #else
 	__asm __volatile("lw %0, 0(gp)" : "=&r"(td));
+#endif
+
 #endif
 
 	return (td);
