@@ -50,6 +50,8 @@
 #define	PTR_LA		lla
 #endif
 
+#ifndef __CHERI_PURE_CAPABILITY__
+
 #ifdef MDX_RISCV_SUPERVISOR_MODE
 #define	REG_EPC		sepc
 #define	REG_CAUSE	scause
@@ -64,6 +66,26 @@
 #define	REG_TVAL	mtval
 #define	REG_SCRATCH	mscratch
 #define	RET		mret
+#endif
+
+#else /* __CHERI_PURE_CAPABILITY__ */
+
+#ifdef MDX_RISCV_SUPERVISOR_MODE
+#define	REG_EPC		sepcc
+#define	REG_CAUSE	scause
+#define	REG_STATUS	sstatus
+#define	REG_TVAL	stval
+#define	REG_SCRATCH	sscratchc
+#define	RET		sret
+#else
+#define	REG_EPC		mepcc
+#define	REG_CAUSE	mcause
+#define	REG_STATUS	mstatus
+#define	REG_TVAL	mtval
+#define	REG_SCRATCH	mscratchc
+#define	RET		mret
+#endif
+
 #endif
 
 #endif	/* !_MACHINE_ASM_H_ */
