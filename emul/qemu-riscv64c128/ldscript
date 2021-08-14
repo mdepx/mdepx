@@ -33,6 +33,10 @@ SECTIONS
 		*(.rodata.str1.1)
 	} > sram0
 
+	__cap_relocs :  ALIGN(16) {
+		*(__cap_relocs)
+	} > sram0
+
 	/* Ensure _smem is associated with the next section */
 	. = .;
 	_smem = ABSOLUTE(.);
