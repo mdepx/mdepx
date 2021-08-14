@@ -34,6 +34,7 @@
 #include <sys/sem.h>
 #include <sys/list.h>
 #include <sys/smp.h>
+#include <sys/cheri.h>
 
 #include <riscv/sifive/e300g_clint.h>
 #include <riscv/sifive/e300g_uart.h>
@@ -84,7 +85,12 @@ board_init(void)
 
 	/* Timer */
 
-	e300g_clint_init(&clint_sc, CLINT_BASE, BOARD_CPU_FREQ);
+	capability cap;
+	cap = cheri_getdefault();
+	cap = cheri_setoffset(cap, CLINT_BASE);
+	cap = cheri_setbounds(cap, 1024);
+
+	e300g_clint_init(&clint_sc, cap, BOARD_CPU_FREQ);
 
 	/* Release secondary core(s) */
 
