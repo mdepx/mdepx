@@ -48,6 +48,7 @@
 #endif
 
 #include "board.h"
+#include "main.h"
 
 #define	VIRTIO_BLOCK_MMIO_BASE	0x10007000
 
@@ -57,6 +58,15 @@ hello(void *arg)
 
 	if (PCPU_GET(cpuid) == 0)
 		printf("\n\nhello\n\n");
+}
+
+void
+start_purecap(void)
+{
+
+	cheri_init_globals_3( __builtin_cheri_global_data_get(),
+		__builtin_cheri_program_counter_get(),
+		__builtin_cheri_global_data_get());
 }
 
 int
