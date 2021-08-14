@@ -82,6 +82,56 @@ END(mdx_iowrite_uint64)
 
 #else
 
-	/* TODO */
+ASM_ENTRY(mdx_ioread_uint8)
+	cincoffset ca2, ca0, a1
+	clbu	a0, 0(ca2)
+	cret
+END(mdx_ioread_uint8)
+
+ASM_ENTRY(mdx_ioread_uint16)
+	cincoffset ca2, ca0, a1
+	clhu	a0, 0(ca2)
+	cret
+END(mdx_ioread_uint16)
+
+ASM_ENTRY(mdx_ioread_uint32)
+	cincoffset ca2, ca0, a1
+	clw	a0, 0(ca2)
+	cret
+END(mdx_ioread_uint32)
+
+#if __riscv_xlen == 64
+ASM_ENTRY(mdx_ioread_uint64)
+	cincoffset ca2, ca0, a1
+	cld	a0, 0(ca2)
+	cret
+END(mdx_ioread_uint64)
+#endif
+
+ASM_ENTRY(mdx_iowrite_uint8)
+	cincoffset ca3, ca0, a1
+	csb	a2, 0(ca3)
+	cret
+END(mdx_iowrite_uint8)
+
+ASM_ENTRY(mdx_iowrite_uint16)
+	cincoffset ca3, ca0, a1
+	csh	a2, 0(ca3)
+	cret
+END(mdx_iowrite_uint16)
+
+ASM_ENTRY(mdx_iowrite_uint32)
+	cincoffset ca3, ca0, a1
+	csw	a2, 0(ca3)
+	cret
+END(mdx_iowrite_uint32)
+
+#if __riscv_xlen == 64
+ASM_ENTRY(mdx_iowrite_uint64)
+	cincoffset ca3, ca0, a1
+	csd	a2, 0(ca3)
+	cret
+END(mdx_iowrite_uint64)
+#endif
 
 #endif
