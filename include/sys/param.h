@@ -34,4 +34,7 @@
 
 #define	roundup2(x, y)	(((x)+((y)-1))&(~((y)-1)))
 
+#define	MIN(a, b)	(((a) < (b)) ? (a) : (b))
+#define	MAX(a, b)	(((a) > (b)) ? (a) : (b))
+
 #endif /* !_SYS_PARAM_H_ */
