@@ -30,8 +30,10 @@ ASM_ENTRY(_start)
 	fence.i
 	fence
 
-	la	t0, cpu_exception_handler
-	csrw	mtvec, t0
+	cllc		ct0, cpu_exception_handler
+	cspecialw	mtcc, ct0
+	cmove		ct1, cnull
+	cspecialw	mtdc, ct1
 
 	li	t0, 0
 	bne	a0, t0, mpentry
@@ -44,22 +46,19 @@ ASM_ENTRY(_start)
 #endif
 
 	/* Clear BSS. */
-	la	t0, _sbss
-	la	t1, _ebss
+	cllc	ct0, _sbss
+	cllc	ct1, _ebss
 1:
-	beq	t0, t1, 2f
-	li	t2, 0
-	sb	t2, 0(t0)
-	addi	t0, t0, 1
-	j	1b
-2:
+	csb	zero, 0(ct0)
+	cincoffset ct0, ct0, 1
+	bltu	t0, t1, 1b
 
-	/* Load our stack pointer. */
-	la	t0, idle_thread_stack
+	/* Setup stack pointer. */
 	li	t1, MDX_THREAD_STACK_SIZE
 	mulw	t2, t1, a0
 	add	t2, t2, t1
-	add	sp, t2, t0
+	cllc	ct0, idle_thread_stack
+	cincoffset csp, ct0, t2
 
 	fence
 
