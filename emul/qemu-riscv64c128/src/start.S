@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2021 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,14 +26,41 @@
 
 #include <machine/asm.h>
 
+#if __CHERI_PURE_CAPABILITY__
+# The CPU starts in hybrid, and the boot initialisation has to be in hybrid.
+.option nocapmode
+#endif /* __CHERI_PURE_CAPABILITY__ */
+
 ASM_ENTRY(_start)
 	fence.i
 	fence
 
-	cllc		ct0, cpu_exception_handler
-	cspecialw	mtcc, ct0
-	cmove		ct1, cnull
-	cspecialw	mtdc, ct1
+#ifdef __CHERI_PURE_CAPABILITY__
+	# W^X for PCC and DDC
+	cspecialrw	ct0, ddc, cnull
+	li		t1, (1 << 1)
+	not		t1, t1
+	candperm	ct0, ct0, t1
+	cspecialrw	cnull, ddc, ct0
+
+	cspecialrw	ct0, pcc, cnull
+	li		t1, ((1 << 3) | (1 << 5))
+	not		t1, t1
+	candperm	ct0, ct0, t1
+	la		t2, _mstart
+	csetoffset	ct0, ct0, t2
+#ifdef __riscv_xcheri_mode_dependent_jumps
+	jr.cap		ct0
+#else
+	cjr		ct0
+#endif
+#endif
+
+_mstart:
+	li	x1, 0
+
+	la	t0, cpu_exception_handler
+	csrw	mtvec, t0
 
 	li	t0, 0
 	bne	a0, t0, mpentry
@@ -46,19 +73,60 @@ ASM_ENTRY(_start)
 #endif
 
 	/* Clear BSS. */
-	cllc	ct0, _sbss
-	cllc	ct1, _ebss
+	la	t0, _sbss
+	la	t1, _ebss
 1:
-	csb	zero, 0(ct0)
-	cincoffset ct0, ct0, 1
-	bltu	t0, t1, 1b
+	beq	t0, t1, 2f
+	li	t2, 0
+	sb	t2, 0(t0)
+	addi	t0, t0, 1
+	j	1b
+2:
 
-	/* Setup stack pointer. */
-	li	t1, MDX_THREAD_STACK_SIZE
-	mulw	t2, t1, a0
-	add	t2, t2, t1
-	cllc	ct0, idle_thread_stack
-	cincoffset csp, ct0, t2
+	/* Init our stack pointer. */
+	la		t0, idle_thread_stack
+	li		t1, MDX_THREAD_STACK_SIZE
+	mulw		t2, t1, a0
+	add		t2, t2, t0	# Start of the current CPU stack
+	add		sp, t2, t1	# End of the current CPU stack
+
+#ifdef __CHERI_PURE_CAPABILITY__
+	# From now on, do purecap ABI but in hybrid mode.
+	cfromptr	csp, ddc, sp	# Get DDC
+	sub		t2, t2, sp	# Length of the stack
+	csetbounds	csp, csp, t2
+	cincoffset	csp, csp, t2
+
+	la		t1, start_purecap
+	csetoffset	ct0, ct0, t1
+#ifdef __riscv_xcheri_mode_dependent_jumps
+	jalr.cap	cra, ct0
+#else
+	cjalr		cra, ct0
+#endif
+
+	# From now on, the DDC is always null
+	cmove		ct0, cnull
+	cspecialrw	cnull, ddc, ct0 # Write DDC
+
+	# Set up mtcc and jump to main in purecap mode
+	cspecialrw	ct0, pcc, cnull # Get PCC
+
+	li		t1, 1
+	csetflags	ct0, ct0, t1 # set cap mode on
+
+	la		t1, cpu_exception_handler
+	csetoffset	ct0, ct0, t1
+	cspecialrw	cnull, mtcc, ct0 # Write MTCC
+
+	la		t1, md_init
+	csetoffset	ct0, ct0, t1
+#ifdef __riscv_xcheri_mode_dependent_jumps
+	jalr.cap	cra, ct0 # jump to main
+#else
+	cjalr		cra, ct0 # jump to main
+#endif
+#endif
 
 	fence
 
@@ -92,3 +160,7 @@ END(mpentry)
 
 cpu_lottery:
 	.space 4
+
+#if __CHERI_PURE_CAPABILITY__
+.option capmode
+#endif /* __CHERI_PURE_CAPABILITY__ */
