@@ -43,6 +43,10 @@
 #include <app/callout_test/callout_test.h>
 #include <app/virtio_test/virtio_test.h>
 
+#ifdef __CHERI_PURE_CAPABILITY__
+#include "cheri_init_globals.h"
+#endif
+
 #include "board.h"
 
 #define	VIRTIO_BLOCK_MMIO_BASE	0x10007000
@@ -71,7 +75,10 @@ main(void)
 	mdx_usleep(1000000);
 #endif
 
-	callout_test();
+	while (1) {
+		printf("Hello Pure Capability World\n");
+		mdx_usleep(1000000);
+	}
 
 	/* NOT REACHED */
 
@@ -88,4 +95,15 @@ main(void)
 #endif
 
 	return (0);
+}
+
+/* Also provide a simple purecap strlen function */
+__SIZE_TYPE__ strlen(const char* str)
+{
+	const char* p = str;
+
+	while (*p != '\0')
+		p++;
+
+	return p - str;
 }
