@@ -27,12 +27,15 @@ RUN_CMD = ${QEMU}							\
 	-kernel ${OBJDIR}/${APP}.elf					\
 	-serial mon:stdio						\
 	-bios none -nographic						\
-	-device virtio-serial-device					\
-	-nodefaults							\
+	-nodefaults
+
+RUN_C1=	-device virtio-serial-device					\
 	-drive if=none,id=sda,format=raw,file=${OBJDIR}/qemu.img	\
 	-device virtio-blk-device,drive=sda				\
 	-chardev socket,path=/tmp/virtio,server,nowait,id=virtiocon0	\
 	-device virtconsole,chardev=virtiocon0
+
+RUN_C2= -trace enable=exec_tb
 
 all:
 	@${CMD} -j mdepx.conf

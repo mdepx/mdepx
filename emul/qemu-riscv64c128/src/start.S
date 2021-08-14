@@ -59,11 +59,11 @@ ASM_ENTRY(_start)
 _mstart:
 	li	x1, 0
 
-	la	t0, cpu_exception_handler
-	csrw	mtvec, t0
+	//la	t0, cpu_exception_handler
+	//csrw	mtvec, t0
 
-	li	t0, 0
-	bne	a0, t0, mpentry
+	//li	t0, 0
+	//bne	a0, t0, mpentry
 
 #if 0
 	la	t0, cpu_lottery
@@ -93,10 +93,16 @@ _mstart:
 #ifdef __CHERI_PURE_CAPABILITY__
 	# From now on, do purecap ABI but in hybrid mode.
 	cfromptr	csp, ddc, sp	# Get DDC
-	sub		t2, t2, sp	# Length of the stack
+	sub		t2, sp, t2	# Length of the stack
 	csetbounds	csp, csp, t2
 	cincoffset	csp, csp, t2
 
+	cspecialrw	ct0, pcc, cnull # Get PCC
+	li		t1, 1
+	csetflags	ct0, ct0, t1
+
+	# Initialise the captable.
+	# ct0 is still PCC
 	la		t1, start_purecap
 	csetoffset	ct0, ct0, t1
 #ifdef __riscv_xcheri_mode_dependent_jumps
@@ -106,8 +112,8 @@ _mstart:
 #endif
 
 	# From now on, the DDC is always null
-	cmove		ct0, cnull
-	cspecialrw	cnull, ddc, ct0 # Write DDC
+	//cmove		ct0, cnull
+	//cspecialrw	cnull, ddc, ct0 # Write DDC
 
 	# Set up mtcc and jump to main in purecap mode
 	cspecialrw	ct0, pcc, cnull # Get PCC

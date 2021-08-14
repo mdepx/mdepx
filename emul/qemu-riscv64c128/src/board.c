@@ -68,15 +68,19 @@ uart_getchar(void)
 void
 board_init(void)
 {
+	capability cap;
 
 	/* Initialize malloc */
 
-	malloc_init();
-	malloc_add_region((void *)0x80800000, 0x7800000);
+	//malloc_init();
+	//malloc_add_region((void *)0x80800000, 0x7800000);
 
 	/* Register UART */
 
-	uart_16550_init(&dev_uart, (void *)UART_BASE, 0, UART_CLOCK_RATE);
+	cap = cheri_getdefault();
+	cap = cheri_setoffset(cap, UART_BASE);
+	cap = cheri_setbounds(cap, 1024);
+	uart_16550_init(&dev_uart, cap, 0, UART_CLOCK_RATE);
 	mdx_uart_setup(&dev_uart, DEFAULT_BAUDRATE,
 	    UART_DATABITS_5,
 	    UART_STOPBITS_1,
@@ -85,14 +89,15 @@ board_init(void)
 
 	/* Timer */
 
-	capability cap;
 	cap = cheri_getdefault();
 	cap = cheri_setoffset(cap, CLINT_BASE);
 	cap = cheri_setbounds(cap, 1024);
-
 	e300g_clint_init(&clint_sc, cap, BOARD_CPU_FREQ);
 
 	/* Release secondary core(s) */
+
+	while (1)
+		printf("Hello World\n");
 
 #ifdef MDX_SCHED_SMP
 	int j;
