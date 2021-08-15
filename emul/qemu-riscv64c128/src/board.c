@@ -72,8 +72,11 @@ board_init(void)
 
 	/* Initialize malloc */
 
-	//malloc_init();
-	//malloc_add_region((void *)0x80800000, 0x7800000);
+	cap = cheri_getdefault();
+	cap = cheri_setoffset(cap, 0x80800000);
+
+	malloc_init();
+	malloc_add_region(cap, 0x7800000);
 
 	/* Register UART */
 
@@ -95,9 +98,6 @@ board_init(void)
 	e300g_clint_init(&clint_sc, cap, BOARD_CPU_FREQ);
 
 	/* Release secondary core(s) */
-
-	while (1)
-		printf("Hello World\n");
 
 #ifdef MDX_SCHED_SMP
 	int j;
