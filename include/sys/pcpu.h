@@ -31,7 +31,7 @@
 
 struct pcpu {
 	struct thread	*pc_curthread;
-	size_t		pc_stack;
+	capability	pc_stack;
 	int		pc_cpuid;
 	struct entry	pc_avail;	/* CPUs that run idle task. */
 	struct entry	pc_all;		/* List of all available CPUs. */
