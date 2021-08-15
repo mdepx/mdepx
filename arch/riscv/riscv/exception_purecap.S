@@ -28,93 +28,93 @@
 #include <machine/cpuregs.h>
 
 .macro save_registers el
-	cincoffset	csp, csp, -(35 * REG_SIZE)
+	cincoffset	csp, csp, -(35 * CREG_SIZE)
 
-	csc	cra, (0 * REG_SIZE)(csp)
-	csc	csp, (1 * REG_SIZE)(csp)
-	csc	cgp, (2 * REG_SIZE)(csp)
-	csc	ctp, (3 * REG_SIZE)(csp)
+	csc	cra, (0 * CREG_SIZE)(csp)
+	csc	csp, (1 * CREG_SIZE)(csp)
+	csc	cgp, (2 * CREG_SIZE)(csp)
+	csc	ctp, (3 * CREG_SIZE)(csp)
 
-	csc	ct0, (4 * REG_SIZE)(csp)
-	csc	ct1, (5 * REG_SIZE)(csp)
-	csc	ct2, (6 * REG_SIZE)(csp)
-	csc	ct3, (7 * REG_SIZE)(csp)
-	csc	ct4, (8 * REG_SIZE)(csp)
-	csc	ct5, (9 * REG_SIZE)(csp)
-	csc	ct6, (10 * REG_SIZE)(csp)
+	csc	ct0, (4 * CREG_SIZE)(csp)
+	csc	ct1, (5 * CREG_SIZE)(csp)
+	csc	ct2, (6 * CREG_SIZE)(csp)
+	csc	ct3, (7 * CREG_SIZE)(csp)
+	csc	ct4, (8 * CREG_SIZE)(csp)
+	csc	ct5, (9 * CREG_SIZE)(csp)
+	csc	ct6, (10 * CREG_SIZE)(csp)
 
-	csc	cs0, (11 * REG_SIZE)(csp)
-	csc	cs1, (12 * REG_SIZE)(csp)
-	csc	cs2, (13 * REG_SIZE)(csp)
-	csc	cs3, (14 * REG_SIZE)(csp)
-	csc	cs4, (15 * REG_SIZE)(csp)
-	csc	cs5, (16 * REG_SIZE)(csp)
-	csc	cs6, (17 * REG_SIZE)(csp)
-	csc	cs7, (18 * REG_SIZE)(csp)
-	csc	cs8, (19 * REG_SIZE)(csp)
-	csc	cs9, (20 * REG_SIZE)(csp)
-	csc	cs10, (21 * REG_SIZE)(csp)
-	csc	cs11, (22 * REG_SIZE)(csp)
+	csc	cs0, (11 * CREG_SIZE)(csp)
+	csc	cs1, (12 * CREG_SIZE)(csp)
+	csc	cs2, (13 * CREG_SIZE)(csp)
+	csc	cs3, (14 * CREG_SIZE)(csp)
+	csc	cs4, (15 * CREG_SIZE)(csp)
+	csc	cs5, (16 * CREG_SIZE)(csp)
+	csc	cs6, (17 * CREG_SIZE)(csp)
+	csc	cs7, (18 * CREG_SIZE)(csp)
+	csc	cs8, (19 * CREG_SIZE)(csp)
+	csc	cs9, (20 * CREG_SIZE)(csp)
+	csc	cs10, (21 * CREG_SIZE)(csp)
+	csc	cs11, (22 * CREG_SIZE)(csp)
 
-	csc	ca0, (23 * REG_SIZE)(csp)
-	csc	ca1, (24 * REG_SIZE)(csp)
-	csc	ca2, (25 * REG_SIZE)(csp)
-	csc	ca3, (26 * REG_SIZE)(csp)
-	csc	ca4, (27 * REG_SIZE)(csp)
-	csc	ca5, (28 * REG_SIZE)(csp)
-	csc	ca6, (29 * REG_SIZE)(csp)
-	csc	ca7, (30 * REG_SIZE)(csp)
+	csc	ca0, (23 * CREG_SIZE)(csp)
+	csc	ca1, (24 * CREG_SIZE)(csp)
+	csc	ca2, (25 * CREG_SIZE)(csp)
+	csc	ca3, (26 * CREG_SIZE)(csp)
+	csc	ca4, (27 * CREG_SIZE)(csp)
+	csc	ca5, (28 * CREG_SIZE)(csp)
+	csc	ca6, (29 * CREG_SIZE)(csp)
+	csc	ca7, (30 * CREG_SIZE)(csp)
 
 	cspecialr	ct0, REG_EPC
-	csc		ct0, (31 * REG_SIZE)(csp)
+	csc		ct0, (31 * CREG_SIZE)(csp)
 	csrr		t0, REG_STATUS
-	csd		t0, (32 * REG_SIZE)(csp)
+	csd		t0, (32 * CREG_SIZE)(csp)
 	csrr		t0, REG_TVAL
-	csd		t0, (33 * REG_SIZE)(csp)
+	csd		t0, (33 * CREG_SIZE)(csp)
 	csrr		t0, REG_CAUSE
-	csd		t0, (34 * REG_SIZE)(csp)
+	csd		t0, (34 * CREG_SIZE)(csp)
 .endm
 
 .macro load_registers el
-	clc		ct0, (31 * REG_SIZE)(csp)
+	clc		ct0, (31 * CREG_SIZE)(csp)
 	cspecialw	REG_EPC, ct0
-	cld		t0, (32 * REG_SIZE)(csp)
+	cld		t0, (32 * CREG_SIZE)(csp)
 	csrw		REG_STATUS, t0
 
-	clc	cra, (0 * REG_SIZE)(csp)
-	clc	ctp, (3 * REG_SIZE)(csp)
+	clc	cra, (0 * CREG_SIZE)(csp)
+	clc	ctp, (3 * CREG_SIZE)(csp)
 
-	clc	ct0, (4 * REG_SIZE)(csp)
-	clc	ct1, (5 * REG_SIZE)(csp)
-	clc	ct2, (6 * REG_SIZE)(csp)
-	clc	ct3, (7 * REG_SIZE)(csp)
-	clc	ct4, (8 * REG_SIZE)(csp)
-	clc	ct5, (9 * REG_SIZE)(csp)
-	clc	ct6, (10 * REG_SIZE)(csp)
+	clc	ct0, (4 * CREG_SIZE)(csp)
+	clc	ct1, (5 * CREG_SIZE)(csp)
+	clc	ct2, (6 * CREG_SIZE)(csp)
+	clc	ct3, (7 * CREG_SIZE)(csp)
+	clc	ct4, (8 * CREG_SIZE)(csp)
+	clc	ct5, (9 * CREG_SIZE)(csp)
+	clc	ct6, (10 * CREG_SIZE)(csp)
 
-	clc	cs0, (11 * REG_SIZE)(csp)
-	clc	cs1, (12 * REG_SIZE)(csp)
-	clc	cs2, (13 * REG_SIZE)(csp)
-	clc	cs3, (14 * REG_SIZE)(csp)
-	clc	cs4, (15 * REG_SIZE)(csp)
-	clc	cs5, (16 * REG_SIZE)(csp)
-	clc	cs6, (17 * REG_SIZE)(csp)
-	clc	cs7, (18 * REG_SIZE)(csp)
-	clc	cs8, (19 * REG_SIZE)(csp)
-	clc	cs9, (20 * REG_SIZE)(csp)
-	clc	cs10, (21 * REG_SIZE)(csp)
-	clc	cs11, (22 * REG_SIZE)(csp)
+	clc	cs0, (11 * CREG_SIZE)(csp)
+	clc	cs1, (12 * CREG_SIZE)(csp)
+	clc	cs2, (13 * CREG_SIZE)(csp)
+	clc	cs3, (14 * CREG_SIZE)(csp)
+	clc	cs4, (15 * CREG_SIZE)(csp)
+	clc	cs5, (16 * CREG_SIZE)(csp)
+	clc	cs6, (17 * CREG_SIZE)(csp)
+	clc	cs7, (18 * CREG_SIZE)(csp)
+	clc	cs8, (19 * CREG_SIZE)(csp)
+	clc	cs9, (20 * CREG_SIZE)(csp)
+	clc	cs10, (21 * CREG_SIZE)(csp)
+	clc	cs11, (22 * CREG_SIZE)(csp)
 
-	clc	ca0, (23 * REG_SIZE)(csp)
-	clc	ca1, (24 * REG_SIZE)(csp)
-	clc	ca2, (25 * REG_SIZE)(csp)
-	clc	ca3, (26 * REG_SIZE)(csp)
-	clc	ca4, (27 * REG_SIZE)(csp)
-	clc	ca5, (28 * REG_SIZE)(csp)
-	clc	ca6, (29 * REG_SIZE)(csp)
-	clc	ca7, (30 * REG_SIZE)(csp)
+	clc	ca0, (23 * CREG_SIZE)(csp)
+	clc	ca1, (24 * CREG_SIZE)(csp)
+	clc	ca2, (25 * CREG_SIZE)(csp)
+	clc	ca3, (26 * CREG_SIZE)(csp)
+	clc	ca4, (27 * CREG_SIZE)(csp)
+	clc	ca5, (28 * CREG_SIZE)(csp)
+	clc	ca6, (29 * CREG_SIZE)(csp)
+	clc	ca7, (30 * CREG_SIZE)(csp)
 
-	cincoffset	csp, csp, (35 * REG_SIZE)
+	cincoffset	csp, csp, (35 * CREG_SIZE)
 .endm
 
 /*
@@ -125,10 +125,11 @@
 	.align 6
 ASM_ENTRY(cpu_exception_handler)
 	save_registers 1
-	mv		a0, sp
+	cmove		ca0, csp
 	cspecialr	csp, REG_SCRATCH
-	jal		riscv_exception
-	mv		sp, a0
+	clgc		ct0, riscv_exception
+	cjalr		ct0
+	cmove		csp, ca0
 	load_registers 1
 	RET
 END(cpu_exception_handler)
