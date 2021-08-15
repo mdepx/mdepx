@@ -32,7 +32,7 @@
 #endif
 
 static inline void *
-mdx_incoffset(void *a, int len)
+mdx_incoffset(void *a, size_t len)
 {
 	void *result;
 
@@ -46,7 +46,7 @@ mdx_incoffset(void *a, int len)
 }
 
 static inline void *
-mdx_decoffset(void *a, int len)
+mdx_decoffset(void *a, size_t len)
 {
 	void *result;
 
@@ -60,7 +60,21 @@ mdx_decoffset(void *a, int len)
 }
 
 static inline void *
-mdx_setbounds(void *a, int len)
+mdx_setoffset(void *a, size_t len)
+{
+	void *result;
+
+#ifdef __CHERI_PURE_CAPABILITY__
+	result = cheri_setoffset(a, len);
+#else
+	result = (void *)(len);
+#endif
+
+	return (result);
+}
+
+static inline void *
+mdx_setbounds(void *a, size_t len)
 {
 	void *result;
 
@@ -85,6 +99,17 @@ mdx_getaddress(void *a)
 #endif
 
 	return (result);
+}
+
+static inline void *
+mdx_getdefault(void)
+{
+
+#ifdef __CHERI_PURE_CAPABILITY__
+	return (cheri_getdefault());
+#else
+	return (NULL);
+#endif
 }
 
 #endif /* !_SYS_CHERI_H_ */
