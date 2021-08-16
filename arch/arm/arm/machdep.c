@@ -131,7 +131,7 @@ md_init(int cpuid)
 	pcpup = &__pcpu[cpuid];
 	pcpup->pc_cpuid = cpuid;
 	list_init(&pcpup->pc_avail);
-	pcpup->pc_stack = (uintptr_t)&intr_stack[cpuid] +
+	pcpup->pc_stack = (uint8_t *)&intr_stack[cpuid] +
 	    MDX_ARM_INTR_STACK_SIZE;
 	__asm __volatile("msr msp, %0" :: "r"(pcpup->pc_stack));
 #endif
