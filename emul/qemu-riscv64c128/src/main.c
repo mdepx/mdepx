@@ -85,6 +85,8 @@ main(void)
 	mdx_usleep(1000000);
 #endif
 
+	callout_test();
+
 	while (1) {
 		printf("Hello Pure Capability World\n");
 		mdx_usleep(1000000);
