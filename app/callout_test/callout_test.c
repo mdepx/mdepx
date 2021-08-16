@@ -56,7 +56,7 @@ test_thr(void *arg)
 		if (!mdx_mutex_timedlock(&m0, 1000))
 			continue;
 		printf("cpu%d: hello from thread%04d\n", PCPU_GET(cpuid),
-		    (size_t)arg);
+		    curthread->td_index);
 		mdx_mutex_unlock(&m0);
 
 		mdx_tsleep(1000);
@@ -69,7 +69,7 @@ test_thr1(void *arg)
 
 	while (1) {
 		printf("cpu%d: hello from thread%d\n",
-		    PCPU_GET(cpuid), (size_t)arg);
+		    PCPU_GET(cpuid), curthread->td_index);
 		mdx_tsleep(10000000);
 	}
 }
@@ -80,7 +80,7 @@ test_thr2(void *arg)
 
 	while (1) {
 		printf("cpu%d: hello from thread%d\n",
-		    PCPU_GET(cpuid), (size_t)arg);
+		    PCPU_GET(cpuid), curthread->td_index);
 		mdx_tsleep(5000000);
 	}
 }
@@ -91,7 +91,7 @@ test_m0(void *arg)
 
 	while (1) {
 		if (mdx_mutex_timedlock(&m1, 50000) == 0) {
-			printf("again %ld\n", (uintptr_t)arg);
+			printf("again %ld\n", curthread->td_index);
 			continue;
 		}
 		printf("test_m0 acuired the mutex\n");
@@ -105,7 +105,7 @@ test_m1(void *arg)
 
 	while (1) {
 		if (mdx_mutex_timedlock(&m1, 50000) == 0) {
-			printf("again %ld\n", (uintptr_t)arg);
+			printf("again %ld\n", curthread->td_index);
 			continue;
 		}
 		printf("test_m1 acuired the mutex\n");
@@ -119,7 +119,7 @@ test_m2(void *arg)
 
 	while (1) {
 		if (mdx_mutex_timedlock(&m1, 50000) == 0) {
-			printf("again %ld\n", (uintptr_t)arg);
+			printf("again %ld\n", curthread->td_index);
 			continue;
 		}
 		printf("test_m2 acuired the mutex\n");
@@ -175,10 +175,11 @@ callout_test(void)
 	size_t i;
 	for (i = 0; i < 20; i++) {
 		td = mdx_thread_create("test", 1, 1000,
-		    8192, test_thr, (void *)i);
+		    8192, test_thr, NULL);
 		if (td == NULL)
 			break;
 		printf("td %p created\n", td);
+		td->td_index = i;
 		mdx_sched_add(td);
 	}
 #endif
@@ -188,7 +189,7 @@ callout_test(void)
 	size_t i;
 	for (i = 1; i < 500; i++) {
 		td = mdx_thread_create("test", 1, 1000 * i,
-		    8192, test_thr, (void *)i);
+		    8192, test_thr, NULL);
 		if (td == NULL)
 			break;
 		td->td_index = i;
@@ -200,14 +201,17 @@ callout_test(void)
 	struct thread *td;
 	td = mdx_thread_create("test", 1, 1000,
 	    8192, test_thr1, (void *)0);
+	td->td_index = 0;
 	mdx_sched_add(td);
 
 	td = mdx_thread_create("test", 1, 2000,
 	    8192, test_thr2, (void *)1);
+	td->td_index = 1;
 	mdx_sched_add(td);
 
 	td = mdx_thread_create("test", 1, 2000,
 	    8192, test_thr2, (void *)2);
+	td->td_index = 2;
 	mdx_sched_add(td);
 #endif
 
