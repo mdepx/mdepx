@@ -125,6 +125,7 @@ _mstart:
 	csetoffset	ct0, ct0, t1
 	cspecialrw	cnull, mtcc, ct0 # Write MTCC
 
+	li		a0, 0
 	la		t1, md_init
 	csetoffset	ct0, ct0, t1
 #ifdef __riscv_xcheri_mode_dependent_jumps
