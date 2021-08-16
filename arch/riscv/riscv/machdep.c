@@ -123,6 +123,29 @@ md_thread_terminate(struct thread *td)
 
 }
 
+static void
+setup_scratch(struct pcpu *pcpup)
+{
+
+#ifdef MDX_RISCV_SUPERVISOR_MODE
+
+#ifdef __CHERI_PURE_CAPABILITY__
+	__asm __volatile("cspecialw sscratchc, %0" :: "C"(pcpup->pc_stack));
+#else
+	csr_write(sscratch, (uintptr_t)pcpup->pc_stack);
+#endif
+
+#else /* !MDX_RISCV_SUPERVISOR_MODE */
+
+#ifdef __CHERI_PURE_CAPABILITY__
+	__asm __volatile("cspecialw mscratchc, %0" :: "C"(pcpup->pc_stack));
+#else
+	csr_write(mscratch, (uintptr_t)pcpup->pc_stack);
+#endif
+
+#endif
+}
+
 #ifdef MDX_SCHED_SMP
 void
 md_init_secondary(int hart)
@@ -149,11 +172,7 @@ md_init_secondary(int hart)
 	__asm __volatile("mv gp, %0" :: "r"(pcpup));
 #endif
 
-#ifdef MDX_RISCV_SUPERVISOR_MODE
-	csr_write(sscratch, pcpup->pc_stack);
-#else
-	csr_write(mscratch, pcpup->pc_stack);
-#endif
+	setup_scratch(pcpup);
 
 	csr_set(mie, MIE_MSIE);
 
@@ -192,26 +211,14 @@ md_init(int hart)
 	pcpup->pc_cpuid = hart;
 	pcpup->pc_stack = cap;
 	list_init(&pcpup->pc_avail);
+
 #ifdef __CHERI_PURE_CAPABILITY__
 	__asm __volatile("cmove cgp, %0" :: "C"(pcpup));
 #else
 	__asm __volatile("mv gp, %0" :: "r"(pcpup));
 #endif
 
-#ifdef MDX_RISCV_SUPERVISOR_MODE
-#ifdef __CHERI_PURE_CAPABILITY__
-	__asm __volatile("cspecialw sscratchc, %0" :: "C"(pcpup->pc_stack));
-#else
-	csr_write(sscratch, (uintptr_t)pcpup->pc_stack);
-#endif
-#else /* !MDX_RISCV_SUPERVISOR_MODE */
-#ifdef __CHERI_PURE_CAPABILITY__
-	__asm __volatile("cspecialw mscratchc, %0" :: "C"(pcpup->pc_stack));
-#else
-	csr_write(mscratch, (uintptr_t)pcpup->pc_stack);
-#endif
-
-#endif
+	setup_scratch(pcpup);
 #endif
 
 #ifdef MDX_THREAD
