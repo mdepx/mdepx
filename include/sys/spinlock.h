@@ -34,7 +34,7 @@
 #include <machine/atomic.h>
 
 struct spinlock {
-	uintptr_t v;
+	size_t v;
 };
 
 static inline void
