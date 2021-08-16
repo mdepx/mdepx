@@ -94,7 +94,7 @@ board_init(void)
 
 	cap = cheri_getdefault();
 	cap = cheri_setoffset(cap, CLINT_BASE);
-	cap = cheri_setbounds(cap, 1024);
+	cap = cheri_setbounds(cap, 0xc000);
 	e300g_clint_init(&clint_sc, cap, BOARD_CPU_FREQ);
 
 	/* Release secondary core(s) */
