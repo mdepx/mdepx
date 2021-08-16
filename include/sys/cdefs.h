@@ -28,6 +28,7 @@
 #define	_SYS_CDEFS_H_
 
 #include <sys/types.h>
+#include <sys/stdint.h>
 #include <sys/errno.h>
 #include <sys/device.h>
 

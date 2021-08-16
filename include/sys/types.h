@@ -107,6 +107,11 @@ typedef	void * __capability otype_t;
 typedef	void * capability;
 #endif
 
+#if !__has_feature(capabilities)
+typedef	__intptr_t	__intcap_t;
+typedef	__uintptr_t	__uintcap_t;
+#endif
+
 typedef	__uintptr_t	vaddr_t;
 
 typedef	__ptrdiff_t	ptrdiff_t;
