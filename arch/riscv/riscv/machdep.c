@@ -101,9 +101,9 @@ md_setup_frame(struct trapframe *tf, void *entry,
 #else
 	tf->tf_status = MSTATUS_MPIE | (MSTATUS_MPP_MASK << MSTATUS_MPP_SHIFT);
 #endif
-	tf->tf_epc = (register_t)entry;
-	tf->tf_a[0] = (register_t)arg;
-	tf->tf_ra = (register_t)terminate;
+	tf->tf_epc = (uintcap_t)entry;
+	tf->tf_a[0] = (uintcap_t)arg;
+	tf->tf_ra = (uintcap_t)terminate;
 }
 
 void

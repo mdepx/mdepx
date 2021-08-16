@@ -33,6 +33,16 @@
 
 #ifndef __ASSEMBLER__
 struct trapframe {
+#if __has_feature(capabilities)
+	uintcap_t tf_ra;
+	uintcap_t tf_sp;
+	uintcap_t tf_gp;
+	uintcap_t tf_tp;
+	uintcap_t tf_t[7];
+	uintcap_t tf_s[12];
+	uintcap_t tf_a[8];
+	uintcap_t tf_epc;
+#else
 	register_t tf_ra;
 	register_t tf_sp;
 	register_t tf_gp;
@@ -41,9 +51,11 @@ struct trapframe {
 	register_t tf_s[12];
 	register_t tf_a[8];
 	register_t tf_epc;
+#endif
 	register_t tf_status;
 	register_t tf_tval;
 	register_t tf_cause;
+	register_t tf_resv; /* alignment for capability mode */
 };
 #endif
 
