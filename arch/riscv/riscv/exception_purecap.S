@@ -28,7 +28,7 @@
 #include <machine/cpuregs.h>
 
 .macro save_registers el
-	cincoffset	csp, csp, -(32 * CREG_SIZE + 4 * REG_SIZE)
+	cincoffset	csp, csp, -(33 * CREG_SIZE + 4 * REG_SIZE)
 
 	csc	cra, (0 * CREG_SIZE)(csp)
 	csc	csp, (1 * CREG_SIZE)(csp)
@@ -67,20 +67,25 @@
 
 	cspecialr	ct0, REG_EPC
 	csc		ct0, (31 * CREG_SIZE)(csp)
+	cspecialr	ct0, ddc
+	csc		ct0, (32 * CREG_SIZE)(csp)
 
 	csrr		t0, REG_STATUS
-	csd		t0, (32 * CREG_SIZE + 0 * REG_SIZE)(csp)
+	csd		t0, (33 * CREG_SIZE + 0 * REG_SIZE)(csp)
 	csrr		t0, REG_TVAL
-	csd		t0, (32 * CREG_SIZE + 1 * REG_SIZE)(csp)
+	csd		t0, (33 * CREG_SIZE + 1 * REG_SIZE)(csp)
 	csrr		t0, REG_CAUSE
-	csd		t0, (32 * CREG_SIZE + 2 * REG_SIZE)(csp)
+	csd		t0, (33 * CREG_SIZE + 2 * REG_SIZE)(csp)
 .endm
 
 .macro load_registers el
 	clc		ct0, (31 * CREG_SIZE)(csp)
 	cspecialw	REG_EPC, ct0
 
-	cld		t0, (32 * CREG_SIZE + 0 * REG_SIZE)(csp)
+	clc		ct0, (32 * CREG_SIZE)(csp)
+	cspecialw	ddc, ct0
+
+	cld		t0, (33 * CREG_SIZE + 0 * REG_SIZE)(csp)
 	csrw		REG_STATUS, t0
 
 	clc	cra, (0 * CREG_SIZE)(csp)
@@ -116,7 +121,7 @@
 	clc	ca6, (29 * CREG_SIZE)(csp)
 	clc	ca7, (30 * CREG_SIZE)(csp)
 
-	cincoffset	csp, csp, (32 * CREG_SIZE + 4 * REG_SIZE)
+	cincoffset	csp, csp, (33 * CREG_SIZE + 4 * REG_SIZE)
 .endm
 
 /*
