@@ -58,12 +58,10 @@ ASM_ENTRY(_start)
 
 _mstart:
 	li	x1, 0
+	li	x2, 0
 
-	//la	t0, cpu_exception_handler
-	//csrw	mtvec, t0
-
-	//li	t0, 0
-	//bne	a0, t0, mpentry
+	li	t0, 0
+	bne	a0, t0, mpentry
 
 #if 0
 	la	t0, cpu_lottery
@@ -90,6 +88,10 @@ _mstart:
 	add		t2, t2, t0	# Start of the current CPU stack
 	add		sp, t2, t1	# End of the current CPU stack
 
+	/* Save a0,a1 with hartid/DTB */
+	mv		s0, a0
+	mv		s1, a1
+
 #ifdef __CHERI_PURE_CAPABILITY__
 	# From now on, do purecap ABI but in hybrid mode.
 	cfromptr	csp, ddc, sp	# Get DDC
@@ -111,6 +113,10 @@ _mstart:
 	cjalr		cra, ct0
 #endif
 
+	/* Restore a0, a1 */
+	mv	a0, s0
+	mv	a1, s1
+
 	# From now on, the DDC is always null
 	//cmove		ct0, cnull
 	//cspecialrw	cnull, ddc, ct0 # Write DDC
@@ -125,7 +131,6 @@ _mstart:
 	csetoffset	ct0, ct0, t1
 	cspecialrw	cnull, mtcc, ct0 # Write MTCC
 
-	li		a0, 0
 	la		t1, md_init
 	csetoffset	ct0, ct0, t1
 #ifdef __riscv_xcheri_mode_dependent_jumps
@@ -150,11 +155,60 @@ ASM_ENTRY(mpentry)
 	lb	t1, 0(t0)
 	beqz	t1, 1b
 
-	la	t0, idle_thread_stack
-	li	t1, MDX_THREAD_STACK_SIZE
-	mulw	t2, t1, a0
-	add	t2, t2, t1
-	add	sp, t2, t0
+#ifdef __CHERI_PURE_CAPABILITY__
+	# W^X for PCC and DDC
+	cspecialrw	ct0, ddc, cnull
+	li		t1, (1 << 1)
+	not		t1, t1
+	candperm	ct0, ct0, t1
+	cspecialrw	cnull, ddc, ct0
+
+	cspecialrw	ct0, pcc, cnull
+	li		t1, ((1 << 3) | (1 << 5))
+	not		t1, t1
+	candperm	ct0, ct0, t1
+	la		t2, smpstart
+	csetoffset	ct0, ct0, t2
+#ifdef __riscv_xcheri_mode_dependent_jumps
+	jr.cap		ct0
+#else
+	cjr		ct0
+#endif
+#endif
+
+smpstart:
+
+	la		t0, idle_thread_stack
+	li		t1, MDX_THREAD_STACK_SIZE
+	mulw		t2, t1, a0
+	add		t2, t2, t0	# Start of the current CPU stack
+	add		sp, t2, t1	# End of the current CPU stack
+
+#ifdef __CHERI_PURE_CAPABILITY__
+	# From now on, do purecap ABI but in hybrid mode.
+	cfromptr	csp, ddc, sp	# Get DDC
+	sub		t2, sp, t2	# Length of the stack
+	csetbounds	csp, csp, t2
+	cincoffset	csp, csp, t2
+#endif
+
+	# Set up mtcc and jump to main in purecap mode
+	cspecialrw	ct0, pcc, cnull # Get PCC
+
+	li		t1, 1
+	csetflags	ct0, ct0, t1 # set cap mode on
+
+	la		t1, cpu_exception_handler
+	csetoffset	ct0, ct0, t1
+	cspecialrw	cnull, mtcc, ct0 # Write MTCC
+
+	la		t1, md_init_secondary
+	csetoffset	ct0, ct0, t1
+#ifdef __riscv_xcheri_mode_dependent_jumps
+	jalr.cap	cra, ct0 # jump to main
+#else
+	cjalr		cra, ct0 # jump to main
+#endif
 
 	fence
 
