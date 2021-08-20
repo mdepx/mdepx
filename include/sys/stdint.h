@@ -31,5 +31,6 @@
 
 typedef	__intcap_t	intcap_t;
 typedef	__uintcap_t	uintcap_t;
+typedef	__ptraddr_t	ptraddr_t;
 
 #endif /* !_SYS_STDINT_H_ */

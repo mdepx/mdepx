@@ -113,8 +113,13 @@ typedef	__uintptr_t	__uintcap_t;
 #endif
 
 typedef	__uintptr_t	vaddr_t;
-
 typedef	__ptrdiff_t	ptrdiff_t;
+
+#ifdef __PTRADDR_TYPE__
+typedef	__PTRADDR_TYPE__	__ptraddr_t;
+#else
+typedef	__uintptr_t		__ptraddr_t;
+#endif
 
 /* Floating point */
 typedef	__uint8_t	uint_fast8_t;
