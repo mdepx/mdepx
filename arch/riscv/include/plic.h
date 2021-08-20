@@ -46,11 +46,11 @@ struct plic_context {
 };
 
 struct plic_softc {
-	size_t base;
+	capability base;
 	struct plic_context contexts[MDX_CPU_MAX];
 };
 
-void plic_init(mdx_device_t dev, size_t base, int cpu, int context);
+void plic_init(mdx_device_t dev, capability base, int cpu, int context);
 void plic_intr(void);
 
 struct plic_intr_entry {

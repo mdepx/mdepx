@@ -26,14 +26,20 @@
 #include <sys/cdefs.h>
 #include <sys/systm.h>
 #include <sys/pcpu.h>
+#include <sys/io.h>
 
 #include <machine/plic.h>
 #include <dev/intc/intc.h>
 
 #define	RD4(_sc, _reg)		\
-	*(volatile uint32_t *)((_sc)->base + _reg)
+	mdx_ioread_uint32((_sc)->base, _reg)
+#define	RD8(_sc, _reg)		\
+	mdx_ioread_uint64((_sc)->base, _reg)
+
 #define	WR4(_sc, _reg, _val)	\
-	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+	mdx_iowrite_uint32((_sc)->base, _reg, _val)
+#define	WR8(_sc, _reg, _val)	\
+	mdx_iowrite_uint64((_sc)->base, _reg, _val)
 
 static struct plic_softc *plic_sc;
 static struct plic_intr_entry intr_map[MDX_RISCV_PLIC_NINTR];
@@ -156,7 +162,7 @@ static struct mdx_intc_ops plic_intc_ops = {
  * TODO: need to map context to hart id (cpu) based on DTS file.
  */
 void
-plic_init(mdx_device_t dev, size_t base, int cpu, int context)
+plic_init(mdx_device_t dev, capability base, int cpu, int context)
 {
 	struct plic_softc *sc;
 	uint32_t reg;
