@@ -376,6 +376,7 @@ void virtio_fill_desc(struct vqs *vq, int id, uint64_t features,
 	next %= vq->size;
 
 	if (features & VIRTIO_F_VERSION_1) {
+#ifdef TODO_PURECAP
 		if (features & VIRTIO_F_IOMMU_PLATFORM) {
 			void *gpa = (void *) addr;
 
@@ -387,6 +388,7 @@ void virtio_fill_desc(struct vqs *vq, int id, uint64_t features,
 			addr = SLOF_dma_map_in(gpa, len, 0);
 			vq->desc_gpas[id] = gpa;
 		}
+#endif
 		desc->addr = cpu_to_le64(addr);
 		desc->len = cpu_to_le32(len);
 		desc->flags = cpu_to_le16(flags);
@@ -564,9 +566,10 @@ struct vqs *virtio_queue_init_vq(struct virtio_device *dev, unsigned int id)
 		return NULL;
 	}
 
+#ifndef __CHERI_PURE_CAPABILITY__
 	vq->avail = (void *) ((size_t) vq->desc + vq->size * sizeof(struct vring_desc));
 
-#ifdef __CHERI_PURE_CAPABILITY__
+#else
 	/* Avail ring is  written by the driver */
 	vq->avail = cheri_derive_data_cap(vq->desc,
 									  (ptraddr_t) vq->avail,
@@ -575,11 +578,11 @@ struct vqs *virtio_queue_init_vq(struct virtio_device *dev, unsigned int id)
 									  __CHERI_CAP_PERMISSION_PERMIT_STORE__);
 #endif
 
+#ifndef __CHERI_PURE_CAPABILITY__
 	vq->used = (void *) ((size_t) VQ_ALIGN((size_t) vq->avail +
 		sizeof(struct vring_avail) +
 		sizeof(uint16_t) * vq->size));
-
-#ifdef __CHERI_PURE_CAPABILITY__
+#else
 	/* Used ring is only written by the device, and read by the driver */
 	vq->used = cheri_derive_data_cap(vq->desc,
 									 (ptraddr_t) vq->used,

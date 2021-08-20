@@ -405,9 +405,9 @@ static int virtionet_receive(struct virtio_net *vnet, char *buf, int maxlen)
 #endif
 
 	// Get the buffer address from the device
+#ifndef __CHERI_PURE_CAPABILITY__
 	dev_buf_addr = (void *) virtio_desc_addr(vdev, VQ_RX, id);
-
-#ifdef __CHERI_PURE_CAPABILITY__
+#else
 	// Get/infer the buffer capability from the address received from device
 	dev_buf_addr = cheri_derive_data_cap(vq_rx->buf_mem, (ptraddr_t) dev_buf_addr, len,
 										 __CHERI_CAP_PERMISSION_PERMIT_LOAD__);
