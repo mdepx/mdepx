@@ -86,7 +86,6 @@ _mstart:
 	li		t1, MDX_THREAD_STACK_SIZE
 	mulw		t2, t1, a0
 	add		t2, t2, t0	# Start of the current CPU stack
-	add		sp, t2, t1	# End of the current CPU stack
 
 	/* Save a0,a1 with hartid/DTB */
 	mv		s0, a0
@@ -94,10 +93,9 @@ _mstart:
 
 #ifdef __CHERI_PURE_CAPABILITY__
 	# From now on, do purecap ABI but in hybrid mode.
-	cfromptr	csp, ddc, sp	# Get DDC
-	sub		t2, sp, t2	# Length of the stack
-	csetbounds	csp, csp, t2
-	cincoffset	csp, csp, t2
+	cfromptr	csp, ddc, t2	# Get DDC
+	csetbounds	csp, csp, t1
+	cincoffset	csp, csp, t1
 
 	cspecialrw	ct0, pcc, cnull # Get PCC
 	li		t1, 1
@@ -182,14 +180,12 @@ smpstart:
 	li		t1, MDX_THREAD_STACK_SIZE
 	mulw		t2, t1, a0
 	add		t2, t2, t0	# Start of the current CPU stack
-	add		sp, t2, t1	# End of the current CPU stack
 
 #ifdef __CHERI_PURE_CAPABILITY__
 	# From now on, do purecap ABI but in hybrid mode.
-	cfromptr	csp, ddc, sp	# Get DDC
-	sub		t2, sp, t2	# Length of the stack
-	csetbounds	csp, csp, t2
-	cincoffset	csp, csp, t2
+	cfromptr	csp, ddc, t2	# Get DDC
+	csetbounds	csp, csp, t1
+	cincoffset	csp, csp, t1
 #endif
 
 	# Set up mtcc and jump to main in purecap mode
