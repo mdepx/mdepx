@@ -59,22 +59,25 @@ dump_frame(struct trapframe *tf)
 {
 	int i;
 
-	printf("tf->tf_ra %zx\n", tf->tf_ra);
-	printf("tf->tf_sp %zx\n", tf->tf_sp);
-	printf("tf->tf_gp %zx\n", tf->tf_gp);
-	printf("tf->tf_tp %zx\n", tf->tf_tp);
+	printf("tf->tf_ra %p\n", tf->tf_ra);
+	printf("tf->tf_sp %p\n", tf->tf_sp);
+	printf("tf->tf_gp %p\n", tf->tf_gp);
+	printf("tf->tf_tp %p\n", tf->tf_tp);
 
 	for (i = 0; i < 7; i++)
-		printf("tf->tf_t%d %zx\n", i, tf->tf_t[i]);
+		printf("tf->tf_t%d %p\n", i, tf->tf_t[i]);
 	for (i = 0; i < 12; i++)
-		printf("tf->tf_s%d %zx\n", i, tf->tf_s[i]);
+		printf("tf->tf_s%d %p\n", i, tf->tf_s[i]);
 	for (i = 0; i < 8; i++)
-		printf("tf->tf_a%d %zx\n", i, tf->tf_a[i]);
+		printf("tf->tf_a%d %p\n", i, tf->tf_a[i]);
 
-	printf("tf->tf_epc %zx\n", tf->tf_epc);
-	printf("tf->tf_status %zx\n", tf->tf_status);
-	printf("tf->tf_tval %zx\n", tf->tf_tval);
-	printf("tf->tf_cause %zx\n", tf->tf_cause);
+	printf("tf->tf_epc %p\n", tf->tf_epc);
+#if __has_feature(capabilities)
+	printf("tf->tf_ddc %p\n", tf->tf_ddc);
+#endif
+	printf("tf->tf_status %p\n", tf->tf_status);
+	printf("tf->tf_tval %p\n", tf->tf_tval);
+	printf("tf->tf_cause %p\n", tf->tf_cause);
 }
 
 static void
