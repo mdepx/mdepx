@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2014 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2014-2021 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * This software was developed by SRI International and the University of
@@ -29,6 +29,8 @@
  *
  * $FreeBSD$
  */
+
+#include <sys/io.h>
 
 #ifndef	_VIRTIO_MMIO_H
 #define	_VIRTIO_MMIO_H
@@ -66,21 +68,24 @@
 
 static inline uint32_t virtio_mmio_read32(uint32_t *base, size_t offset)
 {
-	return *((volatile uint32_t*) (((uintptr_t) base) + offset));
+
+	return (mdx_ioread_uint32(base, offset));
 }
 
 static inline uint16_t virtio_mmio_read16(uint32_t *base, size_t offset)
 {
-	return *((volatile uint16_t*) (((uintptr_t) base) + offset));
+
+	return (mdx_ioread_uint16(base, offset));
 }
 
 static inline uint8_t virtio_mmio_read8(uint32_t *base, size_t offset)
 {
-	return *((volatile uint8_t*) (((uintptr_t) base) + offset));
+
+	return (mdx_ioread_uint8(base, offset));
 }
 
 static inline void virtio_mmio_write32(uint32_t *base, size_t offset, uint32_t val)
 {
-	*((volatile uint32_t*) (((uintptr_t) base) + offset)) = val;
+	mdx_iowrite_uint32(base, offset, val);
 }
 #endif /* _VIRTIO_MMIO_H */
