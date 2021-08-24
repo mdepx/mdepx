@@ -408,8 +408,10 @@ static int virtionet_receive(struct virtio_net *vnet, char *buf, int maxlen)
 #ifndef __CHERI_PURE_CAPABILITY__
 	dev_buf_addr = (void *) virtio_desc_addr(vdev, VQ_RX, id);
 #else
+	size_t address;
+	address = virtio_desc_addr(vdev, VQ_RX, id);
 	// Get/infer the buffer capability from the address received from device
-	dev_buf_addr = cheri_derive_data_cap(vq_rx->buf_mem, (ptraddr_t) dev_buf_addr, len,
+	dev_buf_addr = cheri_derive_data_cap(vq_rx->buf_mem, (ptraddr_t)address, len,
 										 __CHERI_CAP_PERMISSION_PERMIT_LOAD__);
 #endif
 

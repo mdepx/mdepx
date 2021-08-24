@@ -570,9 +570,11 @@ struct vqs *virtio_queue_init_vq(struct virtio_device *dev, unsigned int id)
 	vq->avail = (void *) ((size_t) vq->desc + vq->size * sizeof(struct vring_desc));
 
 #else
+	size_t address;
+	address = ((size_t) vq->desc + vq->size * sizeof(struct vring_desc));
 	/* Avail ring is  written by the driver */
 	vq->avail = cheri_derive_data_cap(vq->desc,
-									  (ptraddr_t) vq->avail,
+									  (ptraddr_t) address,
 									  sizeof(struct vring_avail) + sizeof(uint16_t) * vq->size,
 									  __CHERI_CAP_PERMISSION_PERMIT_LOAD__ |
 									  __CHERI_CAP_PERMISSION_PERMIT_STORE__);
@@ -583,9 +585,12 @@ struct vqs *virtio_queue_init_vq(struct virtio_device *dev, unsigned int id)
 		sizeof(struct vring_avail) +
 		sizeof(uint16_t) * vq->size));
 #else
+	address = ((size_t) VQ_ALIGN((size_t) vq->avail +
+		sizeof(struct vring_avail) +
+		sizeof(uint16_t) * vq->size));
 	/* Used ring is only written by the device, and read by the driver */
 	vq->used = cheri_derive_data_cap(vq->desc,
-									 (ptraddr_t) vq->used,
+									 (ptraddr_t)address,
 									 sizeof(struct vring_used) + sizeof(struct vring_used_elem) * vq->size,
 									 __CHERI_CAP_PERMISSION_PERMIT_LOAD__);
 #endif
