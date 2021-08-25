@@ -59,25 +59,25 @@ dump_frame(struct trapframe *tf)
 {
 	int i;
 
-	printf("tf->tf_ra %p\n", tf->tf_ra);
-	printf("tf->tf_sp %p\n", tf->tf_sp);
-	printf("tf->tf_gp %p\n", tf->tf_gp);
-	printf("tf->tf_tp %p\n", tf->tf_tp);
+	printf("tf->tf_ra %#lp\n", tf->tf_ra);
+	printf("tf->tf_sp %#lp\n", tf->tf_sp);
+	printf("tf->tf_gp %#lp\n", tf->tf_gp);
+	printf("tf->tf_tp %#lp\n", tf->tf_tp);
 
 	for (i = 0; i < 7; i++)
-		printf("tf->tf_t%d %p\n", i, tf->tf_t[i]);
+		printf("tf->tf_t%d %#lp\n", i, tf->tf_t[i]);
 	for (i = 0; i < 12; i++)
-		printf("tf->tf_s%d %p\n", i, tf->tf_s[i]);
+		printf("tf->tf_s%d %#lp\n", i, tf->tf_s[i]);
 	for (i = 0; i < 8; i++)
-		printf("tf->tf_a%d %p\n", i, tf->tf_a[i]);
+		printf("tf->tf_a%d %#lp\n", i, tf->tf_a[i]);
 
-	printf("tf->tf_epc %p\n", tf->tf_epc);
+	printf("tf->tf_epc %#lp\n", tf->tf_epc);
 #if __has_feature(capabilities)
-	printf("tf->tf_ddc %p\n", tf->tf_ddc);
+	printf("tf->tf_ddc %#lp\n", tf->tf_ddc);
 #endif
-	printf("tf->tf_status %p\n", tf->tf_status);
-	printf("tf->tf_tval %p\n", tf->tf_tval);
-	printf("tf->tf_cause %p\n", tf->tf_cause);
+	printf("tf->tf_status %jx\n", tf->tf_status);
+	printf("tf->tf_tval %jx\n", tf->tf_tval);
+	printf("tf->tf_cause %jx\n", tf->tf_cause);
 }
 
 static void
