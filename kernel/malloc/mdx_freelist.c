@@ -47,6 +47,9 @@ struct node_s {
 #define	NODE_S	sizeof(struct node_s)
 
 static struct node_s nodelist[32];
+#ifdef __CHERI_PURE_CAPABILITY__
+static void *malloc_datacap;
+#endif
 
 static int
 size2i(uint32_t size)
@@ -97,8 +100,8 @@ mdx_fl_add_region(void *base, int size)
 
 	node = mdx_incoffset(base, NODE_S);
 	node->size = size - 2 * NODE_S;
-	mdx_setbounds(node, node->size);
 	node->flags = NODE_S;
+	mdx_setbounds(node, node->size);
 	mdx_fl_add_node(node);
 
 	node = mdx_incoffset(base, size - NODE_S);
@@ -118,6 +121,15 @@ mdx_fl_init(void)
 		nodelist[i].prev = &nodelist[i - 1];
 	}
 }
+
+#ifdef __CHERI_PURE_CAPABILITY__
+void
+mdx_fl_init_datacap(void *datacap)
+{
+
+	malloc_datacap = datacap;
+}
+#endif
 
 void
 mdx_fl_dump(void)
@@ -220,7 +232,7 @@ mdx_fl_free(void *ptr)
 		return;
 
 #ifdef __CHERI_PURE_CAPABILITY__
-	node = cheri_setoffset(cheri_getdefault(),
+	node = cheri_setoffset(malloc_datacap,
 	    cheri_getaddress(ptr) - NODE_S);
 #else
 	node = (struct node_s *)((char *)ptr - NODE_S);

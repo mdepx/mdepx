@@ -76,6 +76,7 @@ board_init(void)
 	cap = cheri_setoffset(cap, 0x80800000);
 
 	malloc_init();
+	mdx_fl_init_datacap(cap);
 	malloc_add_region(cap, 0x7800000);
 
 	/* Register UART */

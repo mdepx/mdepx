@@ -28,6 +28,7 @@
 #define _SYS_MALLOC_FL_
 
 void mdx_fl_init(void);
+void mdx_fl_init_datacap(void *datacap);
 void mdx_fl_add_region(void *base, int size);
 void mdx_fl_dump(void);
 void mdx_fl_free(void *ptr);

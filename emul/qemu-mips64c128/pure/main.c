@@ -199,6 +199,7 @@ board_init(void)
 	malloc_size = 0x01000000;
 
 	malloc_init();
+	mdx_fl_init_datacap(malloc_base);
 	malloc_add_region(malloc_base, malloc_size);
 
 	error = mips_timer_init(&timer_sc, MIPS_DEFAULT_FREQ);
