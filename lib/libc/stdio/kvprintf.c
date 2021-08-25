@@ -40,6 +40,7 @@
 #include <sys/cdefs.h>
 #include <sys/stdarg.h>
 #include <sys/libkern.h>
+#include <sys/cheri.h>
 
 #include <stddef.h>
 
@@ -126,6 +127,9 @@ kvprintf(char const *fmt, void (*func)(int, void*), void *arg, int radix, va_lis
 #if defined(MDX_FTOA)
 	char fbuf[MDX_FTOA_MAXFBUF];
 	int i;
+#endif
+#if __has_feature(capabilities)
+	void * __capability cap;
 #endif
 
 	num = 0;
@@ -278,10 +282,117 @@ reswitch:	switch (ch = (u_char)*fmt++) {
 			base = 8;
 			goto handle_nosign;
 		case 'p':
+#if __has_feature(capabilities)
+#ifndef __CHERI_PURE_CAPABILITY__
+			if (!lflag) {
+				num = (uintmax_t)va_arg(ap, void *);
+				sharpflag = 0;
+			} else
+#endif
+			{
+				cap = va_arg(ap, void * __capability);
+				num = cheri_getaddress(cap);
+			}
+			if (sharpflag) {
+				int orig_dwidth;
+
+				orig_dwidth = dwidth;
+
+				/* address */
+				num = cheri_getaddress(cap);
+				PCHAR('0');
+				PCHAR('x');
+				p = ksprintn(nbuf, num, 16, &n, 0);
+				dwidth -= n;
+				while (dwidth-- > 0)
+					PCHAR('0');
+				while (*p)
+					PCHAR(*p--);
+
+				if (ladjust)
+					while (width-- > 0)
+						PCHAR(' ');
+
+				/* Skip attributes if NULL-derived. */
+				if (cheri_is_null_derived(cap))
+					break;
+
+				PCHAR(' ');
+				PCHAR('[');
+
+				/* permissions */
+				num = cheri_getperm(cap);
+				if (num & CHERI_PERM_LOAD)
+					PCHAR('r');
+				if (num & CHERI_PERM_STORE)
+					PCHAR('w');
+				if (num & CHERI_PERM_EXECUTE)
+					PCHAR('x');
+				if (num & CHERI_PERM_LOAD_CAP)
+					PCHAR('R');
+				if (num & CHERI_PERM_STORE_CAP)
+					PCHAR('W');
+				PCHAR(',');
+
+				/* bounds */
+				num = cheri_getbase(cap);
+				PCHAR('0');
+				PCHAR('x');
+				p = ksprintn(nbuf, num, 16, &n, 0);
+				dwidth = orig_dwidth - n;
+				while (dwidth-- > 0)
+					PCHAR('0');
+				while (*p)
+					PCHAR(*p--);
+
+				PCHAR('-');
+
+				num += cheri_getlen(cap);
+				PCHAR('0');
+				PCHAR('x');
+				p = ksprintn(nbuf, num, 16, &n, 0);
+				dwidth = orig_dwidth - n;
+				while (dwidth-- > 0)
+					PCHAR('0');
+				while (*p)
+					PCHAR(*p--);
+
+				PCHAR(']');
+
+				/* tag and sealing */
+				switch (cheri_gettype(cap)) {
+				case CHERI_OTYPE_UNSEALED:
+					if (cheri_gettag(cap))
+						p = NULL;
+					else
+						p = "(invalid)";
+					break;
+				case CHERI_OTYPE_SENTRY:
+					if (cheri_gettag(cap))
+						p = "(sentry)";
+					else
+						p = "(invalid,sentry)";
+					break;
+				default:
+					if (cheri_gettag(cap))
+						p = "(sealed)";
+					else
+						p = "(invalid,sealed)";
+					break;
+				}
+				if (p != NULL) {
+					PCHAR(' ');
+					while (*p)
+						PCHAR(*p++);
+				}
+				break;
+			}
+#else
+			num = (uintptr_t)va_arg(ap, void *);
+#endif
 			base = 16;
 			sharpflag = (width == 0);
 			sign = 0;
-			num = (uintptr_t)va_arg(ap, void *);
 			goto number;
 		case 'q':
 			qflag = 1;
