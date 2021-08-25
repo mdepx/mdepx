@@ -21,7 +21,7 @@ CMD = python3 -B ${OSDIR}/tools/emitter.py
 QEMU = ~/cheri/build/qemu-build/riscv64cheri-softmmu/qemu-system-riscv64cheri
 
 RUN_CMD = ${QEMU}							\
-	-smp cpus=1							\
+	-smp cpus=2							\
 	-machine virt							\
 	-m 1024								\
 	-kernel ${OBJDIR}/${APP}.elf					\
