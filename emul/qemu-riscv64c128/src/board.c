@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2020-2021 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -76,7 +76,7 @@ board_init(void)
 	cap = cheri_setoffset(cap, 0x80800000);
 
 	malloc_init();
-	mdx_fl_init_datacap(cap);
+	malloc_init_purecap(cap);
 	malloc_add_region(cap, 0x7800000);
 
 	/* Register UART */

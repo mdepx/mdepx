@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018-2020 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2018-2021 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,23 +34,6 @@
 #include <string.h>
 #include <stdio.h>
 
-struct node_s {
-	struct node_s *next;
-	struct node_s *prev;
-	uint32_t size;
-	uint32_t flags;
-#define	FLAG_ALLOCATED		(1 << 31)
-#define	FLAG_PREV_SIZE_S	0
-#define	FLAG_PREV_SIZE_M	(0x7fffffff << FLAG_PREV_SIZE_S)
-};
-
-#define	NODE_S	sizeof(struct node_s)
-
-static struct node_s nodelist[32];
-#ifdef __CHERI_PURE_CAPABILITY__
-static void *malloc_datacap;
-#endif
-
 static int
 size2i(uint32_t size)
 {
@@ -69,7 +52,7 @@ size2i(uint32_t size)
 }
 
 static void
-mdx_fl_add_node(struct node_s *node)
+mdx_fl_add_node(struct mdx_fl_zone *fl, struct node_s *node)
 {
 	struct node_s *next;
 	struct node_s *prev;
@@ -77,7 +60,7 @@ mdx_fl_add_node(struct node_s *node)
 
 	i = size2i(node->size);
 
-	for (prev = &nodelist[i], next = nodelist[i].next;
+	for (prev = &fl->nodelist[i], next = fl->nodelist[i].next;
 	    (next && next->size && (next->size < node->size));
 	     prev = next, next = next->next);
 
@@ -89,7 +72,7 @@ mdx_fl_add_node(struct node_s *node)
 }
 
 void
-mdx_fl_add_region(void *base, int size)
+mdx_fl_add_region(struct mdx_fl_zone *fl, void *base, int size)
 {
 	struct node_s *node;
 
@@ -102,7 +85,7 @@ mdx_fl_add_region(void *base, int size)
 	node->size = size - 2 * NODE_S;
 	node->flags = NODE_S;
 	mdx_setbounds(node, node->size);
-	mdx_fl_add_node(node);
+	mdx_fl_add_node(fl, node);
 
 	node = mdx_incoffset(base, size - NODE_S);
 	node->size = NODE_S;
@@ -111,34 +94,25 @@ mdx_fl_add_region(void *base, int size)
 }
 
 void
-mdx_fl_init(void)
+mdx_fl_init(struct mdx_fl_zone *fl)
 {
 	int i;
 
-	memset(&nodelist, 0, NODE_S * 32);
+	memset(&fl->nodelist, 0, NODE_S * 32);
 	for (i = 1; i < 32; i++) {
-		nodelist[i - 1].next = &nodelist[i];
-		nodelist[i].prev = &nodelist[i - 1];
+		fl->nodelist[i - 1].next = &fl->nodelist[i];
+		fl->nodelist[i].prev = &fl->nodelist[i - 1];
 	}
 }
 
-#ifdef __CHERI_PURE_CAPABILITY__
 void
-mdx_fl_init_datacap(void *datacap)
-{
-
-	malloc_datacap = datacap;
-}
-#endif
-
-void
-mdx_fl_dump(void)
+mdx_fl_dump(struct mdx_fl_zone *fl)
 {
 	struct node_s *node;
 
 	printf("\n -- %s -- \n", __func__);
 
-	for (node = &nodelist[0]; node != NULL; node = node->next) {
+	for (node = &fl->nodelist[0]; node != NULL; node = node->next) {
 		if (node->size != 0)
 			printf("    ");
 		printf("node %p, next %p, prev %p, size %d, flags %x\n",
@@ -148,14 +122,14 @@ mdx_fl_dump(void)
 }
 
 uint32_t
-mdx_fl_count(void)
+mdx_fl_count(struct mdx_fl_zone *fl)
 {
 	struct node_s *node;
 	uint32_t size;
 
 	size = 0;
 
-	for (node = &nodelist[0];
+	for (node = &fl->nodelist[0];
 	    node != NULL;
 	    node = node->next)
 		size += node->size;
@@ -164,7 +138,7 @@ mdx_fl_count(void)
 }
 
 void *
-mdx_fl_malloc(size_t size)
+mdx_fl_malloc(struct mdx_fl_zone *fl, size_t size)
 {
 	struct node_s *node;
 	struct node_s *next;
@@ -182,7 +156,7 @@ mdx_fl_malloc(size_t size)
 
 	i = size2i(size);
 
-	for (node = nodelist[i].next;
+	for (node = fl->nodelist[i].next;
 	    (node && (node->size < size));
 	     node = node->next);
 
@@ -205,7 +179,7 @@ mdx_fl_malloc(size_t size)
 			new = mdx_incoffset(node, size);
 			new->size = avail;
 			new->flags = size;
-			mdx_fl_add_node(new);
+			mdx_fl_add_node(fl, new);
 		}
 
 		node->flags |= FLAG_ALLOCATED;
@@ -221,7 +195,7 @@ mdx_fl_malloc(size_t size)
 }
 
 void
-mdx_fl_free(void *ptr)
+mdx_fl_free(struct mdx_fl_zone *fl, void *ptr)
 {
 	struct node_s *node;
 	struct node_s *prev;
@@ -232,8 +206,7 @@ mdx_fl_free(void *ptr)
 		return;
 
 #ifdef __CHERI_PURE_CAPABILITY__
-	node = cheri_setoffset(malloc_datacap,
-	    cheri_getaddress(ptr) - NODE_S);
+	node = cheri_setoffset(fl->datacap, cheri_getaddress(ptr) - NODE_S);
 #else
 	node = (struct node_s *)((char *)ptr - NODE_S);
 #endif
@@ -271,18 +244,18 @@ mdx_fl_free(void *ptr)
 		node = prev;
 	}
 
-	mdx_fl_add_node(node);
+	mdx_fl_add_node(fl, node);
 }
 
 void *
-mdx_fl_calloc(size_t number, size_t size)
+mdx_fl_calloc(struct mdx_fl_zone *fl, size_t number, size_t size)
 {
 	void *res;
 	size_t sz;
 
 	sz = number * size;
 
-	res = mdx_fl_malloc(sz);
+	res = mdx_fl_malloc(fl, sz);
 	if (res)
 		bzero(res, sz);
 
@@ -290,7 +263,7 @@ mdx_fl_calloc(size_t number, size_t size)
 }
 
 void *
-mdx_fl_realloc(void *ptr, size_t size)
+mdx_fl_realloc(struct mdx_fl_zone *fl, void *ptr, size_t size)
 {
 	struct node_s *node;
 	struct node_s *next;
@@ -299,10 +272,10 @@ mdx_fl_realloc(void *ptr, size_t size)
 	void *newptr;
 
 	if (ptr == NULL)
-		return (mdx_fl_malloc(size));
+		return (mdx_fl_malloc(fl, size));
 
 	if (size == 0) {
-		mdx_fl_free(ptr);
+		mdx_fl_free(fl, ptr);
 		return (NULL);
 	}
 
@@ -330,7 +303,7 @@ mdx_fl_realloc(void *ptr, size_t size)
 			node->size = size;
 			subs->flags &= FLAG_ALLOCATED;
 			subs->flags |= new->size;
-			mdx_fl_add_node(new);
+			mdx_fl_add_node(fl, new);
 		} else if (node->size > (size + NODE_S)) {
 			new = mdx_incoffset(node, size);
 			new->size = node->size - size;
@@ -338,7 +311,7 @@ mdx_fl_realloc(void *ptr, size_t size)
 			node->size = size;
 			next->flags &= FLAG_ALLOCATED;
 			next->flags |= new->size;
-			mdx_fl_add_node(new);
+			mdx_fl_add_node(fl, new);
 		}
 	} else {
 		if (((next->flags & FLAG_ALLOCATED) == 0) &&
@@ -357,7 +330,7 @@ mdx_fl_realloc(void *ptr, size_t size)
 			node->size = size;
 			subs->flags &= FLAG_ALLOCATED;
 			subs->flags |= new->size;
-			mdx_fl_add_node(new);
+			mdx_fl_add_node(fl, new);
 
 		} else if (((next->flags & FLAG_ALLOCATED) == 0) &&
 		    (node->size + next->size) == size) {
@@ -373,10 +346,10 @@ mdx_fl_realloc(void *ptr, size_t size)
 			subs->flags &= FLAG_ALLOCATED;
 			subs->flags |= node->size;
 		} else {
-			newptr = mdx_fl_malloc(size);
+			newptr = mdx_fl_malloc(fl, size);
 			if (newptr) {
 				memcpy(newptr, ptr, node->size);
-				mdx_fl_free(ptr);
+				mdx_fl_free(&mdx_fl_defaultzone, ptr);
 			}
 
 			return (newptr);

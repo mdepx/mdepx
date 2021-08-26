@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018-2019 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2018-2021 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,9 @@
 #include <sys/malloc_fl.h>
 
 void malloc_init(void);
+#ifdef __CHERI_PURE_CAPABILITY__
+void malloc_init_purecap(void *);
+#endif
 void malloc_add_region(void *base, int size);
 void * zalloc(size_t size);
 

@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2019-2021 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -198,8 +198,7 @@ board_init(void)
 	malloc_base = cheri_setoffset(malloc_base, BASE_ADDR + 0x01000000);
 	malloc_size = 0x01000000;
 
-	malloc_init();
-	mdx_fl_init_datacap(malloc_base);
+	malloc_init_purecap(malloc_base);
 	malloc_add_region(malloc_base, malloc_size);
 
 	error = mips_timer_init(&timer_sc, MIPS_DEFAULT_FREQ);

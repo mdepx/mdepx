@@ -1,7 +1,7 @@
 /*-
  * SPDX-License-Identifier: BSD-2-Clause
  *
- * Copyright (c) 2018-2020 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2018-2021 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * This software was developed by SRI International and the University of
@@ -55,7 +55,7 @@ malloc(size_t size)
 	void *ret;
 
 	critical_enter();
-	ret = mdx_fl_malloc(size);
+	ret = mdx_fl_malloc(&mdx_fl_defaultzone, size);
 	critical_exit();
 
 #ifdef MDX_MALLOC_DEBUG_ENOMEM
@@ -72,7 +72,7 @@ free(void *ptr)
 {
 
 	critical_enter();
-	mdx_fl_free(ptr);
+	mdx_fl_free(&mdx_fl_defaultzone, ptr);
 	critical_exit();
 }
 
@@ -82,7 +82,7 @@ calloc(size_t number, size_t size)
 	void *ret;
 
 	critical_enter();
-	ret = mdx_fl_calloc(number, size);
+	ret = mdx_fl_calloc(&mdx_fl_defaultzone, number, size);
 	critical_exit();
 
 #ifdef MDX_MALLOC_DEBUG_ENOMEM
@@ -100,7 +100,7 @@ realloc(void *ptr, size_t size)
 	void *ret;
 
 	critical_enter();
-	ret = mdx_fl_realloc(ptr, size);
+	ret = mdx_fl_realloc(&mdx_fl_defaultzone, ptr, size);
 	critical_exit();
 
 #ifdef MDX_MALLOC_DEBUG_ENOMEM
@@ -117,7 +117,7 @@ malloc_add_region(void *base, int size)
 {
 
 	critical_enter();
-	mdx_fl_add_region(base, size);
+	mdx_fl_add_region(&mdx_fl_defaultzone, base, size);
 	critical_exit();
 }
 
@@ -126,6 +126,19 @@ malloc_init(void)
 {
 
 	critical_enter();
-	mdx_fl_init();
+	mdx_fl_init(&mdx_fl_defaultzone);
 	critical_exit();
 }
+
+#ifdef __CHERI_PURE_CAPABILITY__
+void
+malloc_init_purecap(void *cap)
+{
+	struct mdx_fl_zone *fl;
+
+	fl = &mdx_fl_defaultzone;
+	fl->datacap = cap;
+
+	malloc_init();
+}
+#endif

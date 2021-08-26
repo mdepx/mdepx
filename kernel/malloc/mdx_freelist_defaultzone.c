@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018-2021 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2018-2020 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,37 +24,14 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _SYS_MALLOC_FL_
-#define _SYS_MALLOC_FL_
+/* Free list memory allocator */
 
-struct node_s {
-	struct node_s *next;
-	struct node_s *prev;
-	uint32_t size;
-	uint32_t flags;
-#define	FLAG_ALLOCATED		(1 << 31)
-#define	FLAG_PREV_SIZE_S	0
-#define	FLAG_PREV_SIZE_M	(0x7fffffff << FLAG_PREV_SIZE_S)
-};
+#include <sys/cdefs.h>
+#include <sys/cheri.h>
+#include <sys/types.h>
+#include <sys/malloc.h>
 
-#define	NODE_S	sizeof(struct node_s)
+#include <string.h>
+#include <stdio.h>
 
-struct mdx_fl_zone {
-	struct node_s nodelist[32];
-#ifdef __CHERI_PURE_CAPABILITY__
-	void *datacap;
-#endif
-};
-
-void mdx_fl_init(struct mdx_fl_zone *fl);
-void mdx_fl_add_region(struct mdx_fl_zone *fl, void *base, int size);
-void mdx_fl_dump(struct mdx_fl_zone *fl);
-void mdx_fl_free(struct mdx_fl_zone *fl, void *ptr);
-void * mdx_fl_malloc(struct mdx_fl_zone *fl, size_t size);
-void * mdx_fl_realloc(struct mdx_fl_zone *fl, void *ptr, size_t size);
-void * mdx_fl_calloc(struct mdx_fl_zone *fl, size_t number, size_t size);
-uint32_t mdx_fl_count(struct mdx_fl_zone *fl);
-
-extern struct mdx_fl_zone mdx_fl_defaultzone;
-
-#endif /* !_SYS_MALLOC_FL_*/
+struct mdx_fl_zone mdx_fl_defaultzone;
