@@ -38,7 +38,7 @@
 
 /* Interrupt stack */
 static uint8_t intr_stack[MDX_CPU_MAX][MDX_RISCV_INTR_STACK_SIZE];
-uint8_t __riscv_boot_ap[MDX_CPU_MAX];
+uint8_t __riscv_boot_ap[MDX_CPU_MAX] __section(".data") = { 0 };
 
 #ifdef MDX_CPU
 static uint32_t ncpus;
