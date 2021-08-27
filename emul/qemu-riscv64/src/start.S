@@ -33,15 +33,18 @@ ASM_ENTRY(_start)
 	la	t0, cpu_exception_handler
 	csrw	mtvec, t0
 
-	li	t0, 0
-	bne	a0, t0, mpentry
-
-#if 0
+	/* Pick a hart to run the boot process. */
 	la	t0, cpu_lottery
 	li	t1, 1
 	amoadd.w t0, t1, 0(t0)
-	bnez	t0, mpentry
-#endif
+
+	/*
+	 * We must jump to mpentry because the offset is too large to fit
+	 * in a 12-bit branch immediate.
+	 */
+	beqz	t0, 1f
+	j	mpentry
+1:
 
 	/* Clear BSS. */
 	la	t0, _sbss
