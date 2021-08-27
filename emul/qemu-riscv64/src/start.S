@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2019-2021 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -60,9 +60,9 @@ ASM_ENTRY(_start)
 	/* Load our stack pointer. */
 	la	t0, idle_thread_stack
 	li	t1, MDX_THREAD_STACK_SIZE
-	mulw	t2, t1, a0
-	add	t2, t2, t1
-	add	sp, t2, t0
+	mulw	t2, t1, a0	# Offset to start of our stack
+	add	t2, t2, t0	# Start of our stack
+	add	sp, t2, t1	# End of our stack
 
 	fence
 
@@ -81,9 +81,9 @@ ASM_ENTRY(mpentry)
 
 	la	t0, idle_thread_stack
 	li	t1, MDX_THREAD_STACK_SIZE
-	mulw	t2, t1, a0
-	add	t2, t2, t1
-	add	sp, t2, t0
+	mulw	t2, t1, a0	# Offset to start of our stack
+	add	t2, t2, t0	# Start of our stack
+	add	sp, t2, t1	# End of our stack
 
 	fence
 
