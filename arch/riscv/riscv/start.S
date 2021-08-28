@@ -31,7 +31,7 @@ ASM_ENTRY(_start)
 	fence
 
 	la	t0, cpu_exception_handler
-	csrw	mtvec, t0
+	csrw	REG_TVEC, t0
 
 	/* Pick a hart to run the boot process. */
 	la	t0, cpu_lottery
