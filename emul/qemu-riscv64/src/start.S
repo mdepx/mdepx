@@ -47,8 +47,8 @@ ASM_ENTRY(_start)
 1:
 
 	/* Clear BSS. */
-	la	t0, _sbss
-	la	t1, _ebss
+	la	t0, _sbss	# start of BSS section
+	la	t1, _ebss	# end of BSS section
 1:
 	beq	t0, t1, 2f
 	li	t2, 0
