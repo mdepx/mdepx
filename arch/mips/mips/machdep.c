@@ -142,7 +142,7 @@ md_thread_terminate(struct thread *td)
 }
 
 /*
- * The cpuid must be 0 here.
+ * The cpuid argument could be any from 0 to MDX_CPU_MAX - 1.
  */
 void
 md_init(int cpuid)

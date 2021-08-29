@@ -190,8 +190,7 @@ md_init_secondary(int hart)
 #endif
 
 /*
- * The hart must be 0 here.
- * Use md_init_secondary() for harts > 0.
+ * The hart argument could be any from 0 to MDX_CPU_MAX - 1.
  */
 void
 md_init(int hart)
