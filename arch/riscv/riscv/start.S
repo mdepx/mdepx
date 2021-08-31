@@ -94,5 +94,6 @@ ASM_ENTRY(mpentry)
 #endif
 END(mpentry)
 
+	.align 3
 cpu_lottery:
 	.space 4
