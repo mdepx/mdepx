@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018-2020 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2021 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,14 +24,8 @@
  * SUCH DAMAGE.
  */
 
-/* Free list memory allocator */
-
 #include <sys/cdefs.h>
-#include <sys/cheri.h>
 #include <sys/types.h>
 #include <sys/malloc.h>
-
-#include <string.h>
-#include <stdio.h>
 
 struct mdx_fl_zone mdx_fl_defaultzone;
