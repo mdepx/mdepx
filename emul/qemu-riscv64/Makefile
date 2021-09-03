@@ -32,6 +32,8 @@ RUN_CMD = qemu-system-riscv64						\
 	-chardev socket,path=/tmp/virtio,server,nowait,id=virtiocon0	\
 	-device virtconsole,chardev=virtiocon0
 
+# RUN_CMD += -machine dumpdtb=dtb
+
 # Multi-threaded, multi-processor
 all:
 	@${CMD} -j mdepx.conf
