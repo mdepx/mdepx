@@ -75,7 +75,7 @@ static void
 mdx_of_process_chosen(void)
 {
 	mdx_device_t dev;
-	const fdt32_t *prop;
+	const char *prop;
 	int uart_offset;
 	int offset;
 	int error;
@@ -83,9 +83,9 @@ mdx_of_process_chosen(void)
 
 	offset = fdt_path_offset(fdt, "/chosen");
 	if (offset >= 0) {
-		prop = fdt_getprop(fdt, offset, "mdepx,console", &len);
+		prop = fdt_getprop(fdt, offset, "stdout-path", &len);
 		if (prop) {
-			uart_offset = fdt_path_offset(fdt, (const char *)prop);
+			uart_offset = fdt_path_offset(fdt, prop);
 			error = mdx_of_probe_and_attach(uart_offset, &dev);
 			if (error == 0)
 				mdx_console_register_uart(dev);
@@ -112,7 +112,7 @@ mdx_of_probe_devices(void)
 
 int
 mdx_of_get_prop32(mdx_device_t dev, const char *propname,
-    int *res, int *len)
+    uint32_t *res, int *len)
 {
 	const fdt32_t *regp;
 
@@ -158,7 +158,7 @@ mdx_of_get_reg(mdx_device_t dev, int index,
 
 	parent = fdt_parent_offset(fdt, dev->nodeoffset);
 	if (!parent)
-		return (-1);
+		parent = fdt_path_offset(fdt, "/");
 
 	mdx_of_get_props(parent, &naddr, &nsize);
 
@@ -166,10 +166,14 @@ mdx_of_get_reg(mdx_device_t dev, int index,
 	if (!regp)
 		return (-1);
 
-	paddr = fdt32_ld(regp);
+	paddr = fdt32_ld(regp++);
+	if (naddr == 2)
+		paddr = ((uint64_t)paddr << 32) | fdt32_ld(regp++);
 
 	do {
 		bus = fdt_parent_offset(fdt, parent);
+		if (bus < 0)
+			break;
 		mdx_of_get_props(bus, &b_naddr, &b_nsize);
 
 		r = fdt_getprop(fdt, parent, "ranges", &len);
