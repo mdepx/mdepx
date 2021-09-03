@@ -96,8 +96,8 @@ struct nrf_twim_softc {
 
 struct nrf_twim_conf {
 	uint32_t freq;
-	uint8_t pin_scl;
-	uint8_t pin_sda;
+	uint32_t pin_scl;
+	uint32_t pin_sda;
 };
 
 void nrf_twim_setup(mdx_device_t dev, struct nrf_twim_conf *conf);

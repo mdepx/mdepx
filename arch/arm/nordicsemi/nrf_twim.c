@@ -156,7 +156,7 @@ static int
 nrf_twim_attach(mdx_device_t dev)
 {
 	struct nrf_twim_softc *sc;
-	int sda, scl, clk;
+	uint32_t sda, scl, clk;
 	int error;
 
 	sc = mdx_device_get_softc(dev);
