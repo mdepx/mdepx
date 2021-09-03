@@ -203,10 +203,7 @@ mdx_of_get_reg(mdx_device_t dev, int index,
 		}
 
 next:
-		bus = parent;
-		parent = fdt_parent_offset(fdt, bus);
-		mdx_of_get_props(bus, &b_naddr, &b_nsize);
-
+		parent = bus;
 	} while (parent >= 0);
 
 	*addr = paddr;
