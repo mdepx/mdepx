@@ -60,8 +60,9 @@
 
 struct uart_16550_softc {
 	capability base;
-	uint8_t reg_shift;
+	uint32_t reg_shift;
 	uint32_t bus_freq;
+	uint32_t baudrate;
 };
 
 void uart_16550_init(mdx_device_t dev, capability base,
