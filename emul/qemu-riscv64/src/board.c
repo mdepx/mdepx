@@ -34,16 +34,16 @@
 #include <sys/sem.h>
 #include <sys/list.h>
 #include <sys/smp.h>
+#include <sys/of.h>
 
+#include <riscv/include/plic.h>
 #include <riscv/sifive/e300g_clint.h>
 #include <riscv/sifive/e300g_uart.h>
 
 #include "board.h"
 
 #define	CLINT_BASE		0x02000000
-#define	UART_BASE		0x10000000
-#define	UART_CLOCK_RATE		3686400
-#define	DEFAULT_BAUDRATE	115200
+#define	PLIC_BASE		0x0c000000
 
 #include <dev/uart/uart_16550.h>
 
@@ -51,8 +51,10 @@ extern uint8_t __riscv_boot_ap[MDX_CPU_MAX];
 
 static struct uart_16550_softc uart_sc;
 static struct clint_softc clint_sc;
+static struct plic_softc plic_sc;
 
 struct mdx_device dev_uart = { .sc = &uart_sc };
+struct mdx_device dev_plic = { .sc = &plic_sc };
 
 char
 uart_getchar(void)
@@ -69,22 +71,17 @@ board_init(void)
 {
 
 	/* Initialize malloc */
-
 	malloc_init();
 	malloc_add_region((void *)0x80800000, 0x7800000);
 
-	/* Register UART */
-
-	uart_16550_init(&dev_uart, (void *)UART_BASE, 0, UART_CLOCK_RATE);
-	mdx_uart_setup(&dev_uart, DEFAULT_BAUDRATE,
-	    UART_DATABITS_5,
-	    UART_STOPBITS_1,
-	    UART_PARITY_NONE);
-	mdx_console_register_uart(&dev_uart);
+	/* Once malloc has initialized, probe devices. */
+	mdx_of_probe_devices();
 
 	/* Timer */
-
 	e300g_clint_init(&clint_sc, (void *)CLINT_BASE, BOARD_CPU_FREQ);
+
+	/* PLIC */
+	plic_init(&dev_plic, (void *)PLIC_BASE, 0, 1);
 
 	/* Release secondary core(s) */
 
