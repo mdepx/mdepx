@@ -24,9 +24,11 @@
  * SUCH DAMAGE.
  */
 
+#include <sys/cdefs.h>
 #include <sys/types.h>
 #include <sys/cheri.h>
 #include <sys/io.h>
+#include <sys/of.h>
 
 #include <dev/uart/uart_16550.h>
 
@@ -44,6 +46,8 @@
 	RD4((_sc), (_reg)) : RD1((_sc), (_reg))
 #define	UART_WRITE(_sc, _reg, _val)	(_sc)->reg_shift == 2 ?	\
 	(WR4((_sc), (_reg), (_val))) : (WR1((_sc), (_reg), (_val)))
+
+#define	DEFAULT_BAUDRATE	115200
 
 static bool
 uart_16550_rxready(mdx_device_t dev)
@@ -179,3 +183,64 @@ uart_16550_init(mdx_device_t dev, capability base,
 
 	dev->ops = &uart_16550_ops;
 }
+
+#ifdef MDX_OF
+static int
+uart_16550_probe(mdx_device_t dev)
+{
+
+	if (!mdx_of_is_compatible(dev, "ns16550a"))
+		return (MDX_ERROR);
+
+	return (MDX_OK);
+}
+
+static int
+uart_16550_attach(mdx_device_t dev)
+{
+	struct uart_16550_softc *sc;
+	int error;
+
+	sc = mdx_device_get_softc(dev);
+
+	error = mdx_of_get_reg(dev, 0, (void *)&sc->base, NULL);
+	if (error)
+		return (error);
+
+	error = mdx_of_get_prop32(dev, "clock-frequency", &sc->bus_freq, NULL);
+	if (error)
+		return (error);
+
+	error = mdx_of_get_prop32(dev, "current-speed", &sc->baudrate, NULL);
+	if (error)
+		sc->baudrate = DEFAULT_BAUDRATE;
+
+	error = mdx_of_get_prop32(dev, "reg-shift", &sc->reg_shift, NULL);
+	if (error)
+		sc->reg_shift = 0;
+
+	dev->ops = &uart_16550_ops;
+
+#if 0
+	mdx_of_setup_intr(dev, 0, uart_16550_intr, sc);
+#endif
+
+	mdx_uart_setup(dev, sc->baudrate, UART_DATABITS_5, UART_STOPBITS_1,
+	    UART_PARITY_NONE);
+
+	return (0);
+}
+
+static struct mdx_device_ops uart_16550_driver_ops = {
+	.probe = uart_16550_probe,
+	.attach = uart_16550_attach,
+};
+
+static mdx_driver_t uart_16550_driver = {
+	"uart_16550",
+	&uart_16550_driver_ops,
+	sizeof(struct uart_16550_softc),
+};
+
+DRIVER_MODULE(uart_16550, uart_16550_driver);
+#endif
