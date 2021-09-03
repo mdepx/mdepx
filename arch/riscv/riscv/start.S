@@ -66,6 +66,16 @@ ASM_ENTRY(_start)
 
 	fence
 
+	mv	s0, a0
+	mv	s1, a1
+
+#ifdef MDX_OF
+	mv	a0, a1
+	lla	t0, mdx_of_install_dtbp
+	jalr	t0
+#endif
+
+	mv	a0, s0
 	j	md_init
 
 	/* NOT REACHED */
