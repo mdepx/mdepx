@@ -165,15 +165,15 @@ nrf_twim_attach(mdx_device_t dev)
 	if (error)
 		return (error);
 
-	error = mdx_of_get_prop32(dev, "sda-pin", &sda, NULL);
+	error = mdx_of_dev_get_prop32(dev, "sda-pin", &sda, NULL);
 	if (error)
 		return (error);
 
-	error = mdx_of_get_prop32(dev, "scl-pin", &scl, NULL);
+	error = mdx_of_dev_get_prop32(dev, "scl-pin", &scl, NULL);
 	if (error)
 		return (error);
 
-	error = mdx_of_get_prop32(dev, "clock-frequency", &clk, NULL);
+	error = mdx_of_dev_get_prop32(dev, "clock-frequency", &clk, NULL);
 	if (error)
 		return (error);
 

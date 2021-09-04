@@ -110,19 +110,22 @@ mdx_of_probe_devices(void)
 	} while (offset > 0);
 }
 
-int
-mdx_of_get_prop32(mdx_device_t dev, const char *propname,
-    uint32_t *res, int *len)
+const char *
+mdx_of_dev_get_prop(mdx_device_t dev, const char *propname, int *len)
 {
-	const fdt32_t *regp;
+	const char *regp;
 
 	regp = fdt_getprop(fdt, dev->nodeoffset, propname, len);
-	if (!regp)
-		return (-1);
 
-	*res = fdt32_ld(regp);
+	return (regp);
+}
 
-	return (0);
+int
+mdx_of_dev_get_prop32(mdx_device_t dev, const char *propname,
+    uint32_t *res, int *len)
+{
+
+	return (mdx_of_get_prop32(dev->nodeoffset, propname, res, len));
 }
 
 static int

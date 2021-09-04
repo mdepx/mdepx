@@ -49,6 +49,12 @@
 
 #define	DEFAULT_BAUDRATE	115200
 
+static void
+uart_16550_intr(void *arg, int irq)
+{
+
+}
+
 static bool
 uart_16550_rxready(mdx_device_t dev)
 {
@@ -207,23 +213,23 @@ uart_16550_attach(mdx_device_t dev)
 	if (error)
 		return (error);
 
-	error = mdx_of_get_prop32(dev, "clock-frequency", &sc->bus_freq, NULL);
+	error = mdx_of_dev_get_prop32(dev, "clock-frequency", &sc->bus_freq,
+	    NULL);
 	if (error)
 		return (error);
 
-	error = mdx_of_get_prop32(dev, "current-speed", &sc->baudrate, NULL);
+	error = mdx_of_dev_get_prop32(dev, "current-speed", &sc->baudrate,
+	    NULL);
 	if (error)
 		sc->baudrate = DEFAULT_BAUDRATE;
 
-	error = mdx_of_get_prop32(dev, "reg-shift", &sc->reg_shift, NULL);
+	error = mdx_of_dev_get_prop32(dev, "reg-shift", &sc->reg_shift, NULL);
 	if (error)
 		sc->reg_shift = 0;
 
 	dev->ops = &uart_16550_ops;
 
-#if 0
 	mdx_of_setup_intr(dev, 0, uart_16550_intr, sc);
-#endif
 
 	mdx_uart_setup(dev, sc->baudrate, UART_DATABITS_5, UART_STOPBITS_1,
 	    UART_PARITY_NONE);

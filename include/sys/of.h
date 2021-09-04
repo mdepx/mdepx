@@ -35,7 +35,7 @@ int mdx_of_find_first_compatible(const char *compat);
 int mdx_of_get_reg(mdx_device_t dev, int index,
     size_t *addr, size_t *size);
 int mdx_of_intc_offset(int offset);
-int mdx_of_get_prop32(mdx_device_t dev, const char *propname,
+int mdx_of_dev_get_prop32(mdx_device_t dev, const char *propname,
     uint32_t *res, int *len);
 int mdx_of_setup_intr(mdx_device_t dev, int irq,
     void (*handler)(void *arg, int irq), void *arg);
@@ -43,5 +43,11 @@ int mdx_of_ld32(const void *regp);
 void * mdx_of_get_dtbp(void);
 bool mdx_of_node_is_enabled(int offset);
 bool mdx_of_node_is_compatible(int offset, const char *check);
+const char * mdx_of_dev_get_prop(mdx_device_t dev, const char *propname,
+    int *len);
+int mdx_of_node_offset_by_phandle(uint32_t phandle);
+int mdx_of_parent_offset(int nodeoffset);
+int mdx_of_get_prop32(int nodeoffset, const char *propname,
+    uint32_t *res, int *len);
 
 #endif /* _SYS_OF_H_ */
