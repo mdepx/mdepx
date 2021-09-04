@@ -148,3 +148,38 @@ mdx_of_intc_offset(int offset)
 
 	return (intc_offset);
 }
+
+int
+mdx_of_node_offset_by_phandle(uint32_t phandle)
+{
+	int offset;
+
+	offset = fdt_node_offset_by_phandle(fdt, phandle);
+
+	return (offset);
+}
+
+int
+mdx_of_parent_offset(int nodeoffset)
+{
+	int offset;
+
+	offset = fdt_parent_offset(fdt, nodeoffset);
+
+	return (offset);
+}
+
+int
+mdx_of_get_prop32(int nodeoffset, const char *propname,
+    uint32_t *res, int *len)
+{
+	const uint32_t *regp;
+
+	regp = fdt_getprop(fdt, nodeoffset, propname, len);
+	if (!regp)
+		return (-1);
+
+	*res = fdt32_ld(regp);
+
+	return (0);
+}
