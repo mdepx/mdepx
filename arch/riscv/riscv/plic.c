@@ -161,7 +161,7 @@ static struct mdx_intc_ops plic_intc_ops = {
 };
 
 /*
- * TODO: need to map context to hart id (cpu) based on DTS file.
+ * Low-level PLIC initialisation (on platforms without FDT support).
  */
 void
 plic_init(mdx_device_t dev, capability base, int cpu, int context)
