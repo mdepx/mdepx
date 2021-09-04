@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019-2020 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2019-2021 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -170,10 +170,9 @@ mdx_of_get_reg(mdx_device_t dev, int index,
 	if (naddr == 2)
 		paddr = ((uint64_t)paddr << 32) | fdt32_ld(regp++);
 
-	do {
-		bus = fdt_parent_offset(fdt, parent);
-		if (bus < 0)
-			break;
+	for (bus = fdt_parent_offset(fdt, parent);
+	    bus > 0;
+	    parent = bus, bus = fdt_parent_offset(fdt, parent)) {
 		mdx_of_get_props(bus, &b_naddr, &b_nsize);
 
 		r = fdt_getprop(fdt, parent, "ranges", &len);
@@ -181,7 +180,7 @@ mdx_of_get_reg(mdx_device_t dev, int index,
 			break;
 
 		if (len == 0)
-			goto next;
+			continue;
 
 		len /= sizeof(int);
 
@@ -201,10 +200,7 @@ mdx_of_get_reg(mdx_device_t dev, int index,
 				continue;
 			paddr = paddr - raddr + baddr;
 		}
-
-next:
-		parent = bus;
-	} while (parent >= 0);
+	}
 
 	*addr = paddr;
 
