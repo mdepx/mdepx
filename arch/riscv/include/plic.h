@@ -48,6 +48,7 @@ struct plic_context {
 struct plic_softc {
 	capability base;
 	struct plic_context contexts[MDX_CPU_MAX];
+	mdx_device_t dev;
 };
 
 void plic_init(mdx_device_t dev, capability base, int cpu, int context);

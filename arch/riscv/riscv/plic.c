@@ -27,7 +27,9 @@
 #include <sys/systm.h>
 #include <sys/pcpu.h>
 #include <sys/io.h>
+#include <sys/of.h>
 
+#include <machine/intr.h>
 #include <machine/plic.h>
 #include <dev/intc/intc.h>
 
@@ -184,3 +186,117 @@ plic_init(mdx_device_t dev, capability base, int cpu, int context)
 	reg = sc->contexts[cpu].context_offset + PLIC_CONTEXT_THRESHOLD;
 	WR4(sc, reg, 0);
 }
+
+static int
+plic_setup_interrupts(struct plic_softc *sc)
+{
+	mdx_device_t dev;
+	const char *prop;
+	uint32_t hart;
+	uint32_t reg;
+	int cpu_phandle;
+	int clic_node;
+	int cpu_node;
+	int context;
+	int error;
+	int nintr;
+	int mode;
+	int len;
+	int i;
+
+	dev = sc->dev;
+
+	prop = mdx_of_dev_get_prop(dev, "interrupts-extended", &len);
+	if (len <= 0)
+		return (0);
+
+	nintr = len / sizeof(int);
+
+	for (i = 0, context = 0; i < nintr; i += 2, context++) {
+		cpu_phandle = mdx_of_ld32(prop);
+		prop += sizeof(int);
+
+		mode = mdx_of_ld32(prop);
+		prop += sizeof(int);
+
+#ifdef MDX_RISCV_SUPERVISOR_MODE
+		if (mode != IRQ_EXTERNAL_SUPERVISOR)
+			continue;
+#else
+		if (mode != IRQ_EXTERNAL_MACHINE)
+			continue;
+#endif
+
+		clic_node = mdx_of_node_offset_by_phandle(cpu_phandle);
+		if (clic_node < 0)
+			continue;
+
+		cpu_node = mdx_of_parent_offset(clic_node);
+		error = mdx_of_get_prop32(cpu_node, "reg", &hart, NULL);
+		if (error != 0)
+			continue;
+
+		KASSERT(hart < MDX_CPU_MAX, ("CPU id is out of range"));
+
+		sc->contexts[hart].enable_offset = PLIC_ENABLE_BASE +
+		    PLIC_ENABLE_STRIDE * context;
+		sc->contexts[hart].context_offset = PLIC_CONTEXT_BASE +
+		    PLIC_CONTEXT_STRIDE * context;
+
+		/* Accept all priorities. */
+		reg = sc->contexts[hart].context_offset +
+		    PLIC_CONTEXT_THRESHOLD;
+		WR4(sc, reg, 0);
+	}
+
+	return (0);
+}
+
+#ifdef MDX_OF
+static int
+plic_probe(mdx_device_t dev)
+{
+
+	if (!mdx_of_is_compatible(dev, "riscv,plic0"))
+		return (MDX_ERROR);
+
+	return (MDX_OK);
+}
+
+static int
+plic_attach(mdx_device_t dev)
+{
+	struct plic_softc *sc;
+	size_t base;
+	int error;
+
+	sc = mdx_device_get_softc(dev);
+	sc->dev = dev;
+
+	plic_sc = sc;
+
+	error = mdx_of_get_reg(dev, 0, &base, NULL);
+	if (error)
+		return (error);
+	sc->base = (void *)base;
+
+	plic_setup_interrupts(sc);
+
+	dev->ops = &plic_intc_ops;
+
+	return (0);
+}
+
+static struct mdx_device_ops plic_ops = {
+	.probe = plic_probe,
+	.attach = plic_attach,
+};
+
+static mdx_driver_t plic_driver = {
+	"plic",
+	&plic_ops,
+	sizeof(struct plic_softc),
+};
+
+DRIVER_MODULE(plic, plic_driver);
+#endif
