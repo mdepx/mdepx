@@ -36,7 +36,6 @@
 #include <sys/smp.h>
 #include <sys/of.h>
 
-#include <riscv/include/plic.h>
 #include <riscv/sifive/e300g_clint.h>
 #include <riscv/sifive/e300g_uart.h>
 
@@ -51,10 +50,8 @@ extern uint8_t __riscv_boot_ap[MDX_CPU_MAX];
 
 static struct uart_16550_softc uart_sc;
 static struct clint_softc clint_sc;
-static struct plic_softc plic_sc;
 
 struct mdx_device dev_uart = { .sc = &uart_sc };
-struct mdx_device dev_plic = { .sc = &plic_sc };
 
 char
 uart_getchar(void)
@@ -70,20 +67,20 @@ void
 board_init(void)
 {
 
-	/* Initialize malloc */
+	/* Initialize malloc. */
+
 	malloc_init();
 	malloc_add_region((void *)0x80800000, 0x7800000);
 
 	/* Once malloc has initialized, probe devices. */
+
 	mdx_of_probe_devices();
 
-	/* Timer */
+	/* Timer. */
+
 	e300g_clint_init(&clint_sc, (void *)CLINT_BASE, BOARD_CPU_FREQ);
 
-	/* PLIC */
-	plic_init(&dev_plic, (void *)PLIC_BASE, 0, 1);
-
-	/* Release secondary core(s) */
+	/* Release secondary core(s). */
 
 #ifdef MDX_SCHED_SMP
 	int j;
