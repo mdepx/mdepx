@@ -67,5 +67,6 @@ struct uart_16550_softc {
 
 void uart_16550_init(mdx_device_t dev, capability base,
     uint8_t reg_shift, uint32_t bus_freq);
+void uart_16550_intr(void *arg, int irq);
 
 #endif /* !_DEV_UART_UART_16550_H_ */
