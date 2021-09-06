@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2021 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,49 +24,40 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _SYS_DEVICE_H_
-#define _SYS_DEVICE_H_
+#ifndef _SYS_KERNEL_H_
+#define _SYS_KERNEL_H_
 
-#include <sys/list.h>
-#include <sys/kernel.h>
-
-struct mdx_device {
-	void			*sc;		/* Software context. */
-	void			*ops;		/* Methods. */
-	struct entry		node;		/* Entry in the devs list. */
-	int			nodeoffset;	/* libfdt node offset. */
-	struct mdx_driver	*dri;
-	int			unit;
+enum mdx_subsystem_id {
+	SI_SUB_DRIVERS,
+	SI_SUB_CLOCKS,
 };
 
-typedef struct mdx_device *mdx_device_t;
-
-struct mdx_device_ops {
-	int (*probe)(mdx_device_t dev);
-	int (*attach)(mdx_device_t dev);
+enum mdx_order_id {
+	SI_ORDER_FIRST,
+	SI_ORDER_SECOND,
+	SI_ORDER_ANY,
 };
 
-struct mdx_driver {
-	const char		*name;
-	struct mdx_device_ops	*ops;
-	size_t			size;
+struct mdx_moduledata {
+	int	(*handler)(void *);
+	void	*data;
 };
 
-typedef struct mdx_driver mdx_driver_t;
+typedef struct mdx_moduledata mdx_moduledata_t;
 
-#define DRIVER_MODULE(name, driver)			\
-	struct mdx_moduledata name##_mod = {		\
-		.handler = mdx_driver_module_handler,	\
-		.data = &driver,			\
-	};						\
-	SYSINIT(name, SI_SUB_DRIVERS, 0, &name##_mod)
+struct mdx_sysinit {
+	enum mdx_subsystem_id	subsystem;
+	enum mdx_order_id	order;
+	mdx_moduledata_t	*mod;
+};
 
-#define	mdx_device_get_softc(dev)	((dev)->sc)
+#define SYSINIT(name, subsystem, order, mod)		\
+	struct mdx_sysinit name##_sysinit		\
+	    __attribute__((__section__(".sysinit"),	\
+	    __used__, __aligned__(4))) = {		\
+		subsystem,				\
+		order,					\
+		mod,					\
+	};
 
-void * mdx_device_alloc_softc(mdx_device_t dev, size_t size);
-int mdx_device_probe_and_attach(mdx_device_t dev);
-int mdx_driver_module_handler(void *);
-mdx_device_t mdx_device_lookup_by_name(const char *name, int unit);
-mdx_device_t mdx_device_lookup_by_offset(int offset);
-
-#endif /* !_SYS_DEVICE_H_ */
+#endif /* !_SYS_KERNEL_H_ */

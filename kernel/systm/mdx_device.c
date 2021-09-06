@@ -79,19 +79,16 @@ mdx_device_alloc_softc(mdx_device_t dev, size_t size)
 static void
 mdx_device_set_unit(mdx_device_t dev)
 {
-	struct mdx_sysinit *si, *si1;
 	struct mdx_driver *dri, *dri1;
 	mdx_device_t dev1;
 	int unit;
 
-	si = dev->si;
-	dri = si->dri;
+	dri = dev->dri;
 
 	unit = -1;
 
 	for (dev1 = first(); dev1 != NULL; dev1 = next(dev1)) {
-		si1 = dev1->si;
-		dri1 = si1->dri;
+		dri1 = dev1->dri;
 
 		if (strcmp(dri->name, dri1->name) == 0)
 			if (dev1->unit > unit)
@@ -116,8 +113,10 @@ mdx_device_probe_and_attach(mdx_device_t dev)
 
 	for (; start < end; start += sizeof(struct mdx_sysinit)) {
 		si = (struct mdx_sysinit *)start;
-		dev->si = si;
-		driver = si->dri;
+		if (si->subsystem != SI_SUB_DRIVERS)
+			continue;
+		driver = (mdx_driver_t *)si->mod->data;
+		dev->dri = driver;
 		ops = driver->ops;
 		mdx_device_set_unit(dev);
 		error = ops->probe(dev);
@@ -142,12 +141,10 @@ mdx_device_t
 mdx_device_lookup_by_name(const char *name, int unit)
 {
 	struct mdx_driver *dri;
-	struct mdx_sysinit *si;
 	mdx_device_t dev;
 
 	for (dev = first(); dev != NULL; dev = next(dev)) {
-		si = dev->si;
-		dri = si->dri;
+		dri = dev->dri;
 		if (strcmp(name, dri->name) == 0 && dev->unit == unit)
 			return (dev);
 	}
@@ -165,4 +162,11 @@ mdx_device_lookup_by_offset(int offset)
 			return (dev);
 
 	return (NULL);
+}
+
+int
+mdx_driver_module_handler(void *arg)
+{
+
+	return (0);
 }
