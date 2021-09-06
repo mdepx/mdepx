@@ -115,7 +115,9 @@ mdx_device_probe_and_attach(mdx_device_t dev)
 		si = (struct mdx_sysinit *)start;
 		if (si->subsystem != SI_SUB_DRIVERS)
 			continue;
-		driver = (mdx_driver_t *)si->mod->data;
+		struct mdx_moduledata *mod;
+		mod = (struct mdx_moduledata *)si->arg;
+		driver = (mdx_driver_t *)mod->data;
 		dev->dri = driver;
 		ops = driver->ops;
 		mdx_device_set_unit(dev);

@@ -38,6 +38,8 @@ void critical_exit(void);
 
 void panic(const char *fmt, ...);
 
+void mi_startup(void);
+
 #ifdef MDX_PRODUCTION
 #define	KASSERT(e, m) do {} while (0)
 #else

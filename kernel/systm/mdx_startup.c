@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2021 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,50 +24,33 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _SYS_DEVICE_H_
-#define _SYS_DEVICE_H_
-
+#include <sys/cdefs.h>
+#include <sys/systm.h>
+#include <sys/malloc.h>
+#include <sys/device.h>
 #include <sys/list.h>
-#include <sys/kernel.h>
-#include <sys/module.h>
 
-struct mdx_device {
-	void			*sc;		/* Software context. */
-	void			*ops;		/* Methods. */
-	struct entry		node;		/* Entry in the devs list. */
-	int			nodeoffset;	/* libfdt node offset. */
-	struct mdx_driver	*dri;
-	int			unit;
-};
+extern uintptr_t __sysinit_start;
+extern uintptr_t __sysinit_end;
 
-typedef struct mdx_device *mdx_device_t;
+void
+mi_startup(void)
+{
+	struct mdx_sysinit *si;
+	uint8_t *start;
+	uint8_t *end;
+	void (*func)(void *);
+	void *arg;
 
-struct mdx_device_ops {
-	int (*probe)(mdx_device_t dev);
-	int (*attach)(mdx_device_t dev);
-};
+	start = (uint8_t *)&__sysinit_start;
+	end = (uint8_t *)&__sysinit_end;
 
-struct mdx_driver {
-	const char		*name;
-	struct mdx_device_ops	*ops;
-	size_t			size;
-};
+	for (; start < end; start += sizeof(struct mdx_sysinit)) {
+		si = (struct mdx_sysinit *)start;
+		func = si->func;
+		arg = si->arg;
 
-typedef struct mdx_driver mdx_driver_t;
-
-#define DRIVER_MODULE(name, driver)					\
-	struct mdx_moduledata name##_mod = {				\
-		.handler = mdx_driver_module_handler,			\
-		.data = &driver,					\
-	};								\
-	SYSINIT(name, SI_SUB_DRIVERS, 0, mdx_module_init, &name##_mod)
-
-#define	mdx_device_get_softc(dev)	((dev)->sc)
-
-void * mdx_device_alloc_softc(mdx_device_t dev, size_t size);
-int mdx_device_probe_and_attach(mdx_device_t dev);
-int mdx_driver_module_handler(void *);
-mdx_device_t mdx_device_lookup_by_name(const char *name, int unit);
-mdx_device_t mdx_device_lookup_by_offset(int offset);
-
-#endif /* !_SYS_DEVICE_H_ */
+		/* Initialize the subsystem entry. */
+		func(arg);
+	}
+}

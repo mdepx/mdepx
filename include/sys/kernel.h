@@ -38,26 +38,21 @@ enum mdx_order_id {
 	SI_ORDER_ANY,
 };
 
-struct mdx_moduledata {
-	int	(*handler)(void *);
-	void	*data;
-};
-
-typedef struct mdx_moduledata mdx_moduledata_t;
-
 struct mdx_sysinit {
 	enum mdx_subsystem_id	subsystem;
 	enum mdx_order_id	order;
-	mdx_moduledata_t	*mod;
+	void			(*func)(void *);
+	void			*arg;
 };
 
-#define SYSINIT(name, subsystem, order, mod)		\
+#define SYSINIT(name, subsystem, order, func, arg)	\
 	struct mdx_sysinit name##_sysinit		\
 	    __attribute__((__section__(".sysinit"),	\
 	    __used__, __aligned__(4))) = {		\
 		subsystem,				\
 		order,					\
-		mod,					\
+		func,					\
+		arg,					\
 	};
 
 #endif /* !_SYS_KERNEL_H_ */
