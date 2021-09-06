@@ -28,6 +28,7 @@
 #define _SYS_KERNEL_H_
 
 enum mdx_subsystem_id {
+	SI_SUB_BOARD,
 	SI_SUB_DRIVERS,
 	SI_SUB_CLOCKS,
 };
