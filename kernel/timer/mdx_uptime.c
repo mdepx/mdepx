@@ -34,16 +34,21 @@
 #include <machine/atomic.h>
 
 static struct mdx_timer uptime_timer;
+static bool initialized = false;
 
 int
 mdx_uptime_init(void)
 {
+	int error;
+
+	if (initialized)
+		return (-1);
 
 	bzero(&uptime_timer, sizeof(struct mdx_timer));
 	mdx_callout_init(&uptime_timer.c);
-	mdx_timer_start(&uptime_timer, MDX_TIMER_UPTIME_PERIOD_US);
+	error = mdx_timer_start(&uptime_timer, MDX_TIMER_UPTIME_PERIOD_US);
 
-	return (0);
+	return (error);
 }
 
 uint64_t
@@ -52,3 +57,14 @@ mdx_uptime(void)
 
 	return (mdx_timer_count(&uptime_timer));
 }
+
+static void
+mdx_uptime_sysinit(void *unused)
+{
+
+	mdx_uptime_init();
+
+	initialized = true;
+}
+
+SYSINIT(uptime, SI_SUB_CLOCKS, SI_ORDER_FIRST, mdx_uptime_sysinit, NULL);
