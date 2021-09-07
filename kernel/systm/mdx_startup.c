@@ -35,8 +35,6 @@ mi_startup(void)
 {
 	struct mdx_sysinit *si, *xi, *si_start, *si_end;
 	struct mdx_sysinit save;
-	void (*func)(void *);
-	void *arg;
 	int i;
 
 	si_start = &__start_set_sysinit_set;
@@ -55,17 +53,15 @@ mi_startup(void)
 		}
 	}
 
-	printf("(Re)ordered sysinit list:\n");
+	printf("%s: (Re)ordered sysinit list:\n", __func__);
 	for (si = si_start, i = 0; si < si_end; si++, i++)
-		printf("#%d subsystem %d order %d\n", i,
-		    si->subsystem, si->order);
+		printf("%s: #%d subsystem %d order %d\n",
+		    __func__, i, si->subsystem, si->order);
 
 	for (si = si_start, i = 0; si < si_end; si++, i++) {
-		func = (si)->func;
-		arg = (si)->arg;
-
-		/* Initialize the subsystem entry. */
-		printf("Initializing sysinit %d\n", i);
-		func(arg);
+		printf("%s: Initializing sysinit #%d\n", __func__, i);
+		si->func(si->arg);
 	}
+
+	printf("%s: %d sysinits initialized\n", __func__, i);
 }
