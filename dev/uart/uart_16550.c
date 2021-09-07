@@ -49,6 +49,11 @@
 
 #define	DEFAULT_BAUDRATE	115200
 
+static struct mdx_compat_data uart_compat_data[] = {
+	{ "ns16550a" },
+	{ NULL },
+};
+
 void
 uart_16550_intr(void *arg, int irq)
 {
@@ -246,6 +251,7 @@ static mdx_driver_t uart_16550_driver = {
 	"uart_16550",
 	&uart_16550_driver_ops,
 	sizeof(struct uart_16550_softc),
+	uart_compat_data,
 };
 
 DRIVER_MODULE(uart_16550, uart_16550_driver);

@@ -46,6 +46,11 @@
 static struct plic_softc *plic_sc;
 static struct plic_intr_entry intr_map[MDX_RISCV_PLIC_NINTR];
 
+static struct mdx_compat_data plic_compat_data[] = {
+	{ "riscv,plic0" },
+	{ NULL },
+};
+
 void
 plic_intr(void)
 {
@@ -296,6 +301,7 @@ static mdx_driver_t plic_driver = {
 	"plic",
 	&plic_ops,
 	sizeof(struct plic_softc),
+	plic_compat_data,
 };
 
 DRIVER_MODULE_ORDERED(plic, plic_driver, SI_ORDER_FIRST);
