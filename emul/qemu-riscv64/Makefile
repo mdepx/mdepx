@@ -59,4 +59,10 @@ dtb:
 clean:
 	@rm -rf obj/*
 
+objdump:
+	${CROSS_COMPILE}objdump -d ${OBJDIR}/${APP}.elf
+
+readelf:
+	${CROSS_COMPILE}readelf -a ${OBJDIR}/${APP}.elf
+
 include ${OSDIR}/mk/user.mk
