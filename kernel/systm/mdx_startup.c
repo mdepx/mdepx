@@ -30,25 +30,36 @@
 #include <sys/device.h>
 #include <sys/list.h>
 
-extern uintptr_t __sysinit_start;
-extern uintptr_t __sysinit_end;
+extern struct mdx_sysinit __sysinit_start;
+extern struct mdx_sysinit __sysinit_end;
 
 void
 mi_startup(void)
 {
-	struct mdx_sysinit *si;
-	uint8_t *start;
-	uint8_t *end;
+	struct mdx_sysinit *si, *xi, *si_start, *si_end;
+	struct mdx_sysinit save;
 	void (*func)(void *);
 	void *arg;
 
-	start = (uint8_t *)&__sysinit_start;
-	end = (uint8_t *)&__sysinit_end;
+	si_start = &__sysinit_start;
+	si_end = &__sysinit_end;
 
-	for (; start < end; start += sizeof(struct mdx_sysinit)) {
-		si = (struct mdx_sysinit *)start;
-		func = si->func;
-		arg = si->arg;
+	/* Sort by subsystem, order. */
+	for (si = si_start; si < si_end; si++) {
+		for (xi = si + 1; xi < si_end; xi++) {
+			if (si->subsystem < xi->subsystem ||
+			    (si->subsystem == xi->subsystem &&
+			    si->order <= xi->order))
+				continue;
+			save = *si;
+			*si = *xi;
+			*xi = save;
+		}
+	}
+
+	for (si = si_start; si < si_end; si++) {
+		func = (si)->func;
+		arg = (si)->arg;
 
 		/* Initialize the subsystem entry. */
 		func(arg);
