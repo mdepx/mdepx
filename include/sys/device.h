@@ -55,12 +55,16 @@ struct mdx_driver {
 
 typedef struct mdx_driver mdx_driver_t;
 
-#define DRIVER_MODULE(name, driver)					\
+#define DRIVER_MODULE_ORDERED(name, driver, order)			\
 	struct mdx_moduledata name##_mod = {				\
 		.handler = mdx_driver_module_handler,			\
 		.data = &driver,					\
 	};								\
-	SYSINIT(name, SI_SUB_DRIVERS, 0, mdx_module_init, &name##_mod)
+	SYSINIT(name, SI_SUB_DRIVERS, order, mdx_module_init,		\
+	    &name##_mod)
+
+#define DRIVER_MODULE(name, driver)					\
+	DRIVER_MODULE_ORDERED(name, driver, SI_ORDER_FIRST)
 
 #define	mdx_device_get_softc(dev)	((dev)->sc)
 
