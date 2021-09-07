@@ -52,7 +52,7 @@ struct mdx_sysinit {
 
 #define SYSINIT(name, subsystem, order, func, arg)			\
 	static struct mdx_sysinit name##_sysinit			\
-	    __section("set_sysinit_set") __used  = {			\
+	    __section("set_sysinit_set") __used = {			\
 		subsystem, order, func, arg, };
 
 extern struct mdx_sysinit __start_set_sysinit_set;
