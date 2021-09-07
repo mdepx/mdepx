@@ -22,6 +22,11 @@ SECTIONS
 	.data : {
 		_sdata = ABSOLUTE(.);
 		*(.data)
+
+		__start_set_sysinit_set = ABSOLUTE(.);
+		*(set_sysinit*)
+		__stop_set_sysinit_set = ABSOLUTE(.);
+
 		_edata = ABSOLUTE(.);
 	}
 
