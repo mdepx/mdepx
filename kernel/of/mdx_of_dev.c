@@ -34,7 +34,7 @@
 
 extern void *fdt;
 
-static int
+int
 mdx_of_probe_and_attach(int offset, mdx_device_t *dev0)
 {
 	const void *prop;
