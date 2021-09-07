@@ -49,10 +49,12 @@
 
 #define	DEFAULT_BAUDRATE	115200
 
+#ifdef MDX_OF
 static struct mdx_compat_data uart_compat_data[] = {
 	{ "ns16550a" },
 	{ NULL },
 };
+#endif
 
 void
 uart_16550_intr(void *arg, int irq)
