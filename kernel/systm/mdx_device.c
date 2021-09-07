@@ -31,8 +31,8 @@
 #include <sys/list.h>
 
 #ifdef MDX_OF
-extern uintptr_t __sysinit_start;
-extern uintptr_t __sysinit_end;
+extern struct mdx_sysinit __sysinit_start;
+extern struct mdx_sysinit __sysinit_end;
 #endif
 
 static struct entry devs = LIST_INIT_STATIC(&devs);
@@ -103,16 +103,13 @@ mdx_device_probe_and_attach(mdx_device_t dev)
 {
 	mdx_driver_t *driver;
 	struct mdx_device_ops *ops;
-	struct mdx_sysinit *si;
-	uint8_t *start;
-	uint8_t *end;
+	struct mdx_sysinit *si, *si_start, *si_end;
 	int error;
 
-	start = (uint8_t *)&__sysinit_start;
-	end = (uint8_t *)&__sysinit_end;
+	si_start = &__sysinit_start;
+	si_end = &__sysinit_end;
 
-	for (; start < end; start += sizeof(struct mdx_sysinit)) {
-		si = (struct mdx_sysinit *)start;
+	for (si = si_start; si < si_end; si++) {
 		if (si->subsystem != SI_SUB_DRIVERS)
 			continue;
 		struct mdx_moduledata *mod;
