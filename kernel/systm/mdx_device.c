@@ -167,7 +167,7 @@ mdx_driver_module_handler(void *arg)
 	struct mdx_compat_data *cd;
 	struct mdx_driver *dri;
 	int offset;
-	int error;
+	int error __unused;
 
 	dri = (struct mdx_driver *)arg;
 
@@ -182,8 +182,8 @@ mdx_driver_module_handler(void *arg)
 		offset = mdx_of_offset_by_compatible(cd->compatible);
 		if (offset) {
 			error = mdx_of_probe_and_attach(offset, NULL);
-			printf("%s: offset %d error %d\n",
-			    __func__, offset, error);
+			dprintf("%s: offset %d error %d\n", __func__, offset,
+			    error);
 			break;
 		}
 	}
