@@ -52,6 +52,7 @@ static struct uart_16550_softc uart_sc;
 static struct clint_softc clint_sc;
 
 struct mdx_device dev_uart = { .sc = &uart_sc };
+mdx_device_t uart;
 
 char
 uart_getchar(void)
@@ -72,13 +73,15 @@ board_init(void)
 	malloc_init();
 	malloc_add_region((void *)0x80800000, 0x7800000);
 
-	/* Once malloc has initialized, probe devices. */
-
-	mdx_of_probe_devices();
-
 	/* Timer. */
-
 	e300g_clint_init(&clint_sc, (void *)CLINT_BASE, BOARD_CPU_FREQ);
+
+	/* Once malloc has initialized, probe devices. */
+	mi_startup();
+
+	/* Register UART */
+	uart = mdx_device_lookup_by_name("uart_16550", 0);
+	mdx_console_register_uart(uart);
 
 	/* Release secondary core(s). */
 
