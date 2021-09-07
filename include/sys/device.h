@@ -47,10 +47,15 @@ struct mdx_device_ops {
 	int (*attach)(mdx_device_t dev);
 };
 
+struct mdx_compat_data {
+	const char *compatible;
+};
+
 struct mdx_driver {
 	const char		*name;
 	struct mdx_device_ops	*ops;
 	size_t			size;
+	struct mdx_compat_data	*compat_data;
 };
 
 typedef struct mdx_driver mdx_driver_t;
