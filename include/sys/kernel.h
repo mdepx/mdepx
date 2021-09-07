@@ -50,14 +50,12 @@ struct mdx_sysinit {
 	void			*arg;
 };
 
-#define SYSINIT(name, subsystem, order, func, arg)	\
-	struct mdx_sysinit name##_sysinit		\
-	    __attribute__((__section__(".sysinit"),	\
-	    __used__, __aligned__(4))) = {		\
-		subsystem,				\
-		order,					\
-		func,					\
-		arg,					\
-	};
+#define SYSINIT(name, subsystem, order, func, arg)			\
+	static struct mdx_sysinit name##_sysinit			\
+	    __section("set_sysinit_set") __used __aligned(4) = {	\
+		subsystem, order, func,	 arg, };
+
+extern struct mdx_sysinit __start_set_sysinit_set;
+extern struct mdx_sysinit __stop_set_sysinit_set;
 
 #endif /* !_SYS_KERNEL_H_ */

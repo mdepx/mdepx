@@ -30,9 +30,6 @@
 #include <sys/device.h>
 #include <sys/list.h>
 
-extern struct mdx_sysinit __sysinit_start;
-extern struct mdx_sysinit __sysinit_end;
-
 void
 mi_startup(void)
 {
@@ -40,9 +37,10 @@ mi_startup(void)
 	struct mdx_sysinit save;
 	void (*func)(void *);
 	void *arg;
+	int i;
 
-	si_start = &__sysinit_start;
-	si_end = &__sysinit_end;
+	si_start = &__start_set_sysinit_set;
+	si_end = &__stop_set_sysinit_set;
 
 	/* Sort by subsystem, order. */
 	for (si = si_start; si < si_end; si++) {
@@ -57,11 +55,17 @@ mi_startup(void)
 		}
 	}
 
-	for (si = si_start; si < si_end; si++) {
+	printf("(Re)ordered sysinit list:\n");
+	for (si = si_start, i = 0; si < si_end; si++, i++)
+		printf("#%d subsystem %d order %d\n", i,
+		    si->subsystem, si->order);
+
+	for (si = si_start, i = 0; si < si_end; si++, i++) {
 		func = (si)->func;
 		arg = (si)->arg;
 
 		/* Initialize the subsystem entry. */
+		printf("Initializing sysinit %d\n", i);
 		func(arg);
 	}
 }
