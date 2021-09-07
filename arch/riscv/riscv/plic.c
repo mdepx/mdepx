@@ -298,5 +298,5 @@ static mdx_driver_t plic_driver = {
 	sizeof(struct plic_softc),
 };
 
-DRIVER_MODULE(plic, plic_driver);
+DRIVER_MODULE_ORDERED(plic, plic_driver, SI_ORDER_FIRST);
 #endif
