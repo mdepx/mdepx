@@ -79,10 +79,6 @@ board_init(void)
 	/* Once malloc has initialized, probe devices. */
 	mi_startup();
 
-	/* Register UART */
-	uart = mdx_device_lookup_by_name("uart_16550", 0);
-	mdx_console_register_uart(uart);
-
 	/* Release secondary core(s). */
 
 #ifdef MDX_SCHED_SMP

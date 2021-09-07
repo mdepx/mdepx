@@ -26,6 +26,7 @@
 
 #include <sys/cdefs.h>
 #include <sys/console.h>
+#include <sys/of.h>
 
 #include <dev/uart/uart.h>
 
@@ -57,6 +58,14 @@ uart_putchar(int c, void *arg)
 void
 mdx_console_register_uart(mdx_device_t dev)
 {
+
+#ifdef MDX_OF
+	int chosen;
+
+	chosen = mdx_of_chosen_path_offset();
+	if (chosen < 0 || chosen != dev->nodeoffset)
+		return;
+#endif
 
 	kern_console.console_putchar = uart_putchar;
 	kern_console.console_putchar_arg = dev;

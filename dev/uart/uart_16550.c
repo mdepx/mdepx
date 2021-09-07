@@ -29,6 +29,7 @@
 #include <sys/cheri.h>
 #include <sys/io.h>
 #include <sys/of.h>
+#include <sys/console.h>
 
 #include <dev/uart/uart_16550.h>
 
@@ -240,6 +241,8 @@ uart_16550_attach(mdx_device_t dev)
 
 	mdx_uart_setup(dev, sc->baudrate, UART_DATABITS_5, UART_STOPBITS_1,
 	    UART_PARITY_NONE);
+
+	mdx_console_register_uart(dev);
 
 	return (0);
 }
