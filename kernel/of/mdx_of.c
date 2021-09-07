@@ -190,3 +190,26 @@ mdx_of_offset_by_compatible(const char *compatible)
 
 	return (fdt_node_offset_by_compatible(fdt, 0, compatible));
 }
+
+int
+mdx_of_chosen_path_offset(int *offset0)
+{
+	const char *prop;
+	int path_offset;
+	int offset;
+	int len;
+
+	offset = fdt_path_offset(fdt, "/chosen");
+	if (offset >= 0) {
+		prop = fdt_getprop(fdt, offset, "stdout-path", &len);
+		if (prop) {
+			path_offset = fdt_path_offset(fdt, prop);
+			if (path_offset > 0) {
+				*offset0 = path_offset;
+				return (0);
+			}
+		}
+	}
+
+	return (MDX_ERROR);
+}
