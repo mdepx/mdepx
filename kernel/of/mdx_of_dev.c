@@ -71,26 +71,47 @@ mdx_of_probe_and_attach(int offset, mdx_device_t *dev0)
 	return (MDX_OK);
 }
 
-static void
-mdx_of_process_chosen(void)
+int
+mdx_of_chosen_path_offset(int *offset0)
 {
-	mdx_device_t dev;
 	const char *prop;
-	int uart_offset;
+	int path_offset;
 	int offset;
-	int error;
 	int len;
 
 	offset = fdt_path_offset(fdt, "/chosen");
 	if (offset >= 0) {
 		prop = fdt_getprop(fdt, offset, "stdout-path", &len);
 		if (prop) {
-			uart_offset = fdt_path_offset(fdt, prop);
-			error = mdx_of_probe_and_attach(uart_offset, &dev);
-			if (error == 0)
-				mdx_console_register_uart(dev);
+			path_offset = fdt_path_offset(fdt, prop);
+			if (path_offset > 0) {
+				*offset0 = path_offset;
+				return (0);
+			}
 		}
 	}
+
+	return (MDX_ERROR);
+}
+
+static int
+mdx_of_process_chosen(void)
+{
+	mdx_device_t dev;
+	int offset;
+	int error;
+
+	error = mdx_of_chosen_path_offset(&offset);
+	if (error)
+		return (error);
+
+	error = mdx_of_probe_and_attach(offset, &dev);
+	if (error)
+		return (error);
+
+	mdx_console_register_uart(dev);
+
+	return (0);
 }
 
 void
