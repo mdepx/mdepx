@@ -29,8 +29,11 @@
 #include <sys/malloc.h>
 #include <sys/device.h>
 #include <sys/list.h>
+#include <sys/of.h>
 
 static struct entry devs = LIST_INIT_STATIC(&devs);
+
+#define	dprintf(fmt, ...)
 
 static mdx_device_t
 first(void)
@@ -161,6 +164,29 @@ mdx_device_lookup_by_offset(int offset)
 int
 mdx_driver_module_handler(void *arg)
 {
+	struct mdx_compat_data *cd;
+	struct mdx_driver *dri;
+	int offset;
+	int error;
+
+	dri = (struct mdx_driver *)arg;
+
+	dprintf("%s: name %s\n", __func__, dri->name);
+
+	cd = dri->compat_data;
+	if (cd == NULL)
+		return (-1);
+
+	for (; cd->compatible != NULL; cd++) {
+		dprintf("%s: compat %s\n", __func__, cd->compatible);
+		offset = mdx_of_offset_by_compatible(cd->compatible);
+		if (offset) {
+			error = mdx_of_probe_and_attach(offset, NULL);
+			printf("%s: offset %d error %d\n",
+			    __func__, offset, error);
+			break;
+		}
+	}
 
 	return (0);
 }
