@@ -36,6 +36,10 @@ enum mdx_subsystem_id {
 enum mdx_order_id {
 	SI_ORDER_FIRST,
 	SI_ORDER_SECOND,
+	SI_ORDER_THIRD,
+	SI_ORDER_FOURTH,
+	SI_ORDER_FIFTH,
+	SI_ORDER_MIDDLE,
 	SI_ORDER_ANY,
 };
 
