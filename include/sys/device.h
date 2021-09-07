@@ -64,7 +64,7 @@ typedef struct mdx_driver mdx_driver_t;
 	    &name##_mod)
 
 #define DRIVER_MODULE(name, driver)					\
-	DRIVER_MODULE_ORDERED(name, driver, SI_ORDER_FIRST)
+	DRIVER_MODULE_ORDERED(name, driver, SI_ORDER_MIDDLE)
 
 #define	mdx_device_get_softc(dev)	((dev)->sc)
 
