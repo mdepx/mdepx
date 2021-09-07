@@ -192,7 +192,7 @@ mdx_of_offset_by_compatible(const char *compatible)
 }
 
 int
-mdx_of_chosen_path_offset(int *offset0)
+mdx_of_chosen_path_offset(void)
 {
 	const char *prop;
 	int path_offset;
@@ -204,12 +204,10 @@ mdx_of_chosen_path_offset(int *offset0)
 		prop = fdt_getprop(fdt, offset, "stdout-path", &len);
 		if (prop) {
 			path_offset = fdt_path_offset(fdt, prop);
-			if (path_offset > 0) {
-				*offset0 = path_offset;
-				return (0);
-			}
+			if (path_offset >= 0)
+				return (path_offset);
 		}
 	}
 
-	return (MDX_ERROR);
+	return (-1);
 }

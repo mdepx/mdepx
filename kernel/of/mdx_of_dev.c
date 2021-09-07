@@ -78,9 +78,9 @@ mdx_of_process_chosen(void)
 	int offset;
 	int error;
 
-	error = mdx_of_chosen_path_offset(&offset);
-	if (error)
-		return (error);
+	offset = mdx_of_chosen_path_offset();
+	if (offset < 0)
+		return (MDX_ERROR);
 
 	error = mdx_of_probe_and_attach(offset, &dev);
 	if (error)

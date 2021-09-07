@@ -51,6 +51,6 @@ int mdx_of_get_prop32(int nodeoffset, const char *propname,
     uint32_t *res, int *len);
 int mdx_of_offset_by_compatible(const char *compatible);
 int mdx_of_probe_and_attach(int offset, mdx_device_t *dev0);
-int mdx_of_chosen_path_offset(int *offset0);
+int mdx_of_chosen_path_offset(void);
 
 #endif /* _SYS_OF_H_ */
