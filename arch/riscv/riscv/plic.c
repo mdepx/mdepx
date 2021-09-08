@@ -28,6 +28,7 @@
 #include <sys/pcpu.h>
 #include <sys/io.h>
 #include <sys/of.h>
+#include <sys/cheri.h>
 
 #include <machine/intr.h>
 #include <machine/plic.h>
@@ -276,6 +277,7 @@ static int
 plic_attach(mdx_device_t dev)
 {
 	struct plic_softc *sc;
+	capability cap;
 	size_t base;
 	int error;
 
@@ -287,7 +289,9 @@ plic_attach(mdx_device_t dev)
 	error = mdx_of_get_reg(dev, 0, &base, NULL);
 	if (error)
 		return (error);
-	sc->base = (void *)base;
+	cap = mdx_getdefault();
+	cap = mdx_setoffset(cap, base);
+	sc->base = cap;
 
 	plic_setup_interrupts(sc);
 
