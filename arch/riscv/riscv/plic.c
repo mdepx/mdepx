@@ -46,10 +46,12 @@
 static struct plic_softc *plic_sc;
 static struct plic_intr_entry intr_map[MDX_RISCV_PLIC_NINTR];
 
+#ifdef MDX_OF
 static struct mdx_compat_data plic_compat_data[] = {
 	{ "riscv,plic0" },
 	{ NULL },
 };
+#endif
 
 void
 plic_intr(void)
@@ -192,6 +194,7 @@ plic_init(mdx_device_t dev, capability base, int cpu, int context)
 	WR4(sc, reg, 0);
 }
 
+#ifdef MDX_OF
 static int
 plic_setup_interrupts(struct plic_softc *sc)
 {
@@ -256,6 +259,7 @@ plic_setup_interrupts(struct plic_softc *sc)
 
 	return (0);
 }
+#endif
 
 #ifdef MDX_OF
 static int
