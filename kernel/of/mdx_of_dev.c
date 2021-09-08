@@ -214,3 +214,15 @@ mdx_of_is_compatible(mdx_device_t dev, const char *compatstr)
 
 	return (mdx_of_node_is_compatible(dev->nodeoffset, compatstr));
 }
+
+bool
+mdx_of_dev_uart_chosen(mdx_device_t dev)
+{
+	int chosen;
+
+	chosen = mdx_of_chosen_path_offset();
+	if (chosen < 0 || chosen != dev->nodeoffset)
+		return (false);
+
+	return (true);
+}
