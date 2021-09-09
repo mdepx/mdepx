@@ -153,7 +153,7 @@ mdx_of_get_reg(mdx_device_t dev, int index,
 	int len;
 	uint32_t naddr, nsize, b_naddr, b_nsize;
 	uint64_t raddr, rsize, baddr;
-	size_t paddr;
+	size_t paddr, psize;
 	int ntuples;
 	int i, j;
 
@@ -167,9 +167,13 @@ mdx_of_get_reg(mdx_device_t dev, int index,
 	if (!regp)
 		return (-1);
 
-	paddr = fdt32_ld(regp++);
-	if (naddr == 2)
+	paddr = 0;
+	for (i = 0; i < naddr; i++)
 		paddr = ((uint64_t)paddr << 32) | fdt32_ld(regp++);
+
+	psize = 0;
+	for (i = 0; i < nsize; i++)
+		psize = ((uint64_t)psize << 32) | fdt32_ld(regp++);
 
 	for (bus = fdt_parent_offset(fdt, parent);
 	    bus > 0;
@@ -204,6 +208,7 @@ mdx_of_get_reg(mdx_device_t dev, int index,
 	}
 
 	*addr = paddr;
+	*size = psize;
 
 	return (0);
 }
