@@ -278,7 +278,7 @@ plic_attach(mdx_device_t dev)
 {
 	struct plic_softc *sc;
 	capability cap;
-	size_t base;
+	size_t base, size;
 	int error;
 
 	sc = mdx_device_get_softc(dev);
@@ -286,11 +286,13 @@ plic_attach(mdx_device_t dev)
 
 	plic_sc = sc;
 
-	error = mdx_of_get_reg(dev, 0, &base, NULL);
+	error = mdx_of_get_reg(dev, 0, &base, &size);
 	if (error)
 		return (error);
+
 	cap = mdx_getdefault();
 	cap = mdx_setoffset(cap, base);
+	cap = mdx_setbounds(cap, size);
 	sc->base = cap;
 
 	plic_setup_interrupts(sc);

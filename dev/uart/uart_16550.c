@@ -213,13 +213,20 @@ static int
 uart_16550_attach(mdx_device_t dev)
 {
 	struct uart_16550_softc *sc;
+	capability cap;
+	size_t base, size;
 	int error;
 
 	sc = mdx_device_get_softc(dev);
 
-	error = mdx_of_get_reg(dev, 0, (void *)&sc->base, NULL);
+	error = mdx_of_get_reg(dev, 0, &base, &size);
 	if (error)
 		return (error);
+
+	cap = mdx_getdefault();
+	cap = mdx_setoffset(cap, base);
+	cap = mdx_setbounds(cap, size);
+	sc->base = cap;
 
 	error = mdx_of_dev_get_prop32(dev, "clock-frequency", &sc->bus_freq,
 	    NULL);
