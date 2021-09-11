@@ -246,7 +246,8 @@ mdx_of_get_reg(mdx_device_t dev, int index,
 	}
 
 	*addr = paddr;
-	*size = psize;
+	if (size)
+		*size = psize;
 
 	return (0);
 }
