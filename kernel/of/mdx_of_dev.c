@@ -35,7 +35,7 @@
 extern void *fdt;
 
 int
-mdx_of_probe_and_attach1(struct mdx_driver *dri, int offset, mdx_device_t *dev0)
+mdx_of_probe_and_attach(struct mdx_driver *dri, int offset, mdx_device_t *dev0)
 {
 	const void *prop;
 	mdx_device_t dev;
@@ -73,43 +73,6 @@ mdx_of_probe_and_attach1(struct mdx_driver *dri, int offset, mdx_device_t *dev0)
 }
 
 static int
-mdx_of_probe_and_attach(int offset, mdx_device_t *dev0)
-{
-	const void *prop;
-	mdx_device_t dev;
-	int len;
-	int error;
-
-	if (mdx_of_node_is_enabled(offset) == false)
-		return (-1);
-
-	if (mdx_device_lookup_by_offset(offset) != NULL)
-		return (MDX_EEXIST);
-
-	prop = fdt_getprop(fdt, offset, "compatible", &len);
-	if (prop == NULL)
-		return (-2);
-
-	dev = zalloc(sizeof(struct mdx_device));
-	if (dev == NULL)
-		panic("could not allocate device");
-	dev->nodeoffset = offset;
-
-	error = mdx_device_probe_and_attach(dev);
-	if (error) {
-		free(dev);
-		return (MDX_ERROR);
-	}
-
-	printf("device attached: %s (offset %x)\n", prop, offset);
-
-	if (dev0)
-		*dev0 = dev;
-
-	return (MDX_OK);
-}
-
-static int
 mdx_of_process_chosen(void)
 {
 	mdx_device_t dev;
@@ -120,7 +83,7 @@ mdx_of_process_chosen(void)
 	if (offset < 0)
 		return (MDX_ERROR);
 
-	error = mdx_of_probe_and_attach(offset, &dev);
+	error = mdx_of_probe_and_attach(NULL, offset, &dev);
 	if (error)
 		return (error);
 
@@ -141,7 +104,7 @@ mdx_of_probe_devices(void)
 	mdx_of_process_chosen();
 
 	do {
-		mdx_of_probe_and_attach(offset, NULL);
+		mdx_of_probe_and_attach(NULL, offset, NULL);
 		offset = fdt_next_node(fdt, offset, &depth);
 	} while (offset > 0);
 }

@@ -215,7 +215,7 @@ mdx_driver_module_handler(void *arg)
 			    cd->compatible);
 			if (offset < 0)
 				break;
-			error = mdx_of_probe_and_attach1(dri, offset, &dev);
+			error = mdx_of_probe_and_attach(dri, offset, &dev);
 			if (error == 0) {
 				/*
 				 * If this was the chosen uart device, register
