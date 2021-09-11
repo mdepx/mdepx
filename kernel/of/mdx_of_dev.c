@@ -35,7 +35,7 @@
 extern void *fdt;
 
 int
-mdx_of_probe_and_attach(struct mdx_driver *dri, int offset, mdx_device_t *dev0)
+mdx_of_probe_and_attach(int offset, struct mdx_driver *dri, mdx_device_t *dev0)
 {
 	const void *prop;
 	mdx_device_t dev;
