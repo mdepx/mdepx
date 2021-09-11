@@ -62,18 +62,6 @@ next(struct mdx_device *c0)
 	return (c);
 }
 
-void *
-mdx_device_alloc_softc(mdx_device_t dev, size_t size)
-{
-
-	if (dev->sc)
-		return (dev->sc);
-
-	dev->sc = zalloc(size);
-
-	return (dev->sc);
-}
-
 static void
 mdx_device_set_unit(mdx_device_t dev)
 {

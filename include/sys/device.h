@@ -30,6 +30,7 @@
 #include <sys/list.h>
 #include <sys/kernel.h>
 #include <sys/module.h>
+#include <sys/malloc.h>
 
 struct mdx_device {
 	void			*sc;		/* Software context. */
@@ -73,7 +74,14 @@ typedef struct mdx_driver mdx_driver_t;
 
 #define	mdx_device_get_softc(dev)	((dev)->sc)
 
-void * mdx_device_alloc_softc(mdx_device_t dev, size_t size);
+static inline void *
+mdx_device_alloc_softc(mdx_device_t dev, size_t size)
+{
+	if ((dev)->sc == NULL)
+		dev->sc = zalloc(size);
+	return (dev->sc);
+}
+
 int mdx_driver_module_handler(void *);
 mdx_device_t mdx_device_lookup_by_name(const char *name, int unit);
 mdx_device_t mdx_device_lookup_by_offset(int offset);
