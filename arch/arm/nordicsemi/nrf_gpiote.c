@@ -35,6 +35,13 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
+#ifdef MDX_OF
+static struct mdx_compat_data nrf_gpiote_compat_data[] = {
+	{ "nordic,nrf-gpiote" },
+	{ NULL },
+};
+#endif
+
 void
 nrf_gpiote_intr(void *arg, int irq)
 {
@@ -169,6 +176,7 @@ static mdx_driver_t nrf_gpiote_driver = {
 	"nrf_gpiote",
 	&nrf_gpiote_ops,
 	sizeof(struct nrf_gpiote_softc),
+	nrf_gpiote_compat_data,
 };
 
 DRIVER_MODULE(nrf_gpiote, nrf_gpiote_driver);

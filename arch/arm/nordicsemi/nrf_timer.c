@@ -45,6 +45,13 @@
 #define	dprintf(fmt, ...)
 #endif
 
+#ifdef MDX_OF
+static struct mdx_compat_data nrf_timer_compat_data[] = {
+	{ "nordic,nrf-timer" },
+	{ NULL },
+};
+#endif
+
 void
 nrf_timer_intr(void *arg, int irq)
 {
@@ -204,6 +211,7 @@ static mdx_driver_t nrf_timer_driver = {
 	"nrf_timer",
 	&nrf_timer_ops,
 	sizeof(struct nrf_timer_softc),
+	nrf_timer_compat_data,
 };
 
 DRIVER_MODULE(nrf_timer, nrf_timer_driver);

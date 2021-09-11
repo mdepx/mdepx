@@ -37,6 +37,13 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
+#ifdef MDX_OF
+static struct mdx_compat_data nrf_gpio_compat_data[] = {
+	{ "nordic,nrf-gpio" },
+	{ NULL },
+};
+#endif
+
 static int
 nrf_gpio_set_pin(mdx_device_t dev, int pin, int val)
 {
@@ -144,6 +151,7 @@ static mdx_driver_t nrf_gpio_driver = {
 	"nrf_gpio",
 	&nrf_gpio_ops,
 	sizeof(struct nrf_gpio_softc),
+	nrf_gpio_compat_data,
 };
 
 DRIVER_MODULE(nrf_gpio, nrf_gpio_driver);

@@ -35,6 +35,13 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
+#ifdef MDX_OF
+static struct mdx_compat_data nrf_spu_compat_data[] = {
+	{ "nordic,nrf-spu" },
+	{ NULL },
+};
+#endif
+
 void
 nrf_spu_periph_set_attr(mdx_device_t dev, int periph_id,
     bool secure_attr, bool secure_dma)
@@ -227,6 +234,7 @@ static mdx_driver_t nrf_spu_driver = {
 	"nrf_spu",
 	&nrf_spu_ops,
 	sizeof(struct nrf_spu_softc),
+	nrf_spu_compat_data,
 };
 
 DRIVER_MODULE(nrf_spu, nrf_spu_driver);

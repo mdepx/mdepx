@@ -35,6 +35,13 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
+#ifdef MDX_OF
+static struct mdx_compat_data nrf_nvmc_compat_data[] = {
+	{ "nordic,nrf91-flash-controller" },
+	{ NULL },
+};
+#endif
+
 void
 nrf_nvmc_init(mdx_device_t dev, uint32_t base)
 {
@@ -95,6 +102,7 @@ static mdx_driver_t nrf_nvmc_driver = {
 	"nrf_nvmc",
 	&nrf_nvmc_ops,
 	sizeof(struct nrf_nvmc_softc),
+	nrf_nvmc_compat_data,
 };
 
 DRIVER_MODULE(nrf_nvmc, nrf_nvmc_driver);

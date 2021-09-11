@@ -44,6 +44,13 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
+#ifdef MDX_OF
+static struct mdx_compat_data nrf_ipc_compat_data[] = {
+	{ "nordic,nrf-ipc" },
+	{ NULL },
+};
+#endif
+
 void
 nrf_ipc_trigger(mdx_device_t dev, int ev)
 {
@@ -174,6 +181,7 @@ static mdx_driver_t nrf_ipc_driver = {
 	"nrf_ipc",
 	&nrf_ipc_ops,
 	sizeof(struct nrf_ipc_softc),
+	nrf_ipc_compat_data,
 };
 
 DRIVER_MODULE(nrf_ipc, nrf_ipc_driver);

@@ -39,6 +39,13 @@
 
 #define	TWIM_TIMEOUT	10000	/* usec */
 
+#ifdef MDX_OF
+static struct mdx_compat_data nrf_twim_compat_data[] = {
+	{ "nordic,nrf-twim" },
+	{ NULL },
+};
+#endif
+
 void
 nrf_twim_intr(void *arg, int irq)
 {
@@ -206,6 +213,7 @@ static mdx_driver_t nrf_twim_driver = {
 	"nrf_twim",
 	&nrf_twim_ops,
 	sizeof(struct nrf_twim_softc),
+	nrf_twim_compat_data,
 };
 
 DRIVER_MODULE(nrf_twim, nrf_twim_driver);

@@ -35,6 +35,13 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
+#ifdef MDX_OF
+static struct mdx_compat_data nrf_reset_compat_data[] = {
+	{ "nordic,nrf-reset" },
+	{ NULL },
+};
+#endif
+
 void
 nrf_reset_release(mdx_device_t dev)
 {
@@ -89,6 +96,7 @@ static mdx_driver_t nrf_reset_driver = {
 	"nrf_reset",
 	&nrf_reset_ops,
 	sizeof(struct nrf_reset_softc),
+	nrf_reset_compat_data,
 };
 
 DRIVER_MODULE(nrf_reset, nrf_reset_driver);

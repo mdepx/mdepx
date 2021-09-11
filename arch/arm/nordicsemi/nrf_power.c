@@ -35,6 +35,13 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
+#ifdef MDX_OF
+static struct mdx_compat_data nrf_power_compat_data[] = {
+	{ "nordic,nrf-power" },
+	{ NULL },
+};
+#endif
+
 void
 nrf_power_reset_events(mdx_device_t dev)
 {
@@ -90,6 +97,7 @@ static mdx_driver_t nrf_power_driver = {
 	"nrf_power",
 	&nrf_power_ops,
 	sizeof(struct nrf_power_softc),
+	nrf_power_compat_data,
 };
 
 DRIVER_MODULE(nrf_power, nrf_power_driver);

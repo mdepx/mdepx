@@ -35,6 +35,13 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
+#ifdef MDX_OF
+static struct mdx_compat_data nrf_uicr_compat_data[] = {
+	{ "nordic,nrf-uicr" },
+	{ NULL },
+};
+#endif
+
 void
 nrf_uicr_init(mdx_device_t dev, uint32_t base)
 {
@@ -79,6 +86,7 @@ static mdx_driver_t nrf_uicr_driver = {
 	"nrf_uicr",
 	&nrf_uicr_ops,
 	sizeof(struct nrf_uicr_softc),
+	nrf_uicr_compat_data,
 };
 
 DRIVER_MODULE(nrf_uicr, nrf_uicr_driver);
