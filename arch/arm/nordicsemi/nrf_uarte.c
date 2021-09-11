@@ -210,5 +210,5 @@ static mdx_driver_t nrf_uarte_driver = {
 	nrf_uarte_compat_data,
 };
 
-DRIVER_MODULE(nrf_uarte, nrf_uarte_driver);
+DRIVER_MODULE_ORDERED(nrf_uarte, nrf_uarte_driver, SI_ORDER_SECOND);
 #endif
