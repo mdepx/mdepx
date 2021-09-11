@@ -74,7 +74,6 @@ mdx_device_alloc_softc(mdx_device_t dev, size_t size)
 	return (dev->sc);
 }
 
-#ifdef MDX_OF
 static void
 mdx_device_set_unit(mdx_device_t dev)
 {
@@ -98,7 +97,7 @@ mdx_device_set_unit(mdx_device_t dev)
 }
 
 int
-mdx_device_probe_and_attach1(mdx_device_t dev)
+mdx_device_probe_and_attach(mdx_device_t dev)
 {
 	struct mdx_device_ops *ops;
 	mdx_driver_t *driver;
@@ -124,44 +123,6 @@ mdx_device_probe_and_attach1(mdx_device_t dev)
 
 	return (-1);
 }
-
-int
-mdx_device_probe_and_attach(mdx_device_t dev)
-{
-	struct mdx_sysinit *si, *si_start, *si_end;
-	struct mdx_device_ops *ops;
-	struct mdx_moduledata *mod;
-	mdx_driver_t *driver;
-	int error;
-
-	si_start = &__start_set_sysinit_set;
-	si_end = &__stop_set_sysinit_set;
-
-	for (si = si_start; si < si_end; si++) {
-		if (si->subsystem != SI_SUB_DRIVERS)
-			continue;
-		mod = (struct mdx_moduledata *)si->arg;
-		driver = (mdx_driver_t *)mod->data;
-		dev->dri = driver;
-		ops = driver->ops;
-		mdx_device_set_unit(dev);
-		error = ops->probe(dev);
-		if (error == 0) {
-			mdx_device_alloc_softc(dev, driver->size);
-
-			error = ops->attach(dev);
-			if (error == 0)
-				list_append(&devs, &dev->node);
-			else {
-				/* TODO: free the softc */
-			}
-			return (error);
-		}
-	}
-
-	return (-1);
-}
-#endif
 
 mdx_device_t
 mdx_device_lookup_by_name(const char *name, int unit)

@@ -58,7 +58,7 @@ mdx_of_probe_and_attach(struct mdx_driver *dri, int offset, mdx_device_t *dev0)
 	dev->dri = dri;
 	dev->nodeoffset = offset;
 
-	error = mdx_device_probe_and_attach1(dev);
+	error = mdx_device_probe_and_attach(dev);
 	if (error) {
 		free(dev);
 		return (MDX_ERROR);
