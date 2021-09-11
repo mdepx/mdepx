@@ -161,6 +161,7 @@ mdx_device_lookup_by_offset(int offset)
 	return (NULL);
 }
 
+#ifdef MDX_OF
 int
 mdx_driver_module_handler(void *arg)
 {
@@ -190,3 +191,4 @@ mdx_driver_module_handler(void *arg)
 
 	return (0);
 }
+#endif
