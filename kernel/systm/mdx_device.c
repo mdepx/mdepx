@@ -97,6 +97,34 @@ mdx_device_set_unit(mdx_device_t dev)
 }
 
 int
+mdx_device_probe_and_attach1(mdx_device_t dev)
+{
+	struct mdx_device_ops *ops;
+	mdx_driver_t *driver;
+	int error;
+
+	driver = dev->dri;
+	ops = driver->ops;
+
+	mdx_device_set_unit(dev);
+
+	error = ops->probe(dev);
+	if (error == 0) {
+		mdx_device_alloc_softc(dev, driver->size);
+
+		error = ops->attach(dev);
+		if (error == 0)
+			list_append(&devs, &dev->node);
+		else {
+			/* TODO: free the softc */
+		}
+		return (error);
+	}
+
+	return (-1);
+}
+
+int
 mdx_device_probe_and_attach(mdx_device_t dev)
 {
 	struct mdx_sysinit *si, *si_start, *si_end;
@@ -180,12 +208,14 @@ mdx_driver_module_handler(void *arg)
 
 	for (; cd->compatible != NULL; cd++) {
 		dprintf("%s: compat %s\n", __func__, cd->compatible);
-		offset = mdx_of_offset_by_compatible(cd->compatible);
-		if (offset) {
-			error = mdx_of_probe_and_attach(offset, NULL);
-			dprintf("%s: offset %d error %d\n", __func__, offset,
-			    error);
-			break;
+		for (offset = 0;;) {
+			offset = mdx_of_offset_by_compatible(offset,
+			    cd->compatible);
+			if (offset < 0)
+				break;
+			error = mdx_of_probe_and_attach1(dri, offset, NULL);
+			dprintf("%s: offset %d error %d\n", __func__,
+			    offset, error);
 		}
 	}
 

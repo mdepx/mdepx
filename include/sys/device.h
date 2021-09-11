@@ -78,5 +78,6 @@ int mdx_device_probe_and_attach(mdx_device_t dev);
 int mdx_driver_module_handler(void *);
 mdx_device_t mdx_device_lookup_by_name(const char *name, int unit);
 mdx_device_t mdx_device_lookup_by_offset(int offset);
+int mdx_device_probe_and_attach1(mdx_device_t dev);
 
 #endif /* !_SYS_DEVICE_H_ */

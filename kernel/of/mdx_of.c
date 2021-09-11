@@ -185,10 +185,10 @@ mdx_of_get_prop32(int nodeoffset, const char *propname,
 }
 
 int
-mdx_of_offset_by_compatible(const char *compatible)
+mdx_of_offset_by_compatible(int offset, const char *compatible)
 {
 
-	return (fdt_node_offset_by_compatible(fdt, 0, compatible));
+	return (fdt_node_offset_by_compatible(fdt, offset, compatible));
 }
 
 int
