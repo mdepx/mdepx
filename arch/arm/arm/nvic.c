@@ -38,6 +38,13 @@
 
 static struct nvic_intr_entry intr_map[MDX_ARM_NVIC_NINTRS];
 
+#ifdef MDX_OF
+static struct mdx_compat_data arm_nvic_compat_data[] = {
+	{ "arm,v8m-nvic" },
+	{ NULL },
+};
+#endif
+
 void
 arm_nvic_intr(uint32_t irq)
 {
@@ -208,7 +215,8 @@ static mdx_driver_t nvic_driver = {
 	"nvic",
 	&arm_nvic_ops,
 	sizeof(struct arm_nvic_softc),
+	arm_nvic_compat_data,
 };
 
-DRIVER_MODULE(nvic, nvic_driver);
+DRIVER_MODULE_ORDERED(nvic, nvic_driver, SI_ORDER_FIRST);
 #endif
