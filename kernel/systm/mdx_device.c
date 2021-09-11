@@ -28,6 +28,7 @@
 #include <sys/systm.h>
 #include <sys/malloc.h>
 #include <sys/device.h>
+#include <sys/console.h>
 #include <sys/list.h>
 #include <sys/of.h>
 
@@ -195,8 +196,9 @@ mdx_driver_module_handler(void *arg)
 {
 	struct mdx_compat_data *cd;
 	struct mdx_driver *dri;
+	mdx_device_t dev;
 	int offset;
-	int error __unused;
+	int error;
 
 	dri = (struct mdx_driver *)arg;
 
@@ -213,7 +215,15 @@ mdx_driver_module_handler(void *arg)
 			    cd->compatible);
 			if (offset < 0)
 				break;
-			error = mdx_of_probe_and_attach1(dri, offset, NULL);
+			error = mdx_of_probe_and_attach1(dri, offset, &dev);
+			if (error == 0) {
+				/*
+				 * If this was the chosen uart device, register
+				 * console immediately.
+				 */
+				if (mdx_of_dev_uart_chosen(dev))
+					mdx_console_register_uart(dev);
+			}
 			dprintf("%s: offset %d error %d\n", __func__,
 			    offset, error);
 		}
