@@ -72,43 +72,6 @@ mdx_of_probe_and_attach(struct mdx_driver *dri, int offset, mdx_device_t *dev0)
 	return (MDX_OK);
 }
 
-static int
-mdx_of_process_chosen(void)
-{
-	mdx_device_t dev;
-	int offset;
-	int error;
-
-	offset = mdx_of_chosen_path_offset();
-	if (offset < 0)
-		return (MDX_ERROR);
-
-	error = mdx_of_probe_and_attach(NULL, offset, &dev);
-	if (error)
-		return (error);
-
-	mdx_console_register_uart(dev);
-
-	return (0);
-}
-
-void
-mdx_of_probe_devices(void)
-{
-	int offset;
-	int depth;
-
-	offset = 0;
-	depth = 0;
-
-	mdx_of_process_chosen();
-
-	do {
-		mdx_of_probe_and_attach(NULL, offset, NULL);
-		offset = fdt_next_node(fdt, offset, &depth);
-	} while (offset > 0);
-}
-
 const char *
 mdx_of_dev_get_prop(mdx_device_t dev, const char *propname, int *len)
 {
