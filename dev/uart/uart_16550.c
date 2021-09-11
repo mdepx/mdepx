@@ -249,9 +249,6 @@ uart_16550_attach(mdx_device_t dev)
 	mdx_uart_setup(dev, sc->baudrate, UART_DATABITS_5, UART_STOPBITS_1,
 	    UART_PARITY_NONE);
 
-	if (mdx_of_dev_uart_chosen(dev))
-		mdx_console_register_uart(dev);
-
 	return (0);
 }
 

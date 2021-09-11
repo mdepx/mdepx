@@ -67,6 +67,7 @@ uart_getchar(void)
 void
 board_init(void)
 {
+	mdx_device_t dev;
 
 	/* Initialize malloc. */
 
@@ -78,6 +79,10 @@ board_init(void)
 
 	/* Once malloc has initialized, probe devices. */
 	mi_startup();
+
+	/* Register console. */
+	dev = mdx_device_lookup_by_name("uart_16550", 0);
+	mdx_console_register_uart(dev);
 
 	/* Release secondary core(s). */
 
