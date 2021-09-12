@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2017 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2017-2021 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,8 +29,8 @@
  * SiFive E300 Platform Reference Manual, Version 1.0.1
  */
 
-#ifndef _SYS_RISCV_SIFIVE_E300G_CLINT_H_
-#define _SYS_RISCV_SIFIVE_E300G_CLINT_H_
+#ifndef _MACHINE_CLINT_H_
+#define _MACHINE_CLINT_H_
 
 #include <sys/callout.h>
 #include <machine/cpuregs.h>
@@ -47,8 +47,7 @@ struct clint_softc {
 	struct mi_timer mt;
 };
 
-int e300g_clint_init(struct clint_softc *sc, capability base,
-    uint32_t frequency);
+int clint_init(struct clint_softc *sc, capability base, uint32_t frequency);
 int clint_get_cpu_freq(struct clint_softc *sc, uint32_t osc_freq);
 void clint_udelay(struct clint_softc *sc, uint32_t usec, uint32_t osc_freq);
 void clint_intr(void);
@@ -88,4 +87,4 @@ csr_set_tie(void)
 #endif
 }
 
-#endif /* !_SYS_RISCV_SIFIVE_E300G_CLINT_H_ */
+#endif /* !_MACHINE_CLINT_H_ */

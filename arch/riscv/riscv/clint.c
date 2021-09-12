@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2017-2020 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2017-2021 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@
 #include <machine/cpuregs.h>
 #include <machine/sbi.h>
 
-#include <riscv/sifive/e300g_clint.h>
+#include <machine/clint.h>
 
 #define	RD4(_sc, _reg)		\
 	mdx_ioread_uint32((_sc)->base, _reg)
@@ -260,7 +260,7 @@ clint_get_cpu_freq(struct clint_softc *sc, uint32_t osc_freq)
 }
 
 int
-e300g_clint_init(struct clint_softc *sc, capability base,
+clint_init(struct clint_softc *sc, capability base,
     uint32_t frequency)
 {
 

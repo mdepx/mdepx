@@ -35,8 +35,8 @@
 #include <riscv/riscv/trap.h>
 #include <riscv/include/intr.h>
 #include <riscv/include/clic.h>
+#include <riscv/include/clint.h>
 #include <riscv/include/plic.h>
-#include <riscv/sifive/e300g_clint.h>
 
 #define	INTR_DEBUG
 #undef	INTR_DEBUG
