@@ -36,7 +36,8 @@
 #include <sys/smp.h>
 #include <sys/of.h>
 
-#include <riscv/sifive/e300g_clint.h>
+#include <machine/clint.h>
+
 #include <riscv/sifive/e300g_uart.h>
 
 #include "board.h"
@@ -75,7 +76,7 @@ board_init(void)
 	malloc_add_region((void *)0x80800000, 0x7800000);
 
 	/* Timer. */
-	e300g_clint_init(&clint_sc, (void *)CLINT_BASE, BOARD_CPU_FREQ);
+	clint_init(&clint_sc, (void *)CLINT_BASE, BOARD_CPU_FREQ);
 
 	/* Once malloc has initialized, probe devices. */
 	mi_startup();

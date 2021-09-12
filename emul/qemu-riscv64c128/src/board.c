@@ -36,7 +36,8 @@
 #include <sys/smp.h>
 #include <sys/cheri.h>
 
-#include <riscv/sifive/e300g_clint.h>
+#include <machine/clint.h>
+
 #include <riscv/sifive/e300g_uart.h>
 
 #include "board.h"
@@ -96,7 +97,7 @@ board_init(void)
 	cap = cheri_getdefault();
 	cap = cheri_setoffset(cap, CLINT_BASE);
 	cap = cheri_setbounds(cap, 0xc000);
-	e300g_clint_init(&clint_sc, cap, BOARD_CPU_FREQ);
+	clint_init(&clint_sc, cap, BOARD_CPU_FREQ);
 
 	/* Release secondary core(s) */
 
