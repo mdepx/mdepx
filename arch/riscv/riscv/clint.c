@@ -31,6 +31,8 @@
 #include <sys/smp.h>
 #include <sys/systm.h>
 #include <sys/io.h>
+#include <sys/of.h>
+#include <sys/cheri.h>
 
 #include <machine/atomic.h>
 #include <machine/cpuregs.h>
@@ -58,6 +60,13 @@
 #endif
 
 static struct clint_softc *clint_sc;
+
+#if defined(MDX_OF) && !defined(MDX_RISCV_SUPERVISOR_MODE)
+static struct mdx_compat_data clint_compat_data[] = {
+	{ "riscv,clint0" },
+	{ NULL },
+};
+#endif
 
 #ifdef MDX_SCHED_SMP
 extern struct entry pcpu_all;
@@ -159,10 +168,14 @@ clint_start(void *arg, uint32_t ticks)
 	uint64_t val;
 	uint64_t new;
 
-	val = RD8(sc, MTIME);
+	val = csr_read64(time);
 	new = val + ticks;
 	clint_set_timer(sc, cpuid, new);
 #else
+	/*
+	 * Machine-mode only.
+	 * TODO: support for 32-bit supervisor-mode.
+	 */
 	uint32_t low, high;
 	uint32_t new;
 
@@ -188,7 +201,11 @@ clint_mtime(void *arg)
 
 	sc = arg;
 
+#ifndef MDX_RISCV_SUPERVISOR_MODE
 	low = RD4(sc, MTIME);
+#else
+	low = csr_read(time);
+#endif
 
 	return (low);
 }
@@ -264,6 +281,9 @@ clint_init(struct clint_softc *sc, capability base,
     uint32_t frequency)
 {
 
+	if (clint_sc != NULL)
+		return (MDX_EEXIST);
+
 	clint_sc = sc;
 	sc->base = base;
 
@@ -280,3 +300,99 @@ clint_init(struct clint_softc *sc, capability base,
 
 	return (0);
 }
+
+#ifdef MDX_OF
+static int
+clint_get_freq(uint32_t *freq)
+{
+	int cpus_node;
+	int error;
+
+	cpus_node = mdx_of_node_by_path("/cpus");
+	if (cpus_node < 0)
+		return (MDX_ERROR);
+
+	error = mdx_of_get_prop32(cpus_node, "timebase-frequency", freq, NULL);
+
+	return (error);
+}
+
+#ifndef MDX_RISCV_SUPERVISOR_MODE
+static int
+clint_probe(mdx_device_t dev)
+{
+
+	if (!mdx_of_is_compatible(dev, "riscv,clint0"))
+		return (MDX_ERROR);
+
+	return (MDX_OK);
+}
+
+static int
+clint_attach(mdx_device_t dev)
+{
+	struct clint_softc *sc;
+	size_t base, size;
+	capability cap;
+	uint32_t freq;
+	int error;
+
+	if (clint_sc != NULL)
+		return (MDX_EEXIST);
+
+	sc = mdx_device_get_softc(dev);
+	sc->dev = dev;
+
+	error = mdx_of_get_reg(dev, 0, &base, &size);
+	if (error)
+		return (error);
+
+	cap = mdx_getdefault();
+	cap = mdx_setoffset(cap, base);
+	cap = mdx_setbounds(cap, size);
+	sc->base = cap;
+
+	error = clint_get_freq(&freq);
+	if (error != 0)
+		return (error);
+
+	error = clint_init(sc, cap, freq);
+
+	return (error);
+}
+
+static struct mdx_device_ops clint_ops = {
+	.probe = clint_probe,
+	.attach = clint_attach,
+};
+
+static mdx_driver_t clint_driver = {
+	"clint",
+	&clint_ops,
+	sizeof(struct clint_softc),
+	clint_compat_data,
+};
+
+DRIVER_MODULE_ORDERED(clint, clint_driver, SI_ORDER_THIRD);
+#else
+static void
+mdx_clint_sysinit(void *unused)
+{
+	struct clint_softc *sc;
+	uint32_t freq;
+	int error;
+
+	error = clint_get_freq(&freq);
+	if (error != 0) {
+		printf("%s: could not get timer frequency\n", __func__);
+		return;
+	}
+
+	sc = zalloc(sizeof(struct clint_softc));
+
+	clint_init(sc, NULL, freq);
+}
+
+SYSINIT(clint, SI_SUB_DRIVERS, SI_ORDER_FIRST, mdx_clint_sysinit, NULL);
+#endif
+#endif

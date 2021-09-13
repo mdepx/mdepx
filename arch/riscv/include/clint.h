@@ -45,6 +45,7 @@
 struct clint_softc {
 	capability base;
 	struct mi_timer mt;
+	mdx_device_t dev;
 };
 
 int clint_init(struct clint_softc *sc, capability base, uint32_t frequency);
