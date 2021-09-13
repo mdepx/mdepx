@@ -53,5 +53,6 @@ int mdx_of_chosen_path_offset(void);
 bool mdx_of_dev_uart_chosen(mdx_device_t dev);
 int mdx_of_probe_and_attach(int offset, struct mdx_driver *dri,
     mdx_device_t *dev0);
+int mdx_of_node_by_path(const char *path);
 
 #endif /* _SYS_OF_H_ */

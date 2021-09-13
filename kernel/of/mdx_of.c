@@ -211,3 +211,13 @@ mdx_of_chosen_path_offset(void)
 
 	return (-1);
 }
+
+int
+mdx_of_node_by_path(const char *path)
+{
+	int offset;
+
+	offset = fdt_path_offset(fdt, path);
+
+	return (offset);
+}
