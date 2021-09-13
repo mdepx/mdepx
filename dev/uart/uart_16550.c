@@ -264,5 +264,5 @@ static mdx_driver_t uart_16550_driver = {
 	uart_compat_data,
 };
 
-DRIVER_MODULE(uart_16550, uart_16550_driver);
+DRIVER_MODULE_ORDERED(uart_16550, uart_16550_driver, SI_ORDER_SECOND);
 #endif
