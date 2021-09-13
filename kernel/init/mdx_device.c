@@ -162,6 +162,7 @@ mdx_driver_module_handler(void *arg)
 		for (offset = 0;;) {
 			offset = mdx_of_offset_by_compatible(offset,
 			    cd->compatible);
+			dprintf("%s: offset %d\n", __func__, offset);
 			if (offset < 0)
 				break;
 			error = mdx_of_probe_and_attach(offset, dri, &dev);
