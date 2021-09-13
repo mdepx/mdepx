@@ -51,7 +51,7 @@ struct mdx_callout {
 struct mi_timer {
 	void (*start)(void *arg, uint32_t ticks);
 	void (*stop)(void *arg);
-	uint32_t (*count)(void *arg);
+	ticks_t (*count)(void *arg);
 	void *arg;
 	uint32_t count_saved[MDX_CPU_MAX];
 	uint32_t maxcnt;

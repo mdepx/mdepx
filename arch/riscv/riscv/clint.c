@@ -193,18 +193,26 @@ clint_start(void *arg, uint32_t ticks)
 	csr_set_tie();
 }
 
-static uint32_t
+static ticks_t
 clint_mtime(void *arg)
 {
 	struct clint_softc *sc;
-	uint32_t low;
+	ticks_t low;
 
 	sc = arg;
 
-#ifndef MDX_RISCV_SUPERVISOR_MODE
+#ifdef MDX_RISCV_SUPERVISOR_MODE
+#if __riscv_xlen == 64
+	low = csr_read(time);
+#else
+	low = csr_read64(time);
+#endif
+#else
+#if __riscv_xlen == 64
 	low = RD4(sc, MTIME);
 #else
-	low = csr_read(time);
+	low = RD8(sc, MTIME);
+#endif
 #endif
 
 	return (low);
@@ -214,9 +222,9 @@ void
 clint_udelay(struct clint_softc *sc,
     uint32_t usec, uint32_t osc_freq)
 {
-	uint32_t first, last;
-	uint32_t delta;
-	uint32_t counts;
+	ticks_t first, last;
+	ticks_t delta;
+	ticks_t counts;
 
 	counts = 0;
 	first = clint_mtime(sc);
