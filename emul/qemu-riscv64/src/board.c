@@ -36,8 +36,6 @@
 #include <sys/smp.h>
 #include <sys/of.h>
 
-#include <machine/clint.h>
-
 #include <riscv/sifive/e300g_uart.h>
 
 #include "board.h"
@@ -50,7 +48,6 @@
 extern uint8_t __riscv_boot_ap[MDX_CPU_MAX];
 
 static struct uart_16550_softc uart_sc;
-static struct clint_softc clint_sc;
 
 struct mdx_device dev_uart = { .sc = &uart_sc };
 mdx_device_t uart;
@@ -74,9 +71,6 @@ board_init(void)
 
 	malloc_init();
 	malloc_add_region((void *)0x80800000, 0x7800000);
-
-	/* Timer. */
-	clint_init(&clint_sc, (void *)CLINT_BASE, BOARD_CPU_FREQ);
 
 	/* Once malloc has initialized, probe devices. */
 	mi_startup();
