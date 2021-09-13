@@ -140,4 +140,6 @@ typedef	__float_t	float_t;
 /* stub */
 typedef	int		locale_t;
 
+typedef	__uint32_t	ticks_t;
+
 #endif /* !_SYS_TYPES_H_ */
