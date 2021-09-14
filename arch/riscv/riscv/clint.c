@@ -196,10 +196,7 @@ clint_start(void *arg, uint32_t ticks)
 static ticks_t
 clint_mtime(void *arg)
 {
-	struct clint_softc *sc;
 	ticks_t low;
-
-	sc = arg;
 
 #ifdef MDX_RISCV_SUPERVISOR_MODE
 #if __riscv_xlen == 64
@@ -208,6 +205,10 @@ clint_mtime(void *arg)
 	low = csr_read64(time);
 #endif
 #else
+	struct clint_softc *sc;
+
+	sc = arg;
+
 #if __riscv_xlen == 64
 	low = RD4(sc, MTIME);
 #else
