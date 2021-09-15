@@ -16,10 +16,11 @@ export CFLAGS = -march=rv64gc -mabi=lp64 -mcmodel=medany		\
 
 export AFLAGS = ${CFLAGS}
 
-CMD = python3 -B ${OSDIR}/tools/emitter.py
+BUILD_CMD = python3 -B ${OSDIR}/tools/emitter.py
+QEMU = qemu-system-riscv64
 
-RUN_CMD = qemu-system-riscv64						\
-	-smp cpus=8							\
+RUN_CMD = ${QEMU}							\
+	-smp cpus=2							\
 	-machine virt							\
 	-m 1024								\
 	-kernel ${OBJDIR}/qemu-riscv64.elf				\
@@ -30,23 +31,31 @@ RUN_CMD = qemu-system-riscv64						\
 	-drive if=none,id=sda,format=raw,file=${OBJDIR}/qemu.img	\
 	-device virtio-blk-device,drive=sda				\
 	-chardev socket,path=/tmp/virtio,server,nowait,id=virtiocon0	\
-	-device virtconsole,chardev=virtiocon0
+	-device virtconsole,chardev=virtiocon0				\
+	-accel tcg,thread=multi
 
+# Uncomment for supervisor mode
+# RUN_CMD += -bios /home/br/cheri/build/bbl-baremetal-riscv64-build/bbl
+
+# Uncomment for debugging
+# RUN_CMD += -D trace.log -d in_asm,mmu
+
+# Uncomment for DTB
 # RUN_CMD += -machine dumpdtb=dtb
 
 # Multi-threaded, multi-processor
 all:
-	@${CMD} -j mdepx.conf
+	@${BUILD_CMD} -j mdepx.conf
 	${CROSS_COMPILE}objcopy -O binary ${OBJDIR}/${APP}.elf	\
 		${OBJDIR}/${APP}.bin
 
 # Single-threaded, uni-processor
 st:
-	@${CMD} -j mdepx-st.conf
+	@${BUILD_CMD} -j mdepx-st.conf
 
 # Multi-threaded, uni-processor
 up:
-	@${CMD} -j mdepx-up.conf
+	@${BUILD_CMD} -j mdepx-up.conf
 
 run:
 	truncate -s 12m ${OBJDIR}/qemu.img
