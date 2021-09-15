@@ -37,6 +37,7 @@
 #include <sys/of.h>
 
 #include <riscv/sifive/e300g_uart.h>
+#include <machine/vmparam.h>
 
 #include "board.h"
 
@@ -65,19 +66,17 @@ uart_getchar(void)
 void
 board_init(void)
 {
-	mdx_device_t dev;
+	void *addr;
 
 	/* Initialize malloc. */
 
+	addr = (void *)PHYS_TO_DMAP(0x90800000);
+
 	malloc_init();
-	malloc_add_region((void *)0x80800000, 0x7800000);
+	malloc_add_region(addr, 0x7800000);
 
 	/* Once malloc has initialized, probe devices. */
 	mi_startup();
-
-	/* Register console. */
-	dev = mdx_device_lookup_by_name("uart_16550", 0);
-	mdx_console_register_uart(dev);
 
 	/* Release secondary core(s). */
 
