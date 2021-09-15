@@ -41,9 +41,6 @@
 
 #include "board.h"
 
-#define	CLINT_BASE		0x02000000
-#define	PLIC_BASE		0x0c000000
-
 #include <dev/uart/uart_16550.h>
 
 extern uint8_t __riscv_boot_ap[MDX_CPU_MAX];
