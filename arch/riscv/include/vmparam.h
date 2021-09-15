@@ -43,8 +43,8 @@
 #define	DMAPBASE		(DMAP_MIN_ADDRESS)
 #define	KERNBASE		(DMAP_MIN_ADDRESS + 0x80200000)
 #else
-#define	DMAPBASE		(0)
-#define	KERNBASE		(0x80000000)
+#define	DMAPBASE		(0x0UL)
+#define	KERNBASE		(0x80000000UL)
 #endif
 
 #define	PHYS_TO_DMAP(pa)		\
