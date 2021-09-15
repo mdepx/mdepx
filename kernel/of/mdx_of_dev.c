@@ -30,6 +30,8 @@
 #include <sys/malloc.h>
 #include <sys/of.h>
 
+#include <machine/vmparam.h>
+
 #include <libfdt/libfdt.h>
 
 extern void *fdt;
@@ -171,7 +173,7 @@ mdx_of_get_reg(mdx_device_t dev, int index,
 		}
 	}
 
-	*addr = paddr;
+	*addr = PHYS_TO_DMAP(paddr);
 	if (size)
 		*size = psize;
 

@@ -38,6 +38,7 @@
 
 #include <machine/cpuregs.h>
 #include <machine/cpufunc.h>
+#include <machine/vmparam.h>
 
 #include <app/fpu_test/fpu_test.h>
 #include <app/callout_test/callout_test.h>
@@ -45,7 +46,7 @@
 
 #include "board.h"
 
-#define	VIRTIO_BLOCK_MMIO_BASE	0x10007000
+#define	VIRTIO_BLOCK_MMIO_BASE	PHYS_TO_DMAP(0x10007000)
 
 static void __unused
 hello(void *arg)
