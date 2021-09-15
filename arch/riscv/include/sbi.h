@@ -167,7 +167,7 @@ sbi_probe_extension(long id)
 void sbi_set_timer(uint64_t val);
 
 /* IPI extension functions. */
-void sbi_send_ipi(const u_long *hart_mask);
+static __inline void sbi_send_ipi(const u_long *hart_mask);
 
 /* RFENCE extension functions. */
 void sbi_remote_fence_i(const u_long *hart_mask);
@@ -223,6 +223,13 @@ sbi_shutdown(void)
 {
 
 	(void)SBI_CALL0(SBI_SHUTDOWN, 0);
+}
+
+static __inline void
+sbi_send_ipi(const u_long *hart_mask)
+{
+
+	(void)SBI_CALL1(SBI_SEND_IPI, 0, (uint64_t)hart_mask);
 }
 
 void sbi_print_version(void);

@@ -93,6 +93,7 @@ send_ipi(int cpumask, int ipi)
 void
 clint_intr_software(void)
 {
+#ifndef MDX_RISCV_SUPERVISOR_MODE
 	struct clint_softc *sc;
 	int cpuid;
 
@@ -101,6 +102,9 @@ clint_intr_software(void)
 	cpuid = PCPU_GET(cpuid);
 
 	WR4(sc, MSIP(cpuid), 0);
+#else
+	csr_clear(sip, SIP_SSIP);
+#endif
 
 	ipi_handler();
 }
@@ -109,11 +113,18 @@ clint_intr_software(void)
 void
 clint_set_sip(int hart_id)
 {
+#ifndef MDX_RISCV_SUPERVISOR_MODE
 	struct clint_softc *sc;
 
 	sc = clint_sc;
 
 	WR4(sc, MSIP(hart_id), 1);
+#else
+	uint64_t hart_mask;
+
+	hart_mask = (1 << hart_id);
+	sbi_send_ipi(&hart_mask);
+#endif
 }
 
 void
