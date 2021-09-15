@@ -20,7 +20,7 @@ BUILD_CMD = python3 -B ${OSDIR}/tools/emitter.py
 QEMU = qemu-system-riscv64
 
 RUN_CMD = ${QEMU}							\
-	-smp cpus=2							\
+	-smp cpus=8							\
 	-machine virt							\
 	-m 1024								\
 	-kernel ${OBJDIR}/qemu-riscv64.elf				\
