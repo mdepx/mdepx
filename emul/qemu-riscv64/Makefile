@@ -76,9 +76,9 @@ clean:
 	@rm -rf obj/*
 
 objdump:
-	${CROSS_COMPILE}objdump -d ${OBJDIR}/${APP}.elf
+	${CROSS_COMPILE}objdump -d ${OBJDIR}/${APP}.elf | less
 
 readelf:
-	${CROSS_COMPILE}readelf -a ${OBJDIR}/${APP}.elf
+	${CROSS_COMPILE}readelf -a ${OBJDIR}/${APP}.elf | less
 
 include ${OSDIR}/mk/user.mk
