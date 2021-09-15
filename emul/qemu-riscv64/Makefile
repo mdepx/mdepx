@@ -34,8 +34,8 @@ RUN_CMD = ${QEMU}							\
 	-device virtconsole,chardev=virtiocon0				\
 	-accel tcg,thread=multi
 
-# Uncomment for supervisor mode
-# RUN_CMD += -bios /home/br/cheri/build/bbl-baremetal-riscv64-build/bbl
+# Provide BBL elf for supervisor mode only
+BBL ?= ~/cheri/build/bbl-baremetal-riscv64-build/bbl
 
 # Uncomment for debugging
 # RUN_CMD += -D trace.log -d in_asm,mmu
@@ -57,9 +57,16 @@ st:
 up:
 	@${BUILD_CMD} -j mdepx-up.conf
 
+supervisor:
+	@${BUILD_CMD} -j mdepx-supervisor.conf
+
 run:
 	truncate -s 12m ${OBJDIR}/qemu.img
 	${RUN_CMD}
+
+run-supervisor:
+	truncate -s 12m ${OBJDIR}/qemu.img
+	${RUN_CMD} -bios ${BBL}
 
 dtb:
 	${RUN_CMD} -machine dumpdtb=dtb.dtb
