@@ -1,27 +1,23 @@
 OUTPUT_ARCH("riscv")
 ENTRY(_start)
 
-MEMORY
-{
-	sram0 (wxa!ri)  : ORIGIN = 0x80000000, LENGTH = 8M
-	sram1 (wxa!ri)  : ORIGIN = 0x80800000, LENGTH = 120M /* malloc */
-}
-
 SECTIONS
 {
-	. = 0x80000000;
+	. = kernbase;
 
-	.start . : {
+	.start . : AT(kernbase - dmapbase)
+	{
 		*start.o(.text)
-	} > sram0
+	}
 
-	.text : {
+	.text :
+	{
 		*(.text)
-	} > sram0
+	}
 
 	.rodata : {
 		*(.rodata)
-	} > sram0
+	}
 
 	/* Ensure _smem is associated with the next section */
 	. = .;
@@ -30,12 +26,12 @@ SECTIONS
 		_sdata = ABSOLUTE(.);
 		*(.sdata)
 		_edata = ABSOLUTE(.);
-	} > sram0
+	}
 
 	.bss : {
 		_sbss = ABSOLUTE(.);
 		*(.bss COMMON)
 		*(.sbss)
 		_ebss = ABSOLUTE(.);
-	} > sram0
+	}
 }
