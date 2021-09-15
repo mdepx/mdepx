@@ -160,22 +160,45 @@ va:
 
 ASM_ENTRY(mpentry)
 #ifdef MDX_SCHED_SMP
-	la	t0, __riscv_boot_ap
+	lla	t0, __riscv_boot_ap
 	add	t0, t0, a0
 
 1:
 	lb	t1, 0(t0)
 	beqz	t1, 1b
 
-	la	t0, idle_thread_stack
+	lla	t0, idle_thread_stack
 	li	t1, MDX_THREAD_STACK_SIZE
 	mulw	t2, t1, a0	# Offset to start of our stack
 	add	t2, t2, t0	# Start of our stack
 	add	sp, t2, t1	# End of our stack
+	li	t1, DMAPBASE
+	add	sp, sp, t1
+
+	/* Setup supervisor trap vector */
+	lla	t0, mpva
+	sub	t0, t0, s9
+	li	t1, DMAPBASE
+	add	t0, t0, t1
+	csrw	stvec, t0
+
+	/* Set page tables base register */
+	lla	s2, pagetable_l1
+	srli	s2, s2, PAGE_SHIFT
+	li	t0, SATP_MODE_SV39
+	or	s2, s2, t0
+	sfence.vma
+	csrw	satp, s2
+
+	.align 2
+mpva:
+
+	lla	t0, cpu_exception_handler
+	csrw	REG_TVEC, t0
 
 	fence
 
-	j	md_init_secondary
+	call	md_init_secondary
 #else
 1:
 	j	1b
