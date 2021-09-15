@@ -174,10 +174,15 @@ md_init_secondary(int hart)
 
 	setup_scratch(pcpup);
 
+#ifdef MDX_RISCV_SUPERVISOR_MODE
+	csr_set(sie, SIE_SSIE);
+	csr_clear(sie, SIE_STIE);
+	csr_clear(sip, SIP_STIP);
+#else
 	csr_set(mie, MIE_MSIE);
-
 	csr_clear(mie, MIE_MTIE);
 	csr_clear(mip, MIP_MTIP);
+#endif
 
 	mdx_thread_init(hart);
 
@@ -185,6 +190,7 @@ md_init_secondary(int hart)
 	mdx_sched_cpu_avail(pcpup, true);
 
 	intr_enable();
+
 	mdx_sched_enter();
 }
 #endif
