@@ -56,11 +56,10 @@ hello(void *arg)
 		printf("\n\nhello\n\n");
 }
 
-int
-main(void)
-{
-
 #ifdef MDX_VIRTIO
+static void __unused
+virtio_main(void)
+{
 	int error;
 
 	/* Start system ticker that is needed for virtio. */
@@ -70,7 +69,12 @@ main(void)
 	printf("%s: Virtio test completed with error %d\n", __func__, error);
 
 	mdx_usleep(1000000);
+}
 #endif
+
+int
+main(void)
+{
 
 	callout_test();
 
