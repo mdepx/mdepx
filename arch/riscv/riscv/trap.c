@@ -89,8 +89,10 @@ handle_exception(struct trapframe *tf)
 
 	switch (tf->tf_cause & EXCP_MASK) {
 	case EXCP_MACHINE_ECALL:
-	case EXCP_BREAKPOINT:
 		tf->tf_epc += 4;
+		break;
+	case EXCP_BREAKPOINT:
+		tf->tf_epc += 2;
 		break;
 	case EXCP_ILLEGAL_INSTRUCTION:
 #ifdef MDX_RISCV_FPE
