@@ -64,11 +64,11 @@ ASM_ENTRY(_start)
 pagetables:
 	/*
 	 * Make a direct mapping:
-	 * 0xffffffc000000000 (va) -> 0 (pa),
+	 * 0xffffffd000000000 (va) -> 0 (pa),
 	 * using 4 x L1 superpages (1GiB each)
 	 */
 
-	/* Get the kernel's load address */
+	/* Physical base address. */
 	li	s9, 0
 
 	/* Level 1 superpages (512 x 1GiB) */
