@@ -82,6 +82,10 @@ typedef	uint64_t	pn_t;			/* page number */
 #define	PTE_RWX		(PTE_R | PTE_W | PTE_X)
 #define	PTE_RX		(PTE_R | PTE_X)
 #define	PTE_KERN	(PTE_V | PTE_R | PTE_W | PTE_A | PTE_D)
+#define	PTE_CW		(1UL << 63) /* Capability Write */
+#define	PTE_CR		(1UL << 62) /* Capability Read */
+#define	PTE_CD		(1UL << 61) /* Capability Dirty */
+#define	PTE_KERN_CAP	(PTE_CR | PTE_CW | PTE_CD)
 #define	PTE_PROMOTE	(PTE_V | PTE_RWX | PTE_D | PTE_A | PTE_G | PTE_U | \
 			 PTE_SW_MANAGED | PTE_SW_WIRED)
 
