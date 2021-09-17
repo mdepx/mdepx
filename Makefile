@@ -12,3 +12,6 @@ supervisor:
 
 purecap:
 	${MAKE} -C emul/qemu-riscv64c128 clean all run
+
+purecap-supervisor:
+	${MAKE} -C emul/qemu-riscv64c128 clean supervisor run-supervisor
