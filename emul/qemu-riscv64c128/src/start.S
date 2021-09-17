@@ -66,10 +66,6 @@ ASM_ENTRY(_start)
 #endif
 
 _mstart:
-	/* Save a0,a1 with hartid/DTB */
-	mv		s4, a0
-	mv		s5, a1
-
 	/* Pick a hart to run the boot process. */
 	li	t1, 1
 	cllc	ct0, cpu_lottery
@@ -189,7 +185,16 @@ va:
 	mv		s1, a1
 
 #ifdef MDX_OF
+	cspecialr	ct0, ddc
+	cfromptr	ct0, ct0, a1
+#ifdef MDX_RISCV_SUPERVISOR_MODE
+	li		t0, DMAPBASE
+	cincoffset	ca0, ct0, t0	/* Map to VA space. */
 #endif
+	cllc		ct0, mdx_of_install_dtbp
+	cjalr		ct0
+#endif
+
 	cllc		ct0, start_purecap
 	cjalr		ct0
 
@@ -200,11 +205,6 @@ va:
 	/* NOT REACHED */
 
 ASM_ENTRY(mpentry)
-
-	/* Restore a0, a1 */
-	mv	a0, s4
-	mv	a1, s5
-
 #ifdef MDX_SCHED_SMP
 	cllc	ct0, __riscv_boot_ap
 	cincoffset ct0, ct0, a0
@@ -250,6 +250,14 @@ mpva:
 #endif
 END(mpentry)
 
+get_physmem:
+	cllc	ct0, virt_map	/* physical address of virt_map */
+	cld	t1, 0(ct0)	/* virtual address of virt_map */
+	sub	t1, t1, t0	/* calculate phys->virt delta */
+	li	t2, KERNBASE
+	sub	s9, t2, t2	/* s9 = physmem base */
+	ret
+
 	.align 12
 pagetable_l1:
 	.space  PAGE_SIZE
@@ -259,7 +267,3 @@ virt_map:
 	.quad	virt_map
 cpu_lottery:
 	.space 4
-
-#if __CHERI_PURE_CAPABILITY__
-.option capmode
-#endif /* __CHERI_PURE_CAPABILITY__ */

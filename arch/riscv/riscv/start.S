@@ -167,14 +167,7 @@ ASM_ENTRY(mpentry)
 	lb	t1, 0(t0)
 	beqz	t1, 1b
 
-	lla	t0, idle_thread_stack
-	li	t1, MDX_THREAD_STACK_SIZE
-	mulw	t2, t1, a0	# Offset to start of our stack
-	add	t2, t2, t0	# Start of our stack
-	add	sp, t2, t1	# End of our stack
-	li	t1, DMAPBASE
-	add	sp, sp, t1
-
+#ifdef MDX_RISCV_SUPERVISOR_MODE
 	/* Setup supervisor trap vector */
 	lla	t0, mpva
 	sub	t0, t0, s9
@@ -192,11 +185,16 @@ ASM_ENTRY(mpentry)
 
 	.align 2
 mpva:
+#endif
+
+	lla	t0, idle_thread_stack
+	li	t1, MDX_THREAD_STACK_SIZE
+	mulw	t2, t1, a0	# Offset to start of our stack
+	add	t2, t2, t0	# Start of our stack
+	add	sp, t2, t1	# End of our stack
 
 	lla	t0, cpu_exception_handler
 	csrw	REG_TVEC, t0
-
-	fence
 
 	call	md_init_secondary
 #else
