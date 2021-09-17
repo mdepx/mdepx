@@ -7,7 +7,7 @@ SECTIONS
 
 	.start . : AT(kernbase - dmapbase)
 	{
-		*start.o(.text)
+		*start-purecap.o(.text)
 	}
 
 	.text :
