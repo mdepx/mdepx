@@ -78,6 +78,7 @@
 #define	REG_STATUS	sstatus
 #define	REG_TVAL	stval
 #define	REG_SCRATCH	sscratchc
+#define	REG_TCC		stcc
 #define	RET		sret
 #else
 #define	REG_EPC		mepcc
@@ -85,6 +86,7 @@
 #define	REG_STATUS	mstatus
 #define	REG_TVAL	mtval
 #define	REG_SCRATCH	mscratchc
+#define	REG_TCC		mtcc
 #define	RET		mret
 #endif
 
