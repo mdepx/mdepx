@@ -37,6 +37,7 @@
 #include <sys/cheri.h>
 
 #include <machine/clint.h>
+#include <machine/vmparam.h>
 
 #include <riscv/sifive/e300g_uart.h>
 
@@ -74,7 +75,7 @@ board_init(void)
 	/* Initialize malloc */
 
 	cap = cheri_getdefault();
-	cap = cheri_setoffset(cap, 0x80800000);
+	cap = cheri_setoffset(cap, PHYS_TO_DMAP(0x90800000));
 
 	malloc_init();
 	malloc_init_purecap(cap);
@@ -83,7 +84,7 @@ board_init(void)
 	/* Register UART */
 
 	cap = cheri_getdefault();
-	cap = cheri_setoffset(cap, UART_BASE);
+	cap = cheri_setoffset(cap, PHYS_TO_DMAP(UART_BASE));
 	cap = cheri_setbounds(cap, 1024);
 	uart_16550_init(&dev_uart, cap, 0, UART_CLOCK_RATE);
 	mdx_uart_setup(&dev_uart, DEFAULT_BAUDRATE,
@@ -95,7 +96,7 @@ board_init(void)
 	/* Timer */
 
 	cap = cheri_getdefault();
-	cap = cheri_setoffset(cap, CLINT_BASE);
+	cap = cheri_setoffset(cap, PHYS_TO_DMAP(CLINT_BASE));
 	cap = cheri_setbounds(cap, 0xc000);
 	clint_init(&clint_sc, cap, BOARD_CPU_FREQ);
 
