@@ -66,38 +66,22 @@ ASM_ENTRY(_start)
 #endif
 
 _mstart:
-
-	nop
-
-	li	x1, 0
-	li	x2, 0
-
 	/* Save a0,a1 with hartid/DTB */
 	mv		s4, a0
 	mv		s5, a1
 
-	li	t0, 0
-	bne	a0, t0, mpentry
-
-#if 0
-	la	t0, cpu_lottery
+	/* Pick a hart to run the boot process. */
 	li	t1, 1
-	amoadd.w t0, t1, 0(t0)
-	bnez	t0, mpentry
-#endif
+	cllc	ct0, cpu_lottery
+	camoadd.w t0, t1, 0(ct0)
 
-	/* Clear BSS. */
-	cllc	ct0, _sbss
-	cllc	ct1, _ebss
+	/*
+	 * We must jump to mpentry because the offset is too large to fit
+	 * in a 12-bit branch immediate.
+	 */
+	beqz	t0, 1f
+	j	mpentry
 1:
-	beq	t0, t1, 2f
-	li	t2, 0
-	//sb	t2, 0(t0)
-	//addi	t0, t0, 1
-	csb	zero, 0(ct0)
-	cincoffset ct0, ct0, 1
-	j	1b
-2:
 
 #ifdef MDX_RISCV_SUPERVISOR_MODE
 	/*
@@ -161,9 +145,6 @@ pagetables:
 	csrw	stvec, t0
 #endif
 
-	/* Start trace. */
-	//slti zero, zero, 0x1b
-
 	/* Set page tables base register */
 #ifdef __CHERI_PURE_CAPABILITY__
 	cllc	cs2, pagetable_l1
@@ -180,72 +161,41 @@ pagetables:
 va:
 #endif /* !MDX_RISCV_SUPERVISOR_MODE */
 
-	/* Restore a0, a1 */
-	mv	a0, s4
-	mv	a1, s5
+	cllc		ct0, cpu_exception_handler
+	cspecialw	REG_TCC, ct0
 
-	/* Init our stack pointer. */
+	/* Clear BSS. */
+	cllc	ct0, _sbss
+	cllc	ct1, _ebss
+1:
+	beq	t0, t1, 2f
+	li	t2, 0
+	csb	zero, 0(ct0)
+	cincoffset ct0, ct0, 1
+	j	1b
+2:
+
+	/* Load our stack pointer. */
 	cllc		ct0, idle_thread_stack
 	li		t1, MDX_THREAD_STACK_SIZE
 	mulw		t2, t1, a0
-	//add		t2, t2, t0	# Start of the current CPU stack
-	cincoffset	csp, ct0, t2
-
-#ifdef __CHERI_PURE_CAPABILITY__
-	# From now on, do purecap ABI but in hybrid mode.
-	//cfromptr	csp, ddc, t2	# Get DDC
+	cincoffset	csp, ct0, t2	# Start of the current CPU stack
 	csetbounds	csp, csp, t1
-	cincoffset	csp, csp, t1
-
-	cspecialrw	ct0, pcc, cnull # Get PCC
-	cllc		ct0, start_purecap
-	li		t1, 1
-	csetflags	ct0, ct0, t1
-
-	# Initialise the captable.
-	# ct0 is still PCC
-	//csetoffset	ct0, ct0, t1
-#ifdef __riscv_xcheri_mode_dependent_jumps
-	aaa
-	jalr.cap	cra, ct0
-#else
-	cjalr		ct0
-#endif
-
-	/* Restore a0, a1 */
-	mv	a0, s4
-	mv	a1, s5
-
-	# From now on, the DDC is always null
-	//cmove		ct0, cnull
-	//cspecialrw	cnull, ddc, ct0 # Write DDC
-
-	# Set up REG_TCC and jump to main in purecap mode
-	cspecialrw	ct0, pcc, cnull # Get PCC
-
-	cllc		ct0, cpu_exception_handler
-	li		t1, 1
-	csetflags	ct0, ct0, t1 # set cap mode on
-
-	//csetoffset	ct0, ct0, t1
-	//cspecialrw	cnull, REG_TCC, ct0 # Write MTCC
-	cspecialw	REG_TCC, ct0
-
-	clgc		cra, md_init
-	cjalr		cra
-
-	//la		t1, md_init
-	csetoffset	ct0, ct0, t1
-#ifdef __riscv_xcheri_mode_dependent_jumps
-	jalr.cap	cra, ct0 # jump to main
-#else
-	cjalr		cra, ct0 # jump to main
-#endif
-#endif
+	cincoffset	csp, csp, t1	# End of our stack
 
 	fence
 
-	j	md_init
+	mv		s0, a0
+	mv		s1, a1
+
+#ifdef MDX_OF
+#endif
+	cllc		ct0, start_purecap
+	cjalr		ct0
+
+	mv		a0, s0
+	clgc		cra, md_init
+	cjalr		cra
 
 	/* NOT REACHED */
 
@@ -286,33 +236,14 @@ mpva:
 	li		t1, MDX_THREAD_STACK_SIZE
 	mulw		t2, t1, a0
 	cincoffset	csp, ct0, t2	# Start of the current CPU stack
-
-#ifdef __CHERI_PURE_CAPABILITY__
-	# From now on, do purecap ABI but in hybrid mode.
-	//cfromptr	csp, ddc, t2	# Get DDC
 	csetbounds	csp, csp, t1
-	cincoffset	csp, csp, t1
-#endif
+	cincoffset	csp, csp, t1	# End of our stack
 
-	# Set up REG_TCC and jump to main in purecap mode
-	//cspecialrw	ct0, pcc, cnull # Get PCC
 	cllc		ct0, cpu_exception_handler
-	li		t1, 1
-	csetflags	ct0, ct0, t1 # set cap mode on
-
-	cspecialrw	cnull, REG_TCC, ct0 # Write MTCC
+	cspecialrw	cnull, REG_TCC, ct0
 
 	cllc		ct0, md_init_secondary
-	//csetoffset	ct0, ct0, t1
-#ifdef __riscv_xcheri_mode_dependent_jumps
-	jalr.cap	cra, ct0 # jump to main
-#else
 	cjalr		cra, ct0 # jump to main
-#endif
-
-	fence
-
-	j	md_init_secondary
 #else
 1:
 	j	1b

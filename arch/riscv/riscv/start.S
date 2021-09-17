@@ -43,8 +43,8 @@ ASM_ENTRY(_start)
 	fence
 
 	/* Pick a hart to run the boot process. */
-	lla	t0, cpu_lottery
 	li	t1, 1
+	lla	t0, cpu_lottery
 	amoadd.w t0, t1, 0(t0)
 
 	/*
