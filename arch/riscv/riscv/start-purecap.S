@@ -42,6 +42,9 @@ ASM_ENTRY(_start)
 	fence.i
 	fence
 
+	/* Start tracing. */
+	//slti zero, zero, 0x1b
+
 #ifdef __CHERI_PURE_CAPABILITY__
 .option push
 .option nocapmode
@@ -79,6 +82,7 @@ _mstart:
 	j	mpentry
 1:
 
+#if 1
 #ifdef MDX_RISCV_SUPERVISOR_MODE
 	/*
 	 * Page tables setup
@@ -156,6 +160,7 @@ pagetables:
 	.align 2
 va:
 #endif /* !MDX_RISCV_SUPERVISOR_MODE */
+#endif
 
 	cllc		ct0, cpu_exception_handler
 	cspecialw	REG_TCC, ct0
@@ -184,19 +189,20 @@ va:
 	mv		s0, a0
 	mv		s1, a1
 
+	/* Initialize cap relocs. */
+	cllc		ct0, start_purecap
+	cjalr		ct0
+
 #ifdef MDX_OF
 	cspecialr	ct0, ddc
-	cfromptr	ct0, ct0, a1
+	csetoffset	ca0, ct0, s1
 #ifdef MDX_RISCV_SUPERVISOR_MODE
 	li		t0, DMAPBASE
-	cincoffset	ca0, ct0, t0	/* Map to VA space. */
+	cincoffset	ca0, ca0, t0	/* Map to VA space. */
 #endif
 	cllc		ct0, mdx_of_install_dtbp
 	cjalr		ct0
 #endif
-
-	cllc		ct0, start_purecap
-	cjalr		ct0
 
 	mv		a0, s0
 	clgc		cra, md_init
@@ -213,6 +219,7 @@ ASM_ENTRY(mpentry)
 	clb	t1, 0(ct0)
 	beqz	t1, 1b
 
+#if 1
 #ifdef MDX_RISCV_SUPERVISOR_MODE
 	/* Setup supervisor trap vector */
 	cllc		ct0, mpva
@@ -230,6 +237,7 @@ ASM_ENTRY(mpentry)
 
 	.align 2
 mpva:
+#endif
 #endif
 
 	cllc		ct0, idle_thread_stack
