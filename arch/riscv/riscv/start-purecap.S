@@ -99,7 +99,7 @@ pagetables:
 	/* Physical base address. */
 	li	s9, 0
 
-	/* Level 1 superpages (512 x 1GiB) */
+	/* Level 1 superpages (1GiB each) */
 	cllc	cs1, pagetable_l1
 
 	li	s2, DMAPBASE
