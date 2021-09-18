@@ -35,27 +35,22 @@
 #include <sys/list.h>
 #include <sys/smp.h>
 #include <sys/of.h>
-
-#include <riscv/sifive/e300g_uart.h>
 #include <machine/vmparam.h>
-
-#include "board.h"
 
 #include <dev/uart/uart_16550.h>
 
+#include "board.h"
+
 extern uint8_t __riscv_boot_ap[MDX_CPU_MAX];
 
-static struct uart_16550_softc uart_sc;
-
-struct mdx_device dev_uart = { .sc = &uart_sc };
-mdx_device_t uart;
+static mdx_device_t uart;
 
 char
 uart_getchar(void)
 {
 	char a;
 
-	a = mdx_uart_getc(&dev_uart);
+	a = mdx_uart_getc(uart);
 
 	return (a);
 }
@@ -74,6 +69,8 @@ board_init(void)
 
 	/* Once malloc has initialized, probe devices. */
 	mi_startup();
+
+	uart = mdx_device_lookup_by_name("uart_16550", 0);
 
 	/* Release secondary core(s). */
 
