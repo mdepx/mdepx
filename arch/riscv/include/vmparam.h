@@ -52,4 +52,9 @@
 	((pa) + DMAPBASE);		\
 })
 
+#define	DMAP_TO_PHYS(pa)		\
+({					\
+	((pa) - DMAPBASE);		\
+})
+
 #endif /* !_MACHINE_VMPARAM_H_ */
