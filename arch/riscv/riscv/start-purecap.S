@@ -42,9 +42,6 @@ ASM_ENTRY(_start)
 	fence.i
 	fence
 
-	/* Start tracing. */
-	//slti zero, zero, 0x1b
-
 #ifdef __CHERI_PURE_CAPABILITY__
 .option push
 .option nocapmode
@@ -82,7 +79,6 @@ _mstart:
 	j	mpentry
 1:
 
-#if 1
 #ifdef MDX_RISCV_SUPERVISOR_MODE
 	/*
 	 * Page tables setup
@@ -160,7 +156,6 @@ pagetables:
 	.align 2
 va:
 #endif /* !MDX_RISCV_SUPERVISOR_MODE */
-#endif
 
 	cllc		ct0, cpu_exception_handler
 	cspecialw	REG_TCC, ct0
@@ -219,7 +214,6 @@ ASM_ENTRY(mpentry)
 	clb	t1, 0(ct0)
 	beqz	t1, 1b
 
-#if 1
 #ifdef MDX_RISCV_SUPERVISOR_MODE
 	/* Setup supervisor trap vector */
 	cllc		ct0, mpva
@@ -237,7 +231,6 @@ ASM_ENTRY(mpentry)
 
 	.align 2
 mpva:
-#endif
 #endif
 
 	cllc		ct0, idle_thread_stack
