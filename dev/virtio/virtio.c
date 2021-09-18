@@ -30,6 +30,8 @@
 #include "virtio_mmio.h"
 #endif
 
+#include <machine/vmparam.h>
+
 #ifdef __CHERI_PURE_CAPABILITY__
 #include <cheri/cheri-utility.h>
 #endif
@@ -375,6 +377,8 @@ void virtio_fill_desc(struct vqs *vq, int id, uint64_t features,
 	desc = &vq->desc[id];
 	next %= vq->size;
 
+	addr = DMAP_TO_PHYS(addr);
+
 	if (features & VIRTIO_F_VERSION_1) {
 #ifdef TODO_PURECAP
 		if (features & VIRTIO_F_IOMMU_PLATFORM) {
@@ -479,6 +483,8 @@ void virtio_queue_notify(struct virtio_device *dev, int queue)
  */
 static void virtio_set_qaddr(struct virtio_device *dev, int queue, uint64_t qaddr)
 {
+	qaddr = DMAP_TO_PHYS(qaddr);
+
 #ifdef VIRTIO_USE_PCI
 	if (dev->features & VIRTIO_F_VERSION_1) {
 		uint64_t q_desc = qaddr;

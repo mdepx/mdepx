@@ -32,6 +32,8 @@
 #include "virtio-net.h"
 #include "virtio-internal.h"
 
+#include <machine/vmparam.h>
+
 #ifdef __CHERI_PURE_CAPABILITY__
 #include <cheri/cheri-utility.h>
 #endif
@@ -410,6 +412,7 @@ static int virtionet_receive(struct virtio_net *vnet, char *buf, int maxlen)
 #else
 	size_t address;
 	address = virtio_desc_addr(vdev, VQ_RX, id);
+	address = PHYS_TO_DMAP(address);
 	// Get/infer the buffer capability from the address received from device
 	dev_buf_addr = cheri_derive_data_cap(vq_rx->buf_mem, (ptraddr_t)address, len,
 										 __CHERI_CAP_PERMISSION_PERMIT_LOAD__);
