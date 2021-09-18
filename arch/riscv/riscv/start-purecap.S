@@ -65,7 +65,6 @@ ASM_ENTRY(_start)
 .option pop
 #endif
 
-_mstart:
 	/* Pick a hart to run the boot process. */
 	li	t1, 1
 	cllc	ct0, cpu_lottery
@@ -80,11 +79,7 @@ _mstart:
 1:
 
 #ifdef MDX_RISCV_SUPERVISOR_MODE
-	/*
-	 * Page tables setup
-	 *  a0 - modulep or zero
-	 *  a1 - zero or dtbp
-	 */
+	/* Page tables setup */
 pagetables:
 	/*
 	 * Make a direct mapping:
@@ -181,8 +176,8 @@ va:
 
 	fence
 
-	mv		s0, a0
-	mv		s1, a1
+	mv	s0, a0
+	mv	s1, a1
 
 	/* Initialize cap relocs. */
 	cllc		ct0, start_purecap
