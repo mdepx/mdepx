@@ -51,11 +51,11 @@ all:
 
 # Single-threaded, uni-processor
 st:
-	@${BUILD_CMD} -j mdepx-st.conf
+	@${BUILD_CMD} -j mdepx-singlethread.conf
 
 # Multi-threaded, uni-processor
 up:
-	@${BUILD_CMD} -j mdepx-up.conf
+	@${BUILD_CMD} -j mdepx-uniprocessor.conf
 
 supervisor:
 	@${BUILD_CMD} -j mdepx-supervisor.conf
