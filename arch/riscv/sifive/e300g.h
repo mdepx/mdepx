@@ -27,7 +27,6 @@
 #ifndef _SYS_RISCV_SIFIVE_E300G_H_
 #define _SYS_RISCV_SIFIVE_E300G_H_
 
-#include <riscv/sifive/e300g_clint.h>
 #include <riscv/sifive/e300g_aon.h>
 #include <riscv/sifive/e300g_spi.h>
 #include <riscv/sifive/e300g_prci.h>
