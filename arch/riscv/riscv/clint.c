@@ -40,16 +40,6 @@
 
 #include <machine/clint.h>
 
-#define	RD4(_sc, _reg)		\
-	mdx_ioread_uint32((_sc)->base, _reg)
-#define	RD8(_sc, _reg)		\
-	mdx_ioread_uint64((_sc)->base, _reg)
-
-#define	WR4(_sc, _reg, _val)	\
-	mdx_iowrite_uint32((_sc)->base, _reg, _val)
-#define	WR8(_sc, _reg, _val)	\
-	mdx_iowrite_uint64((_sc)->base, _reg, _val)
-
 #define	CLINT_DEBUG
 #undef	CLINT_DEBUG
 
@@ -59,7 +49,7 @@
 #define	dprintf(fmt, ...)
 #endif
 
-static struct clint_softc *clint_sc;
+struct clint_softc *clint_sc;
 
 #if defined(MDX_OF) && !defined(MDX_RISCV_SUPERVISOR_MODE)
 static struct mdx_compat_data clint_compat_data[] = {
@@ -67,65 +57,6 @@ static struct mdx_compat_data clint_compat_data[] = {
 	{ NULL },
 };
 #endif
-
-#ifdef MDX_SCHED_SMP
-extern struct entry pcpu_all;
-
-void
-send_ipi(int cpumask, int ipi)
-{
-	struct pcpu *p;
-
-	KASSERT(MDX_CPU_MAX <= 32, ("cpumask is 32 bit"));
-	KASSERT(!list_empty(&pcpu_all), ("no cpus"));
-
-	for (p = CONTAINER_OF(pcpu_all.next, struct pcpu, pc_all);;
-	    (p = CONTAINER_OF(p->pc_all.next, struct pcpu, pc_all))) {
-		if (cpumask & (1 << p->pc_cpuid)) {
-			atomic_set_32(&p->pc_pending_ipis, ipi);
-			clint_set_sip(p->pc_cpuid);
-		}
-		if (p->pc_all.next == &pcpu_all)
-			break;
-	}
-}
-
-void
-clint_intr_software(void)
-{
-#ifndef MDX_RISCV_SUPERVISOR_MODE
-	struct clint_softc *sc;
-	int cpuid;
-
-	sc = clint_sc;
-
-	cpuid = PCPU_GET(cpuid);
-
-	WR4(sc, MSIP(cpuid), 0);
-#else
-	csr_clear(sip, SIP_SSIP);
-#endif
-
-	ipi_handler();
-}
-#endif
-
-void
-clint_set_sip(int hart_id)
-{
-#ifndef MDX_RISCV_SUPERVISOR_MODE
-	struct clint_softc *sc;
-
-	sc = clint_sc;
-
-	WR4(sc, MSIP(hart_id), 1);
-#else
-	uint64_t hart_mask;
-
-	hart_mask = (1 << hart_id);
-	sbi_send_ipi(&hart_mask);
-#endif
-}
 
 void
 clint_intr(void)
