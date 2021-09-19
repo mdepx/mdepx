@@ -75,7 +75,7 @@ clint_stop(void *arg)
 
 #if __riscv_xlen == 64
 static void
-clint_set_timer(struct clint_softc *sc, int cpuid, uint64_t ticks)
+clint_set_timer(struct clint_softc *sc, int cpuid, uint32_t ticks)
 {
 	uint64_t val;
 	uint64_t new;
@@ -93,24 +93,29 @@ clint_set_timer(struct clint_softc *sc, int cpuid, uint64_t ticks)
 
 #if __riscv_xlen == 32
 static void
-clint_set_timer(struct clint_softc *sc, int cpuid, uint64_t ticks)
+clint_set_timer(struct clint_softc *sc, int cpuid, uint32_t ticks)
 {
-	uint32_t low, high;
+	uint32_t lo, hi;
 	uint32_t new;
 
-	low = RD4(sc, MTIME);
-	high = RD4(sc, MTIME + 0x4);
+tryagain:
+	hi = RD4(sc, MTIME + 0x4);
+	lo = RD4(sc, MTIME);
+	hi1 = RD4(sc, MTIME + 0x4);
 
-	new = low + ticks;
+	if (hi != hi1)
+		goto tryagain;
 
-	dprintf("%s%d: ticks %u, low %u, high %u, new %u\n",
-	    __func__, PCPU_GET(cpuid), ticks, low, high, new);
+	new = lo + ticks;
 
-	if (new < low)
-		high += 1;
+	dprintf("%s%d: ticks %u, lo %u, hi %u, new %u\n",
+	    __func__, PCPU_GET(cpuid), ticks, lo, hi, new);
+
+	if (new < lo)
+		hi += 1;
 
 #ifndef MDX_RISCV_SUPERVISOR_MODE
-	WR4(sc, MTIMECMP(cpuid) + 0x4, high);
+	WR4(sc, MTIMECMP(cpuid) + 0x4, hi);
 	WR4(sc, MTIMECMP(cpuid), new);
 #else
 	panic("implement me");
