@@ -75,13 +75,45 @@ clint_stop(void *arg)
 
 #if __riscv_xlen == 64
 static void
-clint_set_timer(struct clint_softc *sc, int cpuid, uint64_t new)
+clint_set_timer(struct clint_softc *sc, int cpuid, uint64_t ticks)
 {
+	uint64_t val;
+	uint64_t new;
+
+	val = csr_read64(time);
+	new = val + ticks;
 
 #ifndef MDX_RISCV_SUPERVISOR_MODE
 	WR8(sc, MTIMECMP(cpuid), new);
 #else
 	sbi_set_timer(new);
+#endif
+}
+#endif
+
+#if __riscv_xlen == 32
+static void
+clint_set_timer(struct clint_softc *sc, int cpuid, uint64_t ticks)
+{
+	uint32_t low, high;
+	uint32_t new;
+
+	low = RD4(sc, MTIME);
+	high = RD4(sc, MTIME + 0x4);
+
+	new = low + ticks;
+
+	dprintf("%s%d: ticks %u, low %u, high %u, new %u\n",
+	    __func__, PCPU_GET(cpuid), ticks, low, high, new);
+
+	if (new < low)
+		high += 1;
+
+#ifndef MDX_RISCV_SUPERVISOR_MODE
+	WR4(sc, MTIMECMP(cpuid) + 0x4, high);
+	WR4(sc, MTIMECMP(cpuid), new);
+#else
+	panic("implement me");
 #endif
 }
 #endif
@@ -96,34 +128,9 @@ clint_start(void *arg, uint32_t ticks)
 
 	cpuid = PCPU_GET(cpuid);
 
-	dprintf("%s: ticks %u\n", __func__, ticks);
 	dprintf("%s%d: ticks %u\n", __func__, cpuid, ticks);
 
-#if __riscv_xlen == 64
-	uint64_t val;
-	uint64_t new;
-
-	val = csr_read64(time);
-	new = val + ticks;
-	clint_set_timer(sc, cpuid, new);
-#else
-	/*
-	 * Machine-mode only.
-	 * TODO: support for 32-bit supervisor-mode.
-	 */
-	uint32_t low, high;
-	uint32_t new;
-
-	low = RD4(sc, MTIME);
-	high = RD4(sc, MTIME + 0x4);
-	new = low + ticks;
-	dprintf("%s%d: ticks %u, low %u, high %u, new %u\n",
-	    __func__, PCPU_GET(cpuid), ticks, low, high, new);
-	if (new < low)
-		high += 1;
-	WR4(sc, MTIMECMP(cpuid) + 0x4, high);
-	WR4(sc, MTIMECMP(cpuid), new);
-#endif
+	clint_set_timer(sc, cpuid, ticks);
 
 	csr_set_tie();
 }
@@ -132,14 +139,7 @@ ticks_t
 clint_mtime(void *arg)
 {
 	ticks_t low;
-
-#ifdef MDX_RISCV_SUPERVISOR_MODE
-#if __riscv_xlen == 64
-	low = csr_read(time);
-#else
-	low = csr_read64(time);
-#endif
-#else
+#ifndef MDX_RISCV_SUPERVISOR_MODE
 	struct clint_softc *sc;
 
 	sc = arg;
@@ -148,6 +148,14 @@ clint_mtime(void *arg)
 	low = RD4(sc, MTIME);
 #else
 	low = RD8(sc, MTIME);
+#endif
+
+#else
+
+#if __riscv_xlen == 64
+	low = csr_read(time);
+#else
+	low = csr_read64(time);
 #endif
 #endif
 
