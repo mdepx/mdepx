@@ -29,8 +29,19 @@
 
 #include <machine/stdint.h>
 
+#ifndef	_INTCAP_T_DECLARED
 typedef	__intcap_t	intcap_t;
+#define	_INTCAP_T_DECLARED
+#endif
+
+#ifndef	_UINTCAP_T_DECLARED
 typedef	__uintcap_t	uintcap_t;
+#define	_UINTCAP_T_DECLARED
+#endif
+
+#ifndef	_PTRADDR_T_DECLARED
 typedef	__ptraddr_t	ptraddr_t;
+#define	_PTRADDR_T_DECLARED
+#endif
 
 #endif /* !_SYS_STDINT_H_ */

@@ -113,7 +113,6 @@ typedef	__uintptr_t	__uintcap_t;
 #endif
 
 typedef	__uintptr_t	vaddr_t;
-typedef	__ptrdiff_t	ptrdiff_t;
 
 #ifdef __PTRADDR_TYPE__
 typedef	__PTRADDR_TYPE__	__ptraddr_t;
