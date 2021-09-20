@@ -40,26 +40,7 @@
 
 #include <machine/clint.h>
 
-#define	RD4(_sc, _reg)		\
-	mdx_ioread_uint32((_sc)->base, _reg)
-#define	RD8(_sc, _reg)		\
-	mdx_ioread_uint64((_sc)->base, _reg)
-
-#define	WR4(_sc, _reg, _val)	\
-	mdx_iowrite_uint32((_sc)->base, _reg, _val)
-#define	WR8(_sc, _reg, _val)	\
-	mdx_iowrite_uint64((_sc)->base, _reg, _val)
-
-#define	CLINT_DEBUG
-#undef	CLINT_DEBUG
-
-#ifdef	CLINT_DEBUG
-#define	dprintf(fmt, ...)	printf(fmt, ##__VA_ARGS__)
-#else
-#define	dprintf(fmt, ...)
-#endif
-
-static struct clint_softc *clint_sc;
+struct clint_softc *clint_sc;
 
 #if defined(MDX_OF) && !defined(MDX_RISCV_SUPERVISOR_MODE)
 static struct mdx_compat_data clint_compat_data[] = {
@@ -67,191 +48,6 @@ static struct mdx_compat_data clint_compat_data[] = {
 	{ NULL },
 };
 #endif
-
-#ifdef MDX_SCHED_SMP
-extern struct entry pcpu_all;
-
-void
-send_ipi(int cpumask, int ipi)
-{
-	struct pcpu *p;
-
-	KASSERT(MDX_CPU_MAX <= 32, ("cpumask is 32 bit"));
-	KASSERT(!list_empty(&pcpu_all), ("no cpus"));
-
-	for (p = CONTAINER_OF(pcpu_all.next, struct pcpu, pc_all);;
-	    (p = CONTAINER_OF(p->pc_all.next, struct pcpu, pc_all))) {
-		if (cpumask & (1 << p->pc_cpuid)) {
-			atomic_set_32(&p->pc_pending_ipis, ipi);
-			clint_set_sip(p->pc_cpuid);
-		}
-		if (p->pc_all.next == &pcpu_all)
-			break;
-	}
-}
-
-void
-clint_intr_software(void)
-{
-#ifndef MDX_RISCV_SUPERVISOR_MODE
-	struct clint_softc *sc;
-	int cpuid;
-
-	sc = clint_sc;
-
-	cpuid = PCPU_GET(cpuid);
-
-	WR4(sc, MSIP(cpuid), 0);
-#else
-	csr_clear(sip, SIP_SSIP);
-#endif
-
-	ipi_handler();
-}
-#endif
-
-void
-clint_set_sip(int hart_id)
-{
-#ifndef MDX_RISCV_SUPERVISOR_MODE
-	struct clint_softc *sc;
-
-	sc = clint_sc;
-
-	WR4(sc, MSIP(hart_id), 1);
-#else
-	uint64_t hart_mask;
-
-	hart_mask = (1 << hart_id);
-	sbi_send_ipi(&hart_mask);
-#endif
-}
-
-void
-clint_intr(void)
-{
-	struct clint_softc *sc;
-
-	dprintf("%s\n", __func__);
-
-	sc = clint_sc;
-
-	csr_clear_tie();
-
-	mdx_callout_callback(&sc->mt);
-}
-
-static void
-clint_stop(void *arg)
-{
-
-	csr_clear_tie();
-	csr_clear_tip();
-}
-
-#if __riscv_xlen == 64
-static void
-clint_set_timer(struct clint_softc *sc, int cpuid, uint64_t new)
-{
-
-#ifndef MDX_RISCV_SUPERVISOR_MODE
-	WR8(sc, MTIMECMP(cpuid), new);
-#else
-	sbi_set_timer(new);
-#endif
-}
-#endif
-
-static void
-clint_start(void *arg, uint32_t ticks)
-{
-	struct clint_softc *sc;
-	int cpuid;
-
-	sc = arg;
-
-	cpuid = PCPU_GET(cpuid);
-
-	dprintf("%s: ticks %u\n", __func__, ticks);
-	dprintf("%s%d: ticks %u\n", __func__, cpuid, ticks);
-
-#if __riscv_xlen == 64
-	uint64_t val;
-	uint64_t new;
-
-	val = csr_read64(time);
-	new = val + ticks;
-	clint_set_timer(sc, cpuid, new);
-#else
-	/*
-	 * Machine-mode only.
-	 * TODO: support for 32-bit supervisor-mode.
-	 */
-	uint32_t low, high;
-	uint32_t new;
-
-	low = RD4(sc, MTIME);
-	high = RD4(sc, MTIME + 0x4);
-	new = low + ticks;
-	dprintf("%s%d: ticks %u, low %u, high %u, new %u\n",
-	    __func__, PCPU_GET(cpuid), ticks, low, high, new);
-	if (new < low)
-		high += 1;
-	WR4(sc, MTIMECMP(cpuid) + 0x4, high);
-	WR4(sc, MTIMECMP(cpuid), new);
-#endif
-
-	csr_set_tie();
-}
-
-static ticks_t
-clint_mtime(void *arg)
-{
-	ticks_t low;
-
-#ifdef MDX_RISCV_SUPERVISOR_MODE
-#if __riscv_xlen == 64
-	low = csr_read(time);
-#else
-	low = csr_read64(time);
-#endif
-#else
-	struct clint_softc *sc;
-
-	sc = arg;
-
-#if __riscv_xlen == 64
-	low = RD4(sc, MTIME);
-#else
-	low = RD8(sc, MTIME);
-#endif
-#endif
-
-	return (low);
-}
-
-void
-clint_udelay(struct clint_softc *sc,
-    uint32_t usec, uint32_t osc_freq)
-{
-	ticks_t first, last;
-	ticks_t delta;
-	ticks_t counts;
-
-	counts = 0;
-	first = clint_mtime(sc);
-	while (counts < usec) {
-		last = clint_mtime(sc);
-		if (last > first)
-			delta = last - first;
-		else
-			delta = last + (0xffffffff - first) + 1;
-
-		counts += (delta * (1000000 / osc_freq));
-
-		first = last;
-	}
-}
 
 static int
 clint_measure_cpu_freq(struct clint_softc *sc, uint32_t osc_freq, int n)
@@ -300,25 +96,17 @@ int
 clint_init(struct clint_softc *sc, capability base,
     uint32_t frequency)
 {
+	int error;
 
 	if (clint_sc != NULL)
 		return (MDX_EEXIST);
-
 	clint_sc = sc;
+
 	sc->base = base;
 
-	sc->mt.start = clint_start;
-	sc->mt.stop = clint_stop;
-	sc->mt.count = clint_mtime;
-	sc->mt.maxcnt = 0xffffffff;
-	sc->mt.frequency = frequency;
-	sc->mt.arg = sc;
+	error = clint_timer_init(sc, frequency);
 
-	mdx_callout_register(&sc->mt);
-
-	clint_stop(sc);
-
-	return (0);
+	return (error);
 }
 
 #ifdef MDX_OF

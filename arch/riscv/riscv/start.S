@@ -56,11 +56,7 @@ ASM_ENTRY(_start)
 1:
 
 #ifdef MDX_RISCV_SUPERVISOR_MODE
-	/*
-	 * Page tables setup
-	 *  a0 - modulep or zero
-	 *  a1 - zero or dtbp
-	 */
+	/* Page tables setup */
 pagetables:
 	/*
 	 * Make a direct mapping:
@@ -71,7 +67,7 @@ pagetables:
 	/* Physical base address. */
 	li	s9, 0
 
-	/* Level 1 superpages (512 x 1GiB) */
+	/* Level 1 superpages (1GiB each) */
 	lla	s1, pagetable_l1
 
 	li	s2, DMAPBASE

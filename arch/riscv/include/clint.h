@@ -88,4 +88,17 @@ csr_set_tie(void)
 #endif
 }
 
+#define	RD4(_sc, _reg)		\
+	mdx_ioread_uint32((_sc)->base, _reg)
+#define	RD8(_sc, _reg)		\
+	mdx_ioread_uint64((_sc)->base, _reg)
+
+#define	WR4(_sc, _reg, _val)	\
+	mdx_iowrite_uint32((_sc)->base, _reg, _val)
+#define	WR8(_sc, _reg, _val)	\
+	mdx_iowrite_uint64((_sc)->base, _reg, _val)
+
+ticks_t clint_mtime(void *arg);
+int clint_timer_init(struct clint_softc *sc, uint32_t frequency);
+
 #endif /* !_MACHINE_CLINT_H_ */

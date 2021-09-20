@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019-2021 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2017-2021 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,70 +24,79 @@
  * SUCH DAMAGE.
  */
 
+/* Core Local Interruptor (CLINT) */
+
 #include <sys/cdefs.h>
-#include <sys/console.h>
-#include <sys/systm.h>
-#include <sys/thread.h>
-#include <sys/spinlock.h>
-#include <sys/malloc.h>
-#include <sys/mutex.h>
-#include <sys/sem.h>
-#include <sys/list.h>
+#include <sys/pcpu.h>
 #include <sys/smp.h>
-#include <sys/tick.h>
+#include <sys/systm.h>
+#include <sys/io.h>
+#include <sys/of.h>
+#include <sys/cheri.h>
 
+#include <machine/atomic.h>
 #include <machine/cpuregs.h>
-#include <machine/cpufunc.h>
-#include <machine/vmparam.h>
+#include <machine/sbi.h>
 
-#include <app/fpu_test/fpu_test.h>
-#include <app/callout_test/callout_test.h>
-#include <app/virtio_test/virtio_test.h>
+#include <machine/clint.h>
 
-#include "board.h"
-
-#define	VIRTIO_BLOCK_MMIO_BASE	PHYS_TO_DMAP(0x10007000)
-
-static void __unused
-hello(void *arg)
-{
-
-	if (PCPU_GET(cpuid) == 0)
-		printf("\n\nhello\n\n");
-}
-
-#ifdef MDX_VIRTIO
-static void __unused
-virtio_main(void)
-{
-	int error;
-
-	error = virtio_test((void *)VIRTIO_BLOCK_MMIO_BASE);
-	printf("%s: Virtio test completed with error %d\n", __func__, error);
-
-	mdx_usleep(1000000);
-}
-#endif
-
-int
-main(void)
-{
-
-	callout_test();
-
-	/* NOT REACHED */
+extern struct clint_softc *clint_sc;
 
 #ifdef MDX_SCHED_SMP
-	char a;
-	while (1) {
-		a = uart_getchar();
-		if (a == 0x61) {
-			critical_enter();
-			smp_rendezvous_cpus(0xf, hello, NULL);
-			critical_exit();
+extern struct entry pcpu_all;
+
+void
+send_ipi(int cpumask, int ipi)
+{
+	struct pcpu *p;
+
+	KASSERT(MDX_CPU_MAX <= 32, ("cpumask is 32 bit"));
+	KASSERT(!list_empty(&pcpu_all), ("no cpus"));
+
+	for (p = CONTAINER_OF(pcpu_all.next, struct pcpu, pc_all);;
+	    (p = CONTAINER_OF(p->pc_all.next, struct pcpu, pc_all))) {
+		if (cpumask & (1 << p->pc_cpuid)) {
+			atomic_set_32(&p->pc_pending_ipis, ipi);
+			clint_set_sip(p->pc_cpuid);
 		}
+		if (p->pc_all.next == &pcpu_all)
+			break;
 	}
+}
+
+void
+clint_intr_software(void)
+{
+#ifndef MDX_RISCV_SUPERVISOR_MODE
+	struct clint_softc *sc;
+	int cpuid;
+
+	sc = clint_sc;
+
+	cpuid = PCPU_GET(cpuid);
+
+	WR4(sc, MSIP(cpuid), 0);
+#else
+	csr_clear(sip, SIP_SSIP);
 #endif
 
-	return (0);
+	ipi_handler();
+}
+#endif
+
+void
+clint_set_sip(int hart_id)
+{
+#ifndef MDX_RISCV_SUPERVISOR_MODE
+	struct clint_softc *sc;
+
+	sc = clint_sc;
+
+	WR4(sc, MSIP(hart_id), 1);
+#else
+	uint64_t hart_mask;
+
+	hart_mask = (1 << hart_id);
+	sbi_send_ipi(&hart_mask);
+#endif
 }
