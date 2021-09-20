@@ -12,7 +12,7 @@ export CFLAGS = -march=rv64imafdcxcheri -mabi=l64pc128d -mno-relax	\
 	-nostdinc -fno-builtin-printf -ffreestanding -Wall		\
 	-Wredundant-decls -Wnested-externs -Wstrict-prototypes		\
 	-Wmissing-prototypes -Wpointer-arith -Winline -Wcast-qual	\
-	-Wundef -Wmissing-include-dirs -Werror -g
+	-Wundef -Wmissing-include-dirs -Werror -g -std=c99
 
 export AFLAGS = ${CFLAGS}
 
