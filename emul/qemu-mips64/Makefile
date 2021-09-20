@@ -27,7 +27,7 @@ export CFLAGS = -march=mips64 -mabi=64 -g -nostdinc -G0		\
 	-nostdinc -fno-builtin-printf -ffreestanding		\
 	-mno-abicalls -msoft-float -fwrapv -fno-builtin-printf	\
 	-D__mips_n64 -nostdlib ${WARNFLAGS}			\
-	-DBASE_ADDR=${BASE_ADDR}
+	-DBASE_ADDR=${BASE_ADDR} -std=c99
 
 export AFLAGS = ${CFLAGS}
 
