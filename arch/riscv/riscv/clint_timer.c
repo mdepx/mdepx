@@ -95,7 +95,7 @@ clint_set_timer(struct clint_softc *sc, int cpuid, uint32_t ticks)
 static void
 clint_set_timer(struct clint_softc *sc, int cpuid, uint32_t ticks)
 {
-	uint32_t lo, hi;
+	uint32_t lo, hi, hi1;
 	uint32_t new;
 
 tryagain:
@@ -150,9 +150,9 @@ clint_mtime(void *arg)
 	sc = arg;
 
 #if __riscv_xlen == 64
-	low = RD4(sc, MTIME);
-#else
 	low = RD8(sc, MTIME);
+#else
+	low = RD4(sc, MTIME);
 #endif
 
 #else
