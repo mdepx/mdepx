@@ -1,0 +1,37 @@
+OUTPUT_ARCH("riscv")
+ENTRY(_start)
+
+SECTIONS
+{
+	. = kernbase;
+
+	.start . : AT(kernbase - dmapbase)
+	{
+		*start.o(.text)
+	}
+
+	.text :
+	{
+		*(.text)
+	}
+
+	.rodata : {
+		*(.rodata)
+	}
+
+	/* Ensure _smem is associated with the next section */
+	. = .;
+	_smem = ABSOLUTE(.);
+	.sdata : {
+		_sdata = ABSOLUTE(.);
+		*(.sdata)
+		_edata = ABSOLUTE(.);
+	}
+
+	.bss : {
+		_sbss = ABSOLUTE(.);
+		*(.bss COMMON)
+		*(.sbss)
+		_ebss = ABSOLUTE(.);
+	}
+}
