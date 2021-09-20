@@ -46,7 +46,7 @@
 # define dprintf(fmt...)
 #endif
 
-#define sync()  asm volatile ("fence o, i" ::: "memory")
+#define sync()  __asm volatile ("fence o, i" ::: "memory")
 
 #define DRIVER_FEATURE_SUPPORT  (VIRTIO_NET_F_MAC | VIRTIO_F_VERSION_1)
 

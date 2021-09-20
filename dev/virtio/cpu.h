@@ -19,13 +19,13 @@
 
 static inline void barrier(void)
 {
-	asm volatile("" : : : "memory");
+	__asm volatile("" : : : "memory");
 }
 #define cpu_relax() barrier()
 
 static inline void sync(void)
 {
-  asm volatile("fence iorw,iorw" :::"memory");
+	__asm volatile("fence iorw,iorw" :::"memory");
 }
 #define mb() sync()
 
