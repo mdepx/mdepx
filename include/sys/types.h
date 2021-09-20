@@ -128,9 +128,18 @@ typedef	unsigned int	u_int;
 typedef	unsigned long	u_long;
 
 typedef	__int64_t	__off_t;
+
+#ifndef	_OFF_T_DECLARED
 typedef	__off_t		off_t;
+#define	_OFF_T_DECLARED
+#endif
+
 typedef	__register_t	register_t;
+
+#ifndef	_TIME_T_DECLARED
 typedef	__time_t	time_t;
+#define	_TIME_T_DECLARED
+#endif
 
 typedef	__uint8_t	__sa_family_t;
 typedef	__uint32_t	__socklen_t;
@@ -141,7 +150,6 @@ typedef	__uint32_t	in_addr_t;
 typedef char *		caddr_t; /* core address */
 typedef	uint8_t		clockid_t;
 
-#define	INT_MAX		__INT_MAX
 #define	NULL		((void *)0)
 
 typedef	_Bool		bool;

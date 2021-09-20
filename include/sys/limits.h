@@ -41,6 +41,7 @@
 #define	OFF_MAX		__OFF_MAX	/* off_t max val */
 #define	OFF_MIN		__OFF_MIN	/* off_t min val */
 #define	INT_MIN		__INT_MIN
+#define	INT_MAX		__INT_MAX
 #define	UQUAD_MAX	__UQUAD_MAX
 #define	QUAD_MIN	__QUAD_MIN
 #define	QUAD_MAX	__QUAD_MAX
