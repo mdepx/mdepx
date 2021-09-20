@@ -229,7 +229,7 @@ static __inline void
 sbi_send_ipi(const u_long *hart_mask)
 {
 
-	(void)SBI_CALL1(SBI_SEND_IPI, 0, (uint64_t)hart_mask);
+	(void)SBI_CALL1(SBI_SEND_IPI, 0, (u_long)hart_mask);
 }
 
 void sbi_print_version(void);

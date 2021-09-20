@@ -94,7 +94,7 @@ clint_set_sip(int hart_id)
 
 	WR4(sc, MSIP(hart_id), 1);
 #else
-	uint64_t hart_mask;
+	u_long hart_mask;
 
 	hart_mask = (1 << hart_id);
 	sbi_send_ipi(&hart_mask);
