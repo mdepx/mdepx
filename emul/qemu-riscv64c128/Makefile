@@ -37,8 +37,7 @@ RUN_C1=	-device virtio-serial-device					\
 	-chardev socket,path=/tmp/virtio,server,nowait,id=virtiocon0	\
 	-device virtconsole,chardev=virtiocon0
 
-RUN_CMD += -D trace.log -d in_asm,mmu
-# -trace exec_tb
+# RUN_CMD += -D trace.log -d in_asm,mmu
 
 all:
 	@${CMD} -j mdepx.conf
