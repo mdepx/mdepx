@@ -75,7 +75,7 @@ pagetables:
 	andi	s2, s2, 0x1ff
 
 	li	t0, PTE_SIZE
-	mulw	s2, s2, t0
+	mul	s2, s2, t0
 
 	li	t0, (PTE_KERN | PTE_X)
 	li	t1, 0			/* Start ppn */
@@ -130,7 +130,7 @@ va:
 	/* Load our stack pointer. */
 	lla	t0, idle_thread_stack
 	li	t1, MDX_THREAD_STACK_SIZE
-	mulw	t2, t1, a0	# Offset to start of our stack
+	mul	t2, t1, a0	# Offset to start of our stack
 	add	t2, t2, t0	# Start of our stack
 	add	sp, t2, t1	# End of our stack
 
@@ -185,7 +185,7 @@ mpva:
 
 	lla	t0, idle_thread_stack
 	li	t1, MDX_THREAD_STACK_SIZE
-	mulw	t2, t1, a0	# Offset to start of our stack
+	mul	t2, t1, a0	# Offset to start of our stack
 	add	t2, t2, t0	# Start of our stack
 	add	sp, t2, t1	# End of our stack
 
@@ -201,7 +201,7 @@ END(mpentry)
 
 get_physmem:
 	lla	t0, virt_map	/* physical address of virt_map */
-	ld	t1, 0(t0)	/* virtual address of virt_map */
+	REG_L	t1, 0(t0)	/* virtual address of virt_map */
 	sub	t1, t1, t0	/* calculate phys->virt delta */
 	li	t2, KERNBASE
 	sub	s9, t2, t2	/* s9 = physmem base */

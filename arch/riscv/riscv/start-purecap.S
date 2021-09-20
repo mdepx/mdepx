@@ -98,7 +98,7 @@ pagetables:
 	andi	s2, s2, 0x1ff
 
 	li	t0, PTE_SIZE
-	mulw	s2, s2, t0
+	mul	s2, s2, t0
 
 	li	t0, (PTE_KERN | PTE_KERN_CAP | PTE_X)
 	li	t1, 0			/* Start ppn */
@@ -169,7 +169,7 @@ va:
 	/* Load our stack pointer. */
 	cllc		ct0, idle_thread_stack
 	li		t1, MDX_THREAD_STACK_SIZE
-	mulw		t2, t1, a0
+	mul		t2, t1, a0
 	cincoffset	csp, ct0, t2	# Start of the current CPU stack
 	csetbounds	csp, csp, t1
 	cincoffset	csp, csp, t1	# End of our stack
@@ -230,7 +230,7 @@ mpva:
 
 	cllc		ct0, idle_thread_stack
 	li		t1, MDX_THREAD_STACK_SIZE
-	mulw		t2, t1, a0
+	mul		t2, t1, a0
 	cincoffset	csp, ct0, t2	# Start of the current CPU stack
 	csetbounds	csp, csp, t1
 	cincoffset	csp, csp, t1	# End of our stack
