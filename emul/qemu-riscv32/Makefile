@@ -34,11 +34,8 @@ RUN_CMD = ${QEMU}							\
 	-device virtconsole,chardev=virtiocon0				\
 	-accel tcg,thread=multi
 
-# Provide BBL elf for supervisor mode only
-BBL ?= ~/cheri/build/bbl-baremetal-riscv64-build/bbl
-
 # Uncomment for debugging
-# RUN_CMD += -D trace.log -d in_asm,mmu
+# RUN_CMD += -D trace.log -d in_asm
 
 # Uncomment for DTB
 # RUN_CMD += -machine dumpdtb=dtb
@@ -49,20 +46,9 @@ all:
 	${CROSS_COMPILE}objcopy -O binary ${OBJDIR}/${APP}.elf	\
 		${OBJDIR}/${APP}.bin
 
-# Single-threaded, uni-processor
-st:
-	@${BUILD_CMD} -j mdepx-singlethread.conf
-
-supervisor:
-	@${BUILD_CMD} -j mdepx-supervisor.conf
-
 run:
 	truncate -s 12m ${OBJDIR}/qemu.img
 	${RUN_CMD}
-
-run-supervisor:
-	truncate -s 12m ${OBJDIR}/qemu.img
-	${RUN_CMD} -bios ${BBL}
 
 dtb:
 	${RUN_CMD} -machine dumpdtb=dtb.dtb
