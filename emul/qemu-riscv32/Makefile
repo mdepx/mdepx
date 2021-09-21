@@ -8,7 +8,7 @@ OBJCOPY = ${CROSS_COMPILE}objcopy
 
 export CROSS_COMPILE
 
-export CFLAGS = -march=rv32gc -mabi=ilp32 -mcmodel=medany		\
+export CFLAGS = -march=rv32imc -mabi=ilp32 -mcmodel=medany		\
 	-nostdinc -fno-builtin-printf -ffreestanding -Wall		\
 	-Wredundant-decls -Wnested-externs -Wstrict-prototypes		\
 	-Wmissing-prototypes -Wpointer-arith -Winline -Wcast-qual	\
@@ -20,7 +20,7 @@ BUILD_CMD = python3 -B ${OSDIR}/tools/emitter.py
 QEMU = qemu-system-riscv32
 
 RUN_CMD = ${QEMU}							\
-	-smp cpus=8							\
+	-smp cpus=1							\
 	-machine virt							\
 	-m 1024								\
 	-kernel ${OBJDIR}/${APP}.elf					\
