@@ -42,6 +42,7 @@ ASM_ENTRY(_start)
 	fence.i
 	fence
 
+#ifdef __riscv_atomic
 	/* Pick a hart to run the boot process. */
 	li	t1, 1
 	lla	t0, cpu_lottery
@@ -54,6 +55,7 @@ ASM_ENTRY(_start)
 	beqz	t0, 1f
 	j	mpentry
 1:
+#endif
 
 #ifdef MDX_RISCV_SUPERVISOR_MODE
 	/* Page tables setup */
