@@ -148,7 +148,13 @@ typedef	__uint16_t	in_port_t;
 typedef	__uint32_t	in_addr_t;
 
 typedef char *		caddr_t; /* core address */
-typedef	uint8_t		clockid_t;
+
+typedef	__int32_t	__clockid_t;
+
+#ifndef	_CLOCKID_T_DECLARED
+typedef	__clockid_t	clockid_t;
+#define	_CLOCKID_T_DECLARED
+#endif
 
 #define	NULL		((void *)0)
 
@@ -181,19 +187,6 @@ typedef	__PTRADDR_TYPE__	__ptraddr_t;
 #else
 typedef	__uintptr_t		__ptraddr_t;
 #endif
-
-/* Floating point */
-typedef	__uint8_t	uint_fast8_t;
-typedef	__uint16_t	uint_fast16_t;
-typedef	__uint32_t	uint_fast32_t;
-typedef	__uint64_t	uint_fast64_t;
-
-typedef	__int8_t	int_fast8_t;
-typedef	__int16_t	int_fast16_t;
-typedef	__int32_t	int_fast32_t;
-typedef	__int64_t	int_fast64_t;
-
-typedef	__uint8_t	uint_least8_t;
 
 typedef	__double_t	double_t;
 typedef	__float_t	float_t;
