@@ -37,7 +37,6 @@
  */
 
 #include <sys/cdefs.h>
-
 #include <sys/param.h>
 #include <sys/systm.h>
 #include <sys/limits.h>
@@ -49,6 +48,7 @@
  * ANSI and traditional C compilers.
  */
 #include <stdarg.h>
+#include <stddef.h>
 
 #define	BUF		32 	/* Maximum length of numeric string. */
 
