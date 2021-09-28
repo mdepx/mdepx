@@ -252,7 +252,7 @@ get_physmem:
 	sub	t1, t1, t0	/* calculate phys->virt delta */
 	li	t2, KERNBASE
 	sub	s9, t2, t2	/* s9 = physmem base */
-	ret
+	cret
 
 	.align 12
 pagetable_l1:
