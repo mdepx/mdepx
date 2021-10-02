@@ -68,9 +68,10 @@ run-supervisor:
 	truncate -s 12m ${OBJDIR}/qemu.img
 	${RUN_CMD} -bios ${BBL}
 
-dtb:
-	${RUN_CMD} -machine dumpdtb=dtb.dtb
-	dtc -I dtb -O dts dtb.dtb | less
+dtb:	all
+	truncate -s 12m ${OBJDIR}/qemu.img
+	${RUN_CMD} -machine dumpdtb=obj/dtb.dtb
+	dtc -I dtb -O dts obj/dtb.dtb | less
 
 clean:
 	@rm -rf obj/*
