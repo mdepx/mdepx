@@ -84,7 +84,7 @@ mdx_mutex_unlock(mdx_mutex_t *m)
 	int ret;
 
 	if (m->td != curthread)
-		panic("can't unlock mutex");
+		panic("can't unlock mutex, it is owned by a different thread");
 
 	ret = mdx_sem_post(&m->sem);
 
