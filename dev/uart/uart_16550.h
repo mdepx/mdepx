@@ -32,6 +32,9 @@
 #define	REG_DATA		0x00 /* data register (rw) */
 #define	REG_IER			0x01 /* interrupt enable register (wo) */
 #define	 IER_ERXRDY		(1 << 0)
+#define	 IER_ETXRDY		(1 << 1)
+#define	 IER_ERLS		(1 << 2)
+#define	 IER_EMSC		(1 << 3)
 #define	REG_IIR			0x02 /* interrupt identification register(ro) */
 #define	REG_FCR			0x02 /* fifo control register (w) */
 #define	REG_LCR			0x03 /* line control register (rw) */
@@ -48,7 +51,10 @@
 #define	 LCR_PARITY_ODD		(1 << LCR_PARITY_S)
 #define	 LCR_PARITY_EVEN	(3 << LCR_PARITY_S)
 #define	REG_MCR			0x04 /* modem control register (rw) */
+#define	 MCR_DTR		(1 << 0)
 #define	 MCR_RTS		(1 << 1)
+#define	 MCR_DRS		(1 << 2)
+#define	 MCR_IE			(1 << 3)
 #define	REG_LSR			0x05 /* line status register (rw) */
 #define	 LSR_RXRDY		(1 << 0)
 #define	 LSR_THRE		(1 << 5)
