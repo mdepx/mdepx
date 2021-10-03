@@ -34,6 +34,15 @@
 #include <machine/plic.h>
 #include <dev/intc/intc.h>
 
+#define	PLIC_DEBUG
+#undef	PLIC_DEBUG
+
+#ifdef	PLIC_DEBUG
+#define	dprintf(fmt, ...)	printf(fmt, ##__VA_ARGS__)
+#else
+#define	dprintf(fmt, ...)
+#endif
+
 #define	RD4(_sc, _reg)		\
 	mdx_ioread_uint32((_sc)->base, _reg)
 #define	RD8(_sc, _reg)		\
@@ -84,6 +93,8 @@ plic_setup_intr(mdx_device_t dev, int irq,
     void (*handler) (void *arg, int irq),
     void *arg)
 {
+
+	dprintf("%s: %d\n", __func__, irq);
 
 	if (irq >= MDX_RISCV_PLIC_NINTR)
 		return (-1);
@@ -150,7 +161,10 @@ static int
 plic_map(mdx_device_t dev, const void *regp, int ncells, int *irq)
 {
 
-	/* TODO */
+	if (ncells != 1)
+		return (-1);
+
+	*irq = mdx_of_ld32(regp);
 
 	return (0);
 }
