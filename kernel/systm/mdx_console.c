@@ -55,12 +55,30 @@ uart_putchar(int c, void *arg)
 	mdx_uart_putc(dev, c);
 }
 
+int
+mdx_console_getchar(int *c)
+{
+	mdx_device_t dev;
+	bool ready;
+
+	dev = kern_console.dev;
+
+	ready = mdx_uart_rxready(dev);
+	if (ready) {
+		*c = mdx_uart_getc(dev);
+		return (1);
+	}
+
+	return (0);
+}
+
 void
 mdx_console_register_uart(mdx_device_t dev)
 {
 
 	kern_console.console_putchar = uart_putchar;
 	kern_console.console_putchar_arg = dev;
+	kern_console.dev = dev;
 }
 
 #endif

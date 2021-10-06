@@ -32,9 +32,11 @@
 struct kernel_console {
 	void (*console_putchar)(int, void *);
 	void *console_putchar_arg;
+	mdx_device_t dev;
 };
 
 void mdx_console_register(void (*func)(int, void*), void *arg);
 void mdx_console_register_uart(mdx_device_t dev);
+int mdx_console_getchar(int *c);
 
 #endif /* !_SYS_CONSOLE_H_ */
