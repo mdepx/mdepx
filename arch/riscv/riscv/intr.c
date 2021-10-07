@@ -71,6 +71,7 @@ riscv_intr(int irq)
 #endif
 #ifdef MDX_RISCV_PLIC
 	case IRQ_EXTERNAL_SUPERVISOR:
+	case IRQ_EXTERNAL_MACHINE:
 		plic_intr();
 		break;
 #endif
