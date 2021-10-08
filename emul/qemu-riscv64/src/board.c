@@ -36,6 +36,8 @@
 #include <sys/smp.h>
 #include <sys/of.h>
 #include <machine/vmparam.h>
+#include <machine/cpuregs.h>
+#include <machine/cpufunc.h>
 
 #include <dev/uart/uart_16550.h>
 
@@ -71,6 +73,8 @@ board_init(void)
 	mi_startup();
 
 	uart = mdx_device_lookup_by_name("uart_16550", 0);
+
+	csr_set(mie, MIE_MEIE);
 
 	/* Release secondary core(s). */
 
