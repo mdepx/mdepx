@@ -36,6 +36,11 @@
 #define	 IER_ERLS		(1 << 2)
 #define	 IER_EMSC		(1 << 3)
 #define	REG_IIR			0x02 /* interrupt identification register(ro) */
+#define	 IIR_IMASK		(0xf << 0)
+#define	 IIR_RXTOUT		(3 << 2)
+#define	 IIR_RXRDY		(1 << 2)
+#define	 IIR_TXRDY		(1 << 1)
+#define	 IIR_NOPEND		(1 << 0)
 #define	REG_FCR			0x02 /* fifo control register (w) */
 #define	REG_LCR			0x03 /* line control register (rw) */
 #define	 LCR_BITS_S		0 /* Data width */
