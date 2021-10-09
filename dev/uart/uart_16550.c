@@ -29,7 +29,6 @@
 #include <sys/cheri.h>
 #include <sys/io.h>
 #include <sys/of.h>
-#include <sys/console.h>
 
 #include <dev/uart/uart_16550.h>
 
