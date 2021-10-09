@@ -60,7 +60,16 @@ static struct mdx_compat_data uart_compat_data[] = {
 void
 uart_16550_intr(void *arg, int irq)
 {
+	struct uart_16550_softc *sc;
+	uint32_t iir;
 
+	sc = arg;
+
+	do {
+		iir = UART_READ(sc, REG_IIR);
+		if (iir & IIR_RXRDY)
+			UART_READ(sc, REG_DATA);
+	} while (iir & IIR_RXRDY);
 }
 
 static bool
@@ -175,6 +184,7 @@ uart_16550_setup(mdx_device_t dev, int baud_rate,
 	reg = UART_READ(sc, REG_LCR);
 	reg &= ~LCR_DLAB;
 	UART_WRITE(sc, REG_LCR, reg);
+	UART_WRITE(sc, REG_IER, IER_ERXRDY);
 }
 
 static struct mdx_uart_ops uart_16550_ops = {
