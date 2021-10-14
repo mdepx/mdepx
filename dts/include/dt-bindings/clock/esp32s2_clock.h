@@ -1,12 +1,11 @@
 /*
- * Copyright (c) 2020 Mohamed ElShahawi
  * Copyright (c) 2021 Espressif Systems (Shanghai) Co., Ltd.
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef ZEPHYR_INCLUDE_DT_BINDINGS_CLOCK_ESP32_H_
-#define ZEPHYR_INCLUDE_DT_BINDINGS_CLOCK_ESP32_H_
+#ifndef ZEPHYR_INCLUDE_DT_BINDINGS_CLOCK_ESP32S2_H_
+#define ZEPHYR_INCLUDE_DT_BINDINGS_CLOCK_ESP32S2_H_
 
 /* System Clock Source */
 #define ESP32_CLK_SRC_XTAL             0U
@@ -22,10 +21,7 @@
 #define ESP32_CLK_CPU_240M             240U
 
 /* Supported XTAL Frequencies */
-#define ESP32_CLK_XTAL_24M             0U
-#define ESP32_CLK_XTAL_26M             1U
-#define ESP32_CLK_XTAL_40M             2U
-#define ESP32_CLK_XTAL_AUTO            3U
+#define ESP32_CLK_XTAL_40M             0U
 
 /* Modules IDs
  * These IDs are actually offsets in CLK and RST Control registers.
@@ -38,7 +34,7 @@
 #define ESP32_LEDC_MODULE              0
 #define ESP32_UART0_MODULE             1
 #define ESP32_UART1_MODULE             2
-#define ESP32_UART2_MODULE             3
+#define ESP32_USB_MODULE               3
 #define ESP32_I2C0_MODULE              4
 #define ESP32_I2C1_MODULE              5
 #define ESP32_I2S0_MODULE              6
@@ -54,23 +50,22 @@
 #define ESP32_RMT_MODULE               16
 #define ESP32_PCNT_MODULE              17
 #define ESP32_SPI_MODULE               18
-#define ESP32_HSPI_MODULE              19
-#define ESP32_VSPI_MODULE              20
-#define ESP32_SPI_DMA_MODULE           21
-#define ESP32_SDMMC_MODULE             22
-#define ESP32_SDIO_SLAVE_MODULE        23
-#define ESP32_TWAI_MODULE              24
-#define ESP32_CAN_MODULE ESP32_TWAI_MODULE
-#define ESP32_EMAC_MODULE              25
-#define ESP32_RNG_MODULE               26
-#define ESP32_WIFI_MODULE              27
-#define ESP32_BT_MODULE                28
-#define ESP32_WIFI_BT_COMMON_MODULE    29
-#define ESP32_BT_BASEBAND_MODULE       30
-#define ESP32_BT_LC_MODULE             31
-#define ESP32_AES_MODULE               32
-#define ESP32_SHA_MODULE               33
-#define ESP32_RSA_MODULE               34
+#define ESP32_FSPI_MODULE              19
+#define ESP32_HSPI_MODULE              20
+#define ESP32_SPI2_DMA_MODULE          21
+#define ESP32_SPI3_DMA_MODULE          22
+#define ESP32_TWAI_MODULE              23
+#define ESP32_RNG_MODULE               24
+#define ESP32_WIFI_MODULE              25
+#define ESP32_WIFI_BT_COMMON_MODULE    26
+#define ESP32_SYSTIMER_MODULE          27
+#define ESP32_AES_MODULE               28
+#define ESP32_SHA_MODULE               29
+#define ESP32_RSA_MODULE               30
+#define ESP32_CRYPTO_DMA_MODULE        31
+#define ESP32_AES_DMA_MODULE           32
+#define ESP32_SHA_DMA_MODULE           33
+#define ESP32_DEDIC_GPIO_MODULE        34
 #define ESP32_MODULE_MAX               35
 
-#endif /* ZEPHYR_INCLUDE_DT_BINDINGS_CLOCK_ESP32_H_ */
+#endif /* ZEPHYR_INCLUDE_DT_BINDINGS_CLOCK_ESP32S2_H_ */
