@@ -9,6 +9,7 @@ OBJCOPY = ${CROSS_COMPILE}objcopy
 export CROSS_COMPILE
 
 export CFLAGS = -march=rv64imafdcxcheri -mabi=l64pc128d -mno-relax	\
+	-target riscv64-unknown-elf					\
 	-nostdinc -fno-builtin-printf -ffreestanding -Wall		\
 	-Wredundant-decls -Wnested-externs -Wstrict-prototypes		\
 	-Wmissing-prototypes -Wpointer-arith -Winline -Wcast-qual	\
