@@ -4,7 +4,7 @@
 
 mdepx's build system is a set of python3 scripts located in mdepx/tools/ directory.
 
-It compiles your application and OS, links all together to the ELF executable.
+It compiles your application and OS, links all together to an ELF executable.
 
 Files to build, compile flags and macroses to define are described in a config file.
 
@@ -70,16 +70,17 @@ In your application directory create a Makefile:
 
 ## Environment variables
 
-While these settings could be described in the config file using corresponding directives, it is possible to pass them as environment variables (for instance from a Makefile):
+While these settings could be described in the config file using corresponding directives, it is possible to pass them as environment variables (for instance from a Makefile using export directive):
 
  * CROSS_COMPILE
 
 Sets a path to a toolchain triple that will be used for compiling and linking.
 
  * CC
+ * AS
  * LD
 
-Sets a compiler and a linker path individually.
+Sets a compiler, assembler and a linker paths individually.
 
  * CFLAGS
  * AFLAGS
