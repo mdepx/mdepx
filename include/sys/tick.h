@@ -37,7 +37,7 @@ struct mdx_timer {
 };
 
 struct mdx_timer * mdx_timer_create(void);
-int mdx_timer_start(struct mdx_timer *timer, int period_ms);
+int mdx_timer_start(struct mdx_timer *timer, int period_us);
 uint64_t mdx_timer_count(struct mdx_timer *timer);
 
 uint64_t mdx_uptime(void);
