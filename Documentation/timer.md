@@ -2,6 +2,7 @@
 
 The MDX timer is a simple software timer built around mdx_callout framework.
 The implementation features periodic operation, so unlike callouts, the mdx timer automatically restarts after specified period has elapsed.
+MDX timer is currently used for the uptime counter only.
 
 ## Methods
 
