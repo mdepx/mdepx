@@ -29,8 +29,7 @@
 #include <sys/ringbuf.h>
 
 void
-mdx_ringbuf_init(struct mdx_ringbuf_softc *sc,
-    void *base, uint32_t basesize,
+mdx_ringbuf_init(struct mdx_ringbuf_softc *sc, void *base, uint32_t basesize,
     void *buf, uint32_t bufsize)
 {
 	struct mdx_ringbuf *rb;
@@ -63,8 +62,7 @@ mdx_ringbuf_init(struct mdx_ringbuf_softc *sc,
 }
 
 void
-mdx_ringbuf_join(struct mdx_ringbuf_softc *sc,
-    void *base)
+mdx_ringbuf_join(struct mdx_ringbuf_softc *sc, void *base)
 {
 	struct mdx_ringbuf *rb;
 
@@ -75,8 +73,7 @@ mdx_ringbuf_join(struct mdx_ringbuf_softc *sc,
 }
 
 int
-mdx_ringbuf_head(struct mdx_ringbuf_softc *sc,
-    struct mdx_ringbuf **rb0)
+mdx_ringbuf_head(struct mdx_ringbuf_softc *sc, struct mdx_ringbuf **rb0)
 {
 	struct mdx_ringbuf *rb;
 
