@@ -33,7 +33,7 @@ mdx_cputime_usec_to_ticks_1mhz(uint32_t freq, uint32_t usec)
 {
 	uint32_t ticks;
 
-	KASSERT(freq == 1000000, ("Invalid frequency"));
+	KASSERT(freq == 1000000, ("Invalid frequency."));
 
 	ticks = usec;
 
@@ -45,7 +45,7 @@ mdx_cputime_ticks_to_usec_1mhz(uint32_t freq, uint32_t ticks)
 {
 	uint32_t usec;
 
-	KASSERT(freq == 1000000, ("Invalid frequency"));
+	KASSERT(freq == 1000000, ("Invalid frequency."));
 
 	usec = ticks;
 
