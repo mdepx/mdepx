@@ -11,7 +11,7 @@ Thread API manages a struct thread. Threads are used by the scheduler.
     mdx_thread_create(const char *name, int prio, uint32_t quantum_usec,
         uint32_t stack_size, void *entry, void *arg);
 
-Dynamicaly allocates a thread and a stack space for it. Stack size provided in bytes, quantum in microseconds (usecs). Thread's priority *prio*, name *name*, entry point *entry* and a user argument *arg* should also be provided.
+Dynamicaly allocates a thread and a stack space for it. Stack size is provided in bytes, quantum is in microseconds (usecs). Thread's priority *prio*, name *name*, entry point *entry* and a user argument *arg* should also be provided.
 
 Note that the quantum could be specified as 0, the cooperative scheduling mode is used in that case.
 
