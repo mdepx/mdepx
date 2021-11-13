@@ -99,8 +99,8 @@ def to_json(d, data):
 		c = data[i]
 
 		if (depth < 0):
-			print("tools/parser.py: Syntax error detected"
-				" in the configuration file.")
+			print("tools/parser.py: Syntax error: '}' is not "
+				"followed by ';'")
 			return False
 
 		elif (c == '#' and depth == 0):
