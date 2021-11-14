@@ -5,6 +5,7 @@ OBJDIR = obj
 
 CROSS_COMPILE ?= riscv64-unknown-elf-
 OBJCOPY = ${CROSS_COMPILE}objcopy
+PYTHON = python3 -B
 
 export CROSS_COMPILE
 
@@ -16,11 +17,12 @@ export CFLAGS = -march=rv64gc -mabi=lp64 -mcmodel=medany		\
 
 export AFLAGS = ${CFLAGS}
 
-BUILD_CMD = python3 -B ${OSDIR}/tools/emitter.py
+BUILD_CMD = ${PYTHON} ${OSDIR}/tools/emitter.py
+NCPUS := $(shell ${PYTHON} ${OSDIR}/tools/ncpus.py)
 QEMU = qemu-system-riscv64
 
 RUN_CMD = ${QEMU}							\
-	-smp cpus=8							\
+	-smp cpus=${NCPUS}						\
 	-machine virt							\
 	-m 1024								\
 	-kernel ${OBJDIR}/qemu-riscv64.elf				\
