@@ -18,7 +18,7 @@ export CFLAGS = -march=rv64gc -mabi=lp64 -mcmodel=medany		\
 export AFLAGS = ${CFLAGS}
 
 BUILD_CMD = ${PYTHON} ${OSDIR}/tools/emitter.py
-NCPUS := $(shell ${PYTHON} ${OSDIR}/tools/ncpus.py)
+NCPUS := $(shell ${PYTHON} ${OSDIR}/tools/ncpus.py -m 8)
 QEMU = qemu-system-riscv64
 
 RUN_CMD = ${QEMU}							\
