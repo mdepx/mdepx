@@ -92,24 +92,6 @@ mdx_of_dev_get_prop32(mdx_device_t dev, const char *propname,
 	return (mdx_of_get_prop32(dev->nodeoffset, propname, res, len));
 }
 
-static int
-mdx_of_get_props(int offset, uint32_t *addr, uint32_t *size)
-{
-	const fdt32_t *regp;
-
-	regp = fdt_getprop(fdt, offset, "#address-cells", NULL);
-	if (!regp)
-		return (-1);
-	*addr = fdt32_ld(regp);
-
-	regp = fdt_getprop(fdt, offset, "#size-cells", NULL);
-	if (!regp)
-		return (-1);
-	*size = fdt32_ld(regp);
-
-	return (0);
-}
-
 int
 mdx_of_get_reg(mdx_device_t dev, int index,
     size_t *addr, size_t *size)

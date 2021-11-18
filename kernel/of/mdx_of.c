@@ -185,6 +185,24 @@ mdx_of_get_prop32(int nodeoffset, const char *propname,
 }
 
 int
+mdx_of_get_props(int offset, uint32_t *addr, uint32_t *size)
+{
+	const fdt32_t *regp;
+
+	regp = fdt_getprop(fdt, offset, "#address-cells", NULL);
+	if (!regp)
+		return (-1);
+	*addr = fdt32_ld(regp);
+
+	regp = fdt_getprop(fdt, offset, "#size-cells", NULL);
+	if (!regp)
+		return (-1);
+	*size = fdt32_ld(regp);
+
+	return (0);
+}
+
+int
 mdx_of_offset_by_compatible(int offset, const char *compatible)
 {
 
