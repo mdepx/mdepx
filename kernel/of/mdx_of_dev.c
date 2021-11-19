@@ -104,12 +104,15 @@ mdx_of_get_reg(mdx_device_t dev, int index,
 	size_t paddr, psize;
 	int ntuples;
 	int i, j;
+	int error;
 
 	parent = fdt_parent_offset(fdt, dev->nodeoffset);
 	if (!parent)
 		parent = fdt_path_offset(fdt, "/");
 
-	mdx_of_get_props(parent, &naddr, &nsize);
+	error = mdx_of_get_props(parent, &naddr, &nsize);
+	if (error)
+		return (error);
 
 	regp = fdt_getprop(fdt, dev->nodeoffset, "reg", NULL);
 	if (!regp)
@@ -126,7 +129,9 @@ mdx_of_get_reg(mdx_device_t dev, int index,
 	for (bus = fdt_parent_offset(fdt, parent);
 	    bus > 0;
 	    parent = bus, bus = fdt_parent_offset(fdt, parent)) {
-		mdx_of_get_props(bus, &b_naddr, &b_nsize);
+		error = mdx_of_get_props(bus, &b_naddr, &b_nsize);
+		if (error)
+			return (error);
 
 		r = fdt_getprop(fdt, parent, "ranges", &len);
 		if (!r)
