@@ -48,7 +48,7 @@ int mdx_of_node_offset_by_phandle(uint32_t phandle);
 int mdx_of_parent_offset(int nodeoffset);
 int mdx_of_get_prop32(int nodeoffset, const char *propname,
     uint32_t *res, int *len);
-int mdx_of_get_props(int offset, uint32_t *addr, uint32_t *size);
+int mdx_of_get_cells(int offset, uint32_t *addr, uint32_t *size);
 int mdx_of_offset_by_compatible(int offset, const char *compatible);
 int mdx_of_chosen_path_offset(void);
 bool mdx_of_dev_uart_chosen(mdx_device_t dev);

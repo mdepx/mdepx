@@ -110,7 +110,7 @@ mdx_of_get_reg(mdx_device_t dev, int index,
 	if (!parent)
 		parent = fdt_path_offset(fdt, "/");
 
-	error = mdx_of_get_props(parent, &naddr, &nsize);
+	error = mdx_of_get_cells(parent, &naddr, &nsize);
 	if (error)
 		return (error);
 
@@ -129,7 +129,7 @@ mdx_of_get_reg(mdx_device_t dev, int index,
 	for (bus = fdt_parent_offset(fdt, parent);
 	    bus > 0;
 	    parent = bus, bus = fdt_parent_offset(fdt, parent)) {
-		error = mdx_of_get_props(bus, &b_naddr, &b_nsize);
+		error = mdx_of_get_cells(bus, &b_naddr, &b_nsize);
 		if (error)
 			return (error);
 

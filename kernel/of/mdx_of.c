@@ -185,7 +185,7 @@ mdx_of_get_prop32(int nodeoffset, const char *propname,
 }
 
 int
-mdx_of_get_props(int offset, uint32_t *addr, uint32_t *size)
+mdx_of_get_cells(int offset, uint32_t *addr, uint32_t *size)
 {
 	const fdt32_t *regp;
 
