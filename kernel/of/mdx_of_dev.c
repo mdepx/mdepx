@@ -93,8 +93,7 @@ mdx_of_dev_get_prop32(mdx_device_t dev, const char *propname,
 }
 
 int
-mdx_of_get_reg(mdx_device_t dev, int index,
-    size_t *addr, size_t *size)
+mdx_of_get_reg(mdx_device_t dev, int index, size_t *addr, size_t *size)
 {
 	const fdt32_t *regp, *r;
 	int parent, bus;
