@@ -57,6 +57,7 @@ mdx_of_probe_and_attach(int offset, struct mdx_driver *dri, mdx_device_t *dev0)
 	dev = zalloc(sizeof(struct mdx_device));
 	if (dev == NULL)
 		panic("could not allocate device");
+
 	dev->dri = dri;
 	dev->nodeoffset = offset;
 
@@ -66,7 +67,7 @@ mdx_of_probe_and_attach(int offset, struct mdx_driver *dri, mdx_device_t *dev0)
 		return (MDX_ERROR);
 	}
 
-	printf("device attached: %s (offset %x)\n", prop, offset);
+	printf("%s: %s (offset %x)\n", __func__, prop, offset);
 
 	if (dev0)
 		*dev0 = dev;
