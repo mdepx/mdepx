@@ -7,7 +7,7 @@
  *          change at any time.
  */
 /*
- *  Copyright (C) 2006-2018, ARM Limited, All Rights Reserved
+ *  Copyright The Mbed TLS Contributors
  *  SPDX-License-Identifier: Apache-2.0
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -21,18 +21,13 @@
  *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *
- *  This file is part of mbed TLS (https://tls.mbed.org)
  */
 
 #ifndef MBEDTLS_PSA_UTIL_H
 #define MBEDTLS_PSA_UTIL_H
+#include "mbedtls/private_access.h"
 
-#if !defined(MBEDTLS_CONFIG_FILE)
-#include "mbedtls/config.h"
-#else
-#include MBEDTLS_CONFIG_FILE
-#endif
+#include "mbedtls/build_info.h"
 
 #if defined(MBEDTLS_USE_PSA_CRYPTO)
 
@@ -42,6 +37,7 @@
 #include "mbedtls/md.h"
 #include "mbedtls/pk.h"
 #include "mbedtls/oid.h"
+#include "mbedtls/error.h"
 
 #include <string.h>
 
@@ -55,18 +51,27 @@ static inline psa_key_type_t mbedtls_psa_translate_cipher_type(
         case MBEDTLS_CIPHER_AES_128_CCM:
         case MBEDTLS_CIPHER_AES_192_CCM:
         case MBEDTLS_CIPHER_AES_256_CCM:
+        case MBEDTLS_CIPHER_AES_128_CCM_STAR_NO_TAG:
+        case MBEDTLS_CIPHER_AES_192_CCM_STAR_NO_TAG:
+        case MBEDTLS_CIPHER_AES_256_CCM_STAR_NO_TAG:
         case MBEDTLS_CIPHER_AES_128_GCM:
         case MBEDTLS_CIPHER_AES_192_GCM:
         case MBEDTLS_CIPHER_AES_256_GCM:
         case MBEDTLS_CIPHER_AES_128_CBC:
         case MBEDTLS_CIPHER_AES_192_CBC:
         case MBEDTLS_CIPHER_AES_256_CBC:
+        case MBEDTLS_CIPHER_AES_128_ECB:
+        case MBEDTLS_CIPHER_AES_192_ECB:
+        case MBEDTLS_CIPHER_AES_256_ECB:
             return( PSA_KEY_TYPE_AES );
 
         /* ARIA not yet supported in PSA. */
         /* case MBEDTLS_CIPHER_ARIA_128_CCM:
            case MBEDTLS_CIPHER_ARIA_192_CCM:
            case MBEDTLS_CIPHER_ARIA_256_CCM:
+           case MBEDTLS_CIPHER_ARIA_128_CCM_STAR_NO_TAG:
+           case MBEDTLS_CIPHER_ARIA_192_CCM_STAR_NO_TAG:
+           case MBEDTLS_CIPHER_ARIA_256_CCM_STAR_NO_TAG:
            case MBEDTLS_CIPHER_ARIA_128_GCM:
            case MBEDTLS_CIPHER_ARIA_192_GCM:
            case MBEDTLS_CIPHER_ARIA_256_GCM:
@@ -85,15 +90,19 @@ static inline psa_algorithm_t mbedtls_psa_translate_cipher_mode(
 {
     switch( mode )
     {
+        case MBEDTLS_MODE_ECB:
+            return( PSA_ALG_ECB_NO_PADDING );
         case MBEDTLS_MODE_GCM:
-            return( PSA_ALG_AEAD_WITH_TAG_LENGTH( PSA_ALG_GCM, taglen ) );
+            return( PSA_ALG_AEAD_WITH_SHORTENED_TAG( PSA_ALG_GCM, taglen ) );
         case MBEDTLS_MODE_CCM:
-            return( PSA_ALG_AEAD_WITH_TAG_LENGTH( PSA_ALG_CCM, taglen ) );
+            return( PSA_ALG_AEAD_WITH_SHORTENED_TAG( PSA_ALG_CCM, taglen ) );
+        case MBEDTLS_MODE_CCM_STAR_NO_TAG:
+            return PSA_ALG_CCM_STAR_NO_TAG;
         case MBEDTLS_MODE_CBC:
             if( taglen == 0 )
                 return( PSA_ALG_CBC_NO_PADDING );
-            /* Intentional fallthrough for taglen != 0 */
-            /* fallthrough */
+            else
+                return( 0 );
         default:
             return( 0 );
     }
@@ -119,14 +128,6 @@ static inline psa_algorithm_t mbedtls_psa_translate_md( mbedtls_md_type_t md_alg
 {
     switch( md_alg )
     {
-#if defined(MBEDTLS_MD2_C)
-    case MBEDTLS_MD_MD2:
-        return( PSA_ALG_MD2 );
-#endif
-#if defined(MBEDTLS_MD4_C)
-    case MBEDTLS_MD_MD4:
-        return( PSA_ALG_MD4 );
-#endif
 #if defined(MBEDTLS_MD5_C)
     case MBEDTLS_MD_MD5:
         return( PSA_ALG_MD5 );
@@ -135,15 +136,19 @@ static inline psa_algorithm_t mbedtls_psa_translate_md( mbedtls_md_type_t md_alg
     case MBEDTLS_MD_SHA1:
         return( PSA_ALG_SHA_1 );
 #endif
-#if defined(MBEDTLS_SHA256_C)
+#if defined(MBEDTLS_SHA224_C)
     case MBEDTLS_MD_SHA224:
         return( PSA_ALG_SHA_224 );
+#endif
+#if defined(MBEDTLS_SHA256_C)
     case MBEDTLS_MD_SHA256:
         return( PSA_ALG_SHA_256 );
 #endif
-#if defined(MBEDTLS_SHA512_C)
+#if defined(MBEDTLS_SHA384_C)
     case MBEDTLS_MD_SHA384:
         return( PSA_ALG_SHA_384 );
+#endif
+#if defined(MBEDTLS_SHA512_C)
     case MBEDTLS_MD_SHA512:
         return( PSA_ALG_SHA_512 );
 #endif
@@ -151,7 +156,8 @@ static inline psa_algorithm_t mbedtls_psa_translate_md( mbedtls_md_type_t md_alg
     case MBEDTLS_MD_RIPEMD160:
         return( PSA_ALG_RIPEMD160 );
 #endif
-    case MBEDTLS_MD_NONE:  /* Intentional fallthrough */
+    case MBEDTLS_MD_NONE:
+        return( 0 );
     default:
         return( 0 );
     }
@@ -160,12 +166,12 @@ static inline psa_algorithm_t mbedtls_psa_translate_md( mbedtls_md_type_t md_alg
 /* Translations for ECC. */
 
 static inline int mbedtls_psa_get_ecc_oid_from_id(
-    psa_ecc_curve_t curve, size_t bits,
+    psa_ecc_family_t curve, size_t bits,
     char const **oid, size_t *oid_len )
 {
     switch( curve )
     {
-        case PSA_ECC_CURVE_SECP_R1:
+        case PSA_ECC_FAMILY_SECP_R1:
             switch( bits )
             {
 #if defined(MBEDTLS_ECP_DP_SECP192R1_ENABLED)
@@ -200,7 +206,7 @@ static inline int mbedtls_psa_get_ecc_oid_from_id(
 #endif /* MBEDTLS_ECP_DP_SECP521R1_ENABLED */
             }
             break;
-        case PSA_ECC_CURVE_SECP_K1:
+        case PSA_ECC_FAMILY_SECP_K1:
             switch( bits )
             {
 #if defined(MBEDTLS_ECP_DP_SECP192K1_ENABLED)
@@ -223,7 +229,7 @@ static inline int mbedtls_psa_get_ecc_oid_from_id(
 #endif /* MBEDTLS_ECP_DP_SECP256K1_ENABLED */
             }
             break;
-        case PSA_ECC_CURVE_BRAINPOOL_P_R1:
+        case PSA_ECC_FAMILY_BRAINPOOL_P_R1:
             switch( bits )
             {
 #if defined(MBEDTLS_ECP_DP_BP256R1_ENABLED)
@@ -352,11 +358,11 @@ static inline int mbedtls_psa_err_translate_pk( psa_status_t status )
         case PSA_ERROR_COMMUNICATION_FAILURE:
         case PSA_ERROR_HARDWARE_FAILURE:
         case PSA_ERROR_CORRUPTION_DETECTED:
-            return( MBEDTLS_ERR_PK_HW_ACCEL_FAILED );
+            return( MBEDTLS_ERR_PLATFORM_HW_ACCEL_FAILED );
         default: /* We return the same as for the 'other failures',
                   * but list them separately nonetheless to indicate
                   * which failure conditions we have considered. */
-            return( MBEDTLS_ERR_PK_HW_ACCEL_FAILED );
+            return( MBEDTLS_ERR_PLATFORM_HW_ACCEL_FAILED );
     }
 }
 
@@ -418,5 +424,91 @@ static inline int mbedtls_psa_tls_ecpoint_to_psa_ec( unsigned char const *src,
 }
 
 #endif /* MBEDTLS_USE_PSA_CRYPTO */
+
+/* Expose whatever RNG the PSA subsystem uses to applications using the
+ * mbedtls_xxx API. The declarations and definitions here need to be
+ * consistent with the implementation in library/psa_crypto_random_impl.h.
+ * See that file for implementation documentation. */
+#if defined(MBEDTLS_PSA_CRYPTO_C)
+
+/* The type of a `f_rng` random generator function that many library functions
+ * take.
+ *
+ * This type name is not part of the Mbed TLS stable API. It may be renamed
+ * or moved without warning.
+ */
+typedef int mbedtls_f_rng_t( void *p_rng, unsigned char *output, size_t output_size );
+
+#if defined(MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG)
+
+/** The random generator function for the PSA subsystem.
+ *
+ * This function is suitable as the `f_rng` random generator function
+ * parameter of many `mbedtls_xxx` functions. Use #MBEDTLS_PSA_RANDOM_STATE
+ * to obtain the \p p_rng parameter.
+ *
+ * The implementation of this function depends on the configuration of the
+ * library.
+ *
+ * \note Depending on the configuration, this may be a function or
+ *       a pointer to a function.
+ *
+ * \note This function may only be used if the PSA crypto subsystem is active.
+ *       This means that you must call psa_crypto_init() before any call to
+ *       this function, and you must not call this function after calling
+ *       mbedtls_psa_crypto_free().
+ *
+ * \param p_rng         The random generator context. This must be
+ *                      #MBEDTLS_PSA_RANDOM_STATE. No other state is
+ *                      supported.
+ * \param output        The buffer to fill. It must have room for
+ *                      \c output_size bytes.
+ * \param output_size   The number of bytes to write to \p output.
+ *                      This function may fail if \p output_size is too
+ *                      large. It is guaranteed to accept any output size
+ *                      requested by Mbed TLS library functions. The
+ *                      maximum request size depends on the library
+ *                      configuration.
+ *
+ * \return              \c 0 on success.
+ * \return              An `MBEDTLS_ERR_ENTROPY_xxx`,
+ *                      `MBEDTLS_ERR_PLATFORM_xxx,
+ *                      `MBEDTLS_ERR_CTR_DRBG_xxx` or
+ *                      `MBEDTLS_ERR_HMAC_DRBG_xxx` on error.
+ */
+int mbedtls_psa_get_random( void *p_rng,
+                            unsigned char *output,
+                            size_t output_size );
+
+/** The random generator state for the PSA subsystem.
+ *
+ * This macro expands to an expression which is suitable as the `p_rng`
+ * random generator state parameter of many `mbedtls_xxx` functions.
+ * It must be used in combination with the random generator function
+ * mbedtls_psa_get_random().
+ *
+ * The implementation of this macro depends on the configuration of the
+ * library. Do not make any assumption on its nature.
+ */
+#define MBEDTLS_PSA_RANDOM_STATE NULL
+
+#else /* !defined(MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG) */
+
+#if defined(MBEDTLS_CTR_DRBG_C)
+#include "mbedtls/ctr_drbg.h"
+typedef mbedtls_ctr_drbg_context mbedtls_psa_drbg_context_t;
+static mbedtls_f_rng_t *const mbedtls_psa_get_random = mbedtls_ctr_drbg_random;
+#elif defined(MBEDTLS_HMAC_DRBG_C)
+#include "mbedtls/hmac_drbg.h"
+typedef mbedtls_hmac_drbg_context mbedtls_psa_drbg_context_t;
+static mbedtls_f_rng_t *const mbedtls_psa_get_random = mbedtls_hmac_drbg_random;
+#endif
+extern mbedtls_psa_drbg_context_t *const mbedtls_psa_random_state;
+
+#define MBEDTLS_PSA_RANDOM_STATE mbedtls_psa_random_state
+
+#endif /* !defined(MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG) */
+
+#endif /* MBEDTLS_PSA_CRYPTO_C */
 
 #endif /* MBEDTLS_PSA_UTIL_H */
