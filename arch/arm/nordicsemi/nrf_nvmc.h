@@ -28,6 +28,7 @@
 #define _ARM_NORDICSEMI_NRF_NVMC_H_
 
 #define	NVMC_READY		0x400	/* Ready flag */
+#define	 NVMC_READY_READY	(1 << 0) /* NVMC is ready */
 #define	NVMC_READYNEXT		0x408	/* Ready flag */
 #define	NVMC_CONFIG		0x504	/* Configuration register */
 #define	 CONFIG_WEN_S		0
