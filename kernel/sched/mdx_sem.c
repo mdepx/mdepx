@@ -60,8 +60,7 @@ mdx_sem_cb(void *arg)
 	sem = t->sem;
 	td = t->td;
 
-	KASSERT(curthread->td_critnest > 0,
-	    ("Not in critical section"));
+	KASSERT(curthread->td_critnest > 0, ("Not in critical section"));
 
 	sl_lock(&sem->l);
 
