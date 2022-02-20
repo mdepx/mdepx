@@ -51,6 +51,29 @@ nrf_uicr_init(mdx_device_t dev, uint32_t base)
 	sc->base = base;
 }
 
+uint32_t
+nrf_uicr_read(mdx_device_t dev, uint32_t reg)
+{
+	struct nrf_uicr_softc *sc;
+	uint32_t val;
+
+	sc = mdx_device_get_softc(dev);
+
+	val = RD4(sc, reg);
+
+	return (val);
+}
+
+void
+nrf_uicr_write(mdx_device_t dev, uint32_t reg, uint32_t val)
+{
+	struct nrf_uicr_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
+
+	WR4(sc, reg, val);
+}
+
 #ifdef MDX_OF
 static int
 nrf_uicr_probe(mdx_device_t dev)

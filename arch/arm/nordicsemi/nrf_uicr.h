@@ -34,7 +34,13 @@
 #define	UICR_UNUSED3			0x010 /* Reserved */
 #define	UICR_XOSC32M			0x014 /* Oscillator control */
 #define	UICR_HFXOSRC			0x01C /* HFXO clock source selection */
+#define	 HFXOSRC_XTAL			(1 << 0) /* 32 MHz crystal oscillator */
+#define	 HFXOSRC_TCXO			(0 << 0) /* 32 MHz temperature compensated crystal oscillator (TCXO) */
+#define	 HFXOSRC_S			(0x1 << 0)
+#define	 HFXOSRC_M			(0x1 << HFXOSRC_S)
 #define	UICR_HFXOCNT			0x020 /* HFXO startup counter */
+#define	 HFXOCNT_MIN_DEBOUNCE_TIME_S	0
+#define	 HFXOCNT_MIN_DEBOUNCE_TIME_M	(0xff << HFXOCNT_MIN_DEBOUNCE_TIME_S)
 #define	UICR_SECUREAPPROTECT		0x02C /* Secure access port protection */
 #define	UICR_ERASEPROTECT		0x030 /* Erase protection */
 #define	UICR_OTP(n)			(0x108 + (n) * 0x4) /* OTP bits [31+n*32:0+n*32]. */
@@ -47,5 +53,7 @@ struct nrf_uicr_softc {
 };
 
 void nrf_uicr_init(mdx_device_t dev, uint32_t base);
+uint32_t nrf_uicr_read(mdx_device_t dev, uint32_t reg);
+void nrf_uicr_write(mdx_device_t dev, uint32_t reg, uint32_t val);
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_UICR_H_ */
