@@ -67,6 +67,32 @@ nrf_nvmc_icache_control(mdx_device_t dev, bool enable)
 	WR4(sc, NVMC_ICACHECNF, reg);
 }
 
+void
+nrf_nvmc_write_enable(mdx_device_t dev)
+{
+	struct nrf_nvmc_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
+
+	WR4(sc, NVMC_CONFIG, CONFIG_WEN);
+
+	while (RD4(sc, NVMC_READY) != NVMC_READY_READY)
+		;
+}
+
+void
+nrf_nvmc_read_enable(mdx_device_t dev)
+{
+	struct nrf_nvmc_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
+
+	WR4(sc, NVMC_CONFIG, CONFIG_REN);
+
+	while (RD4(sc, NVMC_READY) != NVMC_READY_READY)
+		;
+}
+
 #ifdef MDX_OF
 static int
 nrf_nvmc_probe(mdx_device_t dev)
