@@ -139,17 +139,17 @@ struct trapframe *
 riscv_exception(struct trapframe *tf)
 {
 	struct thread *td;
-	bool released, fpe_saved;
+	bool released;
 	bool intr;
 	int irq;
 #ifdef MDX_RISCV_FPE
 	struct pcb *pcb;
+	bool fpe_saved;
 #endif
 
 	td = curthread;
 	released = false;
 	intr = false;
-	fpe_saved = false;
 
 	td->td_tf = tf;
 
@@ -164,8 +164,7 @@ riscv_exception(struct trapframe *tf)
 	 * Check if the thread will be released later in mdx_sched_ack()
 	 * and save any floating point registers before the call.
 	 */
-	if (fpe_check_and_save(td))
-		fpe_saved = true;
+	fpe_saved = fpe_check_and_save(td);
 #endif
 
 	/* Process the trapframe first before we release this thread. */
