@@ -116,7 +116,7 @@ handle_exception(struct trapframe *tf)
 
 #ifdef MDX_SCHED
 #ifdef MDX_RISCV_FPE
-static void
+static bool
 fpe_check_and_save(struct thread *td)
 {
 	struct pcb *pcb;
@@ -129,15 +129,17 @@ fpe_check_and_save(struct thread *td)
 		pcb = &td->td_pcb;
 		if (pcb->pcb_flags & PCB_FLAGS_FPE_ENABLED)
 			fpe_state_save(&pcb->pcb_x[0][0]);
-		break;
+		return (true);
 	}
+
+	return (false);
 }
 #endif
 struct trapframe *
 riscv_exception(struct trapframe *tf)
 {
 	struct thread *td;
-	bool released;
+	bool released, fpe_saved;
 	bool intr;
 	int irq;
 #ifdef MDX_RISCV_FPE
@@ -147,6 +149,7 @@ riscv_exception(struct trapframe *tf)
 	td = curthread;
 	released = false;
 	intr = false;
+	fpe_saved = false;
 
 	td->td_tf = tf;
 
@@ -161,7 +164,8 @@ riscv_exception(struct trapframe *tf)
 	 * Check if the thread will be released later in mdx_sched_ack()
 	 * and save any floating point registers before the call.
 	 */
-	fpe_check_and_save(td);
+	if (fpe_check_and_save(td))
+		fpe_saved = true;
 #endif
 
 	/* Process the trapframe first before we release this thread. */
@@ -176,6 +180,8 @@ riscv_exception(struct trapframe *tf)
 	 * Note that td and tf can not be used after this call since this
 	 * thread could be added back to the run queue by another CPU in
 	 * mdx_mutex_unlock() or by this cpu in riscv_intr().
+	 *
+	 * Note this is needed in both interrupt/exception cases.
 	 */
 	released = mdx_sched_ack(td);
 
@@ -199,7 +205,8 @@ riscv_exception(struct trapframe *tf)
 		 * Check if the thread will be released in mdx_sched_park()
 		 * and save any floating point registers before the call.
 		 */
-		fpe_check_and_save(td);
+		if (!fpe_saved)
+			fpe_check_and_save(td);
 #endif
 		released = mdx_sched_park(td);
 	}
