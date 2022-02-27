@@ -182,9 +182,10 @@ arm_exception(struct trapframe *tf, int exc_code)
 #endif
 
 	/*
-	 * A thread that is leaving CPU could be added back to the run
-	 * queue by interrupt handlers, which means we have to ACK and
-	 * release it before processing interrupts.
+	 * A thread that is leaving CPU could be added back to the run queue by
+	 * timer/sem timeout callback in arm_nvic_intr() by this CPU, or in
+	 * sem_post by another CPU, which mean we have to ACK and release it
+	 * before processing interrupts.
 	 */
 	if (exc_code >= 16) {
 		/* We will handle the interrupt later. */
