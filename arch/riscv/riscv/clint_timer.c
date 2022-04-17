@@ -80,7 +80,12 @@ clint_set_timer(struct clint_softc *sc, int cpuid, uint32_t ticks)
 	uint64_t val;
 	uint64_t new;
 
+#ifndef MDX_RISCV_SUPERVISOR_MODE
+	val = RD8(sc, MTIME);
+#else
 	val = csr_read64(time);
+#endif
+
 	new = val + ticks;
 
 #ifndef MDX_RISCV_SUPERVISOR_MODE
