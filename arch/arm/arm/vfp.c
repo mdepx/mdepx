@@ -51,3 +51,15 @@ vfp_control(bool enable)
 
 	__asm __volatile("dsb; isb");
 }
+
+int
+vfp_enabled(void)
+{
+	int reg;
+
+	reg = SCS_RD4(FPU_CPACR);
+	if ((reg & CPACR_CP10_FULL) && (reg & CPACR_CP11_FULL))
+		return (1);
+
+	return (0);
+}
