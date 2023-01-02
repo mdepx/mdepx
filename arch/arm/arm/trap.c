@@ -38,10 +38,6 @@
 
 struct trapframe *arm_exception(struct trapframe *tf, int irq);
 
-#ifdef MDX_SCHED
-static struct thread intr_thread[MDX_CPU_MAX];
-#endif
-
 void save_fpu_context(struct vfp_state *vfp);
 void restore_fpu_context(struct vfp_state *vfp);
 
@@ -93,6 +89,7 @@ handle_exception(struct trapframe *tf, int exc_code)
 				if ((pcb->pcb_flags & PCB_FLAGS_FPU) == 0) {
 					vfp_control(true);
 					pcb->pcb_flags |= PCB_FLAGS_FPU;
+					printf("VFP enabled for the thread.\n");
 					break;
 				}
 #else
@@ -150,26 +147,28 @@ restore_fpu(struct thread *td, bool fpu_was_enabled)
 }
 #endif
 
+/* Non-SMP version of exception handler. */
+
 struct trapframe *
 arm_exception(struct trapframe *tf, int exc_code)
 {
 	struct thread *td;
 	bool released;
 	uint32_t irq;
-	bool intr;
 #ifdef MDX_ARM_VFP
 	bool fpu_was_enabled;
 #endif
 
 	td = curthread;
-	released = false;
-	intr = false;
 
-#ifdef MDX_SCHED_SMP
-	/* This CPU could not pick up new threads for a moment. */
-	if (td->td_idle)
-		mdx_sched_cpu_avail(curpcpu, false);
-#endif
+	curthread->td_critnest++;
+	if (curthread->td_critnest > 1) {
+		/* Interrupts are disabled, so this must be nested exception.*/
+		KASSERT(exc_code < 16, ("Nested interrupt is not expected."));
+		handle_exception(tf, exc_code);
+		curthread->td_critnest--;
+		return (tf);
+	}
 
 	/*
 	 * Save the frame address.
@@ -177,50 +176,34 @@ arm_exception(struct trapframe *tf, int exc_code)
 	 */
 	td->td_tf = tf;
 
-#ifdef MDX_ARM_VFP
-	fpu_was_enabled = fpu_check_and_save(td);
-#endif
-
-	/*
-	 * A thread that is leaving CPU could be added back to the run queue by
-	 * timer/sem timeout callback in arm_nvic_intr() by this CPU, or in
-	 * sem_post by another CPU, which mean we have to ACK and release it
-	 * before processing interrupts.
-	 */
-	if (exc_code >= 16) {
-		/* We will handle the interrupt later. */
-		irq = exc_code - 16;
-		intr = true;
-	} else
-		handle_exception(tf, exc_code);
-
+	/* Set ACK flag to the thread that is going to terminate or sleep. */
 	released = mdx_sched_ack(td);
 
 	/*
-	 * Switch to the interrupt thread (we are on msp stack).
+	 * A thread that is leaving CPU could be added back to the run queue by
+	 * timer/sem timeout callback in arm_nvic_intr() by this CPU.
 	 */
-	PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
-	curthread->td_critnest++;
-
-	if (intr)
+	if (exc_code >= 16) {
+		irq = exc_code - 16;
 		arm_nvic_intr(irq);
+	} else
+		handle_exception(tf, exc_code);
 
-	if (!released) {
-#ifdef MDX_ARM_VFP
-		fpu_check_and_save(td);
-#endif
+	if (!released)
 		released = mdx_sched_park(td);
-	}
 
 	if (released) {
 		/* We don't have a thread to run. Pick the next one. */
+#ifdef MDX_ARM_VFP
+		fpu_was_enabled = fpu_check_and_save(td);
+#endif
 		td = mdx_sched_next();
 #ifdef MDX_ARM_VFP
 		restore_fpu(td, fpu_was_enabled);
 #endif
 	}
 
-	/* Switch to the new(old) thread. */
+	/* Switch to the new (old) thread. */
 	curthread->td_critnest--;
 	PCPU_SET(curthread, td);
 

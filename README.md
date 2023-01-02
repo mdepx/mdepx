@@ -14,7 +14,7 @@ mdepx (Machdep X) is an operating system for embedded applications.
   * Flat address space
 
 ## ISA supported
-  * ARM Cortex-M family (ARMv7-M, ARMv8-M) SMP
+  * ARM Cortex-M family (ARMv7-M, ARMv8-M)
   * CHERI128 Hybrid and Pure ABI capability system models
   * MIPS32, MIPS64
   * RISC-V machine or supervisor modes, rv32, rv64, SMP
