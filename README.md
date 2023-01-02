@@ -20,7 +20,7 @@ mdepx (Machdep X) is an operating system for embedded applications.
   * RISC-V machine or supervisor modes, rv32, rv64, SMP
 
 ## Platforms supported
-  * Raspberry Pi Pico (SMP)
+  * Raspberry Pi Pico
   * Nordic Semiconductor nRF5, nRF9
   * STMicroelectronics STM32
   * Microchip PIC32
@@ -35,7 +35,7 @@ mdepx (Machdep X) is an operating system for embedded applications.
   * qemu/mips64
 
 ## Featured applications (external)
-  * [SMP on Raspberry Pi Pico](https://github.com/machdep/raspberrypi-pico)
+  * [Raspberry Pi Pico](https://github.com/machdep/raspberrypi-pico)
   * [LTE 4G Link with nRF9160](https://github.com/machdep/nrf9160)
   * CTSRD-CHERI [device-model](https://github.com/CTSRD-CHERI/device-model) and [device-model-riscv](https://github.com/CTSRD-CHERI/device-model-riscv)
   * Other [example apps](https://github.com/machdep/)
