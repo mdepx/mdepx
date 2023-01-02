@@ -154,7 +154,6 @@ arm_exception(struct trapframe *tf, int exc_code)
 {
 	struct thread *td;
 	bool released;
-	uint32_t irq;
 #ifdef MDX_ARM_VFP
 	bool fpu_was_enabled;
 #endif
@@ -183,10 +182,9 @@ arm_exception(struct trapframe *tf, int exc_code)
 	 * A thread that is leaving CPU could be added back to the run queue by
 	 * timer/sem timeout callback in arm_nvic_intr() by this CPU.
 	 */
-	if (exc_code >= 16) {
-		irq = exc_code - 16;
-		arm_nvic_intr(irq);
-	} else
+	if (exc_code >= 16)
+		arm_nvic_intr(exc_code - 16);
+	else
 		handle_exception(tf, exc_code);
 
 	if (!released)
