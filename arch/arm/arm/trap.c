@@ -77,6 +77,9 @@ handle_exception(struct trapframe *tf, int exc_code)
 #endif
 
 	switch (exc_code) {
+	case 16 ... 1024:
+		arm_nvic_intr(exc_code - 16);
+		break;
 	case EXCP_SVCALL:
 		break;
 	case EXCP_HARD_FAULT:
@@ -182,10 +185,7 @@ arm_exception(struct trapframe *tf, int exc_code)
 	 * A thread that is leaving CPU could be added back to the run queue by
 	 * timer/sem timeout callback in arm_nvic_intr() by this CPU.
 	 */
-	if (exc_code >= 16)
-		arm_nvic_intr(exc_code - 16);
-	else
-		handle_exception(tf, exc_code);
+	handle_exception(tf, exc_code);
 
 	if (!released)
 		released = mdx_sched_park(td);
