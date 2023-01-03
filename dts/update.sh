@@ -1,3 +1,3 @@
-cp -R ../../zephyr/dts/arm .
-cp -R ../../zephyr/dts/common .
-cp -R ../../zephyr/include/dt-bindings include/
+cp -R ${HOME}/dev/zephyr/dts/arm .
+cp -R ${HOME}/dev/zephyr/dts/common .
+cp -R ${HOME}/dev/zephyr/include/zephyr/dt-bindings include/zephyr/
