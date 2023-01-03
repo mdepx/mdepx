@@ -9,6 +9,15 @@
 
 / {
 	soc {
+		clocks {
+			clk_hsi48: clk-hsi48 {
+				#clock-cells = <0>;
+				compatible = "fixed-clock";
+				clock-frequency = <DT_FREQ_M(48)>;
+				status = "disabled";
+			};
+		};
+
 		pinctrl: pin-controller@50000000 {
 			gpioe: gpio@50001000 {
 				compatible = "st,stm32-gpio";
@@ -16,7 +25,6 @@
 				#gpio-cells = <2>;
 				reg = <0x50001000 0x400>;
 				clocks = <&rcc STM32_CLOCK_BUS_IOP 0x00000010>;
-				label = "GPIOE";
 			};
 		};
 
@@ -24,43 +32,42 @@
 			compatible = "st,stm32-usart", "st,stm32-uart";
 			reg = <0x40005000 0x400>;
 			clocks = <&rcc STM32_CLOCK_BUS_APB1 0x00000100>;
+			resets = <&rctl STM32_RESET(APB1L, 8U)>;
 			interrupts = <29 0>;
 			status = "disabled";
-			label = "UART_5";
 		};
 
 		usart6: serial@40013c00 {
 			compatible = "st,stm32-usart", "st,stm32-uart";
 			reg = <0x40013c00 0x400>;
 			clocks = <&rcc STM32_CLOCK_BUS_APB1 0x00000200>;
+			resets = <&rctl STM32_RESET(APB1L, 9U)>;
 			interrupts = <29 0>;
 			status = "disabled";
-			label = "UART_6";
 		};
 
 		lpuart2: serial@40008400 {
 			compatible = "st,stm32-lpuart", "st,stm32-uart";
 			reg = <0x40008400 0x400>;
 			clocks = <&rcc STM32_CLOCK_BUS_APB1 0x00000080>;
+			resets = <&rctl STM32_RESET(APB1L, 7U)>;
 			interrupts = <28 0>;
 			status = "disabled";
-			label = "LPUART_2";
 		};
 
 		timers4: timers@40000800 {
 			compatible = "st,stm32-timers";
 			reg = <0x40000800 0x400>;
 			clocks = <&rcc STM32_CLOCK_BUS_APB1 0x00000004>;
+			resets = <&rctl STM32_RESET(APB1L, 2U)>;
 			interrupts = <16 0>;
 			interrupt-names = "global";
 			st,prescaler = <0>;
 			status = "disabled";
-			label = "TIMERS_4";
 
 			pwm {
 				compatible = "st,stm32-pwm";
 				status = "disabled";
-				label = "PWM_4";
 				#pwm-cells = <3>;
 			};
 		};
@@ -75,7 +82,6 @@
 			interrupts = <24 0>;
 			interrupt-names = "combined";
 			status = "disabled";
-			label = "I2C_3";
 		};
 
 		spi3: spi@40003c00 {
@@ -86,7 +92,6 @@
 			clocks = <&rcc STM32_CLOCK_BUS_APB1 0x00008000>;
 			interrupts = <26 3>;
 			status = "disabled";
-			label = "SPI_3";
 		};
 
 		dma2: dma@40020400 {
@@ -98,7 +103,6 @@
 			dma-requests = <5>;
 			dma-offset = <7>;
 			status = "disabled";
-			label = "DMA_2";
 		};
 
 		dmamux1: dmamux@40020800 {
@@ -116,13 +120,11 @@
 			phys = <&usb_fs_phy>;
 			clocks = <&rcc STM32_CLOCK_BUS_APB1 0x00002000>;
 			status = "disabled";
-			label= "USB";
 		};
 	};
 
 	usb_fs_phy: usbphy {
 		compatible = "usb-nop-xceiv";
 		#phy-cells = <0>;
-		label = "USB_FS_PHY";
 	};
 };
