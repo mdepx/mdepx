@@ -1,6 +1,6 @@
 # Introduction
 
-mdepx (Machdep X) is an operating system for embedded applications.
+mdepx (also known as MDX or Machdep X) is an operating system for embedded applications.
 
 ## Key features
   * Real-time
