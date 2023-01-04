@@ -223,7 +223,6 @@ mdx_sem_post(mdx_sem_t *sem)
 	KASSERT(td->td_state == TD_STATE_SEM_UNLOCK ||
 		td->td_state == TD_STATE_SEM_UNLOCK_ACK,
 	    ("%s: wrong state %d\n", __func__, td->td_state));
-	KASSERT(td != curthread, ("td is curthread"));
 
 	td->td_state = TD_STATE_WAKEUP;
 
