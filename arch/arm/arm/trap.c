@@ -172,11 +172,7 @@ arm_exception(struct trapframe *tf, int exc_code)
 		return (tf);
 	}
 
-	/*
-	 * Save the frame address.
-	 * TODO: compare thread's stack base and tf.
-	 */
-	td->td_tf = tf;
+	/* TODO: compare thread's stack base and tf. */
 
 	/* Set ACK flag to the thread that is going to terminate or sleep. */
 	released = mdx_sched_ack(td);
@@ -195,17 +191,19 @@ arm_exception(struct trapframe *tf, int exc_code)
 #ifdef MDX_ARM_VFP
 		fpu_was_enabled = fpu_check_and_save(td);
 #endif
+		td->td_tf = tf;
 		td = mdx_sched_next();
 #ifdef MDX_ARM_VFP
 		restore_fpu(td, fpu_was_enabled);
 #endif
+		curthread->td_critnest--;
+		PCPU_SET(curthread, td);
+		return (td->td_tf);
 	}
 
-	/* Switch to the new (old) thread. */
 	curthread->td_critnest--;
-	PCPU_SET(curthread, td);
 
-	return (td->td_tf);
+	return (tf);
 }
 
 #else /* !MDX_SCHED */
