@@ -57,9 +57,9 @@ sl_init(struct spinlock *l)
 void
 sl_lock(struct spinlock *l)
 {
+#ifdef MDX_SCHED_SMP
 	uint32_t reg;
 
-#ifdef MDX_SCHED_SMP
 	do
 		reg = *(volatile uint32_t *)(SL_LOCK(l->n));
 	while (reg == 0);
