@@ -28,6 +28,7 @@
 #define	_ARM_RASPBERRYPI_RP2040_H_
 
 #include <arm/raspberrypi/rp2040_clocks.h>
+#include <arm/raspberrypi/rp2040_gpio.h>
 #include <arm/raspberrypi/rp2040_io_bank0.h>
 #include <arm/raspberrypi/rp2040_pads_bank0.h>
 #include <arm/raspberrypi/rp2040_pll.h>
