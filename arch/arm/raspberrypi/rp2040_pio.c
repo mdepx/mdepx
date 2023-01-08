@@ -39,6 +39,7 @@
 #include <sys/systm.h>
 
 #include <arm/raspberrypi/rp2040_pio.h>
+#include <arm/raspberrypi/rp2040_pio_regs.h>
 #include <arm/raspberrypi/pio_instructions.h>
 
 #include <assert.h>
@@ -151,7 +152,7 @@ _pio_add_program_at_offset(struct rp2040_pio_softc *sc,
 		instr = program->instructions[i];
 		reg = pio_instr_bits_jmp != _pio_major_instr_bits (instr) ?
 		    instr : instr + offset;
-		WR4(sc, PIO_INSTR_MEM(offset + i), reg);
+		WR4(sc, RP2040_PIO_INSTR_MEM_OFFSET(offset + i), reg);
 	}
 	program_mask = (1u << program->length) - 1;
 	sc->used_instruction_space |= program_mask << offset;
@@ -185,4 +186,69 @@ rp2040_pio_init(mdx_device_t dev, uint32_t base)
 	sc->base = base;
 
 	return (0);
+}
+
+static void
+rp2040_sm_config_set_clkdiv_int_frac(struct rp2040_pio_sm_config *c,
+    uint16_t div_int, uint8_t div_frac)
+{
+
+	c->clkdiv = (((uint32_t)div_frac) << RP2040_PIO_SM_CLKDIV_FRAC_SHIFT) |
+	    (((uint32_t)div_int) << RP2040_PIO_SM_CLKDIV_INT_SHIFT);
+}
+
+static void
+rp2040_sm_config_set_wrap(struct rp2040_pio_sm_config *c, uint32_t wrap_target,
+    uint32_t wrap)
+{
+	valid_params_if(PIO, wrap < PIO_INSTRUCTION_COUNT);
+	valid_params_if(PIO, wrap_target < PIO_INSTRUCTION_COUNT);
+
+	c->execctrl = (c->execctrl & ~(RP2040_PIO_SM_EXECCTRL_WRAP_TOP_MASK |
+	    RP2040_PIO_SM_EXECCTRL_WRAP_BOTTOM_MASK)) |
+	    (wrap_target << RP2040_PIO_SM_EXECCTRL_WRAP_BOTTOM_SHIFT) |
+	    (wrap << RP2040_PIO_SM_EXECCTRL_WRAP_TOP_SHIFT);
+}
+
+static void
+rp2040_sm_config_set_in_shift(struct rp2040_pio_sm_config *c,
+    bool shift_right, bool autopush, uint32_t push_threshold)
+{
+
+	valid_params_if(PIO, push_threshold <= 32);
+
+	c->shiftctrl = (c->shiftctrl & ~(RP2040_PIO_SM_SHIFTCTRL_IN_SHIFTDIR |
+	    RP2040_PIO_SM_SHIFTCTRL_AUTOPUSH |
+	    RP2040_PIO_SM_SHIFTCTRL_PUSH_THRESH_MASK)) |
+	    (shift_right ? RP2040_PIO_SM_SHIFTCTRL_IN_SHIFTDIR : 0) |
+	    (autopush ? RP2040_PIO_SM_SHIFTCTRL_AUTOPUSH : 0) |
+	    ((push_threshold & 0x1fu) <<
+		RP2040_PIO_SM_SHIFTCTRL_PUSH_THRESH_SHIFT);
+}
+
+static void
+rp2040_sm_config_set_out_shift(struct rp2040_pio_sm_config *c,
+    bool shift_right, bool autopull, uint32_t pull_threshold)
+{
+
+	valid_params_if(PIO, pull_threshold <= 32);
+
+	c->shiftctrl = (c->shiftctrl & ~(RP2040_PIO_SM_SHIFTCTRL_OUT_SHIFTDIR |
+	    RP2040_PIO_SM_SHIFTCTRL_AUTOPULL |
+	    RP2040_PIO_SM_SHIFTCTRL_PULL_THRESH_MASK)) |
+	    (shift_right ? RP2040_PIO_SM_SHIFTCTRL_OUT_SHIFTDIR : 0) |
+	    (autopull ? RP2040_PIO_SM_SHIFTCTRL_AUTOPULL : 0) |
+	    ((pull_threshold & 0x1fu) <<
+		RP2040_PIO_SM_SHIFTCTRL_PULL_THRESH_SHIFT);
+}
+
+void
+rp2040_pio_get_default_sm_config(mdx_device_t dev,
+    struct rp2040_pio_sm_config *c)
+{
+
+	rp2040_sm_config_set_clkdiv_int_frac(c, 1, 0);
+	rp2040_sm_config_set_wrap(c, 0, 31);
+	rp2040_sm_config_set_in_shift(c, true, false, 32);
+	rp2040_sm_config_set_out_shift(c, true, false, 32);
 }
