@@ -31,6 +31,7 @@
 #include <arm/raspberrypi/rp2040_gpio.h>
 #include <arm/raspberrypi/rp2040_io_bank0.h>
 #include <arm/raspberrypi/rp2040_pads_bank0.h>
+#include <arm/raspberrypi/rp2040_pio.h>
 #include <arm/raspberrypi/rp2040_pll.h>
 #include <arm/raspberrypi/rp2040_psm.h>
 #include <arm/raspberrypi/rp2040_resets.h>
