@@ -43,9 +43,14 @@
 #endif
 
 #define	RD4(_sc, _reg)		\
-	*(volatile uint32_t *)((_sc)->base + _reg)
+	*(volatile uint32_t *)((_sc)->sio_base + _reg)
 #define	WR4(_sc, _reg, _val)	\
-	*(volatile uint32_t *)((_sc)->base + _reg) = _val
+	*(volatile uint32_t *)((_sc)->sio_base + _reg) = _val
+
+#define	PADS_RD4(_sc, _reg)		\
+	*(volatile uint32_t *)((_sc)->pads_base + _reg)
+#define	PADS_WR4(_sc, _reg, _val)	\
+	*(volatile uint32_t *)((_sc)->pads_base + _reg) = _val
 
 static int
 rp2040_gpio_set_pin(mdx_device_t dev, int pin, int val)
@@ -81,6 +86,7 @@ static int
 rp2040_gpio_pin_configure(mdx_device_t dev, int pin, int flags)
 {
 	struct rp2040_gpio_softc *sc;
+	uint32_t reg;
 
 	sc = mdx_device_get_softc(dev);
 
@@ -89,6 +95,40 @@ rp2040_gpio_pin_configure(mdx_device_t dev, int pin, int flags)
 	else
 		WR4(sc, RP2040_SIO_GPIO_OE_SET, (1 << pin));
 
+
+	/*
+	 * Set pulls.
+	 * Note that on RP2040 setting both pulls enables a "bus keep"
+	 * function, i.e. weak pull to whatever is current high/low state
+	 * of GPIO.
+	 */
+
+	reg = PADS_RD4(sc, RP2040_PADS_BANK0_GPIO_OFFSET(pin));
+
+	if (flags & MDX_GPIO_PULL_UP)
+		reg |= RP2040_PADS_BANK0_GPIO_PUE;
+	else
+		reg &= ~RP2040_PADS_BANK0_GPIO_PUE;
+
+	if (flags & MDX_GPIO_PULL_DOWN)
+		reg |= RP2040_PADS_BANK0_GPIO_PDE;
+	else
+		reg &= ~RP2040_PADS_BANK0_GPIO_PDE;
+
+	PADS_WR4(sc, RP2040_PADS_BANK0_GPIO_OFFSET(pin), reg);
+
+	return (0);
+}
+
+static int
+rp2040_gpio_pin_set_function(mdx_device_t dev, int pin, int func)
+{
+#if 0
+	struct rp2040_gpio_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
+#endif
+
 	return (0);
 }
 
@@ -96,15 +136,17 @@ static struct mdx_gpio_ops rp2040_gpio_ops = {
 	.pin_set = rp2040_gpio_set_pin,
 	.pin_get = rp2040_gpio_get_pin,
 	.pin_configure = rp2040_gpio_pin_configure,
+	.pin_set_function = rp2040_gpio_pin_set_function,
 };
 
 void
-rp2040_gpio_init(mdx_device_t dev, uint32_t base)
+rp2040_gpio_init(mdx_device_t dev, uint32_t sio_base, uint32_t pads_base)
 {
 	struct rp2040_gpio_softc *sc;
 
 	sc = mdx_device_get_softc(dev);
-	sc->base = base;
+	sc->sio_base = sio_base;
+	sc->pads_base = pads_base;
 
 	dev->ops = &rp2040_gpio_ops;
 }

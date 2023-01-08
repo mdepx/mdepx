@@ -28,9 +28,10 @@
 #define	_RP2040_GPIO_H_
 
 struct rp2040_gpio_softc {
-	uint32_t base;
+	uint32_t sio_base;
+	uint32_t pads_base;
 };
 
-void rp2040_gpio_init(mdx_device_t dev, uint32_t base);
+void rp2040_gpio_init(mdx_device_t dev, uint32_t sio_base, uint32_t pads_base);
 
 #endif /* !_RP2040_SIO_H_ */

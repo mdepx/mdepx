@@ -66,3 +66,16 @@ mdx_gpio_configure(mdx_device_t dev, int pin, int flags)
 
 	return (error);
 }
+
+int
+mdx_gpio_set_function(mdx_device_t dev, int pin, int function)
+{
+	struct mdx_gpio_ops *ops;
+	int error;
+
+	ops = dev->ops;
+
+	error = ops->pin_set_function(dev, pin, function);
+
+	return (error);
+}

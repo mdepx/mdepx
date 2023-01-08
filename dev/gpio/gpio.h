@@ -46,10 +46,12 @@ struct mdx_gpio_ops {
 	int (*pin_set)(mdx_device_t dev, int pin, int value);
 	int (*pin_get)(mdx_device_t dev, int pin);
 	int (*pin_configure)(mdx_device_t dev, int pin, int flags);
+	int (*pin_set_function)(mdx_device_t dev, int pin, int function);
 };
 
 int mdx_gpio_set(mdx_device_t dev, int pin, int value);
 int mdx_gpio_get(mdx_device_t dev, int pin);
 int mdx_gpio_configure(mdx_device_t dev, int pin, int flags);
+int mdx_gpio_set_function(mdx_device_t dev, int pin, int func);
 
 #endif /* !_DEV_GPIO_GPIO_H_ */
