@@ -188,7 +188,7 @@ rp2040_pio_init(mdx_device_t dev, uint32_t base)
 	return (0);
 }
 
-static void
+void
 rp2040_sm_config_set_clkdiv_int_frac(struct rp2040_pio_sm_config *c,
     uint16_t div_int, uint8_t div_frac)
 {
@@ -197,7 +197,7 @@ rp2040_sm_config_set_clkdiv_int_frac(struct rp2040_pio_sm_config *c,
 	    (((uint32_t)div_int) << RP2040_PIO_SM_CLKDIV_INT_SHIFT);
 }
 
-static void
+void
 rp2040_sm_config_set_wrap(struct rp2040_pio_sm_config *c, uint32_t wrap_target,
     uint32_t wrap)
 {
@@ -210,7 +210,7 @@ rp2040_sm_config_set_wrap(struct rp2040_pio_sm_config *c, uint32_t wrap_target,
 	    (wrap << RP2040_PIO_SM_EXECCTRL_WRAP_TOP_SHIFT);
 }
 
-static void
+void
 rp2040_sm_config_set_in_shift(struct rp2040_pio_sm_config *c,
     bool shift_right, bool autopush, uint32_t push_threshold)
 {
@@ -226,7 +226,7 @@ rp2040_sm_config_set_in_shift(struct rp2040_pio_sm_config *c,
 		RP2040_PIO_SM_SHIFTCTRL_PUSH_THRESH_SHIFT);
 }
 
-static void
+void
 rp2040_sm_config_set_out_shift(struct rp2040_pio_sm_config *c,
     bool shift_right, bool autopull, uint32_t pull_threshold)
 {
@@ -240,6 +240,72 @@ rp2040_sm_config_set_out_shift(struct rp2040_pio_sm_config *c,
 	    (autopull ? RP2040_PIO_SM_SHIFTCTRL_AUTOPULL : 0) |
 	    ((pull_threshold & 0x1fu) <<
 		RP2040_PIO_SM_SHIFTCTRL_PULL_THRESH_SHIFT);
+}
+
+void
+rp2040_sm_config_set_out_pins(struct rp2040_pio_sm_config *c, uint32_t out_base,
+    uint32_t out_count)
+{
+
+	valid_params_if(PIO, out_base < 32);
+	valid_params_if(PIO, out_count <= 32);
+
+	c->pinctrl = (c->pinctrl & ~(RP2040_PIO_SM_PINCTRL_OUT_BASE_MASK |
+	    RP2040_PIO_SM_PINCTRL_OUT_COUNT_MASK)) |
+	    (out_base << RP2040_PIO_SM_PINCTRL_OUT_BASE_SHIFT) |
+	    (out_count << RP2040_PIO_SM_PINCTRL_OUT_COUNT_SHIFT);
+}
+
+void
+rp2040_sm_config_set_in_pins(struct rp2040_pio_sm_config *c, uint32_t in_base)
+{
+
+	valid_params_if(PIO, in_base < 32);
+
+	c->pinctrl = (c->pinctrl & ~RP2040_PIO_SM_PINCTRL_IN_BASE_MASK) |
+	    (in_base << RP2040_PIO_SM_PINCTRL_IN_BASE_SHIFT);
+}
+
+void
+rp2040_sm_config_set_set_pins(struct rp2040_pio_sm_config *c,
+    uint32_t set_base, uint32_t set_count)
+{
+
+	valid_params_if(PIO, set_base < 32);
+	valid_params_if(PIO, set_count <= 5);
+
+	c->pinctrl = (c->pinctrl & ~(RP2040_PIO_SM_PINCTRL_SET_BASE_MASK |
+	    RP2040_PIO_SM_PINCTRL_SET_COUNT_MASK)) |
+	    (set_base << RP2040_PIO_SM_PINCTRL_SET_BASE_SHIFT) |
+	    (set_count << RP2040_PIO_SM_PINCTRL_SET_COUNT_SHIFT);
+}
+
+void
+rp2040_sm_config_set_sideset(struct rp2040_pio_sm_config *c,
+    uint32_t bit_count, bool optional, bool pindirs)
+{
+
+	valid_params_if(PIO, bit_count <= 5);
+	valid_params_if(PIO, !optional || bit_count >= 1);
+
+	c->pinctrl = (c->pinctrl & ~RP2040_PIO_SM_PINCTRL_SIDESET_COUNT_MASK) |
+	    (bit_count << RP2040_PIO_SM_PINCTRL_SIDESET_COUNT_SHIFT);
+
+	c->execctrl = (c->execctrl & ~(RP2040_PIO_SM_EXECCTRL_SIDE_EN |
+	    RP2040_PIO_SM_EXECCTRL_SIDE_PINDIR)) |
+	    (optional ? RP2040_PIO_SM_EXECCTRL_SIDE_EN : 0) |
+	    (pindirs ? RP2040_PIO_SM_EXECCTRL_SIDE_PINDIR : 0);
+}
+
+void
+rp2040_sm_config_set_sideset_pins(struct rp2040_pio_sm_config *c,
+    uint32_t sideset_base)
+{
+
+	valid_params_if(PIO, sideset_base < 32);
+
+	c->pinctrl = (c->pinctrl & ~RP2040_PIO_SM_PINCTRL_SIDESET_BASE_MASK) |
+	    (sideset_base << RP2040_PIO_SM_PINCTRL_SIDESET_BASE_SHIFT);
 }
 
 void
