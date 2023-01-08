@@ -201,6 +201,7 @@ void
 rp2040_sm_config_set_wrap(struct rp2040_pio_sm_config *c, uint32_t wrap_target,
     uint32_t wrap)
 {
+
 	valid_params_if(PIO, wrap < PIO_INSTRUCTION_COUNT);
 	valid_params_if(PIO, wrap_target < PIO_INSTRUCTION_COUNT);
 
@@ -317,4 +318,124 @@ rp2040_pio_get_default_sm_config(mdx_device_t dev,
 	rp2040_sm_config_set_wrap(c, 0, 31);
 	rp2040_sm_config_set_in_shift(c, true, false, 32);
 	rp2040_sm_config_set_out_shift(c, true, false, 32);
+}
+
+void
+rp2040_pio_sm_set_config(mdx_device_t dev, uint32_t sm,
+    struct rp2040_pio_sm_config *config)
+{
+	struct rp2040_pio_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
+
+	check_pio_param(pio);
+	check_sm_param(sm);
+
+	WR4(sc, RP2040_PIO_SM_CLKDIV_OFFSET(sm), config->clkdiv);
+	WR4(sc, RP2040_PIO_SM_EXECCTRL_OFFSET(sm), config->execctrl);
+	WR4(sc, RP2040_PIO_SM_SHIFTCTRL_OFFSET(sm), config->shiftctrl);
+	WR4(sc, RP2040_PIO_SM_PINCTRL_OFFSET(sm), config->pinctrl);
+}
+
+void
+rp2040_pio_sm_clear_fifos(mdx_device_t dev, uint32_t sm)
+{
+	struct rp2040_pio_softc *sc;
+	uint32_t reg;
+
+	sc = mdx_device_get_softc(dev);
+
+	check_pio_param(pio);
+	check_sm_param(sm);
+
+	reg = RD4(sc, RP2040_PIO_SM_SHIFTCTRL_OFFSET(sm));
+	reg ^= RP2040_PIO_SM_SHIFTCTRL_FJOIN_RX;
+	WR4(sc, RP2040_PIO_SM_SHIFTCTRL_OFFSET(sm), reg);
+
+	reg ^= RP2040_PIO_SM_SHIFTCTRL_FJOIN_RX;
+	WR4(sc, RP2040_PIO_SM_SHIFTCTRL_OFFSET(sm), reg);
+}
+
+void
+rp2040_pio_sm_set_enabled(mdx_device_t dev, int sm, int enable)
+{
+	struct rp2040_pio_softc *sc;
+	uint32_t reg;
+
+	sc = mdx_device_get_softc(dev);
+
+	reg = RD4(sc, RP2040_PIO_CTRL_OFFSET);
+	if (enable)
+		reg |= (1 << sm);
+	else
+		reg &= ~(1 << sm);
+	WR4(sc, RP2040_PIO_CTRL_OFFSET, reg);
+}
+
+void
+rp2040_pio_sm_restart(mdx_device_t dev, uint32_t sm)
+{
+	struct rp2040_pio_softc *sc;
+	uint32_t reg;
+
+	sc = mdx_device_get_softc(dev);
+
+	check_pio_param(pio);
+	check_sm_param(sm);
+
+	reg = (1 << (RP2040_PIO_CTRL_SM_RESTART_SHIFT + sm));
+	WR4(sc, RP2040_PIO_CTRL_OFFSET, reg);
+}
+
+void
+rp2040_pio_sm_clkdiv_restart(mdx_device_t dev, uint32_t sm)
+{
+	struct rp2040_pio_softc *sc;
+	uint32_t reg;
+
+	sc = mdx_device_get_softc(dev);
+
+	check_pio_param(pio);
+	check_sm_param(sm);
+
+	reg = (1 << (RP2040_PIO_CTRL_CLKDIV_RESTART_SHIFT + sm));
+	WR4(sc, RP2040_PIO_CTRL_OFFSET, reg);
+}
+
+void
+rp2040_pio_sm_exec(mdx_device_t dev, uint32_t sm, uint32_t instr)
+{
+	struct rp2040_pio_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
+
+	check_pio_param(pio);
+	check_sm_param(sm);
+
+	WR4(sc, RP2040_PIO_SM_INSTR_OFFSET(sm), instr);
+}
+
+void
+rp2040_pio_sm_init(mdx_device_t dev, int sm, uint32_t pio_offset,
+    struct rp2040_pio_sm_config *config)
+{
+	struct rp2040_pio_softc *sc;
+	uint32_t reg;
+
+	sc = mdx_device_get_softc(dev);
+
+	rp2040_pio_sm_set_enabled(dev, sm, false);
+	rp2040_pio_sm_set_config(dev, sm, config);
+	rp2040_pio_sm_clear_fifos(dev, sm);
+
+	/* Disable FIFO debug. */
+	reg = (1 << RP2040_PIO_FDEBUG_TXOVER_SHIFT) |
+	    (1 << RP2040_PIO_FDEBUG_RXUNDER_SHIFT) |
+	    (1 << RP2040_PIO_FDEBUG_TXSTALL_SHIFT) |
+	    (1 << RP2040_PIO_FDEBUG_RXSTALL_SHIFT);
+	WR4(sc, RP2040_PIO_FDEBUG_OFFSET, reg << sm);
+
+	rp2040_pio_sm_restart(dev, sm);
+	rp2040_pio_sm_clkdiv_restart(dev, sm);
+	rp2040_pio_sm_exec(dev, sm, pio_encode_jmp(pio_offset));
 }

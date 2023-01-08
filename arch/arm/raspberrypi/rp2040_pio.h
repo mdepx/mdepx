@@ -18,6 +18,7 @@ typedef struct rp2040_pio_program {
 
 #define	PIO_INSTRUCTION_COUNT		32
 #define	PARAM_ASSERTIONS_ENABLED(x)	0
+#define	NUM_PIO_STATE_MACHINES		4
 
 #define valid_params_if(x, y)
 #define	check_pio_param(x)
@@ -74,5 +75,15 @@ void rp2040_sm_config_set_sideset(struct rp2040_pio_sm_config *c,
 
 void rp2040_sm_config_set_sideset_pins(struct rp2040_pio_sm_config *c,
     uint32_t sideset_base);
+
+void rp2040_pio_sm_set_enabled(mdx_device_t dev, int sm, int enable);
+void rp2040_pio_sm_set_config(mdx_device_t dev, uint32_t sm,
+    struct rp2040_pio_sm_config *config);
+void rp2040_pio_sm_clear_fifos(mdx_device_t dev, uint32_t sm);
+void rp2040_pio_sm_restart(mdx_device_t, uint32_t sm);
+void rp2040_pio_sm_clkdiv_restart(mdx_device_t, uint32_t sm);
+void rp2040_pio_sm_exec(mdx_device_t, uint32_t sm, uint32_t instr);
+void rp2040_pio_sm_init(mdx_device_t dev, int sm, uint32_t pio_offset,
+    struct rp2040_pio_sm_config *config);
 
 #endif /* !_ARM_RASPBERRYPI_RP2040_PIO_H_ */
