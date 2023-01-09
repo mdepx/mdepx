@@ -439,3 +439,56 @@ rp2040_pio_sm_init(mdx_device_t dev, int sm, uint32_t pio_offset,
 	rp2040_pio_sm_clkdiv_restart(dev, sm);
 	rp2040_pio_sm_exec(dev, sm, pio_encode_jmp(pio_offset));
 }
+
+void
+rp2040_pio_set_input_sync_bypass(mdx_device_t dev, int pin, bool enable)
+{
+	struct rp2040_pio_softc *sc;
+	uint32_t reg;
+
+	sc = mdx_device_get_softc(dev);
+
+	reg = RD4(sc, RP2040_PIO_INPUT_SYNC_BYPASS_OFFSET);
+	if (enable)
+		reg |= (1 << pin);
+	else
+		reg &= ~(1 << pin);
+	WR4(sc, RP2040_PIO_INPUT_SYNC_BYPASS_OFFSET, reg);
+}
+
+void
+rp2040_pio_sm_set_consecutive_pindirs(mdx_device_t dev, uint32_t sm,
+    uint32_t pin, uint32_t count, bool is_out)
+{
+	struct rp2040_pio_softc *sc;
+	uint32_t pinctrl_saved;
+	uint32_t pindir_val;
+	uint32_t reg;
+
+	sc = mdx_device_get_softc(dev);
+
+	check_pio_param(pio);
+	check_sm_param(sm);
+
+	valid_params_if(PIO, pin < 32u);
+
+	pinctrl_saved = RD4(sc, RP2040_PIO_SM_PINCTRL_OFFSET(sm));
+	pindir_val = is_out ? 0x1f : 0;
+
+	while (count > 5) {
+		reg = (5u << RP2040_PIO_SM_PINCTRL_SET_COUNT_SHIFT) |
+		    (pin << RP2040_PIO_SM_PINCTRL_SET_BASE_SHIFT);
+		WR4(sc, RP2040_PIO_SM_PINCTRL_OFFSET(sm), reg);
+		rp2040_pio_sm_exec(dev, sm, pio_encode_set(pio_pindirs,
+		    pindir_val));
+		count -= 5;
+		pin = (pin + 5) & 0x1f;
+	}
+
+	reg = (count << RP2040_PIO_SM_PINCTRL_SET_COUNT_SHIFT) |
+	    (pin << RP2040_PIO_SM_PINCTRL_SET_BASE_SHIFT);
+	WR4(sc, RP2040_PIO_SM_PINCTRL_OFFSET(sm), reg);
+
+	rp2040_pio_sm_exec(dev, sm, pio_encode_set(pio_pindirs, pindir_val));
+	WR4(sc, RP2040_PIO_SM_PINCTRL_OFFSET(sm), pinctrl_saved);
+}

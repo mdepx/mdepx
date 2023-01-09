@@ -85,5 +85,8 @@ void rp2040_pio_sm_clkdiv_restart(mdx_device_t, uint32_t sm);
 void rp2040_pio_sm_exec(mdx_device_t, uint32_t sm, uint32_t instr);
 void rp2040_pio_sm_init(mdx_device_t dev, int sm, uint32_t pio_offset,
     struct rp2040_pio_sm_config *config);
+void rp2040_pio_set_input_sync_bypass(mdx_device_t dev, int pin, bool enable);
+void rp2040_pio_sm_set_consecutive_pindirs(mdx_device_t dev, uint32_t sm,
+    uint32_t pin, uint32_t count, bool is_out);
 
 #endif /* !_ARM_RASPBERRYPI_RP2040_PIO_H_ */
