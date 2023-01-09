@@ -92,12 +92,11 @@ rp2040_gpio_pin_configure(mdx_device_t dev, int pin, int flags)
 
 	if (flags & MDX_GPIO_INPUT)
 		WR4(sc, RP2040_SIO_GPIO_OE_CLR, (1 << pin));
-	else
+
+	if (flags & MDX_GPIO_OUTPUT)
 		WR4(sc, RP2040_SIO_GPIO_OE_SET, (1 << pin));
 
-
 	/*
-	 * Set pulls.
 	 * Note that on RP2040 setting both pulls enables a "bus keep"
 	 * function, i.e. weak pull to whatever is current high/low state
 	 * of GPIO.
@@ -114,6 +113,17 @@ rp2040_gpio_pin_configure(mdx_device_t dev, int pin, int flags)
 		reg |= RP2040_PADS_BANK0_GPIO_PDE;
 	else
 		reg &= ~RP2040_PADS_BANK0_GPIO_PDE;
+
+	if (flags & MDX_GPIO_SPEED_HIGH) {
+		reg &= ~RP2040_PADS_BANK0_GPIO_DRIVE_MASK;
+		reg |= RP2040_PADS_BANK0_GPIO_DRIVE_12MA;
+	}
+
+	if (flags & MDX_GPIO_SLEW_FAST)
+		reg |= RP2040_PADS_BANK0_GPIO_SLEWFAST;
+
+	if (flags & MDX_GPIO_HYSTERESIS_EN)
+		reg |= RP2040_PADS_BANK0_GPIO_SCHMITT;
 
 	PADS_WR4(sc, RP2040_PADS_BANK0_GPIO_OFFSET(pin), reg);
 
