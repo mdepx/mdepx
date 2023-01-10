@@ -40,7 +40,7 @@
 
 #include <arm/raspberrypi/rp2040_pio.h>
 #include <arm/raspberrypi/rp2040_pio_regs.h>
-#include <arm/raspberrypi/pio_instructions.h>
+#include <arm/raspberrypi/rp2040_pio_instructions.h>
 
 #include <assert.h>
 
@@ -491,4 +491,17 @@ rp2040_pio_sm_set_consecutive_pindirs(mdx_device_t dev, uint32_t sm,
 
 	rp2040_pio_sm_exec(dev, sm, pio_encode_set(pio_pindirs, pindir_val));
 	WR4(sc, RP2040_PIO_SM_PINCTRL_OFFSET(sm), pinctrl_saved);
+}
+
+void
+rp2040_pio_sm_put(mdx_device_t dev, uint32_t sm, uint32_t data)
+{
+	struct rp2040_pio_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
+
+	check_pio_param(dev);
+	check_sm_param(sm);
+
+	WR4(sc, RP2040_PIO_TXF_OFFSET(sm), data);
 }
