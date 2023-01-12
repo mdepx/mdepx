@@ -89,5 +89,7 @@ void rp2040_pio_set_input_sync_bypass(mdx_device_t dev, int pin, bool enable);
 void rp2040_pio_sm_set_consecutive_pindirs(mdx_device_t dev, uint32_t sm,
     uint32_t pin, uint32_t count, bool is_out);
 void rp2040_pio_sm_put(mdx_device_t dev, uint32_t sm, uint32_t data);
+void rp2040_pio_sm_set_pindirs_with_mask(mdx_device_t dev, uint32_t sm,
+    uint32_t pindirs, uint32_t pin_mask);
 
 #endif /* !_ARM_RASPBERRYPI_RP2040_PIO_H_ */
