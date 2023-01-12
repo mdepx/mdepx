@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2021 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2021-2023 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,7 @@
 #define	_ARM_RASPBERRYPI_RP2040_H_
 
 #include <arm/raspberrypi/rp2040_clocks.h>
+#include <arm/raspberrypi/rp2040_dma.h>
 #include <arm/raspberrypi/rp2040_gpio.h>
 #include <arm/raspberrypi/rp2040_io_bank0.h>
 #include <arm/raspberrypi/rp2040_pads_bank0.h>
