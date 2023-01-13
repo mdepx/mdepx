@@ -72,3 +72,42 @@ rp2040_dma_channel_abort(mdx_device_t dev, int channel)
 		reg = RD4(sc, RP2040_DMA_CHAN_ABORT_OFFSET);
 	while (reg & bit);
 }
+
+void
+rp2040_dma_configure(mdx_device_t dev, int channel,
+    struct rp2040_dma_channel_config *config)
+{
+	struct rp2040_dma_softc *sc;
+	uint32_t reg;
+
+	sc = mdx_device_get_softc(dev);
+
+	WR4(sc, RP2040_DMA_READ_ADDR_OFFSET, config->src_addr);
+	WR4(sc, RP2040_DMA_WRITE_ADDR_OFFSET, config->dst_addr);
+	WR4(sc, RP2040_DMA_TRANS_COUNT_OFFSET, config->count);
+	reg = RP2040_DMA_CTRL_TRIG_READ_ERROR |
+		RP2040_DMA_CTRL_TRIG_WRITE_ERROR |
+		(channel << RP2040_DMA_CTRL_TRIG_CHAIN_TO_SHIFT) |
+		(config->size << RP2040_DMA_CTRL_TRIG_DATA_SIZE_SHIFT);
+	reg |= RP2040_DMA_CTRL_TRIG_INCR_READ;
+	reg |= RP2040_DMA_CTRL_TRIG_INCR_WRITE;
+	reg |= RP2040_DMA_CTRL_TRIG_EN;
+
+	WR4(sc, RP2040_DMA_CTRL_TRIG_OFFSET + (channel * 0x40), reg);
+}
+
+int
+rp2040_dma_channel_is_busy(mdx_device_t dev, int channel)
+{
+	struct rp2040_dma_softc *sc;
+	uint32_t reg;
+
+	sc = mdx_device_get_softc(dev);
+
+	reg = RD4(sc, RP2040_DMA_AL1_CTRL_OFFSET + (channel * 0x40));
+	printf("%s: reg %x\n", __func__, reg);
+	if (reg & RP2040_DMA_CTRL_TRIG_BUSY)
+		return (1);
+
+	return (0);
+}

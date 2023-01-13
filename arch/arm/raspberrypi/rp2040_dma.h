@@ -27,11 +27,24 @@
 #ifndef	_RP2040_DMA_H_
 #define	_RP2040_DMA_H_
 
+struct rp2040_dma_channel_config {
+	bool read_incr;
+	bool write_incr;
+	uint8_t dreq;
+	uint8_t size;
+	uint32_t src_addr;
+	uint32_t dst_addr;
+	uint32_t count;
+};
+
 struct rp2040_dma_softc {
 	uint32_t base;
 };
 
 int rp2040_dma_init(mdx_device_t dev, uint32_t base);
 void rp2040_dma_channel_abort(mdx_device_t dev, int channel);
+void rp2040_dma_configure(mdx_device_t dev, int channel,
+    struct rp2040_dma_channel_config *config);
+int rp2040_dma_channel_is_busy(mdx_device_t dev, int channel);
 
 #endif /* !_RP2040_DMA_H_ */
