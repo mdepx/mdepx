@@ -66,10 +66,10 @@ rp2040_dma_channel_abort(mdx_device_t dev, int channel)
 
 	bit = 1 << channel;
 
-	WR4(sc, RP2040_DMA_CHAN_ABORT_OFFSET, bit);
+	WR4(sc, RP2040_DMA_CHAN_ABORT_OFFSET + (channel * 0x40), bit);
 
 	do
-		reg = RD4(sc, RP2040_DMA_CHAN_ABORT_OFFSET);
+		reg = RD4(sc, RP2040_DMA_CHAN_ABORT_OFFSET + (channel * 0x40));
 	while (reg & bit);
 }
 
@@ -82,15 +82,25 @@ rp2040_dma_configure(mdx_device_t dev, int channel,
 
 	sc = mdx_device_get_softc(dev);
 
-	WR4(sc, RP2040_DMA_READ_ADDR_OFFSET, config->src_addr);
-	WR4(sc, RP2040_DMA_WRITE_ADDR_OFFSET, config->dst_addr);
-	WR4(sc, RP2040_DMA_TRANS_COUNT_OFFSET, config->count);
-	reg = RP2040_DMA_CTRL_TRIG_READ_ERROR |
-		RP2040_DMA_CTRL_TRIG_WRITE_ERROR |
-		(channel << RP2040_DMA_CTRL_TRIG_CHAIN_TO_SHIFT) |
-		(config->size << RP2040_DMA_CTRL_TRIG_DATA_SIZE_SHIFT);
-	reg |= RP2040_DMA_CTRL_TRIG_INCR_READ;
-	reg |= RP2040_DMA_CTRL_TRIG_INCR_WRITE;
+	WR4(sc, RP2040_DMA_READ_ADDR_OFFSET + (channel * 0x40),
+	    config->src_addr);
+	WR4(sc, RP2040_DMA_WRITE_ADDR_OFFSET + (channel * 0x40),
+	    config->dst_addr);
+	WR4(sc, RP2040_DMA_TRANS_COUNT_OFFSET + (channel * 0x40),
+	    config->count);
+
+	reg = RP2040_DMA_CTRL_TRIG_READ_ERROR;
+	reg |= RP2040_DMA_CTRL_TRIG_WRITE_ERROR;
+	reg |= channel << RP2040_DMA_CTRL_TRIG_CHAIN_TO_SHIFT;
+	reg |= config->size << RP2040_DMA_CTRL_TRIG_DATA_SIZE_SHIFT;
+	reg |= config->dreq << RP2040_DMA_CTRL_TRIG_TREQ_SEL_SHIFT;
+
+	if (config->src_incr)
+		reg |= RP2040_DMA_CTRL_TRIG_INCR_READ;
+	if (config->dst_incr)
+		reg |= RP2040_DMA_CTRL_TRIG_INCR_WRITE;
+
+	reg |= RP2040_DMA_CTRL_TRIG_BSWAP;
 	reg |= RP2040_DMA_CTRL_TRIG_EN;
 
 	WR4(sc, RP2040_DMA_CTRL_TRIG_OFFSET + (channel * 0x40), reg);

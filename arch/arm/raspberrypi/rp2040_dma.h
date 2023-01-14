@@ -28,8 +28,8 @@
 #define	_RP2040_DMA_H_
 
 struct rp2040_dma_channel_config {
-	bool read_incr;
-	bool write_incr;
+	bool src_incr;
+	bool dst_incr;
 	uint8_t dreq;
 	uint8_t size;
 	uint32_t src_addr;
