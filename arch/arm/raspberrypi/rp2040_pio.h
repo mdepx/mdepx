@@ -91,5 +91,9 @@ void rp2040_pio_sm_set_consecutive_pindirs(mdx_device_t dev, uint32_t sm,
 void rp2040_pio_sm_put(mdx_device_t dev, uint32_t sm, uint32_t data);
 void rp2040_pio_sm_set_pindirs_with_mask(mdx_device_t dev, uint32_t sm,
     uint32_t pindirs, uint32_t pin_mask);
+uint32_t rp2040_pio_get_dreq_offset(mdx_device_t pio, uint32_t sm, bool is_tx);
+void rp2040_pio_sm_set_wrap(mdx_device_t dev, uint32_t sm, uint32_t wrap_target,
+    uint32_t wrap);
+uint32_t rp2040_pio_read_reg(mdx_device_t dev, uint32_t reg);
 
 #endif /* !_ARM_RASPBERRYPI_RP2040_PIO_H_ */

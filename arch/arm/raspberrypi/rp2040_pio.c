@@ -152,6 +152,7 @@ _pio_add_program_at_offset(struct rp2040_pio_softc *sc,
 		instr = program->instructions[i];
 		reg = pio_instr_bits_jmp != _pio_major_instr_bits (instr) ?
 		    instr : instr + offset;
+printf("%s: adding instr %x at offset %x\n", __func__, reg, offset + i);
 		WR4(sc, RP2040_PIO_INSTR_MEM_OFFSET(offset + i), reg);
 	}
 	program_mask = (1u << program->length) - 1;
@@ -209,6 +210,29 @@ rp2040_sm_config_set_wrap(struct rp2040_pio_sm_config *c, uint32_t wrap_target,
 	    RP2040_PIO_SM_EXECCTRL_WRAP_BOTTOM_MASK)) |
 	    (wrap_target << RP2040_PIO_SM_EXECCTRL_WRAP_BOTTOM_SHIFT) |
 	    (wrap << RP2040_PIO_SM_EXECCTRL_WRAP_TOP_SHIFT);
+}
+
+void
+rp2040_pio_sm_set_wrap(mdx_device_t dev, uint32_t sm, uint32_t wrap_target,
+    uint32_t wrap)
+{
+	struct rp2040_pio_softc *sc;
+	uint32_t reg;
+
+	sc = mdx_device_get_softc(dev);
+
+	check_pio_param(pio);
+	check_sm_param(sm);
+
+	valid_params_if(PIO, wrap < PIO_INSTRUCTION_COUNT);
+	valid_params_if(PIO, wrap_target < PIO_INSTRUCTION_COUNT);
+
+	reg = RD4(sc, RP2040_PIO_SM_EXECCTRL_OFFSET(sm));
+	reg &= ~(RP2040_PIO_SM_EXECCTRL_WRAP_TOP_MASK);
+	reg &= ~(RP2040_PIO_SM_EXECCTRL_WRAP_BOTTOM_MASK);
+	reg |= (wrap_target << RP2040_PIO_SM_EXECCTRL_WRAP_BOTTOM_SHIFT);
+	reg |= (wrap << RP2040_PIO_SM_EXECCTRL_WRAP_TOP_SHIFT);
+	WR4(sc, RP2040_PIO_SM_EXECCTRL_OFFSET(sm), reg);
 }
 
 void
@@ -549,4 +573,26 @@ rp2040_pio_sm_set_pindirs_with_mask(mdx_device_t dev, uint32_t sm,
 	}
 
 	WR4(sc, RP2040_PIO_SM_PINCTRL_OFFSET(sm), pinctrl_saved);
+}
+
+uint32_t
+rp2040_pio_get_dreq_offset(mdx_device_t dev, uint32_t sm, bool is_tx)
+{
+	uint32_t reg;
+
+	reg = sm + (is_tx ? 0 : NUM_PIO_STATE_MACHINES);
+
+	return (reg);
+}
+
+uint32_t
+rp2040_pio_read_reg(mdx_device_t dev, uint32_t reg)
+{
+	struct rp2040_pio_softc *sc;
+	uint32_t val;
+
+	sc = mdx_device_get_softc(dev);
+	val = RD4(sc, reg);
+
+	return (val);
 }
