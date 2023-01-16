@@ -52,14 +52,16 @@ rp2040_uart_start(struct rp2040_uart_softc *sc)
 	int fbrd;
 
 	/*
-	 * (12000000 / (16 * 115200)) = 6.510
-	 * 0.510 * 64 = 32.64
+	 * This is based on 125MHz sys freq.
+	 *
+	 * (125000000 / (16 * 115200)) = 67.8168
+	 * 0.817 * 64 = 52.288
 	 */
 
 	switch (sc->baudrate) {
 	case 115200:
-		ibrd = 6;
-		fbrd = 32;
+		ibrd = 67;
+		fbrd = 52;
 		break;
 	default:
 		panic("unknown baudrate\n");
