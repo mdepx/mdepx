@@ -128,4 +128,8 @@
 
 #define	cpu_coreid()	(*(volatile uint32_t *)RP2040_SIO_BASE & 1)
 
+#define	RP2040_ATOMIC_XOR_REG_OFFSET	0x1000
+#define	RP2040_ATOMIC_SET_REG_OFFSET	0x2000
+#define	RP2040_ATOMIC_CLR_REG_OFFSET	0x3000
+
 #endif /* !_ARM_RASPBERRYPI_RP2040_H_ */
