@@ -52,7 +52,7 @@ rp2040_io_bank0_funcsel(struct rp2040_io_bank0_softc *sc,
 
 	reg = RD4(sc, RP2040_IO_BANK0_GPIO_CTRL(pin));
 	reg &= ~IO_BANK0_GPIO_CTRL_FUNCSEL_M;
-	reg |= funcsel;
+	reg |= funcsel << IO_BANK0_GPIO_CTRL_FUNCSEL_S;
 	WR4(sc, RP2040_IO_BANK0_GPIO_CTRL(pin), reg);
 }
 
