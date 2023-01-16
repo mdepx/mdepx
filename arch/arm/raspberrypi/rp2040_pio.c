@@ -38,6 +38,7 @@
 #include <sys/thread.h>
 #include <sys/systm.h>
 
+#include <arm/raspberrypi/rp2040.h>
 #include <arm/raspberrypi/rp2040_pio.h>
 #include <arm/raspberrypi/rp2040_pio_regs.h>
 #include <arm/raspberrypi/rp2040_pio_instructions.h>
@@ -366,18 +367,17 @@ rp2040_pio_sm_clear_fifos(mdx_device_t dev, uint32_t sm)
 {
 	struct rp2040_pio_softc *sc;
 	uint32_t reg;
+	uint32_t val;
 
 	sc = mdx_device_get_softc(dev);
 
 	check_pio_param(pio);
 	check_sm_param(sm);
 
-	reg = RD4(sc, RP2040_PIO_SM_SHIFTCTRL_OFFSET(sm));
-	reg ^= RP2040_PIO_SM_SHIFTCTRL_FJOIN_RX;
-	WR4(sc, RP2040_PIO_SM_SHIFTCTRL_OFFSET(sm), reg);
-
-	reg ^= RP2040_PIO_SM_SHIFTCTRL_FJOIN_RX;
-	WR4(sc, RP2040_PIO_SM_SHIFTCTRL_OFFSET(sm), reg);
+	reg = RP2040_PIO_SM_SHIFTCTRL_OFFSET(sm) + RP2040_ATOMIC_XOR_REG_OFFSET;
+	val = RP2040_PIO_SM_SHIFTCTRL_FJOIN_RX;
+	WR4(sc, reg, val);
+	WR4(sc, reg, val);
 }
 
 void
@@ -407,7 +407,8 @@ rp2040_pio_sm_restart(mdx_device_t dev, uint32_t sm)
 	check_pio_param(pio);
 	check_sm_param(sm);
 
-	reg = (1 << (RP2040_PIO_CTRL_SM_RESTART_SHIFT + sm));
+	reg = RD4(sc, RP2040_PIO_CTRL_OFFSET);
+	reg |= 1 << (RP2040_PIO_CTRL_SM_RESTART_SHIFT + sm);
 	WR4(sc, RP2040_PIO_CTRL_OFFSET, reg);
 }
 
@@ -422,7 +423,8 @@ rp2040_pio_sm_clkdiv_restart(mdx_device_t dev, uint32_t sm)
 	check_pio_param(pio);
 	check_sm_param(sm);
 
-	reg = (1 << (RP2040_PIO_CTRL_CLKDIV_RESTART_SHIFT + sm));
+	reg = RD4(sc, RP2040_PIO_CTRL_OFFSET);
+	reg |= 1 << (RP2040_PIO_CTRL_CLKDIV_RESTART_SHIFT + sm);
 	WR4(sc, RP2040_PIO_CTRL_OFFSET, reg);
 }
 
@@ -530,6 +532,22 @@ rp2040_pio_sm_put(mdx_device_t dev, uint32_t sm, uint32_t data)
 	WR4(sc, RP2040_PIO_TXF_OFFSET(sm), data);
 }
 
+uint32_t
+rp2040_pio_sm_get(mdx_device_t dev, uint32_t sm)
+{
+	struct rp2040_pio_softc *sc;
+	uint32_t reg;
+
+	sc = mdx_device_get_softc(dev);
+
+	check_pio_param(dev);
+	check_sm_param(sm);
+
+	reg = RD4(sc, RP2040_PIO_RXF_OFFSET(sm));
+
+	return (reg);
+}
+
 /* TODO: move this. */
 
 int __ctzsi2(int x);
@@ -563,6 +581,7 @@ rp2040_pio_sm_set_pindirs_with_mask(mdx_device_t dev, uint32_t sm,
 
 	while (pin_mask) {
 		base = (uint32_t)__builtin_ctz(pin_mask);
+printf("%s: mask %x ctz %d\n", __func__, pin_mask, base);
 		reg = (1u << RP2040_PIO_SM_PINCTRL_SET_COUNT_SHIFT) |
 		    (base << RP2040_PIO_SM_PINCTRL_SET_BASE_SHIFT);
 		WR4(sc, RP2040_PIO_SM_PINCTRL_OFFSET(sm), reg);
@@ -592,7 +611,24 @@ rp2040_pio_read_reg(mdx_device_t dev, uint32_t reg)
 	uint32_t val;
 
 	sc = mdx_device_get_softc(dev);
+
 	val = RD4(sc, reg);
 
 	return (val);
+}
+
+uint8_t
+rp2040_pio_sm_get_pc(mdx_device_t dev, uint32_t sm)
+{
+	struct rp2040_pio_softc *sc;
+	uint32_t reg;
+
+	sc = mdx_device_get_softc(dev);
+
+	check_pio_param(pio);
+	check_sm_param(sm);
+
+	reg = RD4(sc, RP2040_PIO_SM_ADDR_OFFSET(sm));
+
+	return (reg);
 }

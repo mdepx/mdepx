@@ -6,8 +6,6 @@ struct rp2040_pio_softc {
 	uint32_t used_instruction_space;
 };
 
-#define	PIO_INSTR_MEM(x)	(0x48 + ((x) * 0x4))
-
 typedef uint32_t uint;
 
 typedef struct rp2040_pio_program {
@@ -95,5 +93,7 @@ uint32_t rp2040_pio_get_dreq_offset(mdx_device_t pio, uint32_t sm, bool is_tx);
 void rp2040_pio_sm_set_wrap(mdx_device_t dev, uint32_t sm, uint32_t wrap_target,
     uint32_t wrap);
 uint32_t rp2040_pio_read_reg(mdx_device_t dev, uint32_t reg);
+uint8_t rp2040_pio_sm_get_pc(mdx_device_t dev, uint32_t sm);
+uint32_t rp2040_pio_sm_get(mdx_device_t dev, uint32_t sm);
 
 #endif /* !_ARM_RASPBERRYPI_RP2040_PIO_H_ */
