@@ -83,6 +83,21 @@ rp2040_gpio_get_pin(mdx_device_t dev, int pin)
 }
 
 static int
+rp2040_gpio_pin_set_dir(mdx_device_t dev, int pin, int dir)
+{
+	struct rp2040_gpio_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
+
+	if (dir)
+		WR4(sc, RP2040_SIO_GPIO_OE_SET, (1 << pin));
+	else
+		WR4(sc, RP2040_SIO_GPIO_OE_CLR, (1 << pin));
+
+	return (0);
+}
+
+static int
 rp2040_gpio_pin_configure(mdx_device_t dev, int pin, int flags)
 {
 	struct rp2040_gpio_softc *sc;
@@ -90,19 +105,13 @@ rp2040_gpio_pin_configure(mdx_device_t dev, int pin, int flags)
 
 	sc = mdx_device_get_softc(dev);
 
-	if (flags & MDX_GPIO_INPUT)
-		WR4(sc, RP2040_SIO_GPIO_OE_CLR, (1 << pin));
-
-	if (flags & MDX_GPIO_OUTPUT)
-		WR4(sc, RP2040_SIO_GPIO_OE_SET, (1 << pin));
+	reg = PADS_RD4(sc, RP2040_PADS_BANK0_GPIO_OFFSET(pin));
 
 	/*
 	 * Note that on RP2040 setting both pulls enables a "bus keep"
 	 * function, i.e. weak pull to whatever is current high/low state
 	 * of GPIO.
 	 */
-
-	reg = PADS_RD4(sc, RP2040_PADS_BANK0_GPIO_OFFSET(pin));
 
 	if (flags & MDX_GPIO_PULL_UP)
 		reg |= RP2040_PADS_BANK0_GPIO_PUE;
@@ -121,9 +130,13 @@ rp2040_gpio_pin_configure(mdx_device_t dev, int pin, int flags)
 
 	if (flags & MDX_GPIO_SLEW_FAST)
 		reg |= RP2040_PADS_BANK0_GPIO_SLEWFAST;
+	else
+		reg &= ~RP2040_PADS_BANK0_GPIO_SLEWFAST;
 
 	if (flags & MDX_GPIO_HYSTERESIS_EN)
 		reg |= RP2040_PADS_BANK0_GPIO_SCHMITT;
+	else
+		reg &= ~RP2040_PADS_BANK0_GPIO_SCHMITT;
 
 	PADS_WR4(sc, RP2040_PADS_BANK0_GPIO_OFFSET(pin), reg);
 
@@ -133,11 +146,17 @@ rp2040_gpio_pin_configure(mdx_device_t dev, int pin, int flags)
 static int
 rp2040_gpio_pin_set_function(mdx_device_t dev, int pin, int func)
 {
-#if 0
 	struct rp2040_gpio_softc *sc;
+	uint32_t reg;
 
 	sc = mdx_device_get_softc(dev);
-#endif
+
+	reg = PADS_RD4(sc, RP2040_PADS_BANK0_GPIO_OFFSET(pin));
+	reg &= ~RP2040_PADS_BANK0_GPIO_OD;
+	reg |= RP2040_PADS_BANK0_GPIO_IE;
+	PADS_WR4(sc, RP2040_PADS_BANK0_GPIO_OFFSET(pin), reg);
+
+	/* The func itself set in iobank0. */
 
 	return (0);
 }
@@ -147,6 +166,7 @@ static struct mdx_gpio_ops rp2040_gpio_ops = {
 	.pin_get = rp2040_gpio_get_pin,
 	.pin_configure = rp2040_gpio_pin_configure,
 	.pin_set_function = rp2040_gpio_pin_set_function,
+	.pin_set_dir = rp2040_gpio_pin_set_dir,
 };
 
 void
