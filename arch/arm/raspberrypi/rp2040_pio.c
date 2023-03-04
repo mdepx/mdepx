@@ -442,6 +442,33 @@ rp2040_pio_sm_exec(mdx_device_t dev, uint32_t sm, uint32_t instr)
 }
 
 void
+rp2040_pio_clear_tx_stall(mdx_device_t dev, int sm)
+{
+	struct rp2040_pio_softc *sc;
+	uint32_t reg;
+
+	sc = mdx_device_get_softc(dev);
+
+	reg = 1 << (RP2040_PIO_FDEBUG_TXSTALL_SHIFT + sm);
+	WR4(sc, RP2040_PIO_FDEBUG_OFFSET, reg);
+}
+
+int
+rp2040_pio_check_tx_stall(mdx_device_t dev, int sm)
+{
+	struct rp2040_pio_softc *sc;
+	uint32_t reg;
+
+	sc = mdx_device_get_softc(dev);
+
+	reg = 1 << (RP2040_PIO_FDEBUG_TXSTALL_SHIFT + sm);
+	if (RD4(sc, RP2040_PIO_FDEBUG_OFFSET) & reg)
+		return (1);
+
+	return (0);
+}
+
+void
 rp2040_pio_sm_init(mdx_device_t dev, int sm, uint32_t pio_offset,
     struct rp2040_pio_sm_config *config)
 {
@@ -581,7 +608,6 @@ rp2040_pio_sm_set_pindirs_with_mask(mdx_device_t dev, uint32_t sm,
 
 	while (pin_mask) {
 		base = (uint32_t)__builtin_ctz(pin_mask);
-printf("%s: mask %x ctz %d\n", __func__, pin_mask, base);
 		reg = (1u << RP2040_PIO_SM_PINCTRL_SET_COUNT_SHIFT) |
 		    (base << RP2040_PIO_SM_PINCTRL_SET_BASE_SHIFT);
 		WR4(sc, RP2040_PIO_SM_PINCTRL_OFFSET(sm), reg);

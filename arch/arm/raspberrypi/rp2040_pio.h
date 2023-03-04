@@ -96,4 +96,7 @@ uint32_t rp2040_pio_read_reg(mdx_device_t dev, uint32_t reg);
 uint8_t rp2040_pio_sm_get_pc(mdx_device_t dev, uint32_t sm);
 uint32_t rp2040_pio_sm_get(mdx_device_t dev, uint32_t sm);
 
+void rp2040_pio_clear_tx_stall(mdx_device_t dev, int sm);
+int rp2040_pio_check_tx_stall(mdx_device_t dev, int sm);
+
 #endif /* !_ARM_RASPBERRYPI_RP2040_PIO_H_ */
