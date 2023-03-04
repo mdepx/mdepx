@@ -56,7 +56,7 @@ void sdio_enable_high_speed_4bit(void);
 #endif
 
 #define CYW43_FLASH_BLOCK_SIZE (512)
-uint32_t storage_read_blocks(uint8_t *dest, uint32_t block_num, uint32_t num_blocks);
+static uint32_t storage_read_blocks(uint8_t *dest, uint32_t block_num, uint32_t num_blocks) { return (0); };
 
 struct pbuf;
 uint16_t pbuf_copy_partial(const struct pbuf *p, void *dataptr, uint16_t len, uint16_t offset);
@@ -110,9 +110,9 @@ static inline void cyw43_put_le32(uint8_t *buf, uint32_t x) {
 #if VERIFY_FIRMWARE_DOWNLOAD
 static void cyw43_xxd(size_t len, const uint8_t *buf) {
     for (int i = 0; i < len; ++i) {
-        CWY43_PRINTF(" %02x", buf[i]);
+        CYW43_PRINTF(" %02x", buf[i]);
     }
-    CWY43_PRINTF("\n");
+    CYW43_PRINTF("\n");
 }
 #endif
 
@@ -474,6 +474,7 @@ static int cyw43_download_resource(cyw43_int_t *self, uint32_t addr, size_t raw_
             CYW43_WARN("fail verify at address 0x%08x:\n", (uint)dest_addr);
             cyw43_xxd(sz, src);
             cyw43_xxd(sz, buf);
+            panic("failed to verify");
             return CYW43_FAIL_FAST_CHECK(-CYW43_EIO);
         }
     }
