@@ -115,7 +115,6 @@ rp2040_dma_channel_is_busy(mdx_device_t dev, int channel)
 	sc = mdx_device_get_softc(dev);
 
 	reg = RD4(sc, RP2040_DMA_AL1_CTRL_OFFSET + (channel * 0x40));
-	printf("%s: reg %x\n", __func__, reg);
 	if (reg & RP2040_DMA_CTRL_TRIG_BUSY)
 		return (1);
 
