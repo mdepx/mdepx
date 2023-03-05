@@ -153,7 +153,6 @@ _pio_add_program_at_offset(struct rp2040_pio_softc *sc,
 		instr = program->instructions[i];
 		reg = pio_instr_bits_jmp != _pio_major_instr_bits (instr) ?
 		    instr : instr + offset;
-printf("%s: adding instr %x at offset %x\n", __func__, reg, offset + i);
 		WR4(sc, RP2040_PIO_INSTR_MEM_OFFSET(offset + i), reg);
 	}
 	program_mask = (1u << program->length) - 1;
