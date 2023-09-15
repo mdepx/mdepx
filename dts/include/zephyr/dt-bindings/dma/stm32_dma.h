@@ -1,34 +1,69 @@
 /*
- * Copyright (c) 2019 Song Qiang <songqiang1304521@gmail.com>
- * Copyright (c) 2020 STMicroelectronics
+ * Copyright (c) 2023 STMicroelectronics
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-#ifndef ZEPHYR_INCLUDE_DT_BINDINGS_DMA_STM32_DMA_H_
-#define ZEPHYR_INCLUDE_DT_BINDINGS_DMA_STM32_DMA_H_
+#ifndef ZEPHYR_INCLUDE_DT_BINDINGS_STM32_DMA_H_
+#define ZEPHYR_INCLUDE_DT_BINDINGS_STM32_DMA_H_
 
-/* macros for channel-config */
-/* direction defined on bits 6-7 */
-/* 0 -> MEM_TO_MEM, 1 -> MEM_TO_PERIPH, 2 -> PERIPH_TO_MEM */
-#define STM32_DMA_CONFIG_DIRECTION(config)		((config >> 6) & 0x3)
-/* periph increment defined on bit 9 as true/false */
-#define STM32_DMA_CONFIG_PERIPHERAL_ADDR_INC(config)	((config >> 9) & 0x1)
-/* mem increment defined on bit 10 as true/false */
-#define STM32_DMA_CONFIG_MEMORY_ADDR_INC(config)	((config >> 10) & 0x1)
-/* perih data size defined on bits 11-12 */
-/* 0 -> 1 byte, 1 -> 2 bytes, 2 -> 4 bytes */
-#define STM32_DMA_CONFIG_PERIPHERAL_DATA_SIZE(config)	\
-						(1 << ((config >> 11) & 0x3))
-/* memory data size defined on bits 13, 14 */
-/* 0 -> 1 byte, 1 -> 2 bytes, 2 -> 4 bytes */
-#define STM32_DMA_CONFIG_MEMORY_DATA_SIZE(config)	\
-						(1 << ((config >> 13) & 0x3))
-/* priority increment offset defined on bit 15 */
-#define STM32_DMA_CONFIG_PERIPHERAL_INC_FIXED(config)	((config >> 15) & 0x1)
-/* priority defined on bits 16-17 as 0, 1, 2, 3 */
-#define STM32_DMA_CONFIG_PRIORITY(config)		((config >> 16) & 0x3)
+/**
+ * @name custom DMA flags for channel configuration
+ * @{
+ */
+/** DMA  cyclic mode config on bit 5*/
+#define STM32_DMA_CH_CFG_MODE(val)		((val & 0x1) << 5)
+#define STM32_DMA_MODE_NORMAL			STM32_DMA_CH_CFG_MODE(0)
+#define STM32_DMA_MODE_CYCLIC			STM32_DMA_CH_CFG_MODE(1)
 
-/* macros for features */
-#define STM32_DMA_FEATURES_FIFO_THRESHOLD(features)	(features & 0x3)
+/** DMA  transfer direction config on bits 6-7 */
+#define STM32_DMA_CH_CFG_DIRECTION(val)		((val & 0x3) << 6)
+#define STM32_DMA_MEMORY_TO_MEMORY		STM32_DMA_CH_CFG_DIRECTION(0)
+#define STM32_DMA_MEMORY_TO_PERIPH		STM32_DMA_CH_CFG_DIRECTION(1)
+#define STM32_DMA_PERIPH_TO_MEMORY		STM32_DMA_CH_CFG_DIRECTION(2)
+#define STM32_DMA_PERIPH_TO_PERIPH		STM32_DMA_CH_CFG_DIRECTION(3)
 
-#endif /* ZEPHYR_INCLUDE_DT_BINDINGS_DMA_STM32_DMA_H_ */
+/** DMA  Peripheral increment Address config on bit 9 */
+#define STM32_DMA_CH_CFG_PERIPH_ADDR_INC(val)	((val & 0x1) << 9)
+#define STM32_DMA_PERIPH_NO_INC			STM32_DMA_CH_CFG_PERIPH_ADDR_INC(0)
+#define STM32_DMA_PERIPH_INC			STM32_DMA_CH_CFG_PERIPH_ADDR_INC(1)
+
+/** DMA  Memory increment Address config on bit 10 */
+#define STM32_DMA_CH_CFG_MEM_ADDR_INC(val)	((val & 0x1) << 10)
+#define STM32_DMA_MEM_NO_INC			STM32_DMA_CH_CFG_MEM_ADDR_INC(0)
+#define STM32_DMA_MEM_INC			STM32_DMA_CH_CFG_MEM_ADDR_INC(1)
+
+/** DMA  Peripheral data size config on bits 11, 12 */
+#define STM32_DMA_CH_CFG_PERIPH_WIDTH(val)	((val & 0x3) << 11)
+#define STM32_DMA_PERIPH_8BITS			STM32_DMA_CH_CFG_PERIPH_WIDTH(0)
+#define STM32_DMA_PERIPH_16BITS			STM32_DMA_CH_CFG_PERIPH_WIDTH(1)
+#define STM32_DMA_PERIPH_32BITS			STM32_DMA_CH_CFG_PERIPH_WIDTH(2)
+
+/** DMA  Memory data size config on bits 13, 14 */
+#define STM32_DMA_CH_CFG_MEM_WIDTH(val)		((val & 0x3) << 13)
+#define STM32_DMA_MEM_8BITS			STM32_DMA_CH_CFG_MEM_WIDTH(0)
+#define STM32_DMA_MEM_16BITS			STM32_DMA_CH_CFG_MEM_WIDTH(1)
+#define STM32_DMA_MEM_32BITS			STM32_DMA_CH_CFG_MEM_WIDTH(2)
+
+/** DMA  Peripheral increment offset config on bit 15 */
+#define STM32_DMA_CH_CFG_PERIPH_INC_FIXED(val)	((val & 0x1) << 15)
+
+/** DMA  Priority config  on bits 16, 17*/
+#define STM32_DMA_CH_CFG_PRIORITY(val)		((val & 0x3) << 16)
+#define STM32_DMA_PRIORITY_LOW			STM32_DMA_CH_CFG_PRIORITY(0)
+#define STM32_DMA_PRIORITY_MEDIUM		STM32_DMA_CH_CFG_PRIORITY(1)
+#define STM32_DMA_PRIORITY_HIGH			STM32_DMA_CH_CFG_PRIORITY(2)
+#define STM32_DMA_PRIORITY_VERY_HIGH		STM32_DMA_CH_CFG_PRIORITY(3)
+
+/** DMA  FIFO threshold feature */
+#define STM32_DMA_FIFO_1_4			0U
+#define STM32_DMA_FIFO_HALF			1U
+#define STM32_DMA_FIFO_3_4			2U
+#define STM32_DMA_FIFO_FULL			3U
+
+/* DMA  usual combination for peripheral transfer */
+#define STM32_DMA_PERIPH_TX	(STM32_DMA_MEMORY_TO_PERIPH | STM32_DMA_MEM_INC)
+#define STM32_DMA_PERIPH_RX	(STM32_DMA_PERIPH_TO_MEMORY | STM32_DMA_MEM_INC)
+
+/** @} */
+
+#endif /* ZEPHYR_INCLUDE_DT_BINDINGS_STM32_DMA_H_ */
