@@ -37,6 +37,7 @@
 #include <arm/stm/stm32f4_dsi.h>
 #include <arm/stm/stm32f4_timer.h>
 
+#define	USART1_BASE	0x40011000
 #define	USART6_BASE	0x40011400
 #define	FLASH_BASE	0x40023C00
 #define	PWR_BASE	0x40007000
