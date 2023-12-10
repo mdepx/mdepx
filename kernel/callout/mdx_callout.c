@@ -131,7 +131,9 @@ get_elapsed(uint32_t *count_saved)
 	count = mi_tmr->count(mi_tmr->arg);
 	saved = mi_tmr->count_saved[cpuid];
 
-	if (count > saved)
+	if (count == saved)
+		elapsed = 0;
+	else if (count > saved)
 		elapsed = (count - saved);
 	else
 		elapsed = (mi_tmr->maxcnt - saved + count);
