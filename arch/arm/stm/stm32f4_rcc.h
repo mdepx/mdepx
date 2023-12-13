@@ -30,16 +30,17 @@
 #define	RCC_CR			0x00
 #define	 CR_PLLSAIRDY		(1 << 29)
 #define	 CR_PLLSAION		(1 << 28)
-#define	 CR_HSEBYP		(1 << 18) /* HSE clock bypass */
-#define	 CR_HSION		(1 << 0)
-#define	 CR_HSEON		(1 << 16)
 #define	 CR_PLLI2SRDY		(1 << 27) /* PLLI2S clock ready flag */
 #define	 CR_PLLI2SON		(1 << 26) /* PLLI2S enable */
+#define	 CR_PLLRDY		(1 << 25)
 #define	 CR_PLLON		(1 << 24)
 #define	 CR_CSSON		(1 << 19) /* Clock security system enable */
 #define	 CR_PLLRDY		(1 << 25)
+#define	 CR_HSEBYP		(1 << 18) /* HSE clock bypass */
 #define	 CR_HSERDY		(1 << 17) /* HSE clock ready flag */
+#define	 CR_HSEON		(1 << 16)
 #define	 CR_HSIRDY		(1 << 1) /* HSI clock ready flag */
+#define	 CR_HSION		(1 << 0)
 #define	RCC_PLLCFGR		0x04
 #define	 PLLCFGR_PLLR_S		28
 #define	 PLLCFGR_PLLQ_S		24
@@ -107,16 +108,19 @@
 #define	 PWREN			(1 << 28) /* Power interface clock enable */
 #define	 I2C3EN			(1 << 23) /* I2C3 clock enable */
 #define	 SPI2EN			(1 << 14) /* SPI2 clock enable */
+#define	 TIM14EN		(1 << 8)
 #define	 TIM2EN			(1 << 0)
 #define	RCC_APB2ENR		0x44
 #define	 DSIEN			(1 << 27) /* DSI clocks enable */
 #define	 LTDCEN			(1 << 26) /* LTDC clock enable */
 #define	 SAI2EN			(1 << 23) /* SAI2 clock enable */
 #define	 SPI5EN			(1 << 20)
+#define	 TIM10EN		(1 << 17)
 #define	 SYSCFGEN		(1 << 14) /* System configuration controller clock enable */
 #define	 SDMMC1EN		(1 << 11)
 #define	 USART6EN		(1 << 5)
 #define	 USART1EN		(1 << 4)
+#define	 TIM8EN			(1 << 1)
 #define	 TIM1EN			(1 << 0)
 #define	RCC_PLLI2SCFGR		0x84
 #define	 PLLI2SR_S		28
@@ -135,6 +139,7 @@
 
 #define	RCC_DCKCFGR			0x8C
 #define	 DCKCFGR_PLLSAIDIVR_S		16
+#define	 DCKCFGR_TIMPRE			(1 << 24)
 #define	 DCKCFGR_SAI2SEL_S		22
 #define	 DCKCFGR_SAI2SEL_PLLI2S		1
 #define	 DCKCFGR_PLLI2SDIV_S		0
