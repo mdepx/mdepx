@@ -55,6 +55,8 @@ mdx_tsleep(uint32_t ticks)
 	struct thread *td;
 	struct mdx_callout c;
 
+	KASSERT(ticks > 0, ("%s: can't sleep 0 ticks\n", __func__));
+
 	td = curthread;
 
 	KASSERT(td->td_idle == 0,
