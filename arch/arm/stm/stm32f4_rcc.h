@@ -102,6 +102,7 @@
 #define	 OTGHSEN		(1 << 29) /* USB OTG HS clock enable */
 #define	RCC_AHB2ENR		0x34
 #define	 OTGFSEN		(1 << 7) /* USB OTG FS clock enable */
+#define	 RNGEN			(1 << 6)
 #define	RCC_AHB3ENR		0x38
 #define	 FMCEN			(1 << 0) /* FMC module clock enabled */
 #define	RCC_APB1ENR		0x40
@@ -109,6 +110,13 @@
 #define	 I2C3EN			(1 << 23) /* I2C3 clock enable */
 #define	 SPI2EN			(1 << 14) /* SPI2 clock enable */
 #define	 TIM14EN		(1 << 8)
+#define	 TIM13EN		(1 << 7)
+#define	 TIM12EN		(1 << 6)
+#define	 TIM7EN			(1 << 5)
+#define	 TIM6EN			(1 << 4)
+#define	 TIM5EN			(1 << 3)
+#define	 TIM4EN			(1 << 2)
+#define	 TIM3EN			(1 << 1)
 #define	 TIM2EN			(1 << 0)
 #define	RCC_APB2ENR		0x44
 #define	 DSIEN			(1 << 27) /* DSI clocks enable */
