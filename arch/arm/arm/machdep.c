@@ -68,9 +68,14 @@ cpu_idle(void)
 {
 
 	critical_enter();
+#ifdef MDX_ARM_SWD_DEBUG
+	/* Do not put core to sleep as it disables JTAG clock. */
+	__asm __volatile("dsb");
+#else
 	__asm __volatile(
 		"dsb \n"
 		"wfi \n");
+#endif
 	critical_exit();
 }
 
