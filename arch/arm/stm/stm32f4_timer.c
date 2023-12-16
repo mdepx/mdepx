@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018, 2020 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2020-2023 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,7 @@
 #include <sys/systm.h>
 #include <sys/callout.h>
 
+#include <arm/stm/stm32f4_tim.h>
 #include <arm/stm/stm32f4_timer.h>
 
 #define	TIM_DEBUG
