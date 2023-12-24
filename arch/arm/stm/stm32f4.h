@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2018-2023 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,7 @@
 #include <arm/stm/stm32f4_timer.h>
 #include <arm/stm/stm32f4_pwm.h>
 #include <arm/stm/stm32f4_rng.h>
+#include <arm/stm/stm32f4_dma.h>
 
 #define	USART1_BASE	0x40011000
 #define	USART6_BASE	0x40011400
@@ -64,5 +65,7 @@
 #define	TIM13_BASE	0x40001c00
 #define	TIM14_BASE	0x40002000
 #define	RNG_BASE	0x50060800
+#define	DMA1_BASE	0x40026000
+#define	DMA2_BASE	0x40026400
 
 #endif	/* !_ARM_STM_STM32F4_H_ */
