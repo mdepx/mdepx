@@ -129,6 +129,7 @@ vsscanf(const char *inp, char const *fmt0, va_list ap)
 	char buf[BUF];		/* buffer for numeric conversions */
 #ifdef MDX_GDTOA
 	int nr;			/* characters read by the current conversion */
+	nr = 0;
 #endif
 
 	/* `basefix' is used to avoid `if' tests in the integer scanner */
@@ -602,6 +603,10 @@ literal:
 			break;
 #endif /* !MDX_GDTOA */
 		}
+		if (!(flags & SUPPRESS))
+			nassigned++;
+		nread += nr;
+		nconversions++;
 	}
 input_failure:
 	return (nconversions != 0 ? nassigned : -1);
