@@ -118,7 +118,7 @@ stm32f4_pwm_step(struct stm32f4_pwm_softc *sc, int chanset, uint32_t freq)
 	 */
 
 	WR4(sc, TIM_PSC, psc);
-	WR4(sc, TIM_CCR1, 200); /* duty cycle */
+	WR4(sc, TIM_CCR1, 300); /* duty cycle */
 	WR4(sc, TIM_ARR, 400); /* period */
 
 	WR4(sc, TIM_SR, 0);
