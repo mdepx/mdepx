@@ -603,10 +603,12 @@ literal:
 			break;
 #endif /* !MDX_GDTOA */
 		}
+#ifdef MDX_GDTOA
 		if (!(flags & SUPPRESS))
 			nassigned++;
 		nread += nr;
 		nconversions++;
+#endif
 	}
 input_failure:
 	return (nconversions != 0 ? nassigned : -1);
