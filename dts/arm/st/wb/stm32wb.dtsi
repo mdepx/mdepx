@@ -413,14 +413,12 @@
 			interrupts = <18 0>;
 			status = "disabled";
 			#io-channel-cells = <1>;
-			temp-channel = <17>;
-			vbat-channel = <18>;
-			vref-channel = <0>;
 			resolutions = <STM32_ADC_RES(12, 0x00)
 				       STM32_ADC_RES(10, 0x01)
 				       STM32_ADC_RES(8, 0x02)
 				       STM32_ADC_RES(6, 0x03)>;
 			sampling-times = <3 7 13 25 48 93 248 641>;
+			st,adc-sequencer = <FULLY_CONFIGURABLE>;
 		};
 
 		iwdg: watchdog@40003000 {
@@ -503,6 +501,14 @@
 			clocks = <&rcc STM32_CLOCK_BUS_AHB3 0x00040000>;
 			status = "disabled";
 		};
+
+		aes1: aes@50060000 {
+			compatible = "st,stm32-aes";
+			reg = <0x50060000 0x400>;
+			clocks = <&rcc STM32_CLOCK_BUS_AHB2 0x00010000>;
+			interrupts = <51 0>;
+			status = "disabled";
+		};
 	};
 
 	die_temp: dietemp {
@@ -540,6 +546,22 @@
 		compatible = "st,stm32wb-rf";
 		clocks = <&rcc STM32_CLOCK_BUS_AHB3 0x00100000>,
 				<&rcc STM32_SRC_LSE RFWKP_SEL(1)>;
+	};
+
+	smbus1: smbus1 {
+		compatible = "st,stm32-smbus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		i2c = <&i2c1>;
+		status = "disabled";
+	};
+
+	smbus3: smbus3 {
+		compatible = "st,stm32-smbus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		i2c = <&i2c3>;
+		status = "disabled";
 	};
 };
 

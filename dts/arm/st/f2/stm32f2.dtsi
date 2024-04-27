@@ -27,7 +27,7 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-		cpu@0 {
+		cpu0: cpu@0 {
 			device_type = "cpu";
 			compatible = "arm,cortex-m3";
 			reg = <0>;
@@ -366,14 +366,13 @@
 			interrupts = <18 0>;
 			status = "disabled";
 			#io-channel-cells = <1>;
-			temp-channel = <16>;
-			vref-channel = <17>;
 			resolutions = <STM32_ADC_RES(12, 0x00)
 				       STM32_ADC_RES(10, 0x01)
 				       STM32_ADC_RES(8, 0x02)
 				       STM32_ADC_RES(6, 0x03)>;
 			sampling-times = <3 15 28 58 84 112 144 480>;
 			st,adc-clock-source = <SYNC>;
+			st,adc-sequencer = <FULLY_CONFIGURABLE>;
 		};
 
 		dma1: dma@40026000 {
@@ -713,6 +712,30 @@
 	otgfs_phy: otgfs_phy {
 		compatible = "usb-nop-xceiv";
 		#phy-cells = <0>;
+	};
+
+	smbus1: smbus1 {
+		compatible = "st,stm32-smbus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		i2c = <&i2c1>;
+		status = "disabled";
+	};
+
+	smbus2: smbus2 {
+		compatible = "st,stm32-smbus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		i2c = <&i2c2>;
+		status = "disabled";
+	};
+
+	smbus3: smbus3 {
+		compatible = "st,stm32-smbus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		i2c = <&i2c3>;
+		status = "disabled";
 	};
 };
 

@@ -222,8 +222,6 @@
 			interrupt-names = "TX", "RX0", "RX1", "SCE";
 			clocks = <&rcc STM32_CLOCK_BUS_APB1 0x02000000>;
 			status = "disabled";
-			sjw = <1>;
-			sample-point = <875>;
 		};
 
 		can2: can@40006800 {
@@ -235,8 +233,6 @@
 			clocks = <&rcc STM32_CLOCK_BUS_APB1 0x06000000>;
 			master-can-reg = <0x40006400>;
 			status = "disabled";
-			sjw = <1>;
-			sample-point = <875>;
 		};
 	};
 };

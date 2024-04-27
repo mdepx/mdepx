@@ -5,7 +5,7 @@
  */
 
 #include <arm/armv8-m.dtsi>
-#include "nrf_common.dtsi"
+#include <nordic/nrf_common.dtsi>
 
 / {
 	cpus {
@@ -22,7 +22,6 @@
 			mpu: mpu@e000ed90 {
 				compatible = "arm,armv8m-mpu";
 				reg = <0xe000ed90 0x40>;
-				arm,num-mpu-regions = <16>;
 			};
 		};
 	};
@@ -47,16 +46,11 @@
 
 		/* Additional Secure peripherals */
 		cryptocell: crypto@50840000 {
-			compatible = "nordic,nrf-cc310";
-			reg = <0x50840000 0x1000>;
-			status = "okay";
-			#address-cells = <1>;
-			#size-cells = <1>;
-			cryptocell310: crypto@50841000 {
-				compatible = "arm,cryptocell-310";
-				reg = <0x50841000 0x1000>;
-				interrupts = <64 NRF_DEFAULT_IRQ_PRIORITY>;
-			};
+			compatible = "nordic,cryptocell", "arm,cryptocell-310";
+			reg = <0x50840000 0x1000>, <0x50841000 0x1000>;
+			reg-names = "wrapper", "core";
+			interrupts = <64 NRF_DEFAULT_IRQ_PRIORITY>;
+			status = "disabled";
 		};
 
 		ctrlap: ctrlap@50006000 {
@@ -65,11 +59,26 @@
 			status = "okay";
 		};
 
-		gpiote: gpiote@5000d000 {
+		/*
+		 * GPIOTE0 is always accessible as a secure peripheral,
+		 * so we give it the 'gpiote' label for use when building
+		 * code for this target.
+		 */
+		 gpiote: gpiote0: gpiote@5000d000 {
 			compatible = "nordic,nrf-gpiote";
 			reg = <0x5000d000 0x1000>;
 			interrupts = <13 5>;
 			status = "disabled";
+			instance = <0>;
+		};
+
+		/* Additional Non-Secure GPIOTE instance */
+		gpiote1: gpiote@40031000 {
+			compatible = "nordic,nrf-gpiote";
+			reg = <0x40031000 0x1000>;
+			interrupts = <49 5>;
+			status = "disabled";
+			instance = <1>;
 		};
 
 		spu: spu@50003000 {
@@ -82,6 +91,7 @@
 		ficr: ficr@ff0000 {
 			compatible = "nordic,nrf-ficr";
 			reg = <0xff0000 0x1000>;
+			#nordic,ficr-cells = <1>;
 			status = "okay";
 		};
 
@@ -95,4 +105,9 @@
 
 &nvic {
 	arm,num-irq-priority-bits = <3>;
+};
+
+&systick {
+	/* Use RTC for system clock, instead of SysTick. */
+	status = "disabled";
 };

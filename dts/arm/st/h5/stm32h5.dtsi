@@ -30,13 +30,13 @@
 			device_type = "cpu";
 			compatible = "arm,cortex-m33";
 			reg = <0>;
+			cpu-power-states = <&stop>;
 			#address-cells = <1>;
 			#size-cells = <1>;
 
 			mpu: mpu@e000ed90 {
 				compatible = "arm,armv8m-mpu";
 				reg = <0xe000ed90 0x40>;
-				arm,num-mpu-regions = <8>;
 			};
 		};
 	};
@@ -114,6 +114,15 @@
 				erase-block-size = <8192>;
 				/* maximum erase time(ms) for a 8K sector */
 				max-erase-time = <5>;
+			};
+		};
+
+		power-states {
+			stop: state0 {
+				compatible = "zephyr,power-state";
+				power-state-name = "suspend-to-idle";
+				substate-id = <1>;
+				min-residency-us = <20>;
 			};
 		};
 
@@ -197,6 +206,28 @@
 			};
 		};
 
+		lptim1: timers@44004400 {
+			compatible = "st,stm32-lptim";
+			clocks = <&rcc STM32_CLOCK_BUS_APB3 0x800>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x44004400 0x400>;
+			interrupts = <64 1>;
+			interrupt-names = "wakeup";
+			status = "disabled";
+		};
+
+		lptim2: timers@40009400 {
+			compatible = "st,stm32-lptim";
+			clocks = <&rcc STM32_CLOCK_BUS_APB1_2 0x20>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x40009400 0x400>;
+			interrupts = <70 1>;
+			interrupt-names = "wakeup";
+			status = "disabled";
+		};
+
 		usart1: serial@40013800 {
 			compatible = "st,stm32-usart", "st,stm32-uart";
 			reg = <0x40013800 0x400>;
@@ -263,14 +294,12 @@
 			status = "disabled";
 			vref-mv = <3300>;
 			#io-channel-cells = <1>;
-			vbat-channel = <2>;
-			temp-channel = <16>;
-			vref-channel = <17>;
 			resolutions = <STM32_ADC_RES(12, 0x00)
 				       STM32_ADC_RES(10, 0x01)
 				       STM32_ADC_RES(8, 0x02)
 				       STM32_ADC_RES(6, 0x03)>;
 			sampling-times = <3 7 13 25 48 93 248 641>;
+			st,adc-sequencer = <FULLY_CONFIGURABLE>;
 		};
 
 		rtc: rtc@44007800 {
@@ -441,13 +470,9 @@
 			reg = <0x4000a400 0x400>, <0x4000ac00 0x350>;
 			reg-names = "m_can", "message_ram";
 			interrupts = <39 0>, <40 0>;
-			interrupt-names = "LINE_0", "LINE_1";
+			interrupt-names = "int0", "int1";
 			clocks = <&rcc STM32_CLOCK_BUS_APB1_2 0x00000200>;
 			bosch,mram-cfg = <0x0 28 8 3 3 0 3 3>;
-			sjw = <1>;
-			sample-point = <875>;
-			sjw-data = <1>;
-			sample-point-data = <875>;
 			status = "disabled";
 		};
 
@@ -540,6 +565,22 @@
 	usb_fs_phy: usbphy {
 		compatible = "usb-nop-xceiv";
 		#phy-cells = <0>;
+	};
+
+	smbus1: smbus1 {
+		compatible = "st,stm32-smbus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		i2c = <&i2c1>;
+		status = "disabled";
+	};
+
+	smbus2: smbus2 {
+		compatible = "st,stm32-smbus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		i2c = <&i2c2>;
+		status = "disabled";
 	};
 };
 

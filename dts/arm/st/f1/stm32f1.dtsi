@@ -26,7 +26,7 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-		cpu@0 {
+		cpu0: cpu@0 {
 			device_type = "cpu";
 			compatible = "arm,cortex-m3";
 			reg = <0>;
@@ -339,10 +339,9 @@
 			interrupts = <18 0>;
 			status = "disabled";
 			#io-channel-cells = <1>;
-			temp-channel = <16>;
-			vref-channel = <17>;
 			resolutions = <STM32F1_ADC_RES(12)>;
 			sampling-times = <2 8 14 29 42 56 72 240>;
+			st,adc-sequencer = <FULLY_CONFIGURABLE>;
 		};
 
 		dma1: dma@40020000 {
@@ -362,6 +361,22 @@
 		avgslope = <43>;
 		v25 = <1430>;
 		ntc;
+	};
+
+	smbus1: smbus1 {
+		compatible = "st,stm32-smbus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		i2c = <&i2c1>;
+		status = "disabled";
+	};
+
+	smbus2: smbus2 {
+		compatible = "st,stm32-smbus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		i2c = <&i2c2>;
+		status = "disabled";
 	};
 };
 

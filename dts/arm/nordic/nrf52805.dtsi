@@ -5,7 +5,7 @@
  */
 
 #include <arm/armv7-m.dtsi>
-#include "nrf_common.dtsi"
+#include <nordic/nrf_common.dtsi>
 
 / {
 	chosen {
@@ -28,6 +28,7 @@
 		ficr: ficr@10000000 {
 			compatible = "nordic,nrf-ficr";
 			reg = <0x10000000 0x1000>;
+			#nordic,ficr-cells = <1>;
 			status = "okay";
 		};
 
@@ -110,6 +111,7 @@
 			reg = <0x40003000 0x1000>;
 			clock-frequency = <I2C_BITRATE_STANDARD>;
 			interrupts = <3 NRF_DEFAULT_IRQ_PRIORITY>;
+			easydma-maxcnt-bits = <14>;
 			status = "disabled";
 		};
 
@@ -131,11 +133,12 @@
 			status = "disabled";
 		};
 
-		gpiote: gpiote@40006000 {
+		gpiote: gpiote0: gpiote@40006000 {
 			compatible = "nordic,nrf-gpiote";
 			reg = <0x40006000 0x1000>;
 			interrupts = <6 5>;
 			status = "disabled";
+			instance = <0>;
 		};
 
 		adc: adc@40007000 {
@@ -310,10 +313,16 @@
 			#gpio-cells = <2>;
 			status = "disabled";
 			port = <0>;
+			gpiote-instance = <&gpiote>;
 		};
 	};
 };
 
 &nvic {
 	arm,num-irq-priority-bits = <3>;
+};
+
+&systick {
+	/* Use RTC for system clock, instead of SysTick. */
+	status = "disabled";
 };

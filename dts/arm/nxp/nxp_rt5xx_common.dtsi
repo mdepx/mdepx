@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023, NXP
+ * Copyright 2022-2024 NXP
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -33,7 +33,6 @@
 			mpu: mpu@e000ed90 {
 				compatible = "arm,armv8m-mpu";
 				reg = <0xe000ed90 0x40>;
-				arm,num-mpu-regions = <8>;
 			};
 		};
 
@@ -69,6 +68,20 @@
 &sram {
 	#address-cells = <1>;
 	#size-cells = <1>;
+
+	/* RT5XX SRAM partitions are shared
+	 * between code and data. Boards can
+	 * override the reg properties of either sram0 or sram_code nodes to
+	 * change the balance of SRAM allocation.
+	 *
+	 * Note that the sram code region starts at an offset of 0x1B000,
+	 * as the boot ROM will not load code before 0x1C000. The first
+	 * 0x1000 of the image will contain the boot header.
+	 */
+	sram_code: memory@1b000 {
+		compatible = "mmio-sram";
+		reg = <0x1b000 DT_SIZE_K(1428)>;
+	};
 
 	sram0: memory@20180000 {
 		compatible = "mmio-sram";
@@ -324,11 +337,10 @@
 	};
 
 	usbhs: usbhs@144000 {
-		compatible = "nxp,mcux-usbd";
+		compatible = "nxp,lpcip3511";
 		reg = <0x144000 0x1000>;
 		interrupts = <50 1>;
 		num-bidir-endpoints = <6>;
-		usb-controller-index = "LpcIp3511Hs0";
 		status = "disabled";
 	};
 
@@ -376,6 +388,72 @@
 		#dma-cells = <1>;
 	};
 
+	dmic0: dmic@121000 {
+		#address-cells=<1>;
+		#size-cells=<0>;
+		compatible = "nxp,dmic";
+		reg = <0x121000 0x1000>;
+		interrupts = <25 0>;
+		status = "disabled";
+		clocks = <&clkctl0 MCUX_DMIC_CLK>;
+
+		pdmc0: dmic-channel@0 {
+			compatible = "nxp,dmic-channel";
+			reg = <0>;
+			dmas = <&dma0 16>;
+			status = "disabled";
+		};
+
+		pdmc1: dmic-channel@1 {
+			compatible = "nxp,dmic-channel";
+			reg = <1>;
+			dmas = <&dma0 17>;
+			status = "disabled";
+		};
+
+		pdmc2: dmic-channel@2 {
+			compatible = "nxp,dmic-channel";
+			reg = <2>;
+			dmas = <&dma0 18>;
+			status = "disabled";
+		};
+
+		pdmc3: dmic-channel@3 {
+			compatible = "nxp,dmic-channel";
+			reg = <3>;
+			dmas = <&dma0 19>;
+			status = "disabled";
+		};
+
+		pdmc4: dmic-channel@4 {
+			compatible = "nxp,dmic-channel";
+			reg = <4>;
+			dmas = <&dma0 20>;
+			status = "disabled";
+		};
+
+		pdmc5: dmic-channel@5 {
+			compatible = "nxp,dmic-channel";
+			reg = <5>;
+			dmas = <&dma0 21>;
+			status = "disabled";
+		};
+
+		pdmc6: dmic-channel@6 {
+			compatible = "nxp,dmic-channel";
+			reg = <6>;
+			dmas = <&dma0 22>;
+			status = "disabled";
+		};
+
+		pdmc7: dmic-channel@7 {
+			compatible = "nxp,dmic-channel";
+			reg = <7>;
+			dmas = <&dma0 23>;
+			status = "disabled";
+		};
+	};
+
 	os_timer: timers@113000 {
 		compatible = "nxp,os-timer";
 		reg = <0x113000 0x1000>;
@@ -388,6 +466,10 @@
 		reg = <0x30000 0x1000>;
 		interrupts = <32 0>;
 		status = "disabled";
+		rtc_highres: rtc_highres {
+			compatible = "nxp,lpc-rtc-highres";
+			status = "disabled";
+		};
 	};
 
 	trng: random@138000 {
@@ -460,6 +542,16 @@
 		offset-value-a = <10>;
 		offset-value-b = <10>;
 		#io-channel-cells = <1>;
+		clocks = <&clkctl1 MCUX_LPADC1_CLK>;
+	};
+
+	smartdma: dma@27020 {
+		compatible = "nxp,smartdma";
+		reg = <0x27020 0x1000>;
+		program-mem = <0x24100000>;
+		interrupts = <73 0>;
+		status = "disabled";
+		#dma-cells = <0>;
 	};
 
 	ctimer0: ctimer@28000 {
@@ -556,6 +648,38 @@
 		#mbox-cells = <1>;
 		status = "disabled";
 	};
+
+	mrt: mrt@2d000 {
+		compatible = "nxp,mrt";
+		reg = <0x2d000 0x100>;
+		interrupts = <9 0>;
+		num-channels = <4>;
+		num-bits = <24>;
+		clocks = <&clkctl1 MCUX_MRT_CLK>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		mrt_channel0: mrt_channel@0 {
+			compatible = "nxp,mrt-channel";
+			reg = <0>;
+			status = "disabled";
+		};
+		mrt_channel1: mrt_channel@1 {
+			compatible = "nxp,mrt-channel";
+			reg = <1>;
+			status = "disabled";
+		};
+		mrt_channel2: mrt_channel@2 {
+			compatible = "nxp,mrt-channel";
+			reg = <2>;
+			status = "disabled";
+		};
+		mrt_channel3: mrt_channel@3 {
+			compatible = "nxp,mrt-channel";
+			reg = <3>;
+			status = "disabled";
+		};
+	};
 };
 
 &flexspi {
@@ -564,6 +688,7 @@
 	interrupts = <42 0>;
 	#address-cells = <1>;
 	#size-cells = <0>;
+	clocks = <&clkctl1 MCUX_FLEXSPI_CLK>;
 };
 
 &flexspi2 {
@@ -572,6 +697,7 @@
 	interrupts = <42 0>;
 	#address-cells = <1>;
 	#size-cells = <0>;
+	clocks = <&clkctl1 MCUX_FLEXSPI2_CLK>;
 };
 
 &nvic {
