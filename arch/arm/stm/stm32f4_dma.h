@@ -68,6 +68,7 @@
 #define	  PSIZE_8	0
 #define	  PSIZE_16	1
 #define	  PSIZE_32	2
+#define	 SCR_PINC	(1 << 9) /* Peripheral increment mode */
 #define	 SCR_CIRC	(1 << 8) /* Circular mode */
 #define	 SCR_MINC	(1 << 10) /* Memory increment mode */
 #define	 SCR_DIR_S	6 /* Data transfer direction */
@@ -91,8 +92,37 @@
 #define	 SFCR_FTH_M	(0x3 << SFCR_FTH_S)
 #define	 SFCR_FTH_FULL	0x3 /* Full FIFO */
 
+struct stm32f4_dma_conf {
+	uintptr_t	mem0;
+	uintptr_t	mem1;
+	uint32_t	nbytes;
+	void		(*user_done)(void *);
+	void		(*user_half_done)(void *);
+	void		*arg;
+	uint32_t	sid;
+	uint32_t	channel;
+	int		dir;
+	uint32_t	periph_addr;
+	int		circ;
+	int		periph_control;
+	int		burst;
+	int		psize;
+	int		fifo_mode;
+};
+
 struct stm32f4_dma_softc {
 	uint32_t base;
 };
+
+void stm32f4_dma_init(struct stm32f4_dma_softc *sc, uint32_t base);
+void stm32f4_dma_intr(void *arg, struct stm32f4_dma_conf *conf);
+void stm32f4_dma_set_mem(struct stm32f4_dma_softc *sc, uint32_t sid,
+    uint32_t target, uint32_t ptr);
+void stm32f4_dma_setup(struct stm32f4_dma_softc *sc,
+    struct stm32f4_dma_conf *conf);
+void stm32f4_dma_control(struct stm32f4_dma_softc *sc, uint32_t sid,
+    bool enable);
+uint32_t stm32f4_dma_getcnt(struct stm32f4_dma_softc *sc, int sid);
+int stm32f4_dma_curtarget(struct stm32f4_dma_softc *sc, int sid);
 
 #endif	/* !_ARM_STM_STM32F4_DMA_H_ */

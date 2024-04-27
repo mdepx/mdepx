@@ -48,10 +48,6 @@
 #define	dprintf(fmt, ...)
 #endif
 
-#ifdef MDX_SCHED
-static struct thread intr_thread[MDX_CPU_MAX];
-#endif
-
 static struct mips_intr_entry mips_intr_map[MIPS_NINTRS];
 
 void MipsTLBMissException(void);
@@ -189,34 +185,25 @@ mips_exception(struct trapframe *tf)
 	uint32_t exc_code;
 	uint32_t cause;
 	bool released;
-	bool intr;
 
 	dprintf("%s\n", __func__);
 
 	td = curthread;
-	released = false;
-	intr = false;
+
+	curthread->td_critnest++;
 
 	td->td_tf = tf;
+
+	released = mdx_sched_ack(td);
 
 	cause = mips_rd_cause();
 	exc_code = (cause & MIPS_CR_EXC_CODE_M) >> MIPS_CR_EXC_CODE_S;
 	dprintf("%s: cause %x, exc_code %d\n", __func__, cause, exc_code);
 
 	if (exc_code == MIPS_CR_EXC_CODE_INT)
-		intr = true;
+		mips_handle_intr(cause);
 	else
 		handle_exception(tf, exc_code);
-
-	released = mdx_sched_ack(td);
-
-	/* Switch to the interrupt thread. Stack is the same. */
-	if (released)
-		PCPU_SET(curthread, &intr_thread[PCPU_GET(cpuid)]);
-	curthread->td_critnest++;
-
-	if (intr)
-		mips_handle_intr(cause);
 
 	if (!released)
 		released = mdx_sched_park(td);

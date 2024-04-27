@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2018-2023 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,6 +33,23 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
+stm32f4_usart_intr(void *arg, int irq)
+{
+	struct stm32f4_usart_softc *sc;
+	uint32_t pending;
+	uint8_t ch;
+
+	sc = arg;
+
+	pending = RD4(sc, USART_SR);
+	if (pending & USART_SR_RXNE) {
+		ch = RD4(sc, USART_DR);
+		if (sc->cb_configured)
+			sc->cb(ch);
+	}
+}
+
+void
 stm32f4_usart_putc(struct stm32f4_usart_softc *sc, char c)
 {
 
@@ -58,4 +75,24 @@ stm32f4_usart_init(struct stm32f4_usart_softc *sc, uint32_t base,
 	WR4(sc, USART_CR1, reg);
 
 	return (0);
+}
+
+void
+stm32f4_usart_setup_receiver(struct stm32f4_usart_softc *sc, int dma,
+    void (*cb)(uint8_t ch))
+{
+	uint32_t reg;
+
+	if (dma) {
+		reg = CR3_DMAR;
+		WR4(sc, USART_CR3, reg);
+	} else {
+		sc->cb = cb;
+		sc->cb_configured = 1;
+
+		/* Enable receive interrupts. */
+		reg = RD4(sc, USART_CR1);
+		reg |= (USART_CR1_RXNEIE);
+		WR4(sc, USART_CR1, reg);
+	}
 }

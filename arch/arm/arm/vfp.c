@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2020-2023 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -50,4 +50,16 @@ vfp_control(bool enable)
 	SCS_WR4(FPU_CPACR, reg);
 
 	__asm __volatile("dsb; isb");
+}
+
+int
+vfp_enabled(void)
+{
+	int reg;
+
+	reg = SCS_RD4(FPU_CPACR);
+	if ((reg & CPACR_CP10_FULL) && (reg & CPACR_CP11_FULL))
+		return (1);
+
+	return (0);
 }

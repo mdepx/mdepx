@@ -28,5 +28,6 @@
 #define _MACHINE_VFP_H_
 
 void vfp_control(bool enable);
+int vfp_enabled(void);
 
 #endif /* !_MACHINE_VFP_H_ */

@@ -39,17 +39,23 @@
 #define	MDX_GPIO_SPEED_LOW	(1 << 7)
 #define	MDX_GPIO_SPEED_MEDIUM	(1 << 8)
 #define	MDX_GPIO_SPEED_HIGH	(1 << 9)
-#define	MDX_GPIO_ALT_FUNC	(1 << 10)	/* Alternate function */
-#define	MDX_GPIO_ANALOG		(1 << 11)	/* Pin is in analog mode */
+#define	MDX_GPIO_SLEW_FAST	(1 << 10)
+#define	MDX_GPIO_HYSTERESIS_EN	(1 << 11)
+#define	MDX_GPIO_ALT_FUNC	(1 << 12)	/* Alternate function */
+#define	MDX_GPIO_ANALOG		(1 << 13)	/* Pin is in analog mode */
 
 struct mdx_gpio_ops {
 	int (*pin_set)(mdx_device_t dev, int pin, int value);
 	int (*pin_get)(mdx_device_t dev, int pin);
 	int (*pin_configure)(mdx_device_t dev, int pin, int flags);
+	int (*pin_set_function)(mdx_device_t dev, int pin, int function);
+	int (*pin_set_dir)(mdx_device_t dev, int pin, int direction);
 };
 
 int mdx_gpio_set(mdx_device_t dev, int pin, int value);
 int mdx_gpio_get(mdx_device_t dev, int pin);
 int mdx_gpio_configure(mdx_device_t dev, int pin, int flags);
+int mdx_gpio_set_function(mdx_device_t dev, int pin, int func);
+int mdx_gpio_set_dir(mdx_device_t dev, int pin, int dir);
 
 #endif /* !_DEV_GPIO_GPIO_H_ */

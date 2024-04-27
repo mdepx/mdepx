@@ -46,6 +46,20 @@
 #define	RP2040_IO_BANK0_DORMANT_WAKE_INTF(n)	(0x170 * 0x4 * (n))
 #define	RP2040_IO_BANK0_DORMANT_WAKE_INTS(n)	(0x180 * 0x4 * (n))
 
+enum rp2040_gpio_function {
+	GPIO_FUNC_XIP = 0,
+	GPIO_FUNC_SPI = 1,
+	GPIO_FUNC_UART = 2,
+	GPIO_FUNC_I2C = 3,
+	GPIO_FUNC_PWM = 4,
+	GPIO_FUNC_SIO = 5,
+	GPIO_FUNC_PIO0 = 6,
+	GPIO_FUNC_PIO1 = 7,
+	GPIO_FUNC_GPCK = 8,
+	GPIO_FUNC_USB = 9,
+	GPIO_FUNC_NULL = 0xf,
+};
+
 struct rp2040_io_bank0_softc {
 	uint32_t base;
 };

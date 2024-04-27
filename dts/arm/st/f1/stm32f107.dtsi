@@ -8,6 +8,8 @@
 
 / {
 	soc {
+		compatible = "st,stm32f107", "st,stm32f1", "simple-bus";
+
 		dma2: dma@40020400 {
 			compatible = "st,stm32-dma-v2bis";
 			#dma-cells = <2>;
@@ -15,7 +17,18 @@
 			clocks = <&rcc STM32_CLOCK_BUS_AHB1 0x2>;
 			interrupts = <56 0 57 0 58 0 59 0 60 0>;
 			status = "disabled";
-			label = "DMA_2";
+		};
+
+		mac: ethernet@40028000 {
+			compatible = "st,stm32-ethernet";
+			reg = <0x40028000 0x2000>;
+			interrupts = <61 0>;
+			clock-names = "stmmaceth", "mac-clk-tx",
+				      "mac-clk-rx";
+			clocks = <&rcc STM32_CLOCK_BUS_AHB1 0x00004000>,
+				 <&rcc STM32_CLOCK_BUS_AHB1 0x00008000>,
+				 <&rcc STM32_CLOCK_BUS_AHB1 0x00010000>;
+			status = "disabled";
 		};
 	};
 };

@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2018-2023 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,14 +39,21 @@
 #define	 USART_CR1_RE		(1 << 2) /* Receiver enable */
 #define	USART_CR2		0x10 /* Control register 2 */
 #define	USART_CR3		0x14 /* Control register 3 */
+#define	 CR3_DMAT		(1 << 7) /* DMA enable transmitter */
+#define	 CR3_DMAR		(1 << 6) /* DMA enable receiver */
 #define	USART_GTPR		0x18 /* Guard time and prescaler register */
 
 struct stm32f4_usart_softc {
 	uint32_t base;
+	void (*cb)(uint8_t ch);
+	int cb_configured;
 };
 
 int stm32f4_usart_init(struct stm32f4_usart_softc *sc, uint32_t base,
     uint32_t cpu_freq, uint32_t baud_rate);
 void stm32f4_usart_putc(struct stm32f4_usart_softc *sc, char c);
+void stm32f4_usart_intr(void *arg, int irq);
+void stm32f4_usart_setup_receiver(struct stm32f4_usart_softc *sc, int dma,
+    void (*cb)(uint8_t ch));
 
 #endif /* !_ARM_STM_STM32F4_USART_H_ */

@@ -8,6 +8,22 @@
 
 / {
 	soc {
+		compatible = "st,stm32l432", "st,stm32l4", "simple-bus";
+
+		clocks {
+			clk_hsi48: clk-hsi48 {
+				#clock-cells = <0>;
+				compatible = "fixed-clock";
+				clock-frequency = <DT_FREQ_M(48)>;
+				status = "disabled";
+			};
+		};
+
+		rng: rng@50060800 {
+			clocks = <&rcc STM32_CLOCK_BUS_AHB2 0x00040000>,
+				 <&rcc STM32_SRC_HSI48 CLK48_SEL(0)>;
+		};
+
 		spi3: spi@40003c00 {
 			compatible = "st,stm32-spi-fifo", "st,stm32-spi";
 			#address-cells = <1>;
@@ -16,33 +32,33 @@
 			clocks = <&rcc STM32_CLOCK_BUS_APB1 0x00008000>;
 			interrupts = <51 5>;
 			status = "disabled";
-			label = "SPI_3";
 		};
 
 		timers7: timers@40001400 {
 			compatible = "st,stm32-timers";
 			reg = <0x40001400 0x400>;
 			clocks = <&rcc STM32_CLOCK_BUS_APB1 0x00000020>;
+			resets = <&rctl STM32_RESET(APB1L, 5U)>;
 			interrupts = <55 0>;
 			interrupt-names = "global";
 			st,prescaler = <0>;
 			status = "disabled";
-			label = "TIMERS_7";
+
+			counter {
+				compatible = "st,stm32-counter";
+				status = "disabled";
+			};
 		};
 
 		can1: can@40006400 {
-			compatible = "st,stm32-can";
+			compatible = "st,stm32-bxcan";
 			reg = <0x40006400 0x400>;
 			interrupts = <19 0>, <20 0>, <21 0>, <22 0>;
 			interrupt-names = "TX", "RX0", "RX1", "SCE";
 			clocks = <&rcc STM32_CLOCK_BUS_APB1 0x02000000>; //RCC_APB1ENR1_CAN1EN
 			status = "disabled";
-			label = "CAN_1";
-			bus-speed = <125000>;
 			sjw = <1>;
-			prop-seg = <0>;
-			phase-seg1 = <4>;
-			phase-seg2 = <5>;
+			sample-point = <875>;
 		};
 
 		usb: usb@40006800 {
@@ -54,9 +70,9 @@
 			ram-size = <1024>;
 			maximum-speed = "full-speed";
 			phys = <&usb_fs_phy>;
-			clocks = <&rcc STM32_CLOCK_BUS_APB1 0x04000000>;
+			clocks = <&rcc STM32_CLOCK_BUS_APB1 0x04000000>,
+				 <&rcc STM32_SRC_HSI48 CLK48_SEL(0)>;
 			status = "disabled";
-			label = "USB";
 		};
 
 		dac1: dac@40007400 {
@@ -64,14 +80,20 @@
 			reg = <0x40007400 0x400>;
 			clocks = <&rcc STM32_CLOCK_BUS_APB1 0x20000000>;
 			status = "disabled";
-			label = "DAC_1";
 			#io-channel-cells = <1>;
+		};
+
+		rtc@40002800 {
+			bbram: bbram_regs {
+				compatible = "st,stm32-bbram";
+				st,backup-regs = <32>;
+				status = "disabled";
+			};
 		};
 	};
 
 	usb_fs_phy: usbphy {
 		compatible = "usb-nop-xceiv";
 		#phy-cells = <0>;
-		label = "USB_FS_PHY";
 	};
 };

@@ -42,7 +42,9 @@ k210_i2c_xfer(mdx_device_t dev, struct i2c_msg *msgs, int len)
 	struct k210_i2c_softc *sc;
 	struct i2c_msg *msg;
 	uint32_t reg;
+	int timeout;
 	int error;
+	int cmd;
 	int i;
 	int j;
 
@@ -56,19 +58,46 @@ k210_i2c_xfer(mdx_device_t dev, struct i2c_msg *msgs, int len)
 
 		WR4(sc, K210_I2C_TAR, msg->slave);
 
+		cmd = 0;
+
 		if (msg->flags & IIC_M_RD) {
 			for (j = 0; j < msg->len; j++) {
-				while (RD4(sc, K210_I2C_TXFLR) >= 8) ;
-				WR4(sc, K210_I2C_DATA_CMD,
-				    K210_I2C_DATA_CMD_CMD);
+				if (((msg->flags & IIC_M_NOSTOP) == 0) &&
+				    (j == msg->len - 1))
+					cmd |= (1 << 9);	/* Stop bit */
 
-				while (RD4(sc, K210_I2C_RXFLR) == 0) ;
+				WR4(sc, K210_I2C_DATA_CMD,
+				    K210_I2C_DATA_CMD_CMD | cmd);
+
+				timeout = 10000;
+				do {
+					reg = RD4(sc, K210_I2C_RXFLR);
+					if (reg != 0)
+						break;
+				} while (timeout--);
+				if (timeout < 0) {
+					error = -2;
+					goto out;
+				}
+
 				msg->buf[j] = RD4(sc, K210_I2C_DATA_CMD);
 			}
 		} else {
 			for (j = 0; j < msg->len; j++) {
-				while (RD4(sc, K210_I2C_TXFLR) >= 8);
-				WR4(sc, K210_I2C_DATA_CMD, msg->buf[j]);
+				timeout = 10000;
+				do {
+					reg = RD4(sc, K210_I2C_TXFLR);
+					if (reg < 8)
+						break;
+				} while (timeout--);
+				if (timeout < 0) {
+					error = -3;
+					goto out;
+				}
+				if (((msg->flags & IIC_M_NOSTOP) == 0) &&
+				    (j == msg->len - 1))
+					cmd |= (1 << 9);	/* Stop bit */
+				WR4(sc, K210_I2C_DATA_CMD, cmd | msg->buf[j]);
 			}
 			reg = RD4(sc, K210_I2C_TX_ABRT_SOURCE);
 			if (reg != 0) {
@@ -77,25 +106,16 @@ k210_i2c_xfer(mdx_device_t dev, struct i2c_msg *msgs, int len)
 			}
 
 			/* Ensure all entries transmitted. */
+			timeout = 10000;
 			do {
 				reg = RD4(sc, K210_I2C_STATUS);
-			} while ((reg & I2C_STATUS_TFE) == 0);
-		}
-
-		if ((msg->flags & IIC_M_NOSTOP) == 0) {
-
-			do {
-				reg = RD4(sc, K210_I2C_STATUS);
-			} while (reg & I2C_STATUS_ACTIVITY);
-
-			/*
-			 * TODO: not sure how to generate STOP condition.
-			 * Do a 25ms timeout which helps.
-			 */
-
-			critical_exit();
-			mdx_usleep(25000);
-			critical_enter();
+				if (reg & I2C_STATUS_TFE)
+					break;
+			} while (timeout--);
+			if (timeout < 0) {
+				error = -4;
+				goto out;
+			}
 		}
 	}
 

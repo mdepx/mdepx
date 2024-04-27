@@ -112,8 +112,7 @@ rp2040_clocks_configure(struct rp2040_clocks_softc *sc,
 }
 
 void
-rp2040_clocks_init(struct rp2040_clocks_softc *sc,
-    uint32_t base)
+rp2040_clocks_init(struct rp2040_clocks_softc *sc, uint32_t base)
 {
 	uint32_t reg;
 
@@ -145,22 +144,12 @@ rp2040_clocks_setup(struct rp2040_clocks_softc *sc)
 				12000000,
 				12000000);
 
-#if 0
-	/* TODO: picoprobe could not reset pico with this. */
 	/* CLK_SYS <= PLL SYS (125MHz) */
 	rp2040_clocks_configure(sc, RP2040_CLOCKS_NDX_SYS,
 				CLOCKS_CLK_SYS_CTRL_SRC_CLKSRC_CLK_SYS_AUX,
 				CLOCKS_CLK_SYS_CTRL_AUXSRC_CLKSRC_PLL_SYS,
-				12000000,
-				12000000);
-#else
-	/* CLK_SYS <= CLK_REF (12MHz) */
-	rp2040_clocks_configure(sc, RP2040_CLOCKS_NDX_SYS,
-				0,
-				0,
-				12000000,
-				12000000);
-#endif
+				125000000,
+				125000000);
 
 	/* CLK USB <= PLL USB (48MHz) */
 	rp2040_clocks_configure(sc, RP2040_CLOCKS_NDX_USB,
@@ -187,6 +176,6 @@ rp2040_clocks_setup(struct rp2040_clocks_softc *sc)
 	rp2040_clocks_configure(sc, RP2040_CLOCKS_NDX_PERI,
 				0,
 				CLOCKS_CLK_PERI_CTRL_AUXSRC_CLK_SYS,
-				12000000,
-				12000000);
+				125000000,
+				125000000);
 }

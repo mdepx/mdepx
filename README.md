@@ -1,6 +1,6 @@
 # Introduction
 
-mdepx (Machdep X) is an operating system for embedded applications.
+mdepx (also known as MDX or Machdep X) is an operating system for embedded applications.
 
 ## Key features
   * Real-time
@@ -14,13 +14,13 @@ mdepx (Machdep X) is an operating system for embedded applications.
   * Flat address space
 
 ## ISA supported
-  * ARM Cortex-M family (ARMv7-M, ARMv8-M) SMP
+  * ARM Cortex-M family (ARMv7-M, ARMv8-M)
   * CHERI128 Hybrid and Pure ABI capability system models
   * MIPS32, MIPS64
   * RISC-V machine or supervisor modes, rv32, rv64, SMP
 
 ## Platforms supported
-  * Raspberry Pi Pico (SMP)
+  * Raspberry Pi Pico
   * Nordic Semiconductor nRF5, nRF9
   * STMicroelectronics STM32
   * Microchip PIC32
@@ -35,7 +35,7 @@ mdepx (Machdep X) is an operating system for embedded applications.
   * qemu/mips64
 
 ## Featured applications (external)
-  * [SMP on Raspberry Pi Pico](https://github.com/machdep/raspberrypi-pico)
+  * [Raspberry Pi Pico](https://github.com/machdep/raspberrypi-pico)
   * [LTE 4G Link with nRF9160](https://github.com/machdep/nrf9160)
   * CTSRD-CHERI [device-model](https://github.com/CTSRD-CHERI/device-model) and [device-model-riscv](https://github.com/CTSRD-CHERI/device-model-riscv)
   * Other [example apps](https://github.com/machdep/)

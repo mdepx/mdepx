@@ -51,6 +51,10 @@ strtof_l(CONST char *s, char **sp, locale_t loc)
 #define fpi &fpi0
 #endif
 
+#ifdef MDX_GDTOA
+	u.f = 0;
+#endif
+
 	k = strtodg_l(s, sp, fpi, &exp, bits, loc);
 	switch(k & STRTOG_Retmask) {
 	  case STRTOG_NoNumber:

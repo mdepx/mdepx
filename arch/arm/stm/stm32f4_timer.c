@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018, 2020 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2020-2023 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,7 @@
 #include <sys/systm.h>
 #include <sys/callout.h>
 
+#include <arm/stm/stm32f4_tim.h>
 #include <arm/stm/stm32f4_timer.h>
 
 #define	TIM_DEBUG
@@ -152,16 +153,16 @@ stm32f4_timer_init(struct stm32f4_timer_softc *sc,
 
 	/*
 	 * Since the timer is 16-bit only, set some reasonable prescaler.
-	 * Let's say 10000 ticks is 1 second.
+	 * Let's say 0xffff ticks is 1 second.
 	 */
 	WR4(sc, TIM_CR1, 0);
-	WR4(sc, TIM_PSC, (freq / 10000) - 1);
+	WR4(sc, TIM_PSC, (freq / 0xffff) - 1);
 
 	sc->mt.start = stm32f4_timer_start;
 	sc->mt.stop = stm32f4_timer_stop;
 	sc->mt.count = stm32f4_timer_count;
 	sc->mt.maxcnt = 0x0000ffff;
-	sc->mt.frequency = 10000;
+	sc->mt.frequency = 0xffff;
 	sc->mt.arg = sc;
 	mdx_callout_register(&sc->mt);
 

@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2021 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2021-2023 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,8 +28,11 @@
 #define	_ARM_RASPBERRYPI_RP2040_H_
 
 #include <arm/raspberrypi/rp2040_clocks.h>
+#include <arm/raspberrypi/rp2040_dma.h>
+#include <arm/raspberrypi/rp2040_gpio.h>
 #include <arm/raspberrypi/rp2040_io_bank0.h>
 #include <arm/raspberrypi/rp2040_pads_bank0.h>
+#include <arm/raspberrypi/rp2040_pio.h>
 #include <arm/raspberrypi/rp2040_pll.h>
 #include <arm/raspberrypi/rp2040_psm.h>
 #include <arm/raspberrypi/rp2040_resets.h>
@@ -124,5 +127,9 @@
 #define	RP2040_RTC_IRQ		25
 
 #define	cpu_coreid()	(*(volatile uint32_t *)RP2040_SIO_BASE & 1)
+
+#define	RP2040_ATOMIC_XOR_REG_OFFSET	0x1000
+#define	RP2040_ATOMIC_SET_REG_OFFSET	0x2000
+#define	RP2040_ATOMIC_CLR_REG_OFFSET	0x3000
 
 #endif /* !_ARM_RASPBERRYPI_RP2040_H_ */

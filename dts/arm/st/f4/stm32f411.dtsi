@@ -8,6 +8,8 @@
 
 / {
 	soc {
+		compatible = "st,stm32f411", "st,stm32f4", "simple-bus";
+
 		spi5: spi@40015000 {
 			compatible = "st,stm32-spi";
 			#address-cells = <1>;
@@ -16,7 +18,6 @@
 			clocks = <&rcc STM32_CLOCK_BUS_APB2 0x00100000>;
 			interrupts = <85 5>;
 			status = "disabled";
-			label = "SPI_5";
 		};
 
 		i2s1: i2s@40013000 {
@@ -30,7 +31,6 @@
 				&dma2 2 3 0x400 0x3>;
 			dma-names = "tx", "rx";
 			status = "disabled";
-			label = "I2S_1";
 		};
 
 		i2s4: i2s@40013400 {
@@ -44,7 +44,6 @@
 				&dma2 0 4 0x400 0x3>;
 			dma-names = "tx", "rx";
 			status = "disabled";
-			label = "I2S_4";
 		};
 
 		i2s5: i2s@40015000 {
@@ -58,7 +57,10 @@
 				&dma2 5 7 0x400 0x3>;
 			dma-names = "tx", "rx";
 			status = "disabled";
-			label = "I2S_5";
 		};
+	};
+
+	die_temp: dietemp {
+		io-channels = <&adc1 18>;
 	};
 };

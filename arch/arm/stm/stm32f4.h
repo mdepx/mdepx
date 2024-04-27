@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2018-2023 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,11 @@
 #include <arm/stm/stm32f4_ltdc.h>
 #include <arm/stm/stm32f4_dsi.h>
 #include <arm/stm/stm32f4_timer.h>
+#include <arm/stm/stm32f4_pwm.h>
+#include <arm/stm/stm32f4_rng.h>
+#include <arm/stm/stm32f4_dma.h>
 
+#define	USART1_BASE	0x40011000
 #define	USART6_BASE	0x40011400
 #define	FLASH_BASE	0x40023C00
 #define	PWR_BASE	0x40007000
@@ -46,7 +50,22 @@
 #define	LTDC_BASE	0x40016800
 #define	DSI_BASE	0x40016C00
 #define	NVIC_BASE	0xE000E100
-#define	TIM2_BASE	0x40000000
 #define	TIM1_BASE	0x40010000
+#define	TIM2_BASE	0x40000000
+#define	TIM3_BASE	0x40000400
+#define	TIM4_BASE	0x40000800
+#define	TIM5_BASE	0x40000c00
+#define	TIM6_BASE	0x40001000
+#define	TIM7_BASE	0x40001400
+#define	TIM8_BASE	0x40010400
+#define	TIM9_BASE	0x40014400
+#define	TIM10_BASE	0x40014400
+#define	TIM11_BASE	0x40014800
+#define	TIM12_BASE	0x40001800
+#define	TIM13_BASE	0x40001c00
+#define	TIM14_BASE	0x40002000
+#define	RNG_BASE	0x50060800
+#define	DMA1_BASE	0x40026000
+#define	DMA2_BASE	0x40026400
 
 #endif	/* !_ARM_STM_STM32F4_H_ */

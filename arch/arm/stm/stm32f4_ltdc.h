@@ -27,6 +27,9 @@
 #ifndef _ARM_STM_STM32F4_LTDC_H_
 #define _ARM_STM_STM32F4_LTDC_H_
 
+#include <dev/display/panel.h>
+#include <dev/display/dsi.h>
+
 #define	LTDC_SSCR	0x0008 /*   */
 #define	 SSCR_HSW_S	16
 #define	 SSCR_VSW_S	0

@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018-2020 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2018-2023 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -68,9 +68,14 @@ cpu_idle(void)
 {
 
 	critical_enter();
+#ifdef MDX_ARM_SWD_DEBUG
+	/* Do not put core to sleep as it disables JTAG clock. */
+	__asm __volatile("dsb");
+#else
 	__asm __volatile(
 		"dsb \n"
 		"wfi \n");
+#endif
 	critical_exit();
 }
 

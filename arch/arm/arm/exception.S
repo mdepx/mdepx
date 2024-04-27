@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018-2019 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2018-2023 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,21 @@
 	.thumb_func
 	.type exception, function
 exception:
+
+	/*
+	 * Stack pointer selection.
+	 * Check bit in EXC_RETURN (r14) if stack saved on psp or msp.
+	 */
+
+	mov	r1, r14			/* r1 == EXC_RETURN */
+	lsls	r1, #29			/* Shift left by 29 */
+	bmi	1f			/* Branch if minus. */
+	mrs	r0, msp
+	b	2f
+
+1:
 	mrs	r0, psp
+2:
 	mrs	r1, ipsr		/* r1 = exception number. */
 	mrs	r3, primask		/* r3 = primask. */
 #ifndef MDX_ARM_THUMB_CM0
@@ -60,6 +74,16 @@ exception:
 	mov	r7, r14
 	str	r7, [r0, #36]
 #endif
+
+	/*
+	 * Adjust msp if needed, so we have valid stack in arm_exception.
+	 */
+	mov	r2, r14			/* r1 == EXC_RETURN */
+	lsls	r2, #29			/* Shift left by 29 */
+	bmi	1f
+	msr	msp, r0
+1:
+
 	cpsid	i			/* Disable interrupts. */
 
 	bl	arm_exception		/* Branch link to arm_exception() */
@@ -83,7 +107,15 @@ exception:
 	ldr	r7, [r0, #16]
 	adds	r0, r0, 40
 #endif
+	mov	r1, r14
+	lsls	r1, #29
+	bmi	5f
+	msr	msp, r0
+	b	6f
+5:
 	msr 	psp, r0			/* Restore sp. */
+6:
+
 	msr	primask, r3		/* Restore interrupts. */
 	bx	r14
 
@@ -138,11 +170,11 @@ __start:
 	movs	r0, 2
 	msr	control, r0
 
-#ifndef MDX_ARM_THUMB_CM0
-	mov	r0, 0	/* cpuid */
-#else
+	/* Ensure msp is not in use. */
+	movs	r0, 0
+	msr	msp, r0
+
 	movs	r0, 0	/* cpuid */
-#endif
 
 	bl	md_init
 
