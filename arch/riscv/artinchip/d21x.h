@@ -102,4 +102,60 @@
 #define	BASE_C906_CINT	(C906_CPU_BASE + 0x04000000)
 #define	BASE_DRAM	0x40000000
 
+#define	ID_DMA			32
+#define	ID_CE			33
+#define	ID_USB_DEV		34
+#define	ID_USB_HOST0_EHCI	35
+#define	ID_USB_HOST0_OHCI	36
+#define	ID_USB_HOST1_EHCI	37
+#define	ID_USB_HOST1_OHCI	38
+#define	ID_GMAC0		39
+#define	ID_GMAC1		40
+#define	ID_QSPI0		44
+#define	ID_QSPI1		45
+#define	ID_QSPI2		42
+#define	ID_QSPI3		43
+#define	ID_SDMC0		46
+#define	ID_SDMC1		47
+#define	ID_SDMC2		48
+#define	ID_SPI_ENC		41
+#define	ID_PWMCS_FAULT		24
+#define	ID_PWMCS_PWM		25
+#define	ID_PWMCS_CAP		26
+#define	ID_PWMCS_QEP		27
+#define	ID_PSADC		28
+#define	ID_MTOP			51
+#define	ID_I2S0			52
+#define	ID_I2S1			53
+#define	ID_AUDIO		54
+#define	ID_GPIO			68 /* 68 - 75 */
+#define	ID_UART0		76
+#define	ID_UART1		77
+#define	ID_UART2		78
+#define	ID_UART3		79
+#define	ID_UART4		80
+#define	ID_UART5		81
+#define	ID_UART6		82
+#define	ID_UART7		83
+#define	ID_LCD			55
+#define	ID_MIPI_DSI		56
+#define	ID_DVP			57
+#define	ID_MIPI_CSI		58
+#define	ID_DE			59
+#define	ID_GE			60
+#define	ID_VE			61
+#define	ID_WDT			64
+#define	ID_RTC			50
+#define	ID_I2C0			84
+#define	ID_I2C1			85
+#define	ID_I2C2			86
+#define	ID_I2C3			87
+#define	ID_CAN0			88
+#define	ID_CAN1			89
+#define	ID_PWM			90
+#define	ID_GPAI			92
+#define	ID_RTP			93
+#define	ID_TSEN			94
+#define	ID_CIR			95
+
 #endif /* !_RISCV_ARTINCHIP_D21X_H_ */
