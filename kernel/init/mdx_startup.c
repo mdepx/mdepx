@@ -60,7 +60,7 @@ mi_startup(void)
 
 	for (si = si_start, i = 0; si < si_end; si++, i++) {
 		printf("%s: Initializing sysinit #%d"
-			" (subsystem %d, order %d, func %jx)\n",
+			" (subsystem %d, order %d, func %p)\n",
 		    __func__, i, si->subsystem, si->order, si->func);
 		si->func(si->arg);
 	}
