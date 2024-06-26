@@ -34,6 +34,32 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
+d21x_cmu_clk_enable(mdx_device_t dev, uint32_t clk_reg, uint32_t div)
+{
+	struct d21x_cmu_softc *sc;
+	uint32_t reg;
+	int i;
+
+	sc = mdx_device_get_softc(dev);
+
+	reg = (div << MOD_CLK_DIV_S);
+	WR4(sc, clk_reg, reg);
+
+	reg |= MOD_CLK_EN;
+	reg |= MOD_BUS_EN;
+	WR4(sc, clk_reg, reg);
+
+	/* TODO: delay */
+	for (i = 0; i < 100000; i ++) {};
+
+	reg |= MOD_RSTN;
+	WR4(sc, clk_reg, reg);
+
+	/* TODO: delay */
+	for (i = 0; i < 100000; i ++) {};
+}
+
+void
 d21x_cmu_init(mdx_device_t dev, uint32_t base)
 {
 	struct d21x_cmu_softc *sc;

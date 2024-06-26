@@ -24,8 +24,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _RISCV_ARTINCHIP_D21X_CLK_H_
-#define	_RISCV_ARTINCHIP_D21X_CLK_H_
+#ifndef _RISCV_ARTINCHIP_D21X_CMU_H_
+#define	_RISCV_ARTINCHIP_D21X_CMU_H_
 
 /* Fixed rate. */
 #define	D21X_CLK_ID_DUMMY	0
@@ -237,5 +237,6 @@ struct d21x_cmu_softc {
 };
 
 void d21x_cmu_init(mdx_device_t dev, uint32_t base);
+void d21x_cmu_clk_enable(mdx_device_t dev, uint32_t clk_reg, uint32_t div);
 
-#endif /* !_RISCV_ARTINCHIP_D21X_CLK_H_ */
+#endif /* !_RISCV_ARTINCHIP_D21X_CMU_H_ */
