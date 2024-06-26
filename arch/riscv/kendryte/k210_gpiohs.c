@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2020-2024 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 static void
-k210_gpiohs_set_dir(mdx_device_t dev, int pin, int dir)
+k210_gpiohs_set_dir(mdx_device_t dev, int bank, int pin, int dir)
 {
 	struct k210_gpiohs_softc *sc;
 	uint32_t reg;
@@ -59,19 +59,19 @@ k210_gpiohs_set_dir(mdx_device_t dev, int pin, int dir)
 }
 
 static int
-k210_gpiohs_pin_configure(mdx_device_t dev, int pin, int flags)
+k210_gpiohs_pin_configure(mdx_device_t dev, int bank, int pin, int flags)
 {
 
 	if (flags & MDX_GPIO_INPUT)
-		k210_gpiohs_set_dir(dev, pin, 0);
+		k210_gpiohs_set_dir(dev, bank, pin, 0);
 	else
-		k210_gpiohs_set_dir(dev, pin, 1);
+		k210_gpiohs_set_dir(dev, bank, pin, 1);
 
 	return (0);
 }
 
 static int
-k210_gpiohs_set_pin(mdx_device_t dev, int pin, int val)
+k210_gpiohs_set_pin(mdx_device_t dev, int bank, int pin, int val)
 {
 	struct k210_gpiohs_softc *sc;
 	uint32_t reg;
@@ -89,7 +89,7 @@ k210_gpiohs_set_pin(mdx_device_t dev, int pin, int val)
 }
 
 static int
-k210_gpiohs_get_pin(mdx_device_t dev, int pin)
+k210_gpiohs_get_pin(mdx_device_t dev, int bank, int pin)
 {
 	struct k210_gpiohs_softc *sc;
 	uint32_t reg;

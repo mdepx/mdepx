@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2023 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2023-2024 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -53,7 +53,7 @@
 	*(volatile uint32_t *)((_sc)->pads_base + _reg) = _val
 
 static int
-rp2040_gpio_set_pin(mdx_device_t dev, int pin, int val)
+rp2040_gpio_set_pin(mdx_device_t dev, int bank, int pin, int val)
 {
 	struct rp2040_gpio_softc *sc;
 
@@ -68,7 +68,7 @@ rp2040_gpio_set_pin(mdx_device_t dev, int pin, int val)
 }
 
 static int
-rp2040_gpio_get_pin(mdx_device_t dev, int pin)
+rp2040_gpio_get_pin(mdx_device_t dev, int bank, int pin)
 {
 	struct rp2040_gpio_softc *sc;
 	uint32_t reg;
@@ -83,7 +83,7 @@ rp2040_gpio_get_pin(mdx_device_t dev, int pin)
 }
 
 static int
-rp2040_gpio_pin_set_dir(mdx_device_t dev, int pin, int dir)
+rp2040_gpio_pin_set_dir(mdx_device_t dev, int bank, int pin, int dir)
 {
 	struct rp2040_gpio_softc *sc;
 
@@ -98,7 +98,7 @@ rp2040_gpio_pin_set_dir(mdx_device_t dev, int pin, int dir)
 }
 
 static int
-rp2040_gpio_pin_configure(mdx_device_t dev, int pin, int flags)
+rp2040_gpio_pin_configure(mdx_device_t dev, int bank, int pin, int flags)
 {
 	struct rp2040_gpio_softc *sc;
 	uint32_t reg;
@@ -144,7 +144,7 @@ rp2040_gpio_pin_configure(mdx_device_t dev, int pin, int flags)
 }
 
 static int
-rp2040_gpio_pin_set_function(mdx_device_t dev, int pin, int func)
+rp2040_gpio_pin_set_function(mdx_device_t dev, int bank, int pin, int func)
 {
 	struct rp2040_gpio_softc *sc;
 	uint32_t reg;

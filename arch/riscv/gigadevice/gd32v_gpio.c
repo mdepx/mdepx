@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2024 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,7 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 static int
-gd32v_gpio_pin_configure(mdx_device_t dev, int pin, int flags)
+gd32v_gpio_pin_configure(mdx_device_t dev, int bank, int pin, int flags)
 {
 	struct gd32v_gpio_softc *sc;
 	uint32_t reg;
@@ -87,7 +87,7 @@ gd32v_gpio_pin_configure(mdx_device_t dev, int pin, int flags)
 }
 
 static int
-gd32v_gpio_pin_set(mdx_device_t dev, int pin, int val)
+gd32v_gpio_pin_set(mdx_device_t dev, int bank, int pin, int val)
 {
 	struct gd32v_gpio_softc *sc;
 
@@ -102,7 +102,7 @@ gd32v_gpio_pin_set(mdx_device_t dev, int pin, int val)
 }
 
 static int
-gd32v_gpio_pin_get(mdx_device_t dev, int pin)
+gd32v_gpio_pin_get(mdx_device_t dev, int bank, int pin)
 {
 
 	/* TODO */

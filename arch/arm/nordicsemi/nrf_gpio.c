@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2019-2020 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2019-2024 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,7 +45,7 @@ static struct mdx_compat_data nrf_gpio_compat_data[] = {
 #endif
 
 static int
-nrf_gpio_set_pin(mdx_device_t dev, int pin, int val)
+nrf_gpio_set_pin(mdx_device_t dev, int bank, int pin, int val)
 {
 	struct nrf_gpio_softc *sc;
 
@@ -60,7 +60,7 @@ nrf_gpio_set_pin(mdx_device_t dev, int pin, int val)
 }
 
 static int
-nrf_gpio_get_pin(mdx_device_t dev, int pin)
+nrf_gpio_get_pin(mdx_device_t dev, int bank, int pin)
 {
 	struct nrf_gpio_softc *sc;
 
@@ -73,7 +73,7 @@ nrf_gpio_get_pin(mdx_device_t dev, int pin)
 }
 
 static int
-nrf_gpio_pin_configure(mdx_device_t dev, int pin, int flags)
+nrf_gpio_pin_configure(mdx_device_t dev, int bank, int pin, int flags)
 {
 	struct nrf_gpio_softc *sc;
 
@@ -88,7 +88,7 @@ nrf_gpio_pin_configure(mdx_device_t dev, int pin, int flags)
 }
 
 void
-nrf_gpio_pincfg(mdx_device_t dev, int pin, int cfg)
+nrf_gpio_pincfg(mdx_device_t dev, int bank, int pin, int cfg)
 {
 	struct nrf_gpio_softc *sc;
 
