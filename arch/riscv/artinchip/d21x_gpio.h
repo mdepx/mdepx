@@ -39,37 +39,30 @@ enum {
 	GRP_MAX,
 };
 
-#define	GPIO_BASE_PA	0x00
-#define	GPIO_BASE_PB	0x20
-#define	GPIO_BASE_PC	0x40
-#define	GPIO_BASE_PD	0x60
-#define	GPIO_BASE_PE	0x80
-#define	GPIO_BASE_PF	0xa0
-#define	GPIO_BASE_PG	0xc0
-#define	GPIO_BASE_PH	0xe0
-#define	GPIO_BASE_PI	0x100
-#define	GPIO_BASE_PJ	0x120
-#define	GPIO_BASE_PK	0x140
-#define	GPIO_BASE_PL	0x160
-#define	GPIO_BASE_PM	0x180
-#define	GPIO_BASE_PN	0x1a0
-#define	GPIO_BASE_PO	0x1c0
-
-#define	GPIOA(n)	(PA_BASE + (n))
-#define	GPIOB(n)	(PB_BASE + (n))
-#define	GPIOC(n)	(PC_BASE + (n))
-#define	GPIOD(n)	(PD_BASE + (n))
-#define	GPIOE(n)	(PE_BASE + (n))
-#define	GPIOF(n)	(PF_BASE + (n))
-#define	GPIOG(n)	(PG_BASE + (n))
-#define	GPIOH(n)	(PH_BASE + (n))
-#define	GPIOI(n)	(PI_BASE + (n))
-#define	GPIOJ(n)	(PJ_BASE + (n))
-#define	GPIOK(n)	(PK_BASE + (n))
-#define	GPIOL(n)	(PL_BASE + (n))
-#define	GPIOM(n)	(PM_BASE + (n))
-#define	GPION(n)	(PN_BASE + (n))
-#define	GPIOO(n)	(PO_BASE + (n))
+/*
+ * This register is valid when PIN_FUN=1 & GEN_IN_EN=1,
+ * PIN_FUN=2~6 & SPE_IN_EN=1.
+ */
+#define	GPIO_GEN_IN_STA(g)	(0x00 + (g) * 0x100) /* Input Status */
+/* This register is valid only when PIN_FUN=1 & GEN_OUT_EN=1 */
+#define	GPIO_GEN_OUT_CFG(g)	(0x04 + (g) * 0x100)
+#define	GPIO_GEN_IRQ_EN(g)	(0x08 + (g) * 0x100)
+#define	GPIO_GEN_IRQ_STA(g)	(0x0C + (g) * 0x100)
+#define	GPIO_GEN_OUT_CLR(g)	(0x10 + (g) * 0x100)
+#define	GPIO_GEN_OUT_SET(g)	(0x14 + (g) * 0x100)
+#define	GPIO_GEN_OUT_TOG(g)	(0x18 + (g) * 0x100)
+#define	GPIO_PIN_CFG(g, p)	(0x80 + (g) * 0x100 + (p) * 0x4)
+#define	 PIN_CFG_PIN_FUN_S	0
+#define	 PIN_CFG_PIN_FUN_M	(0xf << PIN_CFG_PIN_FUN_S)
+#define	 PIN_CFG_PIN_DRV_S	4
+#define	 PIN_CFG_PIN_DRV_M	(0x7 << PIN_CFG_PIN_DRV_S)
+#define	 PIN_CFG_PIN_PULL_S	8
+#define	 PIN_CFG_PIN_PULL_M	(0x3 << PIN_CFG_PIN_PULL_S)
+#define	 PIN_CFG_GEN_IRQ_MODE_S	12
+#define	 PIN_CFG_GEN_IRQ_MODE_M	(0x7 << PIN_CFG_GEN_IRQ_MODE_S)
+#define	 PIN_CFG_GEN_IE		(1 << 16)
+#define	 PIN_CFG_GEN_OE		(1 << 17)
+#define	 PIN_CFG_SPE_IE_FORCE	(1 << 18)
 
 #define	PIN_PA0_GPAI0		2
 #define	PIN_PA0_PSADC0		3
@@ -610,5 +603,11 @@ enum {
 
 #define	PIN_FUNC_DISABLED	0
 #define	PIN_FUNC_GPIO		1
+
+struct d21x_gpio_softc {
+	size_t base;
+};
+
+void d21x_gpio_init(mdx_device_t dev, uint32_t base);
 
 #endif /* !_RISCV_ARTINCHIP_D21X_GPIO_H_ */

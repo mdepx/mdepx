@@ -28,6 +28,7 @@
 #define _RISCV_ARTINCHIP_D21X_H_
 
 #include <riscv/artinchip/d21x_clk.h>
+#include <riscv/artinchip/d21x_gpio.h>
 
 #define	BASE_BROM	0x00000000
 #define	BASE_SRAM	0x00100000
