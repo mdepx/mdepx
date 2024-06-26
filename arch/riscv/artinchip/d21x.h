@@ -27,9 +27,7 @@
 #ifndef _RISCV_ARTINCHIP_D21X_H_
 #define _RISCV_ARTINCHIP_D21X_H_
 
-#if 0
-#include <riscv/artinchip/d21x_uart.h>
-#endif
+#include <riscv/artinchip/d21x_clk.h>
 
 #define	BASE_BROM	0x00000000
 #define	BASE_SRAM	0x00100000
