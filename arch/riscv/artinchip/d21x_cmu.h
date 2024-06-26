@@ -226,4 +226,16 @@
 #define	D21X_CLK_CIR		0x09B0
 #define	D21X_CLK_VER		0x0FFC
 
+#define	MOD_RSTN		(1 << 13) /* Module reset control */
+#define	MOD_BUS_EN		(1 << 12) /* Bus clock enable */
+#define	MOD_CLK_EN		(1 << 8) /* Module clock enable */
+#define	MOD_CLK_DIV_S		0
+#define	MOD_CLK_DIV_M		(0x1f << MOD_CLK_DIV_S)
+
+struct d21x_cmu_softc {
+	size_t base;
+};
+
+void d21x_cmu_init(mdx_device_t dev, uint32_t base);
+
 #endif /* !_RISCV_ARTINCHIP_D21X_CLK_H_ */
