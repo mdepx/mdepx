@@ -88,7 +88,7 @@ nrf_gpio_pin_configure(mdx_device_t dev, int bank, int pin, int flags)
 }
 
 void
-nrf_gpio_pincfg(mdx_device_t dev, int bank, int pin, int cfg)
+nrf_gpio_pincfg(mdx_device_t dev, int pin, int cfg)
 {
 	struct nrf_gpio_softc *sc;
 
