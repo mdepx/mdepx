@@ -160,7 +160,7 @@ clint_mtime(void *arg)
 	low = RD4(sc, MTIME);
 #endif
 
-#else
+#else /* MDX_RISCV_SUPERVISOR_MODE */
 
 #if __riscv_xlen == 64
 	low = csr_read(time);
