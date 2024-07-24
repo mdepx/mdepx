@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2023 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2024 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,26 +24,16 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ARM_STM_STM32G0_H_
-#define _ARM_STM_STM32G0_H_
+#ifndef _ARM_STM_STM32G0_SYSCFG_H_
+#define _ARM_STM_STM32G0_SYSCFG_H_
 
-#include <arm/stm/stm32f4_gpio.h>
-#include <arm/stm/stm32f4_timer.h>
-#include <arm/stm/stm32g0_rcc.h>
-#include <arm/stm/stm32l4_usart.h>
-#include <arm/stm/stm32f4_i2c.h>
-#include <arm/stm/stm32g0_syscfg.h>
+#define	SYSCFG_CFGR1	0x00
+#define	 CFGR1_I2C1_FMP	(1 << 20) /* Fast Mode Plus (FM+) enable for I2C1. */
 
-#define	USART2_BASE	0x40004400
-#define	USART1_BASE	0x40013800
-#define	RCC_BASE	0x40021000
-#define	FLASH_BASE	0x40022000
-#define	GPIO_BASE	0x50000000
-#define	TIM1_BASE	0x40012C00
-#define	NVIC_BASE	0xE000E100
-#define	I2C1_BASE	0x40005400
-#define	I2C2_BASE	0x40005800
-#define	I2C3_BASE	0x40008800
-#define	SYSCFG_BASE	0x40010000
+struct stm32g0_syscfg_softc {
+	uint32_t base;
+};
 
-#endif	/* !_ARM_STM_STM32G0_H_ */
+void stm32g0_syscfg_init(struct stm32g0_syscfg_softc *sc, uint32_t base);
+
+#endif /* !_ARM_STM_STM32G0_SYSCFG_H_ */
