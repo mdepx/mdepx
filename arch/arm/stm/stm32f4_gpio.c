@@ -33,8 +33,8 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
-pin_set(struct stm32f4_gpio_softc *sc, uint32_t port,
-    uint32_t pin, uint32_t enable)
+pin_set(struct stm32f4_gpio_softc *sc, uint32_t port, uint32_t pin,
+    uint32_t enable)
 {
 	uint32_t reg;
 
@@ -47,8 +47,7 @@ pin_set(struct stm32f4_gpio_softc *sc, uint32_t port,
 }
 
 int
-pin_get(struct stm32f4_gpio_softc *sc, uint32_t port,
-    uint32_t pin)
+pin_get(struct stm32f4_gpio_softc *sc, uint32_t port, uint32_t pin)
 {
 	uint32_t reg;
 
