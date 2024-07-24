@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2023 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2024 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,28 +24,39 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ARM_STM_STM32G0_H_
-#define _ARM_STM_STM32G0_H_
+#ifndef _ARM_STM_STM32G0_EXTI_H_
+#define _ARM_STM_STM32G0_EXTI_H_
 
-#include <arm/stm/stm32f4_gpio.h>
-#include <arm/stm/stm32f4_timer.h>
-#include <arm/stm/stm32g0_rcc.h>
-#include <arm/stm/stm32l4_usart.h>
-#include <arm/stm/stm32f4_i2c.h>
-#include <arm/stm/stm32g0_syscfg.h>
-#include <arm/stm/stm32g0_exti.h>
+#define	EXTI_RTSR1		0x00
+#define	EXTI_FTSR1		0x04
+#define	EXTI_SWIER1		0x08
+#define	EXTI_RPR1		0x0C
+#define	EXTI_FPR1		0x10
+#define	_EXTI_EXTICR(x)		(0x060 + 0x4 * ((x) - 1)) /* (x = 1 to 4) */
+#define	EXTI_EXTICR(x)		_EXTI_EXTICR(((x) / 4) + 1)
+#define	 EXTICR_S(x)		((x % 4) * 8)
+#define	 EXTICR_PA(x)		(0 << EXTICR_PIN_S(x))
+#define	 EXTICR_PB(x)		(1 << EXTICR_PIN_S(x))
+#define	 EXTICR_PC(x)		(2 << EXTICR_PIN_S(x))
+#define	 EXTICR_PD(x)		(3 << EXTICR_PIN_S(x))
+#define	 EXTICR_PF(x)		(5 << EXTICR_PIN_S(x))
+#define	EXTI_IMR1		0x80
+#define	EXTI_EMR1		0x84
 
-#define	USART2_BASE	0x40004400
-#define	USART1_BASE	0x40013800
-#define	RCC_BASE	0x40021000
-#define	FLASH_BASE	0x40022000
-#define	GPIO_BASE	0x50000000
-#define	TIM1_BASE	0x40012C00
-#define	NVIC_BASE	0xE000E100
-#define	I2C1_BASE	0x40005400
-#define	I2C2_BASE	0x40005800
-#define	I2C3_BASE	0x40008800
-#define	SYSCFG_BASE	0x40010000
-#define	EXTI_BASE	0x40021800
+struct exti_intr_entry {
+	void (*handler) (void *arg);
+	void *arg;
+};
 
-#endif	/* !_ARM_STM_STM32G0_H_ */
+struct stm32g0_exti_softc {
+	uint32_t base;
+	const struct exti_intr_entry *map;
+};
+
+void stm32g0_exti_intr(void *arg, int irq);
+void stm32g0_exti_install_intr_map(struct stm32g0_exti_softc *sc,
+    const struct exti_intr_entry *map);
+void stm32g0_exti_setup(struct stm32g0_exti_softc *sc, uint32_t n);
+void stm32g0_exti_init(struct stm32g0_exti_softc *sc, uint32_t base);
+
+#endif /* !_ARM_STM_STM32G0_EXTI_H_ */
