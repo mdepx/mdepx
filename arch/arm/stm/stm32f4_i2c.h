@@ -38,8 +38,7 @@ struct stm32f4_i2c_softc {
 };
 
 void stm32f4_i2c_intr(void *arg, int irq);
-void stm32f4_i2c_init(struct stm32f4_i2c_softc *sc, uint32_t base);
-int stm32f4_i2c_xfer(struct stm32f4_i2c_softc *sc,
-    struct i2c_msg *msgs, uint32_t len);
+void stm32f4_i2c_init(mdx_device_t dev, uint32_t base);
+int stm32f4_i2c_xfer(mdx_device_t dev, struct i2c_msg *msgs, int len);
 
 #endif	/* !_ARM_STM_STM32F4_I2C_H_ */

@@ -126,12 +126,14 @@ i2c_setup(struct stm32f4_i2c_softc *sc)
 }
 
 int
-stm32f4_i2c_xfer(struct stm32f4_i2c_softc *sc,
-    struct i2c_msg *msgs, uint32_t len)
+stm32f4_i2c_xfer(mdx_device_t dev, struct i2c_msg *msgs, int len)
 {
+	struct stm32f4_i2c_softc *sc;
 	struct i2c_msg *msg;
 	int reg;
 	int i;
+
+	sc = mdx_device_get_softc(dev);
 
 	dprintf("%s\n", __func__);
 
@@ -187,9 +189,17 @@ i2c_test(struct stm32f4_i2c_softc *sc)
 }
 #endif
 
-void
-stm32f4_i2c_init(struct stm32f4_i2c_softc *sc, uint32_t base)
-{
+static struct mdx_i2c_ops stm32f4_i2c_ops = {
+	.xfer = stm32f4_i2c_xfer,
+};
 
+void
+stm32f4_i2c_init(mdx_device_t dev, uint32_t base)
+{
+	struct stm32f4_i2c_softc *sc;
+
+	sc = mdx_device_get_softc(dev);
 	sc->base = base;
+
+	dev->ops = &stm32f4_i2c_ops;
 }
