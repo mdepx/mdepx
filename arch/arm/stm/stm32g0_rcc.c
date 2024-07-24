@@ -44,6 +44,15 @@ stm32g0_rcc_usartsel_sysclk(struct stm32g0_rcc_softc *sc)
 	WR4(sc, RCC_CCIPR, 1 << 2); /* USART2SEL SYSCLK */
 	WR4(sc, RCC_CCIPR, reg);
 }
+
+void
+stm32g0_rcc_i2c1sel_hsi16(struct stm32g0_rcc_softc *sc)
+{
+	uint32_t reg;
+
+	reg = CCIPR_I2C1SEL_HSI16;
+	WR4(sc, RCC_CCIPR, reg);
+}
 #endif
 
 void
