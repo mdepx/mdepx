@@ -36,7 +36,6 @@
 void
 stm32g0_syscfg_init(struct stm32g0_syscfg_softc *sc, uint32_t base)
 {
-	uint32_t reg;
 
 	sc->base = base;
 }
