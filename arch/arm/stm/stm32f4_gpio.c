@@ -59,9 +59,9 @@ pin_get(struct stm32f4_gpio_softc *sc, uint32_t port, uint32_t pin)
 }
 
 void
-pin_configure(struct stm32f4_gpio_softc *sc, const struct gpio_pin *pins)
+pin_configure(struct stm32f4_gpio_softc *sc, const struct stm32_gpio_pin *pins)
 {
-	const struct gpio_pin *cfg;
+	const struct stm32_gpio_pin *cfg;
 	uint32_t afr;
 	uint32_t reg;
 	int i;
@@ -86,13 +86,17 @@ pin_configure(struct stm32f4_gpio_softc *sc, const struct gpio_pin *pins)
 			WR4(sc, afr, reg);
 		}
 
+		reg = RD4(sc, GPIO_OTYPER(cfg->port));
+		reg |= (cfg->otyper << cfg->pin);
+		WR4(sc, GPIO_OTYPER(cfg->port), reg);
+
 		reg = RD4(sc, GPIO_OSPEEDR(cfg->port));
-		reg &= ~(3 << (cfg->pin * 2));
-		reg |= (3 << (cfg->pin * 2));
+		reg &= ~(OSPEEDR_M << (cfg->pin * 2));
+		reg |= (cfg->ospeedr << (cfg->pin * 2));
 		WR4(sc, GPIO_OSPEEDR(cfg->port), reg);
 
 		reg = RD4(sc, GPIO_PUPDR(cfg->port));
-		reg &= ~(3 << (cfg->pin * 2));
+		reg &= ~(PUPDR_M << (cfg->pin * 2));
 		reg |= (cfg->pupdr << (cfg->pin * 2));
 		WR4(sc, GPIO_PUPDR(cfg->port), reg);
 	}

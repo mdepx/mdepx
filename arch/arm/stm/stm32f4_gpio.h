@@ -33,10 +33,16 @@
 #define	 MODE_ALT	2	/* Alternate function mode */
 #define	 MODE_ANA	3	/* Analog mode (reset state) */
 #define	GPIO_OTYPER(n)	(0x04 + 0x400 * (n))	/* port output type */
-#define	 OT_PUSHPULL	0
-#define	 OT_OPENDRAIN	1
+#define	 OT_PP		0	/* Push-pull */
+#define	 OT_OD		1	/* Opendrain */
 #define	GPIO_OSPEEDR(n)	(0x08 + 0x400 * (n))	/* port output speed */
+#define	 OSPEEDR_M	3	/* Mask */
+#define	 OS_VL		0	/* Very low */
+#define	 OS_L		1	/* Low */
+#define	 OS_H		2	/* High */
+#define	 OS_VH		3	/* Very High */
 #define	GPIO_PUPDR(n)	(0x0C + 0x400 * (n))	/* port pull-up/pull-down */
+#define	 PUPDR_M	3
 #define	 FLOAT		0	/* No pull-up, pull-down */
 #define	 PULLUP		1
 #define	 PULLDOWN	2
@@ -47,8 +53,6 @@
 #define	GPIO_AFRL(n)	(0x20 + 0x400 * (n))	/* alternate function low */
 #define	GPIO_AFRH(n)	(0x24 + 0x400 * (n))	/* alternate function high */
 #define	GPIO_BRR(n)	(0x28 + 0x400 * (n))	/* port bit reset */
-
-#define	PINS_END	{ -1, -1, -1, -1, -1 }
 
 enum {
 	PORT_A,
@@ -64,20 +68,26 @@ enum {
 	PORT_K,
 };
 
-struct gpio_pin {
+struct stm32_gpio_pin {
 	uint32_t	port;
 	uint32_t	pin;
-	uint32_t	mode;
-	uint32_t	alt;
-	uint32_t	pupdr;
+	uint32_t	mode;		/* mode */
+	uint32_t	alt;		/* alternate function ID */
+	uint32_t	otyper;		/* port output type */
+	uint32_t	ospeedr;	/* port output speed */
+	uint32_t	pupdr;		/* port pull-up/pull-down */
 };
+
+#define	PINS_END	{ -1, -1, -1, -1, -1, -1, -1}
+
 
 struct stm32f4_gpio_softc {
 	uint32_t base;
 };
 
 int stm32f4_gpio_init(struct stm32f4_gpio_softc *sc, uint32_t base);
-void pin_configure(struct stm32f4_gpio_softc *sc, const struct gpio_pin *pins);
+void pin_configure(struct stm32f4_gpio_softc *sc,
+    const struct stm32_gpio_pin *pins);
 void pin_set(struct stm32f4_gpio_softc *sc, uint32_t port,
     uint32_t pin, uint32_t enable);
 int pin_get(struct stm32f4_gpio_softc *sc, uint32_t port, uint32_t pin);
