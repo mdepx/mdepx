@@ -44,7 +44,7 @@
 #define	EXTI_EMR1		0x84
 
 struct exti_intr_entry {
-	void (*handler) (void *arg);
+	void (*handler) (void *arg, int raising);
 	void *arg;
 };
 

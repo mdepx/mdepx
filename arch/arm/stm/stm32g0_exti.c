@@ -38,33 +38,31 @@ stm32g0_exti_intr(void *arg, int irq)
 {
 	struct stm32g0_exti_softc *sc;
 	uint32_t reg;
+	int i;
 
 	sc = arg;
 
-#if 0
-	reg = RD4(sc, EXTI_PR(0));
-	for (i = 0; i < 32; i++)
-		if (reg & (1 << i))
-			if (sc->map[i].handler != NULL)
-				sc->map[i].handler(sc->map[i].arg);
-	WR4(sc, EXTI_PR(0), reg);
-
-	reg = RD4(sc, EXTI_PR(32));
-	for (i = 0; i < 7; i++)
-		if (reg & (1 << i))
-			if (sc->map[32 + i].handler != NULL)
-				sc->map[32 + i].handler(sc->map[32 + i].arg);
-	WR4(sc, EXTI_PR(32), reg);
-#endif
-	printf("%s\n", __func__);
+	reg = RD4(sc, EXTI_RPR1);
+	if (reg) {
+		for (i = 0; i < 32; i++)
+			if (reg & (1 << i)) {
+				if (sc->map != NULL &&
+				    sc->map[i].handler != NULL)
+					sc->map[i].handler(sc->map[i].arg, 1);
+				WR4(sc, EXTI_RPR1, (1 << i));
+			}
+	}
 
 	reg = RD4(sc, EXTI_FPR1);
-	if (reg)
-		WR4(sc, EXTI_FPR1, reg);
-
-	reg = RD4(sc, EXTI_RPR1);
-	if (reg)
-		WR4(sc, EXTI_RPR1, reg);
+	if (reg) {
+		for (i = 0; i < 32; i++)
+			if (reg & (1 << i)) {
+				if (sc->map != NULL &&
+				    sc->map[i].handler != NULL)
+					sc->map[i].handler(sc->map[i].arg, 0);
+				WR4(sc, EXTI_FPR1, (1 << i));
+			}
+	}
 }
 
 void
@@ -80,13 +78,7 @@ stm32g0_exti_setup(struct stm32g0_exti_softc *sc, uint32_t n)
 {
 	uint32_t reg;
 
-	reg = RD4(sc, EXTI_FPR1);
-	reg |= (1 << n);
-	WR4(sc, EXTI_FPR1, reg);
-
-	reg = RD4(sc, EXTI_RPR1);
-	reg |= (1 << n);
-	WR4(sc, EXTI_RPR1, reg);
+	/* Generate interrupt on event. */
 
 	reg = RD4(sc, EXTI_RTSR1);
 	reg |= (1 << n);
@@ -99,10 +91,6 @@ stm32g0_exti_setup(struct stm32g0_exti_softc *sc, uint32_t n)
 	reg = RD4(sc, EXTI_IMR1);
 	reg |= (1 << n);
 	WR4(sc, EXTI_IMR1, reg);
-
-	reg = RD4(sc, EXTI_EMR1);
-	reg |= (1 << n);
-	WR4(sc, EXTI_EMR1, reg);
 }
 
 void
