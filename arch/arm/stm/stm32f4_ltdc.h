@@ -30,10 +30,10 @@
 #include <dev/display/panel.h>
 #include <dev/display/dsi.h>
 
-#define	LTDC_SSCR	0x0008 /*   */
-#define	 SSCR_HSW_S	16
-#define	 SSCR_VSW_S	0
-#define	LTDC_BPCR	0x000C /*   */
+#define	LTDC_SSCR	0x0008 /* Synchronization size CR. */
+#define	 SSCR_HSW_S	16 /* Horizontal synchronization width */
+#define	 SSCR_VSW_S	0 /* Vertical synchronization height */
+#define	LTDC_BPCR	0x000C /* Back porch configuration register. */
 #define	 BPCR_AHBP_S	16
 #define	 BPCR_AVBP_S	0
 #define	LTDC_AWCR	0x0010 /*   */

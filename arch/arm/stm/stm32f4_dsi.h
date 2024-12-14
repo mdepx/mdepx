@@ -159,11 +159,11 @@
 #define	 WCFGR_TESRC	(1 << 4) /* TE Source */
 #define	 WCFGR_COLMUX_S	1 /* Color Multiplexing */
 #define	 WCFGR_COLMUX_M	0x7
-#define	 COLMUX_16_1	0x0 /* 16-bit */
-#define	 COLMUX_16_2	0x1 /* 16-bit */
-#define	 COLMUX_16_3	0x2 /* 16-bit */
-#define	 COLMUX_18_1	0x3 /* 18-bit */
-#define	 COLMUX_18_2	0x4 /* 18-bit */
+#define	 COLMUX_16_1	0x0 /* 16-bit configuration 1 */
+#define	 COLMUX_16_2	0x1 /* 16-bit configuration 2 */
+#define	 COLMUX_16_3	0x2 /* 16-bit configuration 3 */
+#define	 COLMUX_18_1	0x3 /* 18-bit configuration 1 */
+#define	 COLMUX_18_2	0x4 /* 18-bit configuration 2 */
 #define	 COLMUX_24	0x5 /* 24-bit */
 #define	 WCFGR_DSIM	(1 << 0) /* DSI mode */
 #define	DSI_WCR		0x0404 /* DSI Wrapper Control Register */
