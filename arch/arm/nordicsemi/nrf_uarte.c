@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2018-2025 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -139,8 +139,7 @@ static struct mdx_uart_ops nrf_uarte_uart_ops = {
 };
 
 void
-nrf_uarte_init(mdx_device_t dev,
-    uint32_t base, uint8_t pin_tx, uint8_t pin_rx)
+nrf_uarte_init(mdx_device_t dev, uint32_t base, uint8_t pin_tx, uint8_t pin_rx)
 {
 	struct nrf_uarte_softc *sc;
 
@@ -192,8 +191,8 @@ nrf_uarte_attach(mdx_device_t dev)
 
 	mdx_of_setup_intr(dev, 0, nrf_uarte_intr, sc);
 
-	mdx_uart_setup(dev, sc->baudrate, UART_DATABITS_8,
-	    UART_STOPBITS_1, UART_PARITY_NONE);
+	mdx_uart_setup(dev, sc->baudrate, UART_DATABITS_8, UART_STOPBITS_1,
+	    UART_PARITY_NONE);
 
 	return (0);
 }
