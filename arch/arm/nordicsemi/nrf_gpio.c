@@ -97,6 +97,21 @@ nrf_gpio_pincfg(mdx_device_t dev, int pin, int cfg)
 	WR4(sc, GPIO_PIN_CNF(pin), cfg);
 }
 
+void
+nrf_gpio_toggle(mdx_device_t dev, int pin)
+{
+	struct nrf_gpio_softc *sc;
+	int reg;
+
+	sc = mdx_device_get_softc(dev);
+
+	reg = RD4(sc, GPIO_OUT);
+	if (reg & (1 << pin))
+		WR4(sc, GPIO_OUTCLR, (1 << pin));
+	else
+		WR4(sc, GPIO_OUTSET, (1 << pin));
+}
+
 static struct mdx_gpio_ops nrf_gpio_gpio_ops = {
 	.pin_set = nrf_gpio_set_pin,
 	.pin_get = nrf_gpio_get_pin,

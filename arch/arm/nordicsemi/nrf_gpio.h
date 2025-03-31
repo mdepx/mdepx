@@ -75,5 +75,6 @@ struct nrf_gpio_softc {
 
 void nrf_gpio_init(mdx_device_t dev, uint32_t base);
 void nrf_gpio_pincfg(mdx_device_t dev, int pin, int cfg);
+void nrf_gpio_toggle(mdx_device_t dev, int pin);
 
 #endif /* !_ARM_NORDICSEMI_NRF_GPIO_H_ */
