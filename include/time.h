@@ -39,9 +39,12 @@ struct tm {
 	int	tm_wday;	/* Day of the week since Sun [0-6]. */
 	int	tm_yday;	/* Days since January 1 [0-365]. */
 	int	tm_isdst;	/* Daylight saving time flag. */
+	char	*tm_zone;
 };
 
 time_t mktime(struct tm *tm);
 struct tm * gmtime_r(const time_t *tp, struct tm *result);
+size_t strftime(char * buf, size_t maxsize, const char *format,
+    const struct tm *timeptr);
 
 #endif /* !_TIME_H_ */
