@@ -43,10 +43,6 @@
 #define	SPIS_SEMSTAT		0x400	/* Semaphore status register */
 #define	SPIS_STATUS		0x440	/* Status from last transaction */
 #define	SPIS_ENABLE		0x500	/* Enable SPI slave */
-#define	SPIS_PSEL_SCK		0x508	/* Pin select for SCK. Deprecated */
-#define	SPIS_PSEL_MISO		0x50C	/* Pin select for MISO signal. Deprecated */
-#define	SPIS_PSEL_MOSI		0x510	/* Pin select for MOSI signal. Deprecated */
-#define	SPIS_PSEL_CSN		0x514	/* Pin select for CSN signal. Deprecated */
 #define	SPIS_PSELSCK		0x508	/* Pin select for SCK */
 #define	SPIS_PSELMISO		0x50C	/* Pin select for MISO */
 #define	SPIS_PSELMOSI		0x510	/* Pin select for MOSI */
@@ -54,15 +50,9 @@
 #define	SPIS_RXD_PTR		0x534	/* RXD data pointer */
 #define	SPIS_RXD_MAXCNT		0x538	/* Maximum number of bytes in receive buffer */
 #define	SPIS_RXD_AMOUNT		0x53C	/* Number of bytes received in last granted transaction */
-#define	SPIS_RXDPTR		0x534	/* RXD data pointer. Deprecated */
-#define	SPIS_MAXRX		0x538	/* Maximum number of bytes in receive buffer. Deprecated */
-#define	SPIS_AMOUNTRX		0x53C	/* Number of bytes received in last granted transaction. Deprecated */
 #define	SPIS_TXD_PTR		0x544	/* TXD data pointer */
 #define	SPIS_TXD_MAXCNT		0x548	/* Maximum number of bytes in transmit buffer */
 #define	SPIS_TXD_AMOUNT		0x54C	/* Number of bytes transmitted in last granted transaction */
-#define	SPIS_TXDPTR		0x544	/* TXD data pointer. Deprecated */
-#define	SPIS_MAXTX		0x548	/* Maximum number of bytes in transmit buffer.Deprecated */
-#define	SPIS_AMOUNTTX		0x54C	/* Number of bytes transmitted in last granted transaction. Deprecated */
 #define	SPIS_CONFIG		0x554	/* Configuration register */
 #define	SPIS_DEF		0x55C	/* Default character. Character clocked out in case of an ignored transaction. */
 #define	SPIS_ORC		0x5C0	/* Over-read character */
