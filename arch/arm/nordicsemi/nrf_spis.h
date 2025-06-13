@@ -39,14 +39,19 @@
 #define	SPIS_PUBLISH_ACQUIRED	0x1A8	/* Publish configuration for event ACQUIRED */
 #define	SPIS_SHORTS		0x200	/* Shortcuts between local events and tasks */
 #define	SPIS_INTENSET		0x304	/* Enable interrupt */
+#define	 INTENSET_END		(1 << 1)
+#define	 INTENSET_ENDRX		(1 << 4)
+#define	 INTENSET_ACQUIRED	(1 << 10)
 #define	SPIS_INTENCLR		0x308	/* Disable interrupt */
 #define	SPIS_SEMSTAT		0x400	/* Semaphore status register */
 #define	SPIS_STATUS		0x440	/* Status from last transaction */
 #define	SPIS_ENABLE		0x500	/* Enable SPI slave */
+#define	 SPIS_ENABLE_EN		2
 #define	SPIS_PSELSCK		0x508	/* Pin select for SCK */
 #define	SPIS_PSELMISO		0x50C	/* Pin select for MISO */
 #define	SPIS_PSELMOSI		0x510	/* Pin select for MOSI */
 #define	SPIS_PSELCSN		0x514	/* Pin select for CSN */
+#define	 CSN_DISCONNECT		(1 << 31)
 #define	SPIS_RXD_PTR		0x534	/* RXD data pointer */
 #define	SPIS_RXD_MAXCNT		0x538	/* Maximum number of bytes in receive buffer */
 #define	SPIS_RXD_AMOUNT		0x53C	/* Number of bytes received in last granted transaction */
@@ -62,5 +67,6 @@ struct nrf_spis_softc {
 };
 
 void nrf_spis_init(mdx_device_t dev, uint32_t base);
+void nrf_spis_configure(mdx_device_t dev);
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_SPIS_H_ */
