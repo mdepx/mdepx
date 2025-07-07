@@ -47,11 +47,14 @@
 #define	SPIM_PUBLISH_STARTED	0x1CC	/* Publish configuration for event STARTED */
 #define	SPIM_SHORTS		0x200	/* Shortcuts between local events and tasks */
 #define	SPIM_INTENSET		0x304	/* Enable interrupt */
+#define	 SPIM_INTENSET_END	(1 << 6)
+#define	 SPIM_INTENSET_ENDTX	(1 << 8)
 #define	SPIM_INTENCLR		0x308	/* Disable interrupt */
 #define	SPIM_ENABLE		0x500	/* Enable SPIM */
-#define	SPIM_PSEL_SCK		0x508	/* Pin select for SCK */
-#define	SPIM_PSEL_MOSI		0x50C	/* Pin select for MOSI signal */
-#define	SPIM_PSEL_MISO		0x510	/* Pin select for MISO signal */
+#define	 SPIM_ENABLE_EN		7
+#define	SPIM_PSELSCK		0x508	/* Pin select for SCK */
+#define	SPIM_PSELMOSI		0x50C	/* Pin select for MOSI signal */
+#define	SPIM_PSELMISO		0x510	/* Pin select for MISO signal */
 #define	SPIM_FREQUENCY		0x524	/* SPI frequency. Accuracy depends on the HFCLK source selected. */
 #define	SPIM_RXD_PTR		0x534	/* Data pointer */
 #define	SPIM_RXD_MAXCNT		0x538	/* Maximum number of bytes in receive buffer */
@@ -62,10 +65,18 @@
 #define	SPIM_TXD_AMOUNT		0x54C	/* Number of bytes transferred in the last transaction */
 #define	SPIM_TXD_LIST		0x550	/* EasyDMA list type */
 #define	SPIM_CONFIG		0x554	/* Configuration register */
+#define	 SPIM_CONFIG_CPHA	(1 << 1) /* Serial clock (SCK) phase */
+#define	 SPIM_CONFIG_CPOL	(1 << 2) /* Serial clock (SCK) polarity */
 #define	SPIM_ORC		0x5C0	/* Over-read character. Character clocked out in case and over-read of the TXD buffer. */
 
 struct nrf_spim_softc {
 	size_t base;
 };
+
+void nrf_spim_init(mdx_device_t dev, uint32_t base);
+void nrf_spim_configure(mdx_device_t dev, int pin_sck, int pin_miso,
+    int pin_mosi);
+int nrf_spim_transmit(mdx_device_t dev, void *tx_buf, void *rx_buf,
+    uint32_t len);
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_SPIM_H_ */
