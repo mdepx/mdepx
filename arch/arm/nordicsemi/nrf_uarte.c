@@ -132,7 +132,6 @@ nrf_uarte_setup(mdx_device_t dev, int baudrate, enum uart_databits databits,
 	nrf_uarte_start(sc);
 }
 
-
 static struct mdx_uart_ops nrf_uarte_uart_ops = {
 	.putc = nrf_uarte_putc,
 	.setup = nrf_uarte_setup,
