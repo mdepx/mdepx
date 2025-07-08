@@ -70,7 +70,7 @@ nrf_spis_intr(void *arg, int irq)
 
 	sc->slave_rx_len = RD4(sc, SPIS_RXD_AMOUNT);
 
-	printf("%s: arrived %d bytes\n", __func__, sc->slave_rx_len);
+	dprintf("%s: arrived %d bytes\n", __func__, sc->slave_rx_len);
 
 	WR4(sc, SPIS_ENABLE, 0);
 
