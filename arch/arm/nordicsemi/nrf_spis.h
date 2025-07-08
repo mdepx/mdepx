@@ -27,6 +27,9 @@
 #ifndef _ARM_NORDICSEMI_NRF9160_SPIS_H_
 #define _ARM_NORDICSEMI_NRF9160_SPIS_H_
 
+#include <sys/sem.h>
+#include <dev/gpio/gpio.h>
+
 #define	SPIS_TASKS_ACQUIRE	0x024	/* Acquire SPI semaphore */
 #define	SPIS_TASKS_RELEASE	0x028	/* Release SPI semaphore, enabling the SPI slave to acquire it */
 #define	SPIS_SUBSCRIBE_ACQUIRE	0x0A4	/* Subscribe configuration for task ACQUIRE */
@@ -38,10 +41,11 @@
 #define	SPIS_PUBLISH_ENDRX	0x190	/* Publish configuration for event ENDRX */
 #define	SPIS_PUBLISH_ACQUIRED	0x1A8	/* Publish configuration for event ACQUIRED */
 #define	SPIS_SHORTS		0x200	/* Shortcuts between local events and tasks */
+#define	 SPIS_SHORTS_END_ACQUIRE	(1 << 2)
 #define	SPIS_INTENSET		0x304	/* Enable interrupt */
-#define	 INTENSET_END		(1 << 1)
-#define	 INTENSET_ENDRX		(1 << 4)
-#define	 INTENSET_ACQUIRED	(1 << 10)
+#define	 SPIS_INTENSET_END	(1 << 1)
+#define	 SPIS_INTENSET_ENDRX	(1 << 4)
+#define	 SPIS_INTENSET_ACQUIRED	(1 << 10)
 #define	SPIS_INTENCLR		0x308	/* Disable interrupt */
 #define	SPIS_SEMSTAT		0x400	/* Semaphore status register */
 #define	SPIS_STATUS		0x440	/* Status from last transaction */
@@ -51,7 +55,7 @@
 #define	SPIS_PSELMISO		0x50C	/* Pin select for MISO */
 #define	SPIS_PSELMOSI		0x510	/* Pin select for MOSI */
 #define	SPIS_PSELCSN		0x514	/* Pin select for CSN */
-#define	 CSN_DISCONNECT		(1 << 31)
+#define	 SPIS_CSN_DISCONNECT	(1 << 31)
 #define	SPIS_RXD_PTR		0x534	/* RXD data pointer */
 #define	SPIS_RXD_MAXCNT		0x538	/* Maximum number of bytes in receive buffer */
 #define	SPIS_RXD_AMOUNT		0x53C	/* Number of bytes received in last granted transaction */
@@ -64,9 +68,25 @@
 
 struct nrf_spis_softc {
 	size_t base;
+	mdx_device_t gpio;
+	uint8_t pin_rdy;
+	mdx_sem_t receive_sem;
+	uint32_t slave_rx_len;
 };
 
 void nrf_spis_init(mdx_device_t dev, uint32_t base);
-void nrf_spis_configure(mdx_device_t dev);
+int nrf_spis_receive(mdx_device_t dev, void *tx_buf, void *rx_buf, int len);
+
+struct spis_conf {
+	mdx_device_t gpio;
+	uint8_t pin_sck;
+	uint8_t pin_miso;
+	uint8_t pin_mosi;
+	uint8_t pin_csn;
+	uint8_t pin_rdy;
+};
+
+void nrf_spis_configure(mdx_device_t dev, struct spis_conf *conf);
+
 
 #endif /* !_ARM_NORDICSEMI_NRF9160_SPIS_H_ */
