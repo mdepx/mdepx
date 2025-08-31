@@ -2,7 +2,11 @@ This app demonstrates multithreading and symmetric multiprocessing (SMP)
 support on a multi-core riscv64 system.
 This app runs virtio and timeout framework (callout) tests.
 
-1. Build QEMU
+0. Install dependencies
+
+    $ sudo apt install gcc-riscv64-unknown-elf qemu-system-riscv64
+
+1. Alternatively, build QEMU manually
 
     $ git clone https://github.com/qemu/qemu
     $ mkdir qemu/build
