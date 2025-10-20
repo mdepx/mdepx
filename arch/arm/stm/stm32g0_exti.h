@@ -34,7 +34,7 @@
 #define	EXTI_FPR1		0x10
 #define	_EXTI_EXTICR(x)		(0x060 + 0x4 * ((x) - 1)) /* (x = 1 to 4) */
 #define	EXTI_EXTICR(x)		_EXTI_EXTICR(((x) / 4) + 1)
-#define	 EXTICR_S(x)		((x % 4) * 8)
+#define	 EXTICR_PIN_S(x)	((x % 4) * 8)
 #define	 EXTICR_PA(x)		(0 << EXTICR_PIN_S(x))
 #define	 EXTICR_PB(x)		(1 << EXTICR_PIN_S(x))
 #define	 EXTICR_PC(x)		(2 << EXTICR_PIN_S(x))
