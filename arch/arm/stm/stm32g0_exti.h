@@ -56,7 +56,8 @@ struct stm32g0_exti_softc {
 void stm32g0_exti_intr(void *arg, int irq);
 void stm32g0_exti_install_intr_map(struct stm32g0_exti_softc *sc,
     const struct exti_intr_entry *map);
-void stm32g0_exti_setup(struct stm32g0_exti_softc *sc, uint32_t n);
+void stm32g0_exti_setup(struct stm32g0_exti_softc *sc, uint32_t port,
+    uint32_t n);
 void stm32g0_exti_init(struct stm32g0_exti_softc *sc, uint32_t base);
 
 #endif /* !_ARM_STM_STM32G0_EXTI_H_ */

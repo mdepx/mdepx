@@ -74,22 +74,26 @@ stm32g0_exti_install_intr_map(struct stm32g0_exti_softc *sc,
 }
 
 void
-stm32g0_exti_setup(struct stm32g0_exti_softc *sc, uint32_t n)
+stm32g0_exti_setup(struct stm32g0_exti_softc *sc, uint32_t port, uint32_t pin)
 {
 	uint32_t reg;
+
+	/* External interrupt selection. */
+
+	WR4(sc, EXTI_EXTICR(pin), port << EXTICR_PIN_S(pin));
 
 	/* Generate interrupt on event. */
 
 	reg = RD4(sc, EXTI_RTSR1);
-	reg |= (1 << n);
+	reg |= (1 << pin);
 	WR4(sc, EXTI_RTSR1, reg);
 
 	reg = RD4(sc, EXTI_FTSR1);
-	reg |= (1 << n);
+	reg |= (1 << pin);
 	WR4(sc, EXTI_FTSR1, reg);
 
 	reg = RD4(sc, EXTI_IMR1);
-	reg |= (1 << n);
+	reg |= (1 << pin);
 	WR4(sc, EXTI_IMR1, reg);
 }
 
