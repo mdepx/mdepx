@@ -26,16 +26,25 @@
 
 #include <sys/cdefs.h>
 #include <sys/callout.h>
+#include <sys/systm.h>
+
+#define dprintf(...)
 
 uint32_t
 mdx_cputime_usec_to_ticks(uint32_t freq, uint32_t usec)
 {
 	uint64_t ticks;
+	uint64_t maxval;
 
 	ticks =	freq;
 
+	dprintf("%s: usec %d\n", __func__, usec);
+
 	ticks <<= 32;
 	ticks /= 1000000;
+	maxval = 0xffffffffUL << 32;
+	if ((maxval / ticks) < usec)
+		panic("could not sleep: too many usecs requested");
 	ticks *= usec;
 	ticks >>= 32;
 
