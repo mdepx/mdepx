@@ -29,11 +29,14 @@
 #include <arm/stm/stm32l4_usart.h>
 #include <arm/stm/stm32f4_gpio.h>
 #include <arm/stm/stm32u3_rcc.h>
+#include <arm/stm/stm32f4_timer.h>
 
 #define	USART1_BASE	0x40013800
 #define	USART3_BASE	0x40004800
 
 #define	GPIO_BASE	0x42020000
 #define	RCC_BASE	0x40030C00
+#define	TIM1_BASE	0x40012C00
+#define	NVIC_BASE	0xE000E100
 
 #endif	/* !_ARM_STM_STM32U3_H_ */
