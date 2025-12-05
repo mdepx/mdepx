@@ -38,10 +38,13 @@ pin_set(struct stm32f4_gpio_softc *sc, uint32_t port, uint32_t pin,
 {
 	uint32_t reg;
 
-	if (enable)
+	if (enable) {
+		/* Set or release OD pin */
 		reg = (1 << pin);
-	else
+	} else {
+		/* Reset or drive low OD pin */
 		reg = (1 << (pin + 16));
+	}
 
 	WR4(sc, GPIO_BSRR(port), reg);
 }
