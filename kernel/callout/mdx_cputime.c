@@ -42,7 +42,7 @@ mdx_cputime_usec_to_ticks(uint32_t freq, uint32_t usec)
 
 	ticks <<= 32;
 	ticks /= 1000000;
-	maxval = 0xffffffffUL << 32;
+	maxval = 0xffffffffULL << 32;
 	if ((maxval / ticks) < usec)
 		panic("could not sleep: too many usecs requested");
 	ticks *= usec;
