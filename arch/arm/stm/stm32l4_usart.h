@@ -60,6 +60,7 @@
 #define	 ISR_TXE		(1 << 7) /* Transmit data register empty */
 #define	USART_RDR		0x24 /* Receive data register */
 #define	USART_TDR		0x28 /* Transmit data register */
+#define	USART_PRESC		0x2C /* USART prescaler register */
 
 struct stm32l4_usart_softc {
 	uint32_t base;
