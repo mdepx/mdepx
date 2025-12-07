@@ -57,6 +57,11 @@
 #define	 AHB4ENSR_GPIOBEN	(1 << 1) /* GPIO B enable */
 #define	 AHB4ENSR_GPIOAEN	(1 << 0) /* GPIO A enable */
 #define	RCC_AHB5ENSR		0xA60
+#define	 AHB5ENSR_LTDCEN	(1 << 1)
+#define	 AHB5ENSR_DCMIPPENS	(1 << 2)
+#define	 AHB5ENSR_GFXTIMENS	(1 << 4)
+#define	 AHB5ENSR_VENCENS	(1 << 5)
+#define	 AHB5ENSR_CSIENS	(1 << 6)
 #define	RCC_APB1LENSR		0xA64
 #define	 APB1LENSR_UART5ENS	(1 << 20)
 #define	 APB1LENSR_USART2ENS	(1 << 17) /* USART2 enable */

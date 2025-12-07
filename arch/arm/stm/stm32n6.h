@@ -40,5 +40,12 @@
 #define	TIM1_BASE	0x42000000	/* 16-bit. */
 #define	TIM2_BASE	0x40000000	/* 32-bit. */
 #define	NVIC_BASE	0xE000E100
+#define	LTDC_BASE	0x48001000
+#define	DCMIPP_BASE	0x48002000
+#define	GFXTIM_BASE	0x48004000
+#define	VENC_BASE	0x48005000	/* H264/JPEG encoder */
+#define	CSI_BASE	0x48006000	/* CSI2 HOST wrapper */
+#define	SYSCFG_BASE	0x46008000
+#define	DMA2D_BASE	0x48021000
 
 #endif	/* !_ARM_STM_STM32N6_H_ */
