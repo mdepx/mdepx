@@ -66,6 +66,12 @@ enum {
 	PORT_I,
 	PORT_J,
 	PORT_K,
+	PORT_L,
+	PORT_M,
+	PORT_N,
+	PORT_O,
+	PORT_P,
+	PORT_Q,
 };
 
 struct stm32_gpio_pin {
