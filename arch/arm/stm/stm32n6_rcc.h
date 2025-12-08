@@ -63,11 +63,17 @@
 #define	 AHB4ENSR_GPIOBEN	(1 << 1) /* GPIO B enable */
 #define	 AHB4ENSR_GPIOAEN	(1 << 0) /* GPIO A enable */
 #define	RCC_AHB5ENSR		0xA60
-#define	 AHB5ENSR_LTDCEN	(1 << 1)
-#define	 AHB5ENSR_DCMIPPENS	(1 << 2)
-#define	 AHB5ENSR_GFXTIMENS	(1 << 4)
-#define	 AHB5ENSR_VENCENS	(1 << 5)
-#define	 AHB5ENSR_CSIENS	(1 << 6)
+#define	 AHB5ENSR_NPUENS	(1 << 31) /* NPU enable */
+#define	 AHB5ENSR_CACHEAXIENS	(1 << 30)
+#define	 AHB5ENSR_GPU2DENS	(1 << 20)
+#define	 AHB5ENSR_GFXMMUENS	(1 << 19)
+#define	 AHB5ENSR_XSPI3ENS	(1 << 17)
+#define	 AHB5ENSR_XSPIMENS	(1 << 13)
+#define	 AHB5ENSR_XSPI2ENS	(1 << 12)
+#define	 AHB5ENSR_XSPI1ENS	(1 << 5)
+#define	 AHB5ENSR_FMCENS	(1 << 4)
+#define	 AHB5ENSR_JPEGENS	(1 << 3)
+#define	 AHB5ENSR_DMA2DENS	(1 << 1)
 #define	RCC_APB1LENSR		0xA64
 #define	 APB1LENSR_UART5ENS	(1 << 20)
 #define	 APB1LENSR_USART2ENS	(1 << 17) /* USART2 enable */
@@ -79,6 +85,11 @@
 #define	RCC_APB4LENSR		0xA74
 #define	RCC_APB4HENSR		0xA78
 #define	RCC_APB5ENSR		0xA7C
+#define	 APB5ENSR_LTDCEN	(1 << 1)
+#define	 APB5ENSR_DCMIPPENS	(1 << 2)
+#define	 APB5ENSR_GFXTIMENS	(1 << 4)
+#define	 APB5ENSR_VENCENS	(1 << 5)
+#define	 APB5ENSR_CSIENS	(1 << 6)
 
 struct rcc_config {
 	uint32_t ahb1enr;
