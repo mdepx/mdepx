@@ -30,6 +30,7 @@
 #include <arm/stm/stm32l4_usart.h>
 #include <arm/stm/stm32f4_gpio.h>
 #include <arm/stm/stm32f4_timer.h>
+#include <arm/stm/stm32f4_ltdc.h>
 
 #define	USART1_BASE	0x42001000
 #define	USART2_BASE	0x40004400
