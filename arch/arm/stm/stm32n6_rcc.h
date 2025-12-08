@@ -50,6 +50,12 @@
 #define	RCC_AHB3ENSR		0xA58
 #define	RCC_AHB4ENSR		0xA5C
 #define	 AHB4ENSR_PWREN		(1 << 18) /* PWR enable */
+#define	 AHB4ENSR_GPIOQEN	(1 << 16) /* GPIO Q enable */
+#define	 AHB4ENSR_GPIOPEN	(1 << 15) /* GPIO P enable */
+#define	 AHB4ENSR_GPIOOEN	(1 << 14) /* GPIO O enable */
+#define	 AHB4ENSR_GPIONEN	(1 << 13) /* GPIO N enable */
+#define	 AHB4ENSR_GPIOHEN	(1 << 7) /* GPIO H enable */
+#define	 AHB4ENSR_GPIOGEN	(1 << 6) /* GPIO G enable */
 #define	 AHB4ENSR_GPIOFEN	(1 << 5) /* GPIO F enable */
 #define	 AHB4ENSR_GPIOEEN	(1 << 4) /* GPIO E enable */
 #define	 AHB4ENSR_GPIODEN	(1 << 3) /* GPIO D enable */
