@@ -27,6 +27,19 @@
 #define _ARM_STM_STM32N6_XSPI_H_
 
 #define	XSPI_CR		0x000
+#define	 CR_MSEL_S	30
+#define	 CR_MSEL_M	(0x3 << CR_MSEL_S)
+#define	 CR_FMODE_S	28
+#define	 CR_FMODE_M	(0x3 << CR_FMODE_S)
+#define	 CR_FMODE_MM	(0x3 << CR_FMODE_S) /* Memory-mapped mode */
+#define	 CR_FMODE_IW	(0x0 << CR_FMODE_S) /* Indirect Write */
+#define	 CR_FMODE_IR	(0x1 << CR_FMODE_S) /* Indirect Read */
+#define	 CR_FMODE_ASP	(0x2 << CR_FMODE_S) /* Automatic Status Polling */
+#define	 CR_FTHRES_S	8
+#define	 CR_FTHRES_M	(0x3f << CR_FTHRES_S)
+#define	 CR_TCEN	(1 << 3) /* Timeout counter enable */
+#define	 CR_DMAEN	(1 << 2)
+#define	 CR_EN		(1 << 0)
 #define	XSPI_DCR1	0x008
 #define	XSPI_DCR2	0x00C
 #define	XSPI_DCR3	0x010
@@ -40,6 +53,7 @@
 #define	XSPI_PSMAR	0x088
 #define	XSPI_PIR	0x090
 #define	XSPI_CCR	0x100
+#define	 CCR_DQSE	(1 << 29) /* DQS enable */
 #define	XSPI_TCR	0x108
 #define	XSPI_IR		0x110
 #define	XSPI_ABR	0x120
