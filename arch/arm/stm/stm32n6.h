@@ -30,7 +30,7 @@
 #include <arm/stm/stm32l4_usart.h>
 #include <arm/stm/stm32f4_gpio.h>
 #include <arm/stm/stm32f4_timer.h>
-#include <arm/stm/stm32f4_ltdc.h>
+#include <arm/stm/stm32n6_ltdc.h>
 #include <arm/stm/stm32n6_xspi.h>
 #include <arm/stm/stm32n6_pwr.h>
 
