@@ -31,6 +31,8 @@
 #include <arm/stm/stm32f4_gpio.h>
 #include <arm/stm/stm32f4_timer.h>
 #include <arm/stm/stm32f4_ltdc.h>
+#include <arm/stm/stm32n6_xspi.h>
+#include <arm/stm/stm32n6_pwr.h>
 
 #define	USART1_BASE	0x42001000
 #define	USART2_BASE	0x40004400
@@ -48,5 +50,7 @@
 #define	CSI_BASE	0x48006000	/* CSI2 HOST wrapper */
 #define	SYSCFG_BASE	0x46008000
 #define	DMA2D_BASE	0x48021000
+#define	XSPI1_BASE	0x48025000
+#define	PWR_BASE	0x46024800
 
 #endif	/* !_ARM_STM_STM32N6_H_ */
