@@ -41,6 +41,20 @@
 #define	 CR_DMAEN	(1 << 2)
 #define	 CR_EN		(1 << 0)
 #define	XSPI_DCR1	0x008
+#define	 DCR1_MTYP_S		24
+#define	 DCR1_MTYP_M		(0x7 << DCR1_MTYP_S)
+#define	 DCR1_MTYP_MICRON	(0x0 << DCR1_MTYP_S)
+#define	 DCR1_MTYP_MACRONIX	(0x1 << DCR1_MTYP_S)
+#define	 DCR1_MTYP_STD		(0x2 << DCR1_MTYP_S)
+#define	 DCR1_MTYP_MACRONIX_RAM	(0x3 << DCR1_MTYP_S)
+#define	 DCR1_MTYP_HYPERBUS_MEM	(0x4 << DCR1_MTYP_S)
+#define	 DCR1_MTYP_HYPERBUS_REG	(0x5 << DCR1_MTYP_S)
+#define	 DCR1_MTYP_AP		(0x6 << DCR1_MTYP_S)
+#define	 DCR1_DEVSIZE_S		16
+#define	 DCR1_DEVSIZE_M		(0x1f << DCR1_DEVSIZE_S)
+#define	 DCR1_DEVSIZE_256M	(27 << DCR1_DEVSIZE_S)
+#define	 DCR1_CSHT_S		8
+#define	 DCR1_CSHT_M		(0x3f << DCR1_CSHT_S)
 #define	XSPI_DCR2	0x00C
 #define	XSPI_DCR3	0x010
 #define	XSPI_DCR4	0x014
@@ -54,6 +68,37 @@
 #define	XSPI_PIR	0x090
 #define	XSPI_CCR	0x100
 #define	 CCR_DQSE	(1 << 29) /* DQS enable */
+#define	 CCR_DDTR	(1 << 27) /* Data double transfer rate */
+#define	 CCR_DMODE_S	24
+#define	 CCR_DMODE_NONE	0
+#define	 CCR_DMODE_1	(1 << CCR_DMODE_S)
+#define	 CCR_DMODE_2	(2 << CCR_DMODE_S)
+#define	 CCR_DMODE_4	(3 << CCR_DMODE_S)
+#define	 CCR_DMODE_8	(4 << CCR_DMODE_S)
+#define	 CCR_DMODE_16	(5 << CCR_DMODE_S)
+#define	 CCR_ADDTR	(1 << 11) /* Address double transfer rate */
+#define	 CCR_IDTR	(1 << 3) /* Instruction double transfer rate */
+#define	 CCR_ADSIZE_S	12
+#define	 CCR_ADSIZE_8	(0 << CCR_ADSIZE_S)
+#define	 CCR_ADSIZE_16	(1 << CCR_ADSIZE_S)
+#define	 CCR_ADSIZE_24	(2 << CCR_ADSIZE_S)
+#define	 CCR_ADSIZE_32	(3 << CCR_ADSIZE_S)
+#define	 CCR_ADMODE_S	8
+#define	 CCR_ADMODE_1	(1 << CCR_ADMODE_S)
+#define	 CCR_ADMODE_2	(2 << CCR_ADMODE_S)
+#define	 CCR_ADMODE_4	(3 << CCR_ADMODE_S)
+#define	 CCR_ADMODE_8	(4 << CCR_ADMODE_S)
+#define	 CCR_ISIZE_S	4
+#define	 CCR_ISIZE_M	(0x3 << CCR_ISIZE_S)
+#define	 CCR_ISIZE_8	(0 << CCR_ISIZE_S)
+#define	 CCR_ISIZE_16	(1 << CCR_ISIZE_S)
+#define	 CCR_ISIZE_24	(2 << CCR_ISIZE_S)
+#define	 CCR_ISIZE_32	(3 << CCR_ISIZE_S)
+#define	 CCR_IMODE_S	0
+#define	 CCR_IMODE_1	(1 << CCR_IMODE_S)
+#define	 CCR_IMODE_2	(2 << CCR_IMODE_S)
+#define	 CCR_IMODE_4	(3 << CCR_IMODE_S)
+#define	 CCR_IMODE_8	(4 << CCR_IMODE_S)
 #define	XSPI_TCR	0x108
 #define	XSPI_IR		0x110
 #define	XSPI_ABR	0x120
@@ -73,14 +118,36 @@
 #define	XSPI_CALSIR	0x228
 
 struct xspi_config {
-	int buswidth;
+	uint8_t instruction_write;
+	uint8_t instruction_read;
+	uint8_t dummy_cycles;
+	uint8_t prescaler;
+	uint8_t dqs_en;
+	uint32_t mem_type;
+	uint32_t dev_size;
+	uint8_t cs_cycles;
+	uint8_t data_dtr;
+	uint8_t data_lines;
+	uint8_t address_dtr;
+	uint8_t address_size; /* bits */
+	uint8_t address_lines;
+	uint8_t instruction_dtr;
+	uint8_t instruction_size; /* bits */
+	uint8_t instruction_lines;
+	uint8_t instruction;
+	uint8_t mode;
+#define	XSPI_MODE_INDIRECT_WRITE	0
+#define	XSPI_MODE_MEMORY_MAPPED		1
 };
 
 struct stm32n6_xspi_softc {
 	uint32_t base;
 };
 
-void stm32n6_xspi_setup(struct stm32n6_xspi_softc *sc, struct xspi_config *);
-int stm32n6_xspi_init(struct stm32n6_xspi_softc *sc, uint32_t base);
+int stm32n6_xspi_setup(struct stm32n6_xspi_softc *sc, struct xspi_config *conf);
+void stm32n6_xspi_init(struct stm32n6_xspi_softc *sc, uint32_t base);
+int stm32n6_xspi_write_reg(struct stm32n6_xspi_softc *sc, int addr, int val);
+int stm32n6_xspi_transfer(struct stm32n6_xspi_softc *sc, int addr, int val,
+    int len);
 
 #endif /* !_ARM_STM_STM32N6_XSPI_H_ */
