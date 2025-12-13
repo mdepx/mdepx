@@ -51,6 +51,7 @@ stm32n6_rcc_setup(struct stm32n6_rcc_softc *sc, struct rcc_config *cfg)
 	WR4(sc, RCC_APB4LENSR, cfg->apb4lenr);
 	WR4(sc, RCC_APB4HENSR, cfg->apb4henr);
 	WR4(sc, RCC_APB5ENSR, cfg->apb5enr);
+	WR4(sc, RCC_MEMENSR, cfg->memenr);
 }
 
 int
