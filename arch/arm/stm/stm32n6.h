@@ -56,5 +56,8 @@
 #define	PWR_BASE	0x46024800
 #define	RAMCFG_BASE	0x42023000
 #define	RISAF11_BASE	0x44030000	/* XSPI1 */
+#define	RISAF4_BASE	0x44029000	/* NPU Master 0 */
+#define	RISAF5_BASE	0x4402A000	/* NPU Master 1 */
+#define	RISAF6_BASE	0x4402B000	/* CPU Master */
 
 #endif	/* !_ARM_STM_STM32N6_H_ */
