@@ -242,6 +242,6 @@ struct stm32n6_dcmipp_softc {
 	uint32_t base;
 };
 
-int stm32n6_dcmipp_init(struct stm32n6_dcmipp_softc *sc, uint32_t base);
+void stm32n6_dcmipp_init(struct stm32n6_dcmipp_softc *sc, uint32_t base);
 
 #endif /* !_ARM_STM_STM32N6_DCMIPP_H_ */
