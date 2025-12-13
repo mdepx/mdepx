@@ -23,36 +23,18 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ARM_STM_STM32N6_H_
-#define _ARM_STM_STM32N6_H_
+#ifndef _ARM_STM_STM32N6_RAMCFG_H_
+#define _ARM_STM_STM32N6_RAMCFG_H_
 
-#include <arm/stm/stm32n6_rcc.h>
-#include <arm/stm/stm32l4_usart.h>
-#include <arm/stm/stm32f4_gpio.h>
-#include <arm/stm/stm32f4_timer.h>
-#include <arm/stm/stm32n6_ltdc.h>
-#include <arm/stm/stm32n6_xspi.h>
-#include <arm/stm/stm32n6_pwr.h>
-#include <arm/stm/stm32n6_ramcfg.h>
+#define	RAMCFG_AXISRAMCR(x)	(0x80 + (((x) - 2) * 0x80))
+#define	 AXISRAMCR_SRAMSD	(1 << 20) /* Shutdown AXISRAMx */
 
-#define	USART1_BASE	0x42001000
-#define	USART2_BASE	0x40004400
-#define	UART5_BASE	0x40005000
+struct stm32n6_ramcfg_softc {
+	uint32_t base;
+};
 
-#define	GPIO_BASE	0x46020000
-#define	RCC_BASE	0x46028000
-#define	TIM1_BASE	0x42000000	/* 16-bit. */
-#define	TIM2_BASE	0x40000000	/* 32-bit. */
-#define	NVIC_BASE	0xE000E100
-#define	LTDC_BASE	0x48001000
-#define	DCMIPP_BASE	0x48002000
-#define	GFXTIM_BASE	0x48004000
-#define	VENC_BASE	0x48005000	/* H264/JPEG encoder */
-#define	CSI_BASE	0x48006000	/* CSI2 HOST wrapper */
-#define	SYSCFG_BASE	0x46008000
-#define	DMA2D_BASE	0x48021000
-#define	XSPI1_BASE	0x48025000
-#define	PWR_BASE	0x46024800
-#define	RAMCFG_BASE	0x42023000
+int stm32n6_ramcfg_init(struct stm32n6_ramcfg_softc *sc, uint32_t base);
+void stm32n6_ramcfg_shutdown(struct stm32n6_ramcfg_softc *sc, int index,
+    int power);
 
-#endif	/* !_ARM_STM_STM32N6_H_ */
+#endif /* !_ARM_STM_STM32N6_RAMCFG_H_ */
