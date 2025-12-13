@@ -23,42 +23,42 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ARM_STM_STM32N6_H_
-#define _ARM_STM_STM32N6_H_
+#ifndef _ARM_STM_STM32N6_CSI_H_
+#define _ARM_STM_STM32N6_CSI_H_
 
-#include <arm/stm/stm32n6_rcc.h>
-#include <arm/stm/stm32n6_csi.h>
-#include <arm/stm/stm32l4_usart.h>
-#include <arm/stm/stm32f4_gpio.h>
-#include <arm/stm/stm32f4_timer.h>
-#include <arm/stm/stm32n6_ltdc.h>
-#include <arm/stm/stm32n6_xspi.h>
-#include <arm/stm/stm32n6_pwr.h>
-#include <arm/stm/stm32n6_risaf.h>
-#include <arm/stm/stm32n6_ramcfg.h>
+/* CSI-2 Host */
 
-#define	USART1_BASE	0x42001000
-#define	USART2_BASE	0x40004400
-#define	UART5_BASE	0x40005000
+#define	CSI_CR		0x00
+#define	CSI_PCR		0x04
+#define	CSI_VCxCFGR1(x)	(0x10 + 0x10 * (x))
+#define	CSI_VCxCFGR2(x)	(0x14 + 0x10 * (x))
+#define	CSI_VCxCFGR3(x)	(0x18 + 0x10 * (x))
+#define	CSI_VCxCFGR4(x)	(0x1C + 0x10 * (x))
+#define	CSI_LBxCFGR(x)	(0x50 + 0x04 * (x))
+#define	CSI_TIMxCFGR(x)	(0x60 + 0x04 * (x))
+#define	CSI_LMCFGR	0x70
+#define	CSI_PRGITR	0x74
+#define	CSI_WDR		0x78
+#define	CSI_IER0	0x80
+#define	CSI_IER1	0x84
+#define	CSI_SR0		0x90
+#define	CSI_SR1		0x94
+#define	CSI_FCR0	0x100
+#define	CSI_FCR1	0x104
+#define	CSI_SPDFR	0x110
+#define	CSI_ERR1	0x114
+#define	CSI_ERR2	0x118
+#define	CSI_PRCR	0x1000
+#define	CSI_PMCR	0x1004
+#define	CSI_PFCR	0x1008
+#define	CSI_PTCR0	0x1010
+#define	CSI_PTCR1	0x1014
+#define	CSI_PTSR	0x1018
 
-#define	GPIO_BASE	0x46020000
-#define	RCC_BASE	0x46028000
-#define	TIM1_BASE	0x42000000	/* 16-bit. */
-#define	TIM2_BASE	0x40000000	/* 32-bit. */
-#define	NVIC_BASE	0xE000E100
-#define	LTDC_BASE	0x48001000
-#define	DCMIPP_BASE	0x48002000
-#define	GFXTIM_BASE	0x48004000
-#define	VENC_BASE	0x48005000	/* H264/JPEG encoder */
-#define	CSI_BASE	0x48006000	/* CSI2 HOST wrapper */
-#define	SYSCFG_BASE	0x46008000
-#define	DMA2D_BASE	0x48021000
-#define	XSPI1_BASE	0x48025000
-#define	PWR_BASE	0x46024800
-#define	RAMCFG_BASE	0x42023000
-#define	RISAF11_BASE	0x44030000	/* XSPI1 */
-#define	RISAF4_BASE	0x44029000	/* NPU Master 0 */
-#define	RISAF5_BASE	0x4402A000	/* NPU Master 1 */
-#define	RISAF6_BASE	0x4402B000	/* CPU Master */
+struct stm32n6_csi_softc {
+	uint32_t base;
+};
 
-#endif	/* !_ARM_STM_STM32N6_H_ */
+int stm32n6_csi_init(struct stm32n6_csi_softc *sc, uint32_t base);
+
+#endif /* !_ARM_STM_STM32N6_CSI_H_ */
