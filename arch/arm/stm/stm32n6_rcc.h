@@ -42,7 +42,20 @@
 #define	RCC_APB4LENR		0x274 /* RCC APB4L enable register */
 #define	RCC_APB4HENR		0x278 /* RCC APB4H enable register */
 #define	RCC_APB5ENR		0x27C /* RCC APB5 enable register */
-
+#define	RCC_MEMENSR		0xA4C
+#define	 MEMENSR_BOOTROMENS	(1 << 12)
+#define	 MEMENSR_VENCRAMENS	(1 << 11)
+#define	 MEMENSR_CACHEAXIRAMENS	(1 << 10)
+#define	 MEMENSR_FLEXRAMENS	(1 << 9)
+#define	 MEMENSR_AXISRAM2ENS	(1 << 8)
+#define	 MEMENSR_AXISRAM1ENS	(1 << 7)
+#define	 MEMENSR_BKPSRAMENS	(1 << 6)
+#define	 MEMENSR_AHBSRAM2ENS	(1 << 5)
+#define	 MEMENSR_AHBSRAM1ENS	(1 << 4)
+#define	 MEMENSR_AXISRAM6ENS	(1 << 3)
+#define	 MEMENSR_AXISRAM5ENS	(1 << 2)
+#define	 MEMENSR_AXISRAM4ENS	(1 << 1)
+#define	 MEMENSR_AXISRAM3ENS	(1 << 0)
 #define	RCC_AHB1ENSR		0xA50
 #define	RCC_AHB2ENSR		0xA54
 #define	 APB2ENSR_TIM1EN	(1 << 0) /* TIM1 clock enable */
@@ -104,6 +117,7 @@ struct rcc_config {
 	uint32_t apb4lenr;
 	uint32_t apb4henr;
 	uint32_t apb5enr;
+	uint32_t memenr;
 };
 
 struct stm32n6_rcc_softc {
