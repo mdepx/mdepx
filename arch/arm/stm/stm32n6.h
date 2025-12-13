@@ -31,6 +31,7 @@
 #include <arm/stm/stm32n6_dcmipp.h>
 #include <arm/stm/stm32l4_usart.h>
 #include <arm/stm/stm32f4_gpio.h>
+#include <arm/stm/stm32f4_i2c.h>
 #include <arm/stm/stm32f4_timer.h>
 #include <arm/stm/stm32n6_ltdc.h>
 #include <arm/stm/stm32n6_xspi.h>
@@ -61,5 +62,6 @@
 #define	RISAF4_BASE	0x44029000	/* NPU Master 0 */
 #define	RISAF5_BASE	0x4402A000	/* NPU Master 1 */
 #define	RISAF6_BASE	0x4402B000	/* CPU Master */
+#define	I2C1_BASE	0x40005400
 
 #endif	/* !_ARM_STM_STM32N6_H_ */
