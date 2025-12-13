@@ -52,6 +52,7 @@
 #define	DCMIPP_PRSR		0x1F8
 #define	DCMIPP_PRFCR		0x1FC
 #define	DCMIPP_CMCR		0x204
+#define	 CMCR_INSEL_CSI2	(1 << 0) /* input selection */
 #define	DCMIPP_CMFRCR		0x208
 #define	DCMIPP_CMIER		0x3F0
 #define	DCMIPP_CMSR1		0x3F4
@@ -59,6 +60,7 @@
 #define	DCMIPP_CMFCR		0x3FC
 #define	DCMIPP_P0FSCR		0x404
 #define	DCMIPP_P0FCTCR		0x500
+#define	 P0FCTCR_CPTREQ		(1 << 3) /* Capture requested */
 #define	DCMIPP_P0SCSTR		0x504
 #define	DCMIPP_P0SCSZR		0x508
 #define	DCMIPP_P0DCCNTR		0x5B0
@@ -71,6 +73,7 @@
 #define	DCMIPP_P0SR		0x5F8
 #define	DCMIPP_P0FCR		0x5FC
 #define	DCMIPP_P0CFSCR		0x604
+#define	 P0CFSCR_PIPEN		(1 << 31) /* Current activation of PipeN */
 #define	DCMIPP_P0CFCTCR		0x700
 #define	DCMIPP_P0CSCSTR		0x704
 #define	DCMIPP_P0CSCSZR		0x708

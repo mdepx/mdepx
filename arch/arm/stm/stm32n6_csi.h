@@ -29,7 +29,12 @@
 /* CSI-2 Host */
 
 #define	CSI_CR		0x00
+#define	 CR_CSIEN	(1 << 0) /* CSI-2 enable */
 #define	CSI_PCR		0x04
+#define	 PCR_DL1EN	(1 << 3) /* D-PHY_RX data lane 1 enable */
+#define	 PCR_DL0EN	(1 << 2) /* D-PHY_RX data lane 0 enable */
+#define	 PCR_CLEN	(1 << 1) /* Clock lane enable */
+#define	 PCR_PWRDOWN	(1 << 0) /* Power down */
 #define	CSI_VCxCFGR1(x)	(0x10 + 0x10 * (x))
 #define	CSI_VCxCFGR2(x)	(0x14 + 0x10 * (x))
 #define	CSI_VCxCFGR3(x)	(0x18 + 0x10 * (x))
@@ -51,6 +56,7 @@
 #define	CSI_PRCR	0x1000
 #define	CSI_PMCR	0x1004
 #define	CSI_PFCR	0x1008
+#define	 PFCR_DLD_TX	(1 << 16) /* Data lane direction of lane 0 */
 #define	CSI_PTCR0	0x1010
 #define	CSI_PTCR1	0x1014
 #define	CSI_PTSR	0x1018
