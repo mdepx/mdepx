@@ -28,6 +28,7 @@
 
 #include <arm/stm/stm32n6_rcc.h>
 #include <arm/stm/stm32n6_csi.h>
+#include <arm/stm/stm32n6_dcmipp.h>
 #include <arm/stm/stm32l4_usart.h>
 #include <arm/stm/stm32f4_gpio.h>
 #include <arm/stm/stm32f4_timer.h>
