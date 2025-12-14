@@ -88,6 +88,7 @@
 #define	 AHB5ENSR_JPEGENS	(1 << 3)
 #define	 AHB5ENSR_DMA2DENS	(1 << 1)
 #define	RCC_APB1LENSR		0xA64
+#define	 APB1LENSR_I2C1ENS	(1 << 21) /* I2C1 enable */
 #define	 APB1LENSR_UART5ENS	(1 << 20)
 #define	 APB1LENSR_USART2ENS	(1 << 17) /* USART2 enable */
 #define	 APB1LENSR_TIM2ENS	(1 << 0) /* TIM2 enable */
