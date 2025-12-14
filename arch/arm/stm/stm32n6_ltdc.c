@@ -53,6 +53,8 @@ stm32n6_ltdc_layer(struct stm32n6_ltdc_softc *sc,
 
 	if (info->bpp == 24)
 		WR4(sc, LTDC_LPFCR(i), 6); /* RGB888 */
+	else if (info->bpp == 16)
+		WR4(sc, LTDC_LPFCR(i), 4); /* RGB565 */
 	else
 		panic("implement me");
 
