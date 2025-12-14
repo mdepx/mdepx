@@ -49,6 +49,22 @@ stm32n6_pwr_setup_vddio23_1v8(struct stm32n6_pwr_softc *sc)
 	WR4(sc, PWR_SVMCR3, reg);
 }
 
+/*
+ * Mandatory for PB[9,8], PC[12:6], and PD[2].
+ */
+void
+stm32n6_pwr_setup_vddio4_3v3(struct stm32n6_pwr_softc *sc, int enable)
+{
+	uint32_t reg;
+
+	reg = RD4(sc, PWR_SVMCR1);
+	if (enable)
+		reg |= SVMCR1_VDDIO4SV;
+	else
+		reg &= ~SVMCR1_VDDIO4SV;
+	WR4(sc, PWR_SVMCR1, reg);
+}
+
 int
 stm32n6_pwr_init(struct stm32n6_pwr_softc *sc, uint32_t base)
 {

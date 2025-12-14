@@ -26,6 +26,8 @@
 #ifndef _ARM_STM_STM32N6_PWR_H_
 #define _ARM_STM_STM32N6_PWR_H_
 
+#define	PWR_SVMCR1	0x34
+#define	 SVMCR1_VDDIO4SV	(1 << 8)
 #define	PWR_SVMCR3	0x3C
 #define	 SVMCR3_VDDIO3VRSEL	(1 << 26)
 #define	 SVMCR3_VDDIO2VRSEL	(1 << 25)
@@ -43,5 +45,6 @@ struct stm32n6_pwr_softc {
 
 void stm32n6_pwr_setup_vddio23_1v8(struct stm32n6_pwr_softc *sc);
 int stm32n6_pwr_init(struct stm32n6_pwr_softc *sc, uint32_t base);
+void stm32n6_pwr_setup_vddio4_3v3(struct stm32n6_pwr_softc *sc, int enable);
 
 #endif /* !_ARM_STM_STM32N6_PWR_H_ */
