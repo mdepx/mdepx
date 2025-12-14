@@ -135,6 +135,53 @@ static const struct regval mode_2l_10b_regs[] = {
 	{0x3a01, 0x01},
 };
 
+static const struct regval test_pattern_enable_regs[] = {
+	{0x3148, 0x10},
+	{0x3280, 0x00},
+	{0x329c, 0x01},
+	{0x32a0, 0x11},
+	{0x3302, 0x00},
+	{0x3303, 0x00},
+	{0x336c, 0x00},
+};
+
+#if 0
+static const struct regval test_pattern_disable_regs[] = {
+	{0x3148, 0x00},
+	{0x3280, 0x01},
+	{0x329c, 0x00},
+	{0x32a0, 0x10},
+	{0x3302, 0x32},
+	{0x3303, 0x00},
+	{0x336c, 0x01},
+};
+
+static const struct regval inck_24Mhz_regs[] = {
+	{0x300c, 0x3B},
+	{0x300d, 0x2A},
+	{0x314c, 0xC6},
+	{0x314d, 0x00},
+	{0x315a, 0x02},
+	{0x3168, 0xA0},
+	{0x316a, 0x7E},
+};
+#endif
+
+static const struct regval inck_74Mhz_regs[] = {
+	{0x300c, 0xB6},
+	{0x300d, 0x7F},
+	{0x314c, 0x80},
+	{0x314d, 0x00},
+	{0x315a, 0x03},
+	{0x3168, 0x68},
+	{0x316a, 0x7F},
+};
+
+static const struct regval framerate_30fps_regs[] = {
+	{0x3030, 0x94},
+	{0x3031, 0x11},
+};
+
 int
 imx335_read_data(mdx_device_t dev, uint8_t i2c_addr, uint16_t reg, int n,
     uint8_t *val)
@@ -234,6 +281,22 @@ imx335_init(mdx_device_t dev, uint8_t i2c_addr)
 		return (error);
 	}
 
+	/* Set frequency. */
+	error = imx335_init_table(dev, i2c_addr, inck_74Mhz_regs,
+	    ARRAY_LEN(inck_74Mhz_regs));
+	if (error) {
+		printf("%s: cant set freq\n", __func__);
+		return (error);
+	}
+
+	/* Set frame rate. */
+	error = imx335_init_table(dev, i2c_addr, framerate_30fps_regs,
+	    ARRAY_LEN(framerate_30fps_regs));
+	if (error) {
+		printf("%s: cant set frame rate\n", __func__);
+		return (error);
+	}
+
 	/* Unstandby. */
 	error = imx335_write_reg(dev, i2c_addr, IMX335_STANDBY, 0);
 	if (error) {
@@ -242,6 +305,27 @@ imx335_init(mdx_device_t dev, uint8_t i2c_addr)
 	}
 
 	printf("%s: init done\n", __func__);
+
+	return (0);
+}
+
+int
+imx335_test_pattern_enable(mdx_device_t dev, uint8_t i2c_addr, uint8_t mode)
+{
+	int error;
+
+	error = imx335_write_reg(dev, i2c_addr, IMX335_TPG, mode);
+	if (error) {
+		printf("%s: cant start test pattern\n", __func__);
+		return (error);
+	}
+
+	error = imx335_init_table(dev, i2c_addr, test_pattern_enable_regs,
+	    ARRAY_LEN(test_pattern_enable_regs));
+	if (error) {
+		printf("%s: cant init test pattern mode\n", __func__);
+		return (error);
+	}
 
 	return (0);
 }
