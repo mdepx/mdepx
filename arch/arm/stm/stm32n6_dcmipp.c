@@ -95,7 +95,7 @@ stm32n6_dcmipp_setup(struct stm32n6_dcmipp_softc *sc)
 	WR4(sc, DCMIPP_P1DMCR, reg);
 
 /* TODO */
-#define	IMX335_RAW10	0x2b
+#define	IMX335_RAW10	0x2B
 #define	IMX335_RAW12	0x2C
 
 	/* Start Capture */
