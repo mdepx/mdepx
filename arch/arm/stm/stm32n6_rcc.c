@@ -34,6 +34,31 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
+stm32n6_rcc_pll1(struct stm32n6_rcc_softc *sc)
+{
+	uint32_t reg;
+
+	reg = PLL1CFGR1_PLL1SEL_HSE_CK;
+	reg |= 3 << PLL1CFGR1_PLLDIVM_S | 75 << PLL1CFGR1_PLLDIVN_S;
+	WR4(sc, RCC_PLL1CFGR1, reg);
+
+	WR4(sc, RCC_CR, CR_LSI_ON | CR_HSI_ON | CR_HSE_ON | CR_PLL1_ON);
+
+	reg = ICxCFGR_ICxSEL_PLL1 | ((4 - 1) << ICxCFGR_ICxINT_S);
+	WR4(sc, RCC_IC17CFGR, reg);
+
+	reg = ICxCFGR_ICxSEL_PLL1 | ((60 - 1) << ICxCFGR_ICxINT_S);
+	WR4(sc, RCC_IC18CFGR, reg);
+
+	WR4(sc, RCC_CCIPR1, CCRPR1_DCMIPPSEL_IC17_CK);
+
+	reg = DIVENSR_ICxENS(17) | DIVENSR_ICxENS(16);
+	WR4(sc, RCC_DIVENSR, reg);
+
+	printf("RCC CR %x\n", RD4(sc, RCC_CR));
+}
+
+void
 stm32n6_rcc_setup(struct stm32n6_rcc_softc *sc, struct rcc_config *cfg)
 {
 
