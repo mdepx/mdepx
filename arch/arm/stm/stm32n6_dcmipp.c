@@ -94,9 +94,15 @@ stm32n6_dcmipp_setup(struct stm32n6_dcmipp_softc *sc)
 	reg |= DMCR_TYPE_RGGB;
 	WR4(sc, DCMIPP_P1DMCR, reg);
 
+/* TODO */
+#define	IMX335_RAW10	0x2b
+#define	IMX335_RAW12	0x2C
+
 	/* Start Capture */
 	WR4(sc, DCMIPP_P1PPM0AR1, 0x34200000);
-	reg = (0 << P1FSCR_VC_S) | P1FSCR_PIPEN | (0x2b << P1FSCR_DTIDA_S);
+	reg = P1FSCR_PIPEN;
+	reg |= 0 << P1FSCR_VC_S;
+	reg |= IMX335_RAW10 << P1FSCR_DTIDA_S;
 	WR4(sc, DCMIPP_P1FSCR, reg);
 	WR4(sc, DCMIPP_P1FCTCR, P1FCTCR_CPTREQ);
 }
