@@ -327,3 +327,29 @@ imx335_test_pattern_enable(mdx_device_t dev, uint8_t i2c_addr, uint8_t mode)
 
 	return (0);
 }
+
+int
+imx335_set_gain(mdx_device_t dev, uint8_t i2c_addr, uint8_t gain)
+{
+	int error;
+
+	error = imx335_write_reg(dev, i2c_addr, IMX335_HOLD, 1);
+	if (error) {
+		printf("%s: cant hold\n", __func__);
+		return (error);
+	}
+
+	error = imx335_write_reg(dev, i2c_addr, IMX335_GAIN, gain);
+	if (error) {
+		printf("%s: cant set gain\n", __func__);
+		return (error);
+	}
+
+	error = imx335_write_reg(dev, i2c_addr, IMX335_HOLD, 0);
+	if (error) {
+		printf("%s: cant hold\n", __func__);
+		return (error);
+	}
+
+	return (0);
+}
