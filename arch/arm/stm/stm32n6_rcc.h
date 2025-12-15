@@ -27,6 +27,40 @@
 #define _ARM_STM_STM32N6_RCC_H_
 
 #define	RCC_CR			0x00 /* RCC control register */
+#define	 CR_LSI_ON		(1 << 0)
+#define	 CR_LSE_ON		(1 << 1)
+#define	 CR_MSI_ON		(1 << 2)
+#define	 CR_HSI_ON		(1 << 3)
+#define	 CR_HSE_ON		(1 << 4)
+#define	 CR_PLL1_ON		(1 << 8)
+#define	 CR_PLL2_ON		(1 << 9)
+#define	 CR_PLL3_ON		(1 << 10)
+#define	 CR_PLL4_ON		(1 << 11)
+#define	RCC_PLL1CFGR1		0x80
+#define	 PLL1CFGR1_PLLDIVN_S	8
+#define	 PLL1CFGR1_PLLDIVM_S	20
+#define	 PLL1CFGR1_PLLBYP	(1 << 27)
+#define	 PLL1CFGR1_PLL1SEL_S	28
+#define	 PLL1CFGR1_PLL1SEL_HSI_CK	(0 << PLL1CFGR1_PLL1SEL_S)
+#define	 PLL1CFGR1_PLL1SEL_MSI_CK	(1 << PLL1CFGR1_PLL1SEL_S)
+#define	 PLL1CFGR1_PLL1SEL_HSE_CK	(2 << PLL1CFGR1_PLL1SEL_S)
+#define	 PLL1CFGR1_PLL1SEL_I2S_CKIN	(3 << PLL1CFGR1_PLL1SEL_S)
+#define	RCC_PLL1CFGR2		0x84
+#define	RCC_IC17CFGR		0x104
+#define	RCC_IC18CFGR		0x108
+#define	 ICxCFGR_ICxSEL_S	28
+#define	 ICxCFGR_ICxSEL_PLL1	(0 << ICxCFGR_ICxSEL_S)
+#define	 ICxCFGR_ICxSEL_PLL2	(1 << ICxCFGR_ICxSEL_S)
+#define	 ICxCFGR_ICxSEL_PLL3	(2 << ICxCFGR_ICxSEL_S)
+#define	 ICxCFGR_ICxSEL_PLL4	(3 << ICxCFGR_ICxSEL_S)
+#define	 ICxCFGR_ICxINT_S	16
+#define	RCC_CCIPR1		0x144
+#define	 CCRPR1_DCMIPPSEL_S		20
+#define	 CCRPR1_DCMIPPSEL_M		(0x3 << CCRPR1_DCMIPPSEL_S)
+#define	 CCRPR1_DCMIPPSEL_PCLK5		(0x0 << CCRPR1_DCMIPPSEL_S)
+#define	 CCRPR1_DCMIPPSEL_PER_CK	(0x1 << CCRPR1_DCMIPPSEL_S)
+#define	 CCRPR1_DCMIPPSEL_IC17_CK	(0x2 << CCRPR1_DCMIPPSEL_S)
+#define	 CCRPR1_DCMIPPSEL_HSI_DIV_CK	(0x3 << CCRPR1_DCMIPPSEL_S)
 #define	RCC_BUSENR		0x244
 #define	 BUSENR_APB2EN		(1 << 9) /* APB2 enable */
 #define	 BUSENR_AHB4EN		(1 << 6) /* AHB4 enable */
@@ -42,6 +76,8 @@
 #define	RCC_APB4LENR		0x274 /* RCC APB4L enable register */
 #define	RCC_APB4HENR		0x278 /* RCC APB4H enable register */
 #define	RCC_APB5ENR		0x27C /* RCC APB5 enable register */
+#define	RCC_DIVENSR		0xA40
+#define	 DIVENSR_ICxENS(x)	(1 << ((x) - 1))
 #define	RCC_MEMENSR		0xA4C
 #define	 MEMENSR_BOOTROMENS	(1 << 12)
 #define	 MEMENSR_VENCRAMENS	(1 << 11)
@@ -128,5 +164,6 @@ struct stm32n6_rcc_softc {
 int stm32n6_rcc_init(struct stm32n6_rcc_softc *sc, uint32_t base);
 void stm32n6_rcc_setup(struct stm32n6_rcc_softc *sc,
     struct rcc_config *cfg);
+void stm32n6_rcc_pll1(struct stm32n6_rcc_softc *sc);
 
 #endif /* !_ARM_STM_STM32N6_RCC_H_ */
