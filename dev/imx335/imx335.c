@@ -247,21 +247,9 @@ imx335_write_data(mdx_device_t dev, uint8_t i2c_addr, uint16_t reg,
 int
 imx335_write_reg(mdx_device_t dev, uint8_t i2c_addr, uint16_t reg, uint8_t val)
 {
-	struct i2c_msg msgs[1];
-	uint8_t data[3];
 	int err;
 
-	data[0] = (reg >> 8) & 0xff;
-	data[1] = reg & 0xff;
-	data[2] = val;
-
-	/* Write register and data. */
-	msgs[0].slave = i2c_addr;
-	msgs[0].buf = data;
-	msgs[0].len = 3;
-	msgs[0].flags = 0;
-
-	err = mdx_i2c_transfer(dev, msgs, 1);
+	err = imx335_write_data(dev, i2c_addr, reg, &val, 1);
 
 	return (err);
 }
