@@ -218,6 +218,32 @@ imx335_read_reg(mdx_device_t dev, uint8_t i2c_addr, uint16_t reg, uint8_t *val)
 	return (err);
 }
 
+static int
+imx335_write_data(mdx_device_t dev, uint8_t i2c_addr, uint16_t reg,
+    uint8_t *val, int len)
+{
+	struct i2c_msg msgs[1];
+	uint8_t data[2 + 16];
+	int err;
+
+	if (len > 16)
+		return (-1);
+
+	data[0] = (reg >> 8) & 0xff;
+	data[1] = reg & 0xff;
+	memcpy(&data[2], val, len);
+
+	/* Write register and data. */
+	msgs[0].slave = i2c_addr;
+	msgs[0].buf = data;
+	msgs[0].len = 2 + len;
+	msgs[0].flags = 0;
+
+	err = mdx_i2c_transfer(dev, msgs, 1);
+
+	return (err);
+}
+
 int
 imx335_write_reg(mdx_device_t dev, uint8_t i2c_addr, uint16_t reg, uint8_t val)
 {
@@ -329,7 +355,7 @@ imx335_test_pattern_enable(mdx_device_t dev, uint8_t i2c_addr, uint8_t mode)
 }
 
 int
-imx335_set_gain(mdx_device_t dev, uint8_t i2c_addr, uint8_t gain)
+imx335_set_gain(mdx_device_t dev, uint8_t i2c_addr, uint16_t gain)
 {
 	int error;
 
@@ -339,9 +365,43 @@ imx335_set_gain(mdx_device_t dev, uint8_t i2c_addr, uint8_t gain)
 		return (error);
 	}
 
-	error = imx335_write_reg(dev, i2c_addr, IMX335_GAIN, gain);
+	error = imx335_write_data(dev, i2c_addr, IMX335_GAIN, (uint8_t *)&gain,
+	    2);
 	if (error) {
 		printf("%s: cant set gain\n", __func__);
+		return (error);
+	}
+
+	error = imx335_write_reg(dev, i2c_addr, IMX335_HOLD, 0);
+	if (error) {
+		printf("%s: cant hold\n", __func__);
+		return (error);
+	}
+
+#if 0
+	uint8_t test;
+	imx335_read_reg(dev, i2c_addr, IMX335_GAIN, &test);
+	printf("%s: test %x\n", __func__, test);
+#endif
+
+	return (0);
+}
+
+int
+imx335_set_exposure(mdx_device_t dev, uint8_t i2c_addr, uint32_t exposure)
+{
+	int error;
+
+	error = imx335_write_reg(dev, i2c_addr, IMX335_HOLD, 1);
+	if (error) {
+		printf("%s: cant hold\n", __func__);
+		return (error);
+	}
+
+	error = imx335_write_data(dev, i2c_addr, IMX335_SHUTTER,
+	    (uint8_t *)&exposure, 3);
+	if (error) {
+		printf("%s: cant set exposure\n", __func__);
 		return (error);
 	}
 

@@ -29,6 +29,7 @@
 #define	IMX335_STANDBY		0x3000
 #define	 STANDBY_STANDBY	(1 << 0)
 #define	IMX335_HOLD		0x3001
+#define	IMX335_SHUTTER		0x3058
 #define	IMX335_GAIN		0x30e8
 #define	IMX335_TPG		0x329e
 
@@ -41,6 +42,7 @@ int imx335_read_data(mdx_device_t dev, uint8_t i2c_addr, uint16_t reg, int n,
 int imx335_init(mdx_device_t dev, uint8_t i2c_addr);
 int imx335_test_pattern_enable(mdx_device_t dev, uint8_t i2c_addr,
     uint8_t mode);
-int imx335_set_gain(mdx_device_t dev, uint8_t i2c_addr, uint8_t gain);
+int imx335_set_gain(mdx_device_t dev, uint8_t i2c_addr, uint16_t gain);
+int imx335_set_exposure(mdx_device_t dev, uint8_t i2c_addr, uint32_t exposure);
 
 #endif /* !_DEV_IMX335_IMX335_H_ */
