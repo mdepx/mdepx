@@ -27,7 +27,6 @@
 #define _ARM_STM_STM32N6_CSI_H_
 
 /* CSI-2 Host */
-
 #define	CSI_CR		0x00
 #define	 CR_VC1START	(1 << 6)
 #define	 CR_VC0START	(1 << 2) /* Virtual channel 0 start */
@@ -58,12 +57,13 @@
 #define	CSI_ERR2	0x118
 
 /* Phy Registers */
-
 #define	CSI_PRCR	0x1000
 #define	 PRCR_PEN	(1 << 1)
 #define	CSI_PMCR	0x1004
 #define	CSI_PFCR	0x1008
 #define	 PFCR_DLD_TX	(1 << 16) /* Data lane direction of lane 0 */
+#define	 PFCR_CCFR_S	0 /* Configuration clock frequency range selection */
+#define	 PFCR_HSFR_S	8 /* PHY high-speed frequency range selection */
 #define	CSI_PTCR0	0x1010
 #define	 PTCR0_TCKEN	(1 << 0) /* Test-interface clken for the TDI bus */
 #define	CSI_PTCR1	0x1014
