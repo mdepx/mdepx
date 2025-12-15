@@ -32,6 +32,76 @@
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
 void
+stm32n6_dcmipp_status(struct stm32n6_dcmipp_softc *sc)
+{
+
+	printf("%s: pipe0 status %x\n", __func__, RD4(sc, DCMIPP_P0SR));
+	printf("%s: pipe1 status %x\n", __func__, RD4(sc, DCMIPP_P1SR));
+	printf("%s: common status1 %x\n", __func__, RD4(sc, DCMIPP_CMSR1));
+	printf("%s: common status2 %x\n", __func__, RD4(sc, DCMIPP_CMSR2));
+	printf("%s: frame cnt %d\n", __func__, RD4(sc, DCMIPP_CMFRCR));
+	printf("%s: p0 cfscr %x\n", __func__, RD4(sc, DCMIPP_P0CFSCR));
+	printf("%s: p0 m0ar1 %x\n", __func__, RD4(sc, DCMIPP_P0CPPM0AR1));
+}
+
+void
+stm32n6_dcmipp_setup_downsize(struct stm32n6_dcmipp_softc *sc,
+    struct stm32n6_dcmipp_downsize_config *conf)
+{
+	uint32_t reg;
+
+	/* Downsize configuration. */
+
+	reg = conf->hratio << P1DSRTIOR_HRATIO_S;
+	reg |= conf->vratio << P1DSRTIOR_VRATIO_S;
+	WR4(sc, DCMIPP_P1DSRTIOR, reg);
+
+	reg = conf->hsize << P1DSSZR_HSIZE_S;
+	reg |= conf->vsize << P1DSSZR_VSIZE_S;
+	WR4(sc, DCMIPP_P1DSSZR, reg);
+
+	reg = conf->hdivfactor << P1DSCR_HDIV_S;
+	reg |= conf->vdivfactor << P1DSCR_VDIV_S;
+	reg |= P1DSCR_ENABLE;
+	WR4(sc, DCMIPP_P1DSCR, reg);
+}
+
+/* Test setup */
+
+void
+stm32n6_dcmipp_setup(struct stm32n6_dcmipp_softc *sc)
+{
+	uint32_t reg;
+
+	/* Disable parallel interface. */
+	WR4(sc, DCMIPP_PRCR, 0);
+
+	/* Switch input to CSI2. */
+	WR4(sc, DCMIPP_CMCR, CMCR_INSEL_CSI2 | CMCR_PSFC_PIPE1);
+
+	WR4(sc, DCMIPP_P1PPM0PR, 1600 << P1PPM0PR_PITCH_S);
+
+	/* Format and gamma */
+	WR4(sc, DCMIPP_P1PPCR, P1PPCR_FORMAT_RGB565);
+	WR4(sc, DCMIPP_P1GMCR, P1GMCR_EN);
+
+	/* Debayering / demosaicing. */
+	reg = DMCR_EN;
+	reg |= 7 << DMCR_PEAK_S;
+	reg |= 7 << DMCR_LINEV_S;
+	reg |= 7 << DMCR_LINEH_S;
+	reg |= 7 << DMCR_EDGE_S;
+	reg |= DMCR_TYPE_RGGB;
+	WR4(sc, DCMIPP_P1DMCR, reg);
+
+	/* Start Capture */
+	WR4(sc, DCMIPP_P1PPM0AR1, 0x34200000);
+	reg = (0 << P1FSCR_VC_S) | P1FSCR_PIPEN | (0x2b << P1FSCR_DTIDA_S);
+	WR4(sc, DCMIPP_P1FSCR, reg);
+	WR4(sc, DCMIPP_P1FCTCR, P1FCTCR_CPTREQ);
+}
+
+void
 stm32n6_dcmipp_init(struct stm32n6_dcmipp_softc *sc, uint32_t base)
 {
 

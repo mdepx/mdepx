@@ -53,6 +53,10 @@
 #define	DCMIPP_PRFCR		0x1FC
 #define	DCMIPP_CMCR		0x204
 #define	 CMCR_INSEL_CSI2	(1 << 0) /* input selection */
+#define	 CMCR_PSFC_S		1 /* Pipe selection for the frame counter */
+#define	 CMCR_PSFC_PIPE0	(0 << CMCR_PSFC_S)
+#define	 CMCR_PSFC_PIPE1	(1 << CMCR_PSFC_S)
+#define	 CMCR_PSFC_PIPE2	(2 << CMCR_PSFC_S)
 #define	DCMIPP_CMFRCR		0x208
 #define	DCMIPP_CMIER		0x3F0
 #define	DCMIPP_CMSR1		0x3F4
@@ -83,6 +87,13 @@
 #define	DCMIPP_P0CPPM0AR2	0x7C8
 #define	DCMIPP_P1FSCR		0x804
 #define	 P1FSCR_PIPEN		(1 << 31)
+#define	 P1FSCR_FDTFEN		(1 << 30) /* Force Datatype format enable */
+#define	 P1FSCR_FDTF_S		24 /* Force Datatype format */
+#define	 P1FSCR_VC_S		19 /* Virtual channel ID of the CSI flow */
+#define	 P1FSCR_PIPEDIFF	(1 << 18) /* Differentiates Pipe2 from Pipe1 */
+#define	 P1FSCR_DTMODE_S	16 /* Flow selection mode */
+#define	 P1FSCR_DTIDB_S		8
+#define	 P1FSCR_DTIDA_S		0
 #define	DCMIPP_P1SRCR		0x820
 #define	DCMIPP_P1BPRCR		0x824
 #define	DCMIPP_P1BPRSR		0x828
@@ -99,6 +110,16 @@
 #define	DCMIPP_P1ST2SR		0x868
 #define	DCMIPP_P1ST3SR		0x86C
 #define	DCMIPP_P1DMCR		0x870
+#define	 DMCR_EN		(1 << 0)
+#define	 DMCR_TYPE_S		1
+#define	 DMCR_TYPE_RGGB		(0 << DMCR_TYPE_S)
+#define	 DMCR_TYPE_GRBG		(1 << DMCR_TYPE_S)
+#define	 DMCR_TYPE_GBRG		(2 << DMCR_TYPE_S)
+#define	 DMCR_TYPE_BGGR		(3 << DMCR_TYPE_S)
+#define	 DMCR_PEAK_S		16
+#define	 DMCR_LINEV_S		20
+#define	 DMCR_LINEH_S		24
+#define	 DMCR_EDGE_S		28
 #define	DCMIPP_P1CCCR		0x880
 #define	DCMIPP_P1CCRR1		0x884
 #define	DCMIPP_P1CCRR2		0x888
@@ -115,12 +136,20 @@
 #define	DCMIPP_P1CRSZR		0x908
 #define	DCMIPP_P1DCCR		0x90C
 #define	DCMIPP_P1DSCR		0x910
+#define	 P1DSCR_ENABLE		(1 << 31)
+#define	 P1DSCR_VDIV_S		16
+#define	 P1DSCR_HDIV_S		0
 #define	DCMIPP_P1DSRTIOR	0x914
+#define	 P1DSRTIOR_VRATIO_S	16
+#define	 P1DSRTIOR_HRATIO_S	0
 #define	DCMIPP_P1DSSZR		0x918
+#define	 P1DSSZR_VSIZE_S	16
+#define	 P1DSSZR_HSIZE_S	0
 #define	DCMIPP_P1CMRICR		0x920
 #define	DCMIPP_P1RIxCR1		0x924
 #define	DCMIPP_P1RIxCR2		0x928
 #define	DCMIPP_P1GMCR		0x970
+#define	 P1GMCR_EN		(1 << 0) /* Gamma is enabled */
 #define	DCMIPP_P1YUVCR		0x980
 #define	DCMIPP_P1YUVRR1		0x984
 #define	DCMIPP_P1YUVRR2		0x988
@@ -129,9 +158,24 @@
 #define	DCMIPP_P1YUVBR1		0x994
 #define	DCMIPP_P1YUVBR2		0x998
 #define	DCMIPP_P1PPCR		0x9C0
+#define	 P1PPCR_FORMAT_S		0
+#define	 P1PPCR_FORMAT_RGB888_YUV444_1	(0x0 << P1PPCR_FORMAT_S)
+#define	 P1PPCR_FORMAT_RGB565		(0x1 << P1PPCR_FORMAT_S)
+#define	 P1PPCR_FORMAT_ARGB8888		(0x2 << P1PPCR_FORMAT_S) /* A=0xff */
+#define	 P1PPCR_FORMAT_RGBA8888		(0x3 << P1PPCR_FORMAT_S) /* A=0xff */
+#define	 P1PPCR_FORMAT_MONOY8G8_1	(0x4 << P1PPCR_FORMAT_S)
+#define	 P1PPCR_FORMAT_YUV444_1_32_AYUV	(0x5 << P1PPCR_FORMAT_S)
+#define	 P1PPCR_FORMAT_YUV422_1_16_YUYV	(0x6 << P1PPCR_FORMAT_S)
+#define	 P1PPCR_FORMAT_YUV422_2_16_NONE	(0x7 << P1PPCR_FORMAT_S)
+#define	 P1PPCR_FORMAT_YUV420_2_12_NV21	(0x8 << P1PPCR_FORMAT_S)
+#define	 P1PPCR_FORMAT_YUV420_3_12_YV12	(0x9 << P1PPCR_FORMAT_S)
+#define	 P1PPCR_FORMAT_YUV422_1_16_UYVY	(0xa << P1PPCR_FORMAT_S)
+#define	 P1PPCR_SWAPRB			(1 << 4)
+#define	 P1PPCR_DBM			(1 << 16)
 #define	DCMIPP_P1PPM0AR1	0x9C4
 #define	DCMIPP_P1PPM0AR2	0x9C8
 #define	DCMIPP_P1PPM0PR		0x9CC
+#define	 P1PPM0PR_PITCH_S	0 /* Number of bytes between two lines. */
 #define	DCMIPP_P1STM0A		0x9D0
 #define	DCMIPP_P1PPM1AR1	0x9D4
 #define	DCMIPP_P1PPM1AR2	0x9D8
@@ -244,11 +288,23 @@
 #define	DCMIPP_P2CPPM0AR1	0xFC4
 #define	DCMIPP_P2CPPM0AR2	0xFC8
 
+struct stm32n6_dcmipp_downsize_config {
+	uint32_t hratio;
+	uint32_t vratio;
+	uint32_t hsize;
+	uint32_t vsize;
+	uint32_t hdivfactor;
+	uint32_t vdivfactor;
+};
+
 struct stm32n6_dcmipp_softc {
 	uint32_t base;
 };
 
 void stm32n6_dcmipp_init(struct stm32n6_dcmipp_softc *sc, uint32_t base);
 void stm32n6_dcmipp_status(struct stm32n6_dcmipp_softc *sc);
+void stm32n6_dcmipp_setup(struct stm32n6_dcmipp_softc *sc);
+void stm32n6_dcmipp_setup_downsize(struct stm32n6_dcmipp_softc *sc,
+    struct stm32n6_dcmipp_downsize_config *conf);
 
 #endif /* !_ARM_STM_STM32N6_DCMIPP_H_ */
