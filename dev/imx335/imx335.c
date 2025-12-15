@@ -145,8 +145,7 @@ static const struct regval test_pattern_enable_regs[] = {
 	{0x336c, 0x00},
 };
 
-#if 0
-static const struct regval test_pattern_disable_regs[] = {
+static const struct regval test_pattern_disable_regs[] __unused = {
 	{0x3148, 0x00},
 	{0x3280, 0x01},
 	{0x329c, 0x00},
@@ -156,7 +155,7 @@ static const struct regval test_pattern_disable_regs[] = {
 	{0x336c, 0x01},
 };
 
-static const struct regval inck_24Mhz_regs[] = {
+static const struct regval inck_24Mhz_regs[] __unused = {
 	{0x300c, 0x3B},
 	{0x300d, 0x2A},
 	{0x314c, 0xC6},
@@ -165,9 +164,8 @@ static const struct regval inck_24Mhz_regs[] = {
 	{0x3168, 0xA0},
 	{0x316a, 0x7E},
 };
-#endif
 
-static const struct regval inck_74Mhz_regs[] = {
+static const struct regval inck_74Mhz_regs[] __unused = {
 	{0x300c, 0xB6},
 	{0x300d, 0x7F},
 	{0x314c, 0x80},
@@ -177,7 +175,7 @@ static const struct regval inck_74Mhz_regs[] = {
 	{0x316a, 0x7F},
 };
 
-static const struct regval framerate_30fps_regs[] = {
+static const struct regval framerate_30fps_regs[] __unused = {
 	{0x3030, 0x94},
 	{0x3031, 0x11},
 };
