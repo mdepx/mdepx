@@ -59,6 +59,7 @@
 #define	DCMIPP_CMSR2		0x3F8
 #define	DCMIPP_CMFCR		0x3FC
 #define	DCMIPP_P0FSCR		0x404
+#define	 P0FSCR_PIPEN		(1 << 31)
 #define	DCMIPP_P0FCTCR		0x500
 #define	 P0FCTCR_CPTREQ		(1 << 3) /* Capture requested */
 #define	DCMIPP_P0SCSTR		0x504
@@ -81,6 +82,7 @@
 #define	DCMIPP_P0CPPM0AR1	0x7C4
 #define	DCMIPP_P0CPPM0AR2	0x7C8
 #define	DCMIPP_P1FSCR		0x804
+#define	 P1FSCR_PIPEN		(1 << 31)
 #define	DCMIPP_P1SRCR		0x820
 #define	DCMIPP_P1BPRCR		0x824
 #define	DCMIPP_P1BPRSR		0x828
@@ -108,6 +110,7 @@
 #define	DCMIPP_P1CTCR2		0x8A4
 #define	DCMIPP_P1CTCR3		0x8A8
 #define	DCMIPP_P1FCTCR		0x900
+#define	 P1FCTCR_CPTREQ		(1 << 3) /* Capture requested */
 #define	DCMIPP_P1CRSTR		0x904
 #define	DCMIPP_P1CRSZR		0x908
 #define	DCMIPP_P1DCCR		0x90C
@@ -246,5 +249,6 @@ struct stm32n6_dcmipp_softc {
 };
 
 void stm32n6_dcmipp_init(struct stm32n6_dcmipp_softc *sc, uint32_t base);
+void stm32n6_dcmipp_status(struct stm32n6_dcmipp_softc *sc);
 
 #endif /* !_ARM_STM_STM32N6_DCMIPP_H_ */
