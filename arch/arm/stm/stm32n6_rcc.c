@@ -52,7 +52,7 @@ stm32n6_rcc_pll1(struct stm32n6_rcc_softc *sc)
 
 	WR4(sc, RCC_CCIPR1, CCRPR1_DCMIPPSEL_IC17_CK);
 
-	reg = DIVENSR_ICxENS(17) | DIVENSR_ICxENS(16);
+	reg = DIVENSR_ICxENS(17) | DIVENSR_ICxENS(18);
 	WR4(sc, RCC_DIVENSR, reg);
 
 	printf("RCC CR %x\n", RD4(sc, RCC_CR));
