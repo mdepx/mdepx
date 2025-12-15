@@ -280,8 +280,8 @@ imx335_init(mdx_device_t dev, uint8_t i2c_addr)
 	}
 
 	/* Set frequency. */
-	error = imx335_init_table(dev, i2c_addr, inck_74Mhz_regs,
-	    ARRAY_LEN(inck_74Mhz_regs));
+	error = imx335_init_table(dev, i2c_addr, inck_24Mhz_regs,
+	    ARRAY_LEN(inck_24Mhz_regs));
 	if (error) {
 		printf("%s: cant set freq\n", __func__);
 		return (error);
