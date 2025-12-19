@@ -133,16 +133,18 @@ static uint32_t ispGainB[N_COLOR_PROFILES] = \
 static void
 stm32n6_dcmipp_exposure(struct stm32n6_dcmipp_softc *sc, int i)
 {
-	uint8_t s,m;
-	uint8_t sb, mb;
-
-	to_sm(ispGainR[i], &s, &m);
-	WR4(sc, DCMIPP_P1EXCR1, s << 28 | m << 20 | 1 << 0); //red
+	uint32_t reg;
+	uint8_t s, m;
 
 	to_sm(ispGainG[i], &s, &m);
-	to_sm(ispGainB[i], &sb, &mb);
+	reg = s << EXCR2_SHFG_S | m << EXCR2_MULTG_S;
+	to_sm(ispGainB[i], &s, &m);
+	reg |= s << EXCR2_SHFB_S | m << EXCR2_MULTB_S;
+	WR4(sc, DCMIPP_P1EXCR2, reg);
 
-	WR4(sc, DCMIPP_P1EXCR2, s << 28 | m << 20 | sb << 12 | mb << 4);//g b
+	to_sm(ispGainR[i], &s, &m);
+	reg = s << EXCR1_SHFR_S | m << EXCR1_MULTR_S | EXCR1_ENABLE;
+	WR4(sc, DCMIPP_P1EXCR1, reg);
 }
 
 static void

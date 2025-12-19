@@ -104,7 +104,14 @@
 #define	 BLCCR_BLCG_S		16
 #define	 BLCCR_BLCR_S		24
 #define	DCMIPP_P1EXCR1		0x844
+#define	 EXCR1_SHFR_S		28 /* Red */
+#define	 EXCR1_MULTR_S		20 /* Red */
+#define	 EXCR1_ENABLE		(1 << 0)
 #define	DCMIPP_P1EXCR2		0x848
+#define	 EXCR2_SHFG_S		28
+#define	 EXCR2_MULTG_S		20
+#define	 EXCR2_SHFB_S		12
+#define	 EXCR2_MULTB_S		4
 #define	DCMIPP_P1ST1CR		0x850
 #define	DCMIPP_P1ST2CR		0x854
 #define	DCMIPP_P1ST3CR		0x858
