@@ -99,6 +99,10 @@
 #define	DCMIPP_P1BPRSR		0x828
 #define	DCMIPP_P1DECR		0x830
 #define	DCMIPP_P1BLCCR		0x840
+#define	 BLCCR_ENABLE		(1 << 0)
+#define	 BLCCR_BLCB_S		8
+#define	 BLCCR_BLCG_S		16
+#define	 BLCCR_BLCR_S		24
 #define	DCMIPP_P1EXCR1		0x844
 #define	DCMIPP_P1EXCR2		0x848
 #define	DCMIPP_P1ST1CR		0x850
@@ -121,12 +125,27 @@
 #define	 DMCR_LINEH_S		24
 #define	 DMCR_EDGE_S		28
 #define	DCMIPP_P1CCCR		0x880
+#define	 CCCR_ENABLE		(1 << 0)
+#define	 CCCR_TYPE		(1 << 1)	/* R, G and B */
+#define	 CCCR_CLAMP		(1 << 2)
 #define	DCMIPP_P1CCRR1		0x884
+#define	 CCRR1_RG_S		16
+#define	 CCRR1_RR_S		0
 #define	DCMIPP_P1CCRR2		0x888
+#define	 CCRR2_RA_S		16
+#define	 CCRR2_RB_S		0
 #define	DCMIPP_P1CCGR1		0x88C
+#define	 CCGR1_GG_S		16
+#define	 CCGR1_GR_S		0
 #define	DCMIPP_P1CCGR2		0x890
+#define	 CCGR2_GA_S		16
+#define	 CCGR2_GB_S		0
 #define	DCMIPP_P1CCBR1		0x894
+#define	 CCBR1_BG_S		16
+#define	 CCBR1_BR_S		0
 #define	DCMIPP_P1CCBR2		0x898
+#define	 CCBR2_BA_S		16
+#define	 CCBR2_BB_S		0
 #define	DCMIPP_P1CTCR1		0x8A0
 #define	DCMIPP_P1CTCR2		0x8A4
 #define	DCMIPP_P1CTCR3		0x8A8
