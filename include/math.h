@@ -1,1 +1,1 @@
-double fabs(double x);
+#include <lib/msun/src/math.h>
