@@ -77,7 +77,7 @@ tanl(long double x)
 		RETURNI(s ? -hi : hi);
 	}
 
-	e0 = __ieee754_rem_pio2l(x, y);
+	e0 = rem_pio2l(x, y);
 	hi = y[0];
 	lo = y[1];
 

@@ -15,7 +15,7 @@
 
 #include <sys/cdefs.h>
 
-/* __ieee754_rem_pio2(x,y)
+/* rem_pio2(x,y)
  * 
  * return the remainder of x rem pi/2 in y[0]+y[1] 
  * use __kernel_rem_pio2()
@@ -51,7 +51,7 @@ pio2_3t =  8.47842766036889956997e-32; /* 0x397B839A, 0x252049C1 */
 static __inline __always_inline
 #endif
 int
-__ieee754_rem_pio2(double x, double *y)
+rem_pio2(double x, double *y)
 {
 	double z,w,t,r,fn;
 	double tx[3],ty[2];

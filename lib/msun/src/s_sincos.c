@@ -53,7 +53,7 @@ sincos(double x, double *sn, double *cs)
 	}
 
 	/* Argument reduction. */
-	n = __ieee754_rem_pio2(x, y);
+	n = rem_pio2(x, y);
 
 	switch(n & 3) {
 	case 0:

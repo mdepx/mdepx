@@ -64,7 +64,7 @@ tanf(float x)
 
     /* general argument reduction needed */
 	else {
-	    n = __ieee754_rem_pio2f(x,&y);
+	    n = rem_pio2f(x,&y);
 	    /* integer parameter: 1 -- n even; -1 -- n odd */
 	    return __kernel_tandf(y,1-((n&1)<<1));
 	}

@@ -74,7 +74,7 @@ cosf(float x)
 
     /* general argument reduction needed */
 	else {
-	    n = __ieee754_rem_pio2f(x,&y);
+	    n = rem_pio2f(x,&y);
 	    switch(n&3) {
 		case 0: return  __kernel_cosdf(y);
 		case 1: return  __kernel_sindf(-y);

@@ -15,7 +15,7 @@
 
 #include <sys/cdefs.h>
 
-/* ld128 version of __ieee754_rem_pio2l(x,y)
+/* ld128 version of rem_pio2l(x,y)
  * 
  * return the remainder of x rem pi/2 in y[0]+y[1] 
  * use __kernel_rem_pio2()
@@ -58,7 +58,7 @@ pio2_3  =  2.0670321098263988236499468110329591e-43L,	/*  0x127044533e63a0105e00
 pio2_3t = -2.5650587247459238361625433492959285e-65L;	/* -0x159c4ec64ddaeb5f78671cbfb2210.0p-327 */
 
 static inline __always_inline int
-__ieee754_rem_pio2l(long double x, long double *y)
+rem_pio2l(long double x, long double *y)
 {
 	union IEEEl2bits u,u1;
 	long double z,w,t,r,fn;

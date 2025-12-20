@@ -80,7 +80,7 @@ sincosl(long double x, long double *sn, long double *cs)
 	}
 
 	/* Range reduction. */
-	e0 = __ieee754_rem_pio2l(x, y);
+	e0 = rem_pio2l(x, y);
 
 	switch (e0 & 3) {
 	case 0:

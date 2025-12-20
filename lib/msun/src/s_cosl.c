@@ -73,7 +73,7 @@ cosl(long double x)
 	if (z.e < M_PI_4)
 		RETURNI(__kernel_cosl(z.e, 0));
 
-	e0 = __ieee754_rem_pio2l(x, y);
+	e0 = rem_pio2l(x, y);
 	hi = y[0];
 	lo = y[1];
 

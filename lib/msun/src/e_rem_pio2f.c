@@ -16,7 +16,7 @@
 
 #include <sys/cdefs.h>
 
-/* __ieee754_rem_pio2f(x,y)
+/* rem_pio2f(x,y)
  *
  * return the remainder of x rem pi/2 in *y
  * use double precision for everything except passing x
@@ -43,7 +43,7 @@ pio2_1t =  1.58932547735281966916e-08; /* 0x3E5110b4, 0x611A6263 */
 static __inline __always_inline
 #endif
 int
-__ieee754_rem_pio2f(float x, double *y)
+rem_pio2f(float x, double *y)
 {
 	double w,r,fn;
 	double tx[1],ty[1];

@@ -100,7 +100,7 @@ sincosf(float x, float *sn, float *cs)
 	}
 
 	/* Argument reduction. */
-	n = __ieee754_rem_pio2f(x, &y);
+	n = rem_pio2f(x, &y);
 	__kernel_sincosdf(y, &s, &c);
 
 	switch(n & 3) {
