@@ -51,7 +51,10 @@ typedef	__uint32_t		__vm_size_t;
 typedef	__uint32_t		__time_t;
 
 #define	INT64_C(c)		(c ## LL)
-#define	UINT64_C(c)		(c ## UL)
+#define	UINT64_C(c)		(c ## ULL)
+
+#define	INT32_C(c)		(c)
+#define	UINT32_C(c)		(c ## U)
 
 typedef	__int32_t		__ptrdiff_t;
 
