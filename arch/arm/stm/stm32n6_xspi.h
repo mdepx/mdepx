@@ -28,13 +28,24 @@
 
 #define	XSPI_CR		0x000
 #define	 CR_MSEL_S	30
-#define	 CR_MSEL_M	(0x3 << CR_MSEL_S)
+#define	 CR_MSEL_M		(0x3 << CR_MSEL_S)
+#define	 CR_MSEL_IO_3_0		(0x0 << CR_MSEL_S)
+#define	 CR_MSEL_IO_7_4		(0x1 << CR_MSEL_S)
+#define	 CR_MSEL_IO_11_8	(0x2 << CR_MSEL_S)
+#define	 CR_MSEL_IO_15_12	(0x3 << CR_MSEL_S)
+#define	 CR_MSEL_IO_7_0		(0x0 << CR_MSEL_S)	/* Octal, Dual-Quad */
+#define	 CR_MSEL_IO_15_8	(0x2 << CR_MSEL_S)	/* Octal, Dual-Quad */
 #define	 CR_FMODE_S	28
 #define	 CR_FMODE_M	(0x3 << CR_FMODE_S)
 #define	 CR_FMODE_MM	(0x3 << CR_FMODE_S) /* Memory-mapped mode */
 #define	 CR_FMODE_IW	(0x0 << CR_FMODE_S) /* Indirect Write */
 #define	 CR_FMODE_IR	(0x1 << CR_FMODE_S) /* Indirect Read */
 #define	 CR_FMODE_ASP	(0x2 << CR_FMODE_S) /* Automatic Status Polling */
+#define	 CR_PMM_S	23 /* Polling match mode */
+#define	 CR_PMM_M	(1 << CR_PMM_S)
+#define	 CR_PMM_AND	(0 << CR_PMM_S)
+#define	 CR_PMM_OR	(1 << CR_PMM_S)
+#define	 CR_APMS	(1 << 22) /* Automatic status-polling mode stop */
 #define	 CR_FTHRES_S	8
 #define	 CR_FTHRES_M	(0x3f << CR_FTHRES_S)
 #define	 CR_TCEN	(1 << 3) /* Timeout counter enable */
@@ -53,13 +64,18 @@
 #define	 DCR1_DEVSIZE_S		16
 #define	 DCR1_DEVSIZE_M		(0x1f << DCR1_DEVSIZE_S)
 #define	 DCR1_DEVSIZE_256M	(27 << DCR1_DEVSIZE_S)
+#define	 DCR1_DEVSIZE_128M	(26 << DCR1_DEVSIZE_S)
 #define	 DCR1_CSHT_S		8
 #define	 DCR1_CSHT_M		(0x3f << DCR1_CSHT_S)
 #define	XSPI_DCR2	0x00C
 #define	XSPI_DCR3	0x010
 #define	XSPI_DCR4	0x014
 #define	XSPI_SR		0x020
+#define	 SR_BUSY	(1 << 5)
+#define	 SR_SMF		(1 << 3) /* Status match flag */
+#define	 SR_TCF		(1 << 1) /* Transfer complete flag */
 #define	XSPI_FCR	0x024
+#define	 FCR_CTCF	(1 << 1) /* Clear transfer complete flag */
 #define	XSPI_DLR	0x040
 #define	XSPI_AR		0x048
 #define	XSPI_DR		0x050
@@ -76,25 +92,27 @@
 #define	 CCR_DMODE_4	(3 << CCR_DMODE_S)
 #define	 CCR_DMODE_8	(4 << CCR_DMODE_S)
 #define	 CCR_DMODE_16	(5 << CCR_DMODE_S)
-#define	 CCR_ADDTR	(1 << 11) /* Address double transfer rate */
-#define	 CCR_IDTR	(1 << 3) /* Instruction double transfer rate */
 #define	 CCR_ADSIZE_S	12
 #define	 CCR_ADSIZE_8	(0 << CCR_ADSIZE_S)
 #define	 CCR_ADSIZE_16	(1 << CCR_ADSIZE_S)
 #define	 CCR_ADSIZE_24	(2 << CCR_ADSIZE_S)
 #define	 CCR_ADSIZE_32	(3 << CCR_ADSIZE_S)
+#define	 CCR_ADDTR	(1 << 11) /* Address double transfer rate */
 #define	 CCR_ADMODE_S	8
-#define	 CCR_ADMODE_1	(1 << CCR_ADMODE_S)
-#define	 CCR_ADMODE_2	(2 << CCR_ADMODE_S)
-#define	 CCR_ADMODE_4	(3 << CCR_ADMODE_S)
-#define	 CCR_ADMODE_8	(4 << CCR_ADMODE_S)
+#define	 CCR_ADMODE_NONE	(0 << CCR_ADMODE_S)
+#define	 CCR_ADMODE_1		(1 << CCR_ADMODE_S)
+#define	 CCR_ADMODE_2		(2 << CCR_ADMODE_S)
+#define	 CCR_ADMODE_4		(3 << CCR_ADMODE_S)
+#define	 CCR_ADMODE_8		(4 << CCR_ADMODE_S)
 #define	 CCR_ISIZE_S	4
-#define	 CCR_ISIZE_M	(0x3 << CCR_ISIZE_S)
+#define	 CCR_ISIZE_M	(3 << CCR_ISIZE_S)
 #define	 CCR_ISIZE_8	(0 << CCR_ISIZE_S)
 #define	 CCR_ISIZE_16	(1 << CCR_ISIZE_S)
 #define	 CCR_ISIZE_24	(2 << CCR_ISIZE_S)
 #define	 CCR_ISIZE_32	(3 << CCR_ISIZE_S)
+#define	 CCR_IDTR	(1 << 3) /* Instruction double transfer rate */
 #define	 CCR_IMODE_S	0
+#define	 CCR_IMODE_NONE	(0 << CCR_IMODE_S)
 #define	 CCR_IMODE_1	(1 << CCR_IMODE_S)
 #define	 CCR_IMODE_2	(2 << CCR_IMODE_S)
 #define	 CCR_IMODE_4	(3 << CCR_IMODE_S)
@@ -118,11 +136,13 @@
 #define	XSPI_CALSIR	0x228
 
 struct xspi_config {
-	uint8_t instruction_write;
-	uint8_t instruction_read;
+	uint32_t instruction_write;
+	uint32_t instruction_read;
 	uint8_t dummy_cycles;
+	uint8_t wdummy_cycles;
 	uint8_t prescaler;
 	uint8_t dqs_en;
+	uint8_t wdqs_en;
 	uint32_t mem_type;
 	uint32_t dev_size;
 	uint8_t cs_cycles;
@@ -134,14 +154,26 @@ struct xspi_config {
 	uint8_t instruction_dtr;
 	uint8_t instruction_size; /* bits */
 	uint8_t instruction_lines;
-	uint8_t instruction;
+	uint32_t instruction;
 	uint8_t mode;
 #define	XSPI_MODE_INDIRECT_WRITE	0
-#define	XSPI_MODE_MEMORY_MAPPED		1
+#define	XSPI_MODE_INDIRECT_READ		1
+#define	XSPI_MODE_AUTO_POLLING		2
+#define	XSPI_MODE_MEMORY_MAPPED		3
+};
+
+struct stm32n6_xspi_poll_cfg {
+	uint32_t match_value;
+	uint32_t match_mask;
+	uint32_t match_mode;
+	uint32_t interval;
+	uint32_t auto_stop;
+	uint32_t instruction;
 };
 
 struct stm32n6_xspi_softc {
 	uint32_t base;
+	int dopi;
 };
 
 int stm32n6_xspi_setup(struct stm32n6_xspi_softc *sc, struct xspi_config *conf);
@@ -149,5 +181,8 @@ void stm32n6_xspi_init(struct stm32n6_xspi_softc *sc, uint32_t base);
 int stm32n6_xspi_write_reg(struct stm32n6_xspi_softc *sc, int addr, int val);
 int stm32n6_xspi_transfer(struct stm32n6_xspi_softc *sc, int addr, int val,
     int len);
+int stm32n6_xspi_receive(struct stm32n6_xspi_softc *sc, int addr, int len);
+int stm32n6_xspi_autopoll(struct stm32n6_xspi_softc *sc,
+    struct stm32n6_xspi_poll_cfg *poll_cfg);
 
 #endif /* !_ARM_STM_STM32N6_XSPI_H_ */
