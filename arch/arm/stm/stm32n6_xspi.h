@@ -71,6 +71,8 @@
 #define	XSPI_DCR3	0x010
 #define	XSPI_DCR4	0x014
 #define	XSPI_SR		0x020
+#define	 SR_FLEVEL_S	8
+#define	 SR_FLEVEL_M	(0x7f << SR_FLEVEL_S)
 #define	 SR_BUSY	(1 << 5)
 #define	 SR_SMF		(1 << 3) /* Status match flag */
 #define	 SR_TCF		(1 << 1) /* Transfer complete flag */
@@ -179,9 +181,10 @@ struct stm32n6_xspi_softc {
 int stm32n6_xspi_setup(struct stm32n6_xspi_softc *sc, struct xspi_config *conf);
 void stm32n6_xspi_init(struct stm32n6_xspi_softc *sc, uint32_t base);
 int stm32n6_xspi_write_reg(struct stm32n6_xspi_softc *sc, int addr, int val);
-int stm32n6_xspi_transfer(struct stm32n6_xspi_softc *sc, int addr, int val,
+int stm32n6_xspi_transmit(struct stm32n6_xspi_softc *sc, int addr, uint8_t *val,
     int len);
-int stm32n6_xspi_receive(struct stm32n6_xspi_softc *sc, int addr, int len);
+int stm32n6_xspi_receive(struct stm32n6_xspi_softc *sc, int addr, uint8_t *val,
+    int len);
 int stm32n6_xspi_autopoll(struct stm32n6_xspi_softc *sc,
     struct stm32n6_xspi_poll_cfg *poll_cfg);
 

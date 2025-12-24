@@ -30,22 +30,97 @@
 
 #define	RD4(_sc, _reg)		\
 	*(volatile uint32_t *)((_sc)->base + _reg)
+#define	RD2(_sc, _reg)		\
+	*(volatile uint16_t *)((_sc)->base + _reg)
+#define	RD1(_sc, _reg)		\
+	*(volatile uint8_t *)((_sc)->base + _reg)
+
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 #define	WR2(_sc, _reg, _val)	\
 	*(volatile uint16_t *)((_sc)->base + _reg) = _val
+#define	WR1(_sc, _reg, _val)	\
+	*(volatile uint8_t *)((_sc)->base + _reg) = _val
 
 int
-stm32n6_xspi_transfer(struct stm32n6_xspi_softc *sc, int addr, int val, int len)
+stm32n6_xspi_autopoll(struct stm32n6_xspi_softc *sc,
+    struct stm32n6_xspi_poll_cfg *poll_cfg)
 {
+	uint32_t reg;
 
-	WR4(sc, XSPI_AR, addr);
+	/* TODO: AR register? */
+	WR4(sc, XSPI_PSMKR, poll_cfg->match_mask);
+	WR4(sc, XSPI_PSMAR, poll_cfg->match_value);
+	WR4(sc, XSPI_PIR, poll_cfg->interval);
+
+	reg = RD4(sc, XSPI_CR);
+	reg |= poll_cfg->auto_stop;
+	reg |= poll_cfg->match_mode;
+	WR4(sc, XSPI_CR, reg);
+
+	WR4(sc, XSPI_IR, poll_cfg->instruction);
+
+	printf("%s: SR %x\n", __func__, reg);
+
+	while (1) {
+		reg = RD4(sc, XSPI_SR);
+		if (reg & SR_SMF)
+			break;
+	}
+	printf("%s: SR %x ready\n", __func__, reg);
+
+	return (0);
+}
+
+/* Polling receive. */
+int
+stm32n6_xspi_receive(struct stm32n6_xspi_softc *sc, int addr, uint8_t *val,
+    int len)
+{
+	uint32_t reg;
+	int timeout;
+	int i;
+
 	WR4(sc, XSPI_DLR, len - 1);
+	WR4(sc, XSPI_AR, addr);
 
-	/* TODO */
-	WR2(sc, XSPI_DR, val);
+	for (i = 0; i < len; i++) {
+		timeout = 1000;
+		do {
+			reg = RD4(sc, XSPI_SR);
+			if (reg & SR_FLEVEL_M)
+				break;
+		} while (timeout--);
+		if (timeout <= 0)
+			return (-1);
 
-	printf("XSPI_SR after write %x\n", RD4(sc, XSPI_SR));
+		val[i++] = RD1(sc, XSPI_DR);
+	}
+
+	return (0);
+}
+
+int
+stm32n6_xspi_transmit(struct stm32n6_xspi_softc *sc, int addr, uint8_t *val,
+    int len)
+{
+	uint32_t reg;
+	int i;
+
+	WR4(sc, XSPI_DLR, len - 1);
+	WR4(sc, XSPI_AR, addr);
+
+	/* TODO: consider FIFO depth.*/
+	for (i = 0; i < len; i++)
+		WR1(sc, XSPI_DR, val[i]);
+
+	while (1) {
+		reg = RD4(sc, XSPI_SR);
+		if (reg & SR_TCF) {
+			WR4(sc, XSPI_FCR, FCR_CTCF);
+			break;
+		}
+	}
 
 	return (0);
 }
@@ -62,12 +137,14 @@ stm32n6_xspi_setup(struct stm32n6_xspi_softc *sc, struct xspi_config *conf)
 
 	cr = 7 << CR_FTHRES_S;
 	cr |= CR_TCEN;
-	if (conf->mode == XSPI_MODE_INDIRECT_WRITE)
-		cr |= CR_FMODE_IW;
-	else if (conf->mode == XSPI_MODE_MEMORY_MAPPED)
-		cr |= CR_FMODE_MM;
-	else
-		panic("implement me");
+
+	switch (conf->mode) {
+	case XSPI_MODE_INDIRECT_WRITE: cr |= CR_FMODE_IW; break;
+	case XSPI_MODE_INDIRECT_READ:  cr |= CR_FMODE_IR; break;
+	case XSPI_MODE_AUTO_POLLING:   cr |= CR_FMODE_ASP; break;
+	case XSPI_MODE_MEMORY_MAPPED:  cr |= CR_FMODE_MM; break;
+	};
+
 	cr |= CR_EN;
 	WR4(sc, XSPI_CR, cr);
 
@@ -84,7 +161,7 @@ stm32n6_xspi_setup(struct stm32n6_xspi_softc *sc, struct xspi_config *conf)
 	WR4(sc, XSPI_DCR2, conf->prescaler);
 	WR4(sc, XSPI_TCR, conf->dummy_cycles);
 	if (conf->mode == XSPI_MODE_MEMORY_MAPPED)
-		WR4(sc, XSPI_WTCR, conf->dummy_cycles);
+		WR4(sc, XSPI_WTCR, conf->wdummy_cycles);
 
 	ccr = conf->data_dtr ? CCR_DDTR : 0;
 	ccr |= conf->address_dtr ? CCR_ADDTR : 0;
@@ -123,11 +200,37 @@ stm32n6_xspi_setup(struct stm32n6_xspi_softc *sc, struct xspi_config *conf)
 	case 1: ccr |= CCR_IMODE_1; break;
 	};
 	WR4(sc, XSPI_CCR, ccr);
-	if (conf->mode == XSPI_MODE_MEMORY_MAPPED)
+	if (conf->mode == XSPI_MODE_MEMORY_MAPPED) {
+		ccr &= ~CCR_DQSE;
+		ccr |= conf->wdqs_en ? CCR_DQSE : 0;
 		WR4(sc, XSPI_WCCR, ccr);
+	}
 
-	/* These apply to indirect mode. */
-	WR4(sc, XSPI_IR, conf->instruction);
+	printf("%s: 0 inst %x SR %x\n", __func__, conf->instruction,
+	     RD4(sc, XSPI_SR));
+
+	switch(conf->mode) {
+	case XSPI_MODE_INDIRECT_WRITE:
+	case XSPI_MODE_INDIRECT_READ:
+		WR4(sc, XSPI_IR, conf->instruction);
+		if (conf->data_lines == CCR_DMODE_NONE &&
+		    conf->address_lines == CCR_ADMODE_NONE) {
+			/*
+			 * No data transfer. Poll for instruction transfer
+			 * complete.
+			 */
+			while (1) {
+				reg = RD4(sc, XSPI_SR);
+				if (reg & SR_TCF) {
+					WR4(sc, XSPI_FCR, FCR_CTCF);
+					break;
+				}
+			}
+		}
+		break;
+	}
+
+	printf("%s: 1 SR %x\n", __func__, reg);
 
 	return (0);
 }
