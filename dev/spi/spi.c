@@ -29,8 +29,7 @@
 #include <dev/spi/spi.h>
 
 int
-mdx_spi_transfer(mdx_device_t dev, uint8_t *out,
-    uint8_t *in, uint32_t len)
+mdx_spi_transfer(mdx_device_t dev, uint8_t *out, uint8_t *in, uint32_t len)
 {
 	struct mdx_spi_ops *ops;
 	int error;
