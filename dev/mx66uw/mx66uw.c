@@ -46,7 +46,7 @@ xspi_check_ready(struct mx66uw_softc *sc, uint32_t match_value,
 
 	bzero(&conf, sizeof(struct xspi_config));
 	conf.mode = XSPI_MODE_AUTO_POLLING;
-	conf.prescaler = 2; /* 50mhz */
+	conf.prescaler = 2; /* 50 MHz */
 	conf.mem_type = DCR1_MTYP_MACRONIX;
 	conf.dev_size = DCR1_DEVSIZE_128M;
 	conf.cs_cycles = 2;
@@ -85,7 +85,7 @@ xspi_read_reg(struct mx66uw_softc *sc, uint32_t reg, uint8_t *val)
 
 	bzero(&conf, sizeof(struct xspi_config));
 	conf.mode = XSPI_MODE_INDIRECT_READ;
-	conf.prescaler = 2; /* 50mhz */
+	conf.prescaler = 2; /* 50 MHz */
 	conf.mem_type = DCR1_MTYP_MACRONIX;
 	conf.dev_size = DCR1_DEVSIZE_128M;
 	conf.cs_cycles = 2;
@@ -119,7 +119,7 @@ xspi_write_reg(struct mx66uw_softc *sc, uint32_t reg, uint32_t val)
 	bzero(&conf, sizeof(struct xspi_config));
 	conf.dummy_cycles = 0;
 	conf.mode = XSPI_MODE_INDIRECT_WRITE;
-	conf.prescaler = 2; /* 50mhz */
+	conf.prescaler = 2; /* 50 MHz */
 	conf.mem_type = DCR1_MTYP_MACRONIX;
 	conf.dev_size = DCR1_DEVSIZE_128M;
 	conf.cs_cycles = 2;
@@ -151,7 +151,7 @@ xspi_write_enable(struct mx66uw_softc *sc)
 	bzero(&conf, sizeof(struct xspi_config));
 	conf.dummy_cycles = 0;
 	conf.mode = XSPI_MODE_INDIRECT_WRITE;
-	conf.prescaler = 2; /* 50mhz */
+	conf.prescaler = 2; /* 50 MHz */
 	conf.mem_type = DCR1_MTYP_MACRONIX;
 	conf.dev_size = DCR1_DEVSIZE_128M;
 	conf.cs_cycles = 2;
@@ -237,7 +237,7 @@ mx66uw_init(struct mx66uw_softc *sc, struct stm32n6_xspi_softc *xspi_sc)
 	conf.dummy_cycles = 0;
 	conf.mode = XSPI_MODE_INDIRECT_WRITE;
 	conf.dqs_en = 0;
-	conf.prescaler = 2; //50mhz
+	conf.prescaler = 2; /* 50 MHz */
 	conf.mem_type = DCR1_MTYP_MACRONIX;
 	conf.dev_size = DCR1_DEVSIZE_128M;
 	conf.cs_cycles = 2;
