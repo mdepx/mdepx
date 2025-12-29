@@ -24,7 +24,6 @@ extern "C"
 {
 #endif
 
-#include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -32,6 +31,7 @@ extern "C"
 #include "ll_aton_config.h"
 
 #include "ll_aton_attributes.h"
+#include "ll_aton_cipher.h"
 #include "ll_aton_util.h"
 
   /** @defgroup User I/O Return Values & Callback Event Types
@@ -340,6 +340,8 @@ extern "C"
   extern const EpochBlock_ItemTypeDef *LL_ATON_EpochBlockItems_##network_name(void);                                   \
   extern const LL_Buffer_InfoTypeDef *LL_ATON_Output_Buffers_Info_##network_name(void);                                \
   extern const LL_Buffer_InfoTypeDef *LL_ATON_Input_Buffers_Info_##network_name(void);                                 \
+  extern const LL_Streng_EncryptionTypedef *LL_ATON_WeightEncryption_Info_##network_name(void);                        \
+  extern const LL_Streng_EncryptionTypedef *LL_ATON_BlobEncryption_Info_##network_name(void);                          \
   extern const LL_Buffer_InfoTypeDef *LL_ATON_Internal_Buffers_Info_##network_name(void);
 
   /**
@@ -351,6 +353,7 @@ extern "C"
   typedef LL_ATON_User_IO_Result_t (*NN_OutputSetter_TypeDef)(uint32_t num, void *buffer, uint32_t size);
   typedef void *(*NN_OutputGetter_TypeDef)(uint32_t num);
   typedef const EpochBlock_ItemTypeDef *(*NN_EpochBlockItems_TypeDef)(void);
+  typedef const LL_Streng_EncryptionTypedef *(*NN_Encryption_Info_TypeDef)(void);
   typedef const LL_Buffer_InfoTypeDef *(*NN_Buffers_Info_TypeDef)(void);
 
   typedef void (*TraceRuntime_FuncPtr_t)(LL_ATON_RT_Callbacktype_t ctype);
@@ -370,6 +373,8 @@ extern "C"
     NN_EpochBlockItems_TypeDef epoch_block_items;
     NN_Buffers_Info_TypeDef output_buffers_info;
     NN_Buffers_Info_TypeDef input_buffers_info;
+    NN_Encryption_Info_TypeDef blob_encryption_info;
+    NN_Encryption_Info_TypeDef weight_encryption_info;
     NN_Buffers_Info_TypeDef internal_buffers_info;
   } NN_Interface_TypeDef;
 
@@ -395,7 +400,7 @@ extern "C"
         nr_of_epoch_blocks; // number of epoch blocks in network (includes also terminating empty epoch block)
     volatile uint32_t saved_nr_of_epoch_blocks; // number of epoch blocks in saved network (includes also terminating
                                                 // empty epoch block)
-#endif                                          // NDEBUG
+#endif                                          // !NDEBUG
 
     TraceEpochBlock_FuncPtr_t epoch_callback_function; // epoch callback function
 

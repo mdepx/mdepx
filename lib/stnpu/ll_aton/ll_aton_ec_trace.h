@@ -27,6 +27,9 @@ extern "C"
 #include <stdbool.h>
 #include <stdint.h>
 
+  // MCU+NPU cache line size (power of 2 not less than 8)
+  extern unsigned int cache_line_size;
+
   typedef struct mpool_reloc_info_t
   {
     const char *name;
@@ -44,7 +47,7 @@ extern "C"
 
   extern void ec_trace_comment(const char *comment);
 
-  extern void ec_trace_init(const char *out_filenamme, const char *network_name, bool encrypted);
+  extern void ec_trace_init(const char *out_filename, const char *network_name, bool encrypted);
   extern void ec_trace_start_blob(const char *blob_name);
   extern void ec_trace_end_blob(const char *blob_name);
   extern void ec_trace_start_epoch(unsigned int num);
@@ -60,7 +63,7 @@ extern "C"
 
   extern void ec_trace_write(uintptr_t dstreg, unsigned int val);
   extern void ec_trace_write_reloc(uintptr_t dstreg, unsigned int base, unsigned int offset);
-  extern void ec_trace_set_patch_params(const char *id, uint32_t mask);
+  extern void ec_trace_add_patch(const char *id, int32_t shr, uint32_t mask);
   extern void ec_trace_reg_write(unsigned int IP_id, unsigned int REG_id, unsigned int val);
   extern void ec_trace_reg_write_reloc(unsigned int IP_id, unsigned int REG_id, unsigned int base, unsigned int offset);
   extern void ec_trace_reg_writefield(unsigned int IP_id, unsigned int REG_id, unsigned int lsb, unsigned int num_bits,

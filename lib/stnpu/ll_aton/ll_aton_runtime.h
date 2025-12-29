@@ -25,12 +25,12 @@ extern "C"
 {
 #endif
 
-#include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "ll_aton_rt_user_api.h"
+#include "ll_aton_util.h"
 
   /*** Helper Functions ***/
 
@@ -46,20 +46,30 @@ extern "C"
 #ifndef NDEBUG
     extern uint32_t volatile __ll_current_wait_mask;
     LL_ATON_ASSERT(__ll_current_wait_mask == 0);
-#endif // NDEBUG
+#endif // !NDEBUG
 
     __ll_current_aton_ip_owner = new_owner;
   }
 
-  static inline void __ll_clear_aton_owner(NN_Instance_TypeDef *current_owner)
+  static inline void __ll_clear_aton_owner(NN_Instance_TypeDef *current_owner, bool reset_mask)
   {
     extern NN_Instance_TypeDef *volatile __ll_current_aton_ip_owner;
     LL_ATON_ASSERT(current_owner == __ll_current_aton_ip_owner);
 
 #ifndef NDEBUG
     extern uint32_t volatile __ll_current_wait_mask;
-    LL_ATON_ASSERT(__ll_current_wait_mask == 0);
-#endif // NDEBUG
+    if (reset_mask && (__ll_current_wait_mask != 0))
+    {
+      LL_ATON_PRINTF("WARNING: performing a hard-reset of debug wait-mask!\n");
+      __ll_current_wait_mask = 0;
+    }
+    else
+    {
+      LL_ATON_ASSERT(__ll_current_wait_mask == 0);
+    }
+#else  // !NDEBUG
+  LL_ATON_LIB_UNUSED(reset_mask);
+#endif // !NDEBUG
 
     __ll_current_aton_ip_owner = NULL;
     LL_ATON_OSAL_UNLOCK_ATON();
@@ -109,7 +119,7 @@ extern "C"
 
     extern uint32_t volatile __ll_current_wait_mask;
     __ll_current_wait_mask = wait_mask;
-#endif // NDEBUG
+#endif // !NDEBUG
 
 #if (LL_ATON_RT_MODE == LL_ATON_RT_ASYNC)
     wait_mask <<= ATON_STRENG_INT(0);
@@ -147,7 +157,7 @@ extern "C"
     /* Clear owner */
     if (unlock)
     {
-      __ll_clear_aton_owner(__ll_current_aton_ip_owner);
+      __ll_clear_aton_owner(__ll_current_aton_ip_owner, false);
     }
 
     /* set old context */

@@ -162,26 +162,27 @@ extern "C"
     int (*ll_aton_lib_dma_depthtospace)(const LL_LIB_TensorInfo_TypeDef *inputs, unsigned int ninputs,
                                         const LL_LIB_TensorInfo_TypeDef *output, unsigned blocksize_h,
                                         unsigned blocksize_w, int dma_in, int dma_out);
-    int (*ll_aton_lib_dma_outputs_flat_copy)(const LL_LIB_TensorShape_TypeDef *input,
-                                             const LL_LIB_TensorShape_TypeDef *outputs, unsigned int nr_of_outputs,
-                                             int dma_in, int dma_out);
-    int (*ll_aton_lib_dma_outputs_slice_splitlike)(const LL_LIB_TensorShape_TypeDef *input,
-                                                   const LL_LIB_TensorShape_TypeDef *output, int32_t tot_out_size,
+    int (*ll_aton_lib_dma_outputs_flat_copy)(const LL_Buffer_InfoTypeDef *input, const LL_Buffer_InfoTypeDef *outputs,
+                                             unsigned int nr_of_outputs, int dma_in, int dma_out);
+    int (*ll_aton_lib_dma_outputs_slice_splitlike)(const LL_Buffer_InfoTypeDef *input,
+                                                   const LL_Buffer_InfoTypeDef *output, int32_t tot_out_size,
                                                    int32_t width_in_bytes, int32_t fheight, int32_t line_offset,
                                                    int8_t n_bits, int dma_in, int dma_out);
-    int (*ll_aton_lib_dma_outputs_channel_split_aton)(const LL_LIB_TensorShape_TypeDef *input,
-                                                      const LL_LIB_TensorShape_TypeDef *outputs,
-                                                      unsigned int nr_of_outputs, unsigned int leading_dims, int dma_in,
-                                                      int dma_out);
-    int (*ll_aton_lib_dma_outputs_channel_split_batched)(const LL_LIB_TensorShape_TypeDef *input,
-                                                         const LL_LIB_TensorShape_TypeDef *outputs,
+    int (*ll_aton_lib_dma_outputs_channel_split_aton)(const LL_Buffer_InfoTypeDef *input,
+                                                      const LL_Buffer_InfoTypeDef *outputs, unsigned int nr_of_outputs,
+                                                      unsigned int leading_dims, int dma_in, int dma_out);
+    int (*ll_aton_lib_dma_outputs_channel_split_batched)(const LL_Buffer_InfoTypeDef *input,
+                                                         const LL_Buffer_InfoTypeDef *outputs,
                                                          unsigned int nr_of_outputs, int dma_in, int dma_out);
     int (*ll_aton_lib_dma_pad_memset)(void *output, int32_t constant_value, size_t c,
-                                      __ll_pad_sw_params_t *common_params);
+                                      __ll_pad_sw_params_t *common_params, bool deep_copy);
     int (*ll_aton_lib_dma_pad_filling)(__ll_pad_sw_params_t *init_common_params);
-    int (*ll_aton_lib_dma_transpose)(const LL_LIB_TensorShape_TypeDef *input, const uint32_t *input_axes_offsets,
-                                     const LL_LIB_TensorShape_TypeDef *output, const uint32_t *output_axes_offsets,
+    int (*ll_aton_lib_dma_transpose)(const LL_Buffer_InfoTypeDef *input, const uint32_t *input_axes_offsets,
+                                     const LL_Buffer_InfoTypeDef *output, const uint32_t *output_axes_offsets,
                                      const uint8_t *target_pos, const uint8_t *perm_to_use, int dma_in, int dma_out);
+    int (*ll_aton_lib_async_memcpy)(unsigned char *input_start, unsigned char *input_end, unsigned char *input_limit,
+                                    unsigned char *output_start, int dma_in, int dma_out);
+    int (*ll_aton_lib_dma_pad_4loop_filling)(__ll_pad_sw_params_t *common_params);
   };
 
   /* AI RELOC RT context definition */
@@ -327,6 +328,8 @@ extern "C"
   const LL_Buffer_InfoTypeDef *ai_rel_network_get_output_buffers_info(uintptr_t inst);
   const LL_Buffer_InfoTypeDef *ai_rel_network_get_input_buffers_info(uintptr_t inst);
   const LL_Buffer_InfoTypeDef *ai_rel_network_get_internal_buffers_info(uintptr_t inst);
+  const LL_Streng_EncryptionTypedef *ai_rel_network_blob_encryption_info(uintptr_t inst);
+  const LL_Streng_EncryptionTypedef *ai_rel_network_weight_encryption_info(uintptr_t inst);
 
   typedef void (*volatile start_end_func_ptr)(const void *epoch_block);
 
@@ -414,7 +417,7 @@ extern "C"
 #define ASYNC_MODE_FLAG 0
 #endif
 
-/* build EXTRA flags defintion */
+/* build EXTRA flags definition */
 #define EXTRA (SECURE_FLAG | (DBG_INFO_FLAG << 1) | (ASYNC_MODE_FLAG << 2))
 
   /* https://developer.arm.com/documentation/dui0774/l/Other-Compiler-specific-Features/Predefined-macros?lang=en#a183-predefined-macros__when-the-softfp-predefined-macro-is-defined
@@ -463,6 +466,8 @@ extern "C"
 #define _OUTPUT_BUFFERS_INFO(name)   MAKE_FN_(Output_Buffers_Info, name)
 #define _INPUT_BUFFERS_INFO(name)    MAKE_FN_(Input_Buffers_Info, name)
 #define _INTERNAL_BUFFERS_INFO(name) MAKE_FN_(Internal_Buffers_Info, name)
+#define _WEIGHTENCRYPTION_INFO(name) MAKE_FN_(WeightEncryption_Info, name)
+#define _BLOBENCRYPTION_INFO(name)   MAKE_FN_(BlobEncryption_Info, name)
 
 #if !defined(INCLUDE_INTERNAL_BUFFERS)
   const LL_Buffer_InfoTypeDef *LL_ATON_Internal_Buffers_Info_Default_Empty(void)
@@ -491,6 +496,8 @@ extern "C"
     const LL_Buffer_InfoTypeDef *(*get_output_buffers_info)(void);
     const LL_Buffer_InfoTypeDef *(*get_input_buffers_info)(void);
     const LL_Buffer_InfoTypeDef *(*get_internal_buffers_info)(void);
+    const LL_Streng_EncryptionTypedef *(*weight_encryption_info)(void);
+    const LL_Streng_EncryptionTypedef *(*blob_encryption_info)(void);
     struct ai_reloc_rt_ctx *rt_ctx;
   };
 
@@ -527,6 +534,8 @@ extern "C"
       .get_epoch_items = &_EPOCH_BLOCK_ITEMS(C_FCT_SUFFIX),                                                            \
       .get_output_buffers_info = &_OUTPUT_BUFFERS_INFO(C_FCT_SUFFIX),                                                  \
       .get_input_buffers_info = &_INPUT_BUFFERS_INFO(C_FCT_SUFFIX),                                                    \
+      .weight_encryption_info = &_WEIGHTENCRYPTION_INFO(C_FCT_SUFFIX),                                                 \
+      .blob_encryption_info = &_BLOBENCRYPTION_INFO(C_FCT_SUFFIX),                                                     \
       .get_internal_buffers_info = &_LL_ATON_INTERNAL_BUFFERS,                                                         \
       .rt_ctx = &_network_rt_ctx,                                                                                      \
   };                                                                                                                   \

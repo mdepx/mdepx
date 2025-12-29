@@ -23,7 +23,6 @@
 
 #if defined(LL_ATON_DUMP_DEBUG_API)
 
-#include <assert.h>
 #include <inttypes.h>
 #include <math.h>
 #include <stdbool.h>
@@ -936,7 +935,7 @@ static void __dump_epoch_buffers(const LL_Buffer_InfoTypeDef *bufs, int mode, in
     bufs++;
   }
 }
-#endif // NDEBUG
+#endif // !NDEBUG
 
 void *get_buffer(const char *bufname, int in, unsigned *_len, unsigned *_bits, const NN_Interface_TypeDef *nn_interface)
 {
@@ -979,7 +978,7 @@ void dump_buffer(int mode, const char *bufname, int in, const NN_Interface_TypeD
 {
 #ifndef NDEBUG
   __dump_buffer(mode, __get_buffer(bufname, in, nn_interface));
-#endif // NDEBUG
+#endif // !NDEBUG
 }
 
 void dump_all_buffers(int mode, int in, const NN_Interface_TypeDef *nn_interface)
@@ -991,14 +990,14 @@ void dump_all_buffers(int mode, int in, const NN_Interface_TypeDef *nn_interface
     __dump_epoch_buffers(nn_interface->output_buffers_info(), mode, -1);
   if ((in & BUFF_INT) != 0)
     __dump_epoch_buffers(nn_interface->internal_buffers_info(), mode, -1);
-#endif // NDEBUG
+#endif // !NDEBUG
 }
 
 void dump_epoch_buffers(int mode, int epoch, const NN_Interface_TypeDef *nn_interface)
 {
 #ifndef NDEBUG
   __dump_epoch_buffers(nn_interface->internal_buffers_info(), mode, epoch);
-#endif // NDEBUG
+#endif // !NDEBUG
 }
 
 /** @brief Return the total length of network parameters

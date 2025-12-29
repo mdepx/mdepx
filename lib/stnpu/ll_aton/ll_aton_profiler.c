@@ -16,7 +16,6 @@
  ******************************************************************************
  */
 
-#include <assert.h>
 #include <float.h>
 #include <math.h>
 #include <stdbool.h>
@@ -140,8 +139,8 @@ int LL_ATON_LIB_ConvInteger(const LL_LIB_TensorInfo_TypeDef *inputs, unsigned in
 
   int out_H = (H + pad_top + pad_bottom - dilation_h * (R - 1) - 1) / stride_h + 1;
   int out_W = (W + pad_left + pad_right - dilation_w * (S - 1) - 1) / stride_w + 1;
-  assert(out_H == out->shape[(out->ndims - 4) + TDIM_FHEIGHT]);
-  assert(out_W == out->shape[(out->ndims - 4) + TDIM_FWIDTH]);
+  LL_ATON_ASSERT(out_H == out->shape[(out->ndims - 4) + TDIM_FHEIGHT]);
+  LL_ATON_ASSERT(out_W == out->shape[(out->ndims - 4) + TDIM_FWIDTH]);
 
   int32_t maxmax = 0;
   for (int n = 0; n < N; ++n) // input batch
@@ -169,7 +168,8 @@ int LL_ATON_LIB_ConvInteger(const LL_LIB_TensorInfo_TypeDef *inputs, unsigned in
                   if (ih >= 0 && ih < H && iw >= 0 && iw < W)
                   {
                     int input_idx = ((n * C + c) * H + ih) * W + iw; // N[C/B]HWB
-                    assert(LL_Buffer_addr_end(feat) /*feat->addr_end.p*/ > (unsigned char *)(in_data + input_idx));
+                    LL_ATON_ASSERT(LL_Buffer_addr_end(feat) /*feat->addr_end.p*/ >
+                                   (unsigned char *)(in_data + input_idx));
                     if (el_size_0 == 1)
                       input_value = in_signed ? in_data[input_idx] : in_data_u[input_idx];
                     else
@@ -181,7 +181,8 @@ int LL_ATON_LIB_ConvInteger(const LL_LIB_TensorInfo_TypeDef *inputs, unsigned in
                   }
                   // LL_ATON_PROFILER_PRINTF("%d %d %d=%d\n", c, r, s, input_value);
                   int weight_idx = ((k * C + c) * R + r) * S + s;
-                  assert(LL_Buffer_addr_end(kern) /*kern->addr_end.p*/ > (unsigned char *)(w_data + weight_idx));
+                  LL_ATON_ASSERT(LL_Buffer_addr_end(kern) /*kern->addr_end.p*/ >
+                                 (unsigned char *)(w_data + weight_idx));
                   int32_t w_value;
                   if (el_size_0 == 1)
                     w_value = w_signed ? w_data[weight_idx] : w_data_u[weight_idx];
@@ -196,17 +197,17 @@ int LL_ATON_LIB_ConvInteger(const LL_LIB_TensorInfo_TypeDef *inputs, unsigned in
             }
           }
           int output_idx = ((n * K + k) * out_H + oh) * out_W + ow;
-          assert(LL_Buffer_addr_end(out) /*out->addr_end.p*/ > (unsigned char *)(out_data + output_idx));
+          LL_ATON_ASSERT(LL_Buffer_addr_end(out) /*out->addr_end.p*/ > (unsigned char *)(out_data + output_idx));
           out_data[output_idx] = sum;
           // LL_ATON_PROFILER_PRINTF("oidx=%d = %d max=%d\n", output_idx, sum, max);
           maxmax = max > maxmax ? max : maxmax;
           maxmax_k = max > maxmax_k ? max : maxmax_k;
         }
       }
-      LL_ATON_PROFILER_PRINTF("%s k=%d %d scale=%g\n", conv_name, k, maxmax_k, kern->scale[k]);
+      LL_ATON_PROFILER_PRINTF("%s k=%d %d scale=%g\n", conv_name, k, maxmax_k, (double)kern->scale[k]);
     }
   }
-  assert(kcount == K * S * R * C * N * out_H * out_W);
+  LL_ATON_ASSERT(kcount == K * S * R * C * N * out_H * out_W);
 
 #define DIFFTH 1
 #if 0
@@ -242,10 +243,10 @@ int LL_ATON_LIB_ConvInteger(const LL_LIB_TensorInfo_TypeDef *inputs, unsigned in
               {
                 int ref_idx = n * RH * RW * RC + (b * RB * RH * RW) + (oh * RW + ow) * RB + c; // HWC
                 int out_idx = n * RH * RW * RC + (oh * RW + ow) * RC + b * RB + c;             // HWC
-                assert(LL_Buffer_addr_end(ref) /*ref->addr_end.p */ > (unsigned char *)(ref_data + ref_idx));
+                LL_ATON_ASSERT(LL_Buffer_addr_end(ref) /*ref->addr_end.p */ > (unsigned char *)(ref_data + ref_idx));
                 int32_t ref_val = ref_data[ref_idx];
                 ref_val = ref->Qn >= 0 ? ref_val >> ref->Qn : ref_val << -ref->Qn;
-                assert(LL_Buffer_addr_end(out) /*out->addr_end.p*/ > (unsigned char *)(out_data + out_idx));
+                LL_ATON_ASSERT(LL_Buffer_addr_end(out) /*out->addr_end.p*/ > (unsigned char *)(out_data + out_idx));
                 int32_t out_val = out_data[out_idx];
                 int diff = abs(ref_val - out_val);
                 if (diff > DIFFTH)

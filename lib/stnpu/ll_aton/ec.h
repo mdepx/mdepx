@@ -22,7 +22,7 @@
 #include <inttypes.h>
 
 /** Magic number of the Epoch Controller binary file. */
-#define ECASM_BINARY_MAGIC 0xECBF0030
+#define ECASM_BINARY_MAGIC 0xECBF0050
 
 /** Magic number of the Epoch Controller blob. */
 #define ECASM_BLOB_MAGIC 0xCA057A7A

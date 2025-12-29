@@ -67,7 +67,7 @@ extern "C"
   LL_ATON_PRINTF("[ERROR] (%s:%d: errno: %s) " M "\n", __FILE__, __LINE__, __clean_errno(), ##__VA_ARGS__)
 
 /**
- *  @brief Cheks a condition: if it evaluates to false, prints an error message and asserts(false).
+ *  @brief Checks a condition: if it evaluates to false, prints an error message and asserts(false).
  *  @param COND the condition to check.
  *  @param MSG the message to print if the condition evaluates to false (can be a formatted string as well)
  *  @param ASSERT_COND boolean parameter: if 1, this command will LL_ATON_ASSERT(COND), otherwise il will
