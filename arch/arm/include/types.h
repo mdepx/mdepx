@@ -56,6 +56,9 @@ typedef	__uint32_t		__time_t;
 #define	INT32_C(c)		(c)
 #define	UINT32_C(c)		(c ## U)
 
+#define	INT8_C(c)		(c)
+#define	UINT8_C(c)		(c ## U)
+
 typedef	__int32_t		__ptrdiff_t;
 
 #define	NBBY			8
