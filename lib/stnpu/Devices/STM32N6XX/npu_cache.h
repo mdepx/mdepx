@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 
-//#include "stm32n6xx_hal.h"
+#include <lib/cmsis-device-n6/include/stm32n657xx.h>
 
 void npu_cache_init(void);
 void npu_cache_enable(void);
