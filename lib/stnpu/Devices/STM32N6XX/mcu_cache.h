@@ -20,19 +20,15 @@
 
 #include <sys/types.h>
 
-//#include "stm32n6xx_hal.h"
+#include <lib/cmsis-device-n6/include/stm32n657xx.h>
 
-//__STATIC_FORCEINLINE
-static inline int mcu_cache_enabled(void) {
-#if 0
+__STATIC_FORCEINLINE int mcu_cache_enabled(void) {
 #if defined (__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U)
-   if (SCB->CCR & SCB_CCR_DC_Msk) return 1;  /* return `1` if DCache is enabled */
-#endif // (__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U)
+	if (SCB->CCR & SCB_CCR_DC_Msk)
+		return (1); /* Enabled */
 #endif
-
-  return 0;
+	return (0);
 }
-
 
 int mcu_cache_enable(void);
 int mcu_cache_disable(void);
@@ -44,4 +40,4 @@ int mcu_cache_clean_range(uint32_t start_addr, uint32_t end_addr);
 int mcu_cache_clean_invalidate_range(uint32_t start_addr, uint32_t end_addr);
 void set_mcu_cache_state(uint8_t i_cache_state, uint8_t d_cache_state);
 
-#endif // __MCU_CACHE_H
+#endif /* !__MCU_CACHE_H */
