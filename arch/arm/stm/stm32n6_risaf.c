@@ -37,19 +37,6 @@ stm32n6_risaf_setup(struct stm32n6_risaf_softc *sc, uint32_t reg_id,
 {
 	uint32_t reg;
 
-	/* Base region */
-	WR4(sc, RISAF_REG_STARTR(reg_id), conf->base_start);
-	WR4(sc, RISAF_REG_ENDR(reg_id), conf->base_end);
-
-	reg = (conf->base_cid_read << 0);
-	reg |= (conf->base_cid_write << 16);
-	WR4(sc, RISAF_REG_CIDCFGR(reg_id), reg);
-
-	reg = CFGR_BREN;
-	if (conf->base_sec)
-		reg |= CFGR_SEC;
-	WR4(sc, RISAF_REG_CFGR(reg_id), reg);
-
 	/* Subregion */
 	WR4(sc, RISAF_REG_ASTARTR(reg_id), conf->suba_start);
 	WR4(sc, RISAF_REG_AENDR(reg_id), conf->suba_end);
@@ -63,11 +50,29 @@ stm32n6_risaf_setup(struct stm32n6_risaf_softc *sc, uint32_t reg_id,
 	if (conf->suba_sec)
 		reg |= ACFGR_SEC;
 	WR4(sc, RISAF_REG_ACFGR(reg_id), reg);
+
+	/* Base region */
+	WR4(sc, RISAF_REG_STARTR(reg_id), conf->base_start);
+	WR4(sc, RISAF_REG_ENDR(reg_id), conf->base_end);
+
+	reg = (conf->base_cid_read << 0);
+	reg |= (conf->base_cid_write << 16);
+	WR4(sc, RISAF_REG_CIDCFGR(reg_id), reg);
+
+	reg = CFGR_BREN;
+	if (conf->base_sec)
+		reg |= CFGR_SEC;
+	WR4(sc, RISAF_REG_CFGR(reg_id), reg);
 }
 
 void
 stm32n6_risaf_init(struct stm32n6_risaf_softc *sc, uint32_t base)
 {
+	uint32_t reg;
 
 	sc->base = base;
+
+	reg = RD4(sc, RISAF_CR);
+	if (reg & CR_GLOCK)
+		printf("%s: RISAF is locked\n", __func__);
 }
