@@ -68,8 +68,13 @@ stm32n6_pwr_setup_vddio4_3v3(struct stm32n6_pwr_softc *sc, int enable)
 int
 stm32n6_pwr_init(struct stm32n6_pwr_softc *sc, uint32_t base)
 {
+	uint32_t reg;
 
 	sc->base = base;
+
+	reg = RD4(sc, PWR_CR1);
+	reg &= ~CR1_LPDS08V;
+	WR4(sc, PWR_CR1, reg);
 
 	return (0);
 }

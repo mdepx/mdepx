@@ -26,9 +26,11 @@
 #ifndef _ARM_STM_STM32N6_PWR_H_
 #define _ARM_STM_STM32N6_PWR_H_
 
-#define	PWR_SVMCR1	0x34
+#define	PWR_CR1			0x00
+#define	 CR1_LPDS08V		(1 << 5)
+#define	PWR_SVMCR1		0x34
 #define	 SVMCR1_VDDIO4SV	(1 << 8)
-#define	PWR_SVMCR3	0x3C
+#define	PWR_SVMCR3		0x3C
 #define	 SVMCR3_VDDIO3VRSEL	(1 << 26)
 #define	 SVMCR3_VDDIO2VRSEL	(1 << 25)
 #define	 SVMCR3_VDDIOVRSEL	(1 << 24)
