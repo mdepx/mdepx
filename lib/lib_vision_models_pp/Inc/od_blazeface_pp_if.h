@@ -7,8 +7,8 @@
  * If no LICENSE file comes with this software, it is provided AS-IS.
  *--------------------------------------------------------------------------------------------*/
 
-#ifndef __OD_FD_BLAZEFACE_PP_IF_H__
-#define __OD_FD_BLAZEFACE_PP_IF_H__
+#ifndef __OD_BLAZEFACE_PP_IF_H__
+#define __OD_BLAZEFACE_PP_IF_H__
 
 #ifdef __cplusplus
  extern "C" {
@@ -19,18 +19,18 @@
 
 /* I/O structures for SSD detector type */
 /* ------------------------------------ */
-typedef struct od_fd_blazeface_pp_in
+typedef struct od_blazeface_pp_in
 {
   void *pRawDetections_0;
   void *pRawDetections_1;
   void *pScores_0;
   void *pScores_1;
-} od_fd_blazeface_pp_in_t;
+} od_blazeface_pp_in_t;
 
 
 /* Generic Static parameters */
 /* ------------------------- */
-typedef struct od_fd_blazeface_pp_static_param
+typedef struct od_blazeface_pp_static_param
 {
   int32_t   nb_classes;
   int32_t   nb_keypoints;
@@ -52,7 +52,7 @@ typedef struct od_fd_blazeface_pp_static_param
   uint8_t proba_0_zero_point;
   uint8_t boxe_1_zero_point;
   uint8_t proba_1_zero_point;
-} od_fd_blazeface_pp_static_param_t;
+} od_blazeface_pp_static_param_t;
 
 
 /* Exported functions ------------------------------------------------------- */
@@ -63,7 +63,7 @@ typedef struct od_fd_blazeface_pp_static_param
  * @param [IN] Input static parameters
  * @retval Error code
  */
-int32_t od_fd_blazeface_pp_reset(od_fd_blazeface_pp_static_param_t *pInput_static_param);
+int32_t od_blazeface_pp_reset(od_blazeface_pp_static_param_t *pInput_static_param);
 
 
 /*!
@@ -75,9 +75,9 @@ int32_t od_fd_blazeface_pp_reset(od_fd_blazeface_pp_static_param_t *pInput_stati
  *             pointer on static parameters
  * @retval Error code
  */
-int32_t od_fd_blazeface_pp_process(od_fd_blazeface_pp_in_t *pInput,
+int32_t od_blazeface_pp_process(od_blazeface_pp_in_t *pInput,
                                    od_pp_out_t *pOutput,
-                                   od_fd_blazeface_pp_static_param_t *pInput_static_param);
+                                   od_blazeface_pp_static_param_t *pInput_static_param);
 
 /*!
  * @brief Face detector post processing : includes output detector remapping,
@@ -88,9 +88,9 @@ int32_t od_fd_blazeface_pp_process(od_fd_blazeface_pp_in_t *pInput,
  *             pointer on static parameters
  * @retval Error code
  */
-int32_t od_fd_blazeface_pp_process_uint8(od_fd_blazeface_pp_in_t *pInput,
+int32_t od_blazeface_pp_process_uint8(od_blazeface_pp_in_t *pInput,
                                          od_pp_out_t *pOutput,
-                                         od_fd_blazeface_pp_static_param_t *pInput_static_param);
+                                         od_blazeface_pp_static_param_t *pInput_static_param);
 /*!
  * @brief Face detector post processing : includes output detector remapping,
  *        nms and score filtering for fd blazeface quantized signed inputs
@@ -100,11 +100,11 @@ int32_t od_fd_blazeface_pp_process_uint8(od_fd_blazeface_pp_in_t *pInput,
  *             pointer on static parameters
  * @retval Error code
  */
-int32_t od_fd_blazeface_pp_process_int8(od_fd_blazeface_pp_in_t *pInput,
+int32_t od_blazeface_pp_process_int8(od_blazeface_pp_in_t *pInput,
                                          od_pp_out_t *pOutput,
-                                         od_fd_blazeface_pp_static_param_t *pInput_static_param);
+                                         od_blazeface_pp_static_param_t *pInput_static_param);
 #ifdef __cplusplus
  }
 #endif
 
-#endif      /* __OD_FD_BLAZEFACE_PP_IF_H__  */
+#endif      /* __OD_BLAZEFACE_PP_IF_H__  */

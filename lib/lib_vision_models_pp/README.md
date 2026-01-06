@@ -6,24 +6,36 @@ This readme explains how to use the different available post-processing code.
 ## Available post-processings
 
 
-| Models        | Task                 |
-|---------------|----------------------|
-| ST YOLOX      | person_detection     |
-| YOLOv8        | person_detection     |
-| YOLOv5        | person_detection     |
-| YOLOv4        | person_detection     |
-| Tiny Yolo V2  | person_detection     |
-| Standard SSD  | person_detection     |
-| ST SSD        | person_detection     |
-| Centernet     | person_detection     |
-| Blazeface     | face_detection       |
-| YOLOv8 Seg    | instance_segmentation |
-| Deeplabv3     | semantic_segmentation |
-| YOLOv8 Pose   | mpe_estimation       |
-| MoveNet       | spe_estimation       |
-| CNN_pd     | palm_detection |
+| Models        | Task                        |
+|---------------|-----------------------------|
+| ST YOLOX      | person detection            |
+| YOLOv8        | person detection            |
+| YOLOv5        | person detection            |
+| YOLOv4        | person detection            |
+| Tiny Yolo V2  | person detection            |
+| Standard SSD  | person detection            |
+| ST SSD        | person detection            |
+| Centernet     | person detection            |
+| Blazeface     | face detection              |
+| YOLOv8 Seg    | instance segmentation       |
+| Deeplabv3     | semantic segmentation       |
+| YOLOv8 Pose   | multi pose estimation       |
+| BlazeFace     | face detection + keypoints  |
+| MoveNet       | single pose estimation      |
+| CNN_pd        | palm detection              |
 
 ## Version History
+
+### v0.12.0 - 2025-09-17
+
+- **Improvements:**
+  - Renamed od_fd_blazeface to od_blazeface (ouput is od_pp_out_t)
+  - Renamed mpe_fd_blazeface to fd_blazeface (ouput is fd_pp_out_t)
+
+### v0.11.0 - 2025-09-16
+
+- **Improvements:**
+  - multi-pose Blazeface face detection post-processing int8 (outputs keypoints)
 
 ### v0.10.0 - 2025-07-10
 
@@ -277,6 +289,47 @@ Parameters:
 - **uint32_t box_nb**: The number of detections in the output buffer.
 
 ---
+
+</details>
+
+## Face detection post-processing Output Structures
+
+<details>
+
+---
+### `fd_pp_keyPoints_t`
+
+This structure is used to represent key points in a post-processing context. Each key point consists of an x-coordinate, a y-coordinate.
+
+Parameters:
+
+- **float32_t x**: The normalized x-coordinate of the keypoint.
+- **float32_t y**: The normalized y-coordinate of the keypoint.
+
+---
+### `fd_pp_outBuffer_t`
+
+This structure represents the output buffer for a single face detection result. It contains information about the detected object's position, size, confidence score, class index and key points.
+
+Parameters:
+
+- **float32_t x_center**: The normalized x-coordinate of the center of the detected object.
+- **float32_t y_center**: The normalized y-coordinate of the center of the detected object.
+- **float32_t width**: The normalized width of the detected object.
+- **float32_t height**: The normalized height of the detected object.
+- **float32_t conf**: The confidence (between 0.0 and 1.0) score of the detection.
+- **int32_t class_index**: The index of the detected object's class.
+- **fd_pp_keyPoints_t \*pKeyPoints**: The pointer to the array of key points.
+
+---
+### `fd_pp_out_t`
+
+This structure represents the overall output of the face detection post-processing step. It contains a pointer to an array of fd_pp_outBuffer_t structures and the number of detections.
+
+Parameters:
+
+- **fd_pp_outBuffer_t \*pOutBuff**: Pointer to an array of fd_pp_outBuffer_t structures.
+- **int32_t nb_detect**: The number of detections in the output buffer.
 
 </details>
 
@@ -1129,7 +1182,7 @@ This function performs the post-processing steps for ST YOLOX object detection. 
 
 ## Blazeface Structures
 ---
-### `od_fd_blazeface_pp_in_t`
+### `od_blazeface_pp_in_t`
 
 This structure is used for Blazeface post-processing input where the raw detections are in float32_t/uint8_t format.
 
@@ -1141,7 +1194,7 @@ Parameters:
 - **void_t \*pScores_1**: Pointer to raw probabilities in float32_t/uint8_t/int8_t format.
 
 ---
-### `od_fd_blazeface_pp_static_param_t`
+### `od_blazeface_pp_static_param_t`
 
 This structure holds the static parameters required for Blazeface post-processing.
 
@@ -1170,14 +1223,14 @@ Parameters:
 ## Blazeface Routines
 ---
 
-### `od_fd_blazeface_pp_reset`
+### `od_blazeface_pp_reset`
 
 **Purpose**:
 Resets the static parameters for Blazeface post-processing.
 
 **Prototype**:
 ```c
-int32_t od_fd_blazeface_pp_reset(od_fd_blazeface_pp_static_param_t *pInput_static_param);
+int32_t od_blazeface_pp_reset(od_blazeface_pp_static_param_t *pInput_static_param);
 ```
 
 **Parameters**:
@@ -1191,16 +1244,16 @@ This function initializes the static parameters for the Blazeface post-processin
 
 ---
 
-### `od_fd_blazeface_pp_process`
+### `od_blazeface_pp_process`
 
 **Purpose**:
 Processes the Blazeface post-processing pipeline for float32_t input data.
 
 **Prototype**:
 ```c
-int32_t od_fd_blazeface_pp_process(od_fd_blazeface_pp_in_t *pInput,
+int32_t od_blazeface_pp_process(od_blazeface_pp_in_t *pInput,
                                    od_pp_out_t *pOutput,
-                                   od_fd_blazeface_pp_static_param_t *pInput_static_param);
+                                   od_blazeface_pp_static_param_t *pInput_static_param);
 ```
 
 **Parameters**:
@@ -1216,16 +1269,16 @@ This function performs the post-processing steps for Blazeface object detection.
 
 ---
 
-### `od_fd_blazeface_pp_process_uint8`
+### `od_blazeface_pp_process_uint8`
 
 **Purpose**:
 Processes the Blazeface post-processing pipeline for uint8_t input data.
 
 **Prototype**:
 ```c
-int32_t od_fd_blazeface_pp_process_uint8(od_fd_blazeface_pp_in_t *pInput,
+int32_t od_blazeface_pp_process_uint8(od_blazeface_pp_in_t *pInput,
                                   od_pp_out_t *pOutput,
-                                  od_fd_blazeface_pp_static_param_t *pInput_static_param);
+                                  od_blazeface_pp_static_param_t *pInput_static_param);
 ```
 
 **Parameters**:
@@ -1241,16 +1294,16 @@ This function performs the post-processing steps for Blazeface object detection 
 
 ---
 
-### `od_fd_blazeface_pp_process_int8`
+### `od_blazeface_pp_process_int8`
 
 **Purpose**:
 Processes the Blazeface post-processing pipeline for int8_t input data.
 
 **Prototype**:
 ```c
-int32_t od_fd_blazeface_pp_process_int8(od_fd_blazeface_pp_in_t *pInput,
+int32_t od_blazeface_pp_process_int8(od_blazeface_pp_in_t *pInput,
                                   od_pp_out_t *pOutput,
-                                  od_fd_blazeface_pp_static_param_t *pInput_static_param);
+                                  od_blazeface_pp_static_param_t *pInput_static_param);
 ```
 
 **Parameters**:
@@ -1695,6 +1748,119 @@ This function performs the post-processing steps for YOLOv8 pose object detectio
 
 - **AI_MPE_POSTPROCESS_ERROR_NO**: Indicates successful execution of the function.
 - **AI_MPE_POSTPROCESS_ERROR**: Indicates an error occured during execution of the function.
+
+---
+
+</details>
+
+# BlazeFace face detection Post-Processing
+<details>
+
+## BlazeFace Structures
+---
+### `fd_blazeface_pp_in_t`
+
+This structure is used for BlazeFace post-processing input where the raw detections are in int8_t format.
+
+Parameters:
+
+- **void_t \*pRaw_detections_0**: Pointer to raw detection data in int8_t format.
+- **void_t \*pRaw_detections_1**: Pointer to raw detection data in int8_t format.
+- **void_t \*pScores_0**: Pointer to raw probabilities in int8_t format.
+- **void_t \*pScores_1**: Pointer to raw probabilities in int8_t format.
+
+
+---
+### `fd_blazeface_pp_static_param_t`
+
+This structure holds the static parameters required for BlazeFace post-processing.
+
+Parameters:
+
+- **int32_t nb_classes**: Number of classes in the detection model. To extract fom the model output shape.
+- **int32_t nb_keypoints**: Number of keypoints in raw detections. To extract fom the model output shape.
+- **int32_t nb_detections_0**: Total number of boxes predicted first output from the model. To extract fom the model output shape.
+- **int32_t nb_detections_1**: Total number of boxes predicted second output from the model. To extract fom the model output shape.
+- **int32_t in_size**: size of of the input image of the model (in_size x in_size as squared). To extract fom the model output shape.
+- **int32_t max_boxes_limit**: Maximum number of boxes per class to be considered after post-processing.
+- **float32_t conf_threshold**: Confidence threshold for filtering detections. High confidence helps filtering out low-confidence detections (False positives), However, it is essential to balance the threshold value to ensure that you do not miss too many true positives.
+- **float32_t iou_threshold**: Intersection over Union (IoU) threshold for Non-Maximum Suppression (NMS).A high IoU threshold means that more overlapping will be allowed between boxes, while a lower threshold will allow less boxes to be retained.
+- **int32_t nb_detect**: Number of detections after post-processing. To be resetted before each process.
+- **const void *pAnchors_0**: Pointer to anchors for first output. To compute fom the model.
+- **const void *pAnchors_1**: Pointer to anchors for second output. To compute fom the model.
+- **float32_t boxe_0_scale**: Scale factor for first raw boxes output values.
+- **float32_t proba_0_scale**: Scale factor for first scores output values.
+- **float32_t boxe_1_scale**: Scale factor for second raw boxes output values.
+- **float32_t proba_1_scale**: Scale factor for second scores output values.
+- **uint8_t boxe_0_zero_point**: Zero point for quantized first raw boxes output values.
+- **uint8_t proba_0_zero_point**: Zero point for quantized first raw probabilities output values.
+- **uint8_t boxe_1_zero_point**: Zero point for quantized second raw boxes output values.
+- **uint8_t proba_1_zero_point**: Zero point for quantized seconf raw probabilities output values.
+---
+## BlazeFace Routines
+---
+### Pointers initialization
+```c
+#define AI_FD_BLAZEFACE_PP_MAX_BOXES MAX(AI_FD_BLAZEFACE_PP_MAX_BOXES_LIMIT, AI_FD_BLAZEFACE_PP_OUT_0_NB_BOXES + AI_FD_BLAZEFACE_PP_OUT_1_NB_BOXES)
+fd_pp_outBuffer_t out_detections[AI_FD_BLAZEFACE_PP_MAX_BOXES];
+fd_pp_keyPoints_t out_keyPoints[AI_FD_BLAZEFACE_PP_MAX_BOXES*AI_FD_BLAZEFACE_PP_NB_KEYPOINTS];
+```
+```c
+ for (int i = 0; i < AI_FD_BLAZEFACE_PP_MAX_BOXES; i++) {
+    out_detections[i].pKeyPoints = &out_keyPoints[i*AI_FD_BLAZEFACE_PP_NB_KEYPOINTS];
+ }
+```
+
+### `fd_blazeface_pp_reset`
+
+**Purpose**:
+Resets the static parameters for Blazeface post-processing.
+
+**Prototype**:
+```c
+int32_t fd_blazeface_pp_reset(fd_blazeface_pp_static_param_t *pInput_static_param);
+```
+
+**Parameters**:
+- **pInput_static_param**: Pointer to the static parameters structure.
+
+**Returns**:
+- **AI_FD_PP_ERROR_NO** on success.
+
+**Description**:
+This function initializes the static parameters for the Blazeface post-processing by setting the number of detected objects to zero.
+
+---
+
+### `fd_blazeface_pp_process_int8`
+
+**Purpose**:
+Processes the Blazeface post-processing pipeline for int8_t input data.
+
+**Prototype**:
+```c
+int32_t fd_blazeface_pp_process_int8(fd_blazeface_pp_in_t *pInput,
+                                     fd_pp_out_t *pOutput,
+                                     fd_blazeface_pp_static_param_t *pInput_static_param);
+```
+
+**Parameters**:
+- **pInput**: Pointer to the post-processing input structure.
+- **pOutput**: Pointer to the post-processing output structure.
+- **pInput_static_param**: Pointer to the static parameters structure.
+
+**Returns**:
+- **AI_FD_PP_ERROR_NO** on success, or an error code on failure.
+
+**Description**:
+This function performs the post-processing steps for Blazeface face detection with int8_t input data. It first retrieves the neural network boxes, then applies Non-Maximum Suppression (NMS), and finally performs score re-filtering.
+
+---
+
+### Error Codes
+
+- **AI_FD_PP_ERROR_NO**: Indicates successful execution of the function.
+- **AI_FD_PP_ERROR**: Indicates an error occured during execution of the function.
 
 ---
 

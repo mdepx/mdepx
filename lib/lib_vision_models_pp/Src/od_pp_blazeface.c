@@ -8,7 +8,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 #include "od_pp_loc.h"
-#include "od_fd_blazeface_pp_if.h"
+#include "od_blazeface_pp_if.h"
 #include "vision_models_pp.h"
 
 
@@ -16,7 +16,7 @@
 static int32_t AI_FD_PP_SORT_CLASS;
 
 
-int32_t fd_nms_comparator(const void *pa, const void *pb)
+static int32_t fd_nms_comparator(const void *pa, const void *pb)
 {
     od_pp_outBuffer_t a = *(od_pp_outBuffer_t *)pa;
     od_pp_outBuffer_t b = *(od_pp_outBuffer_t *)pb;
@@ -51,7 +51,7 @@ int32_t fd_nms_comparator(const void *pa, const void *pb)
 }
 
 int32_t fd_pp_nmsFiltering_centroid(od_pp_out_t *pOutput,
-                                    od_fd_blazeface_pp_static_param_t *pInput_static_param)
+                                    od_blazeface_pp_static_param_t *pInput_static_param)
 {
     int32_t j, k, limit_counter, detections_per_class;
     for (k = 0; k < pInput_static_param->nb_classes; ++k)
@@ -113,7 +113,7 @@ int32_t fd_pp_nmsFiltering_centroid(od_pp_out_t *pOutput,
 
 
 int32_t fd_pp_scoreFiltering_centroid(od_pp_out_t *pOutput,
-                                      od_fd_blazeface_pp_static_param_t *pInput_static_param)
+                                      od_blazeface_pp_static_param_t *pInput_static_param)
 {
     int32_t det_count = 0;
 
@@ -141,7 +141,7 @@ int32_t fd_pp_level_decode_and_store(float32_t *pRawBoxes,
                                      od_pp_out_t *pOutput,
                                      float32_t *pAnchors,
                                      uint32_t inDetection,
-                                     od_fd_blazeface_pp_static_param_t *pInput_static_param)
+                                     od_blazeface_pp_static_param_t *pInput_static_param)
 
 {
     float32_t inv_size = 1.0f / pInput_static_param->in_size;
@@ -186,7 +186,7 @@ int32_t fd_pp_level_decode_and_store_iu8(uint8_t *pRawBoxes,
                                          od_pp_out_t *pOutput,
                                          float32_t *pAnchors,
                                          uint32_t inDetection,
-                                         od_fd_blazeface_pp_static_param_t *pInput_static_param,
+                                         od_blazeface_pp_static_param_t *pInput_static_param,
                                          float32_t raw_scale,
                                          uint8_t raw_zp,
                                          float32_t proba_scale,
@@ -242,12 +242,12 @@ int32_t fd_pp_level_decode_and_store_iu8(uint8_t *pRawBoxes,
 
 }
 
-int32_t fd_pp_level_decode_and_store_is8(int8_t *pRawBoxes,
+static int32_t fd_pp_level_decode_and_store_is8(int8_t *pRawBoxes,
                                          int8_t *pProbas,
                                          od_pp_out_t *pOutput,
                                          float32_t *pAnchors,
                                          uint32_t inDetection,
-                                         od_fd_blazeface_pp_static_param_t *pInput_static_param,
+                                         od_blazeface_pp_static_param_t *pInput_static_param,
                                          float32_t raw_scale,
                                          int8_t raw_zp,
                                          float32_t proba_scale,
@@ -304,9 +304,9 @@ int32_t fd_pp_level_decode_and_store_is8(int8_t *pRawBoxes,
 }
 
 
-int32_t fd_pp_getNNBoxes_centroid(od_fd_blazeface_pp_in_t *pInput,
+int32_t fd_pp_getNNBoxes_centroid(od_blazeface_pp_in_t *pInput,
                                   od_pp_out_t *pOut,
-                                  od_fd_blazeface_pp_static_param_t *pInput_static_param)
+                                  od_blazeface_pp_static_param_t *pInput_static_param)
 {
   int32_t error   = AI_OD_POSTPROCESS_ERROR_NO;
 
@@ -346,9 +346,9 @@ int32_t fd_pp_getNNBoxes_centroid(od_fd_blazeface_pp_in_t *pInput,
   return (error);
 }
 
-int32_t fd_pp_getNNBoxes_centroid_iu8(od_fd_blazeface_pp_in_t *pInput,
+int32_t fd_pp_getNNBoxes_centroid_iu8(od_blazeface_pp_in_t *pInput,
                                       od_pp_out_t *pOut,
-                                      od_fd_blazeface_pp_static_param_t *pInput_static_param)
+                                      od_blazeface_pp_static_param_t *pInput_static_param)
 {
   int32_t error   = AI_OD_POSTPROCESS_ERROR_NO;
 
@@ -397,9 +397,9 @@ int32_t fd_pp_getNNBoxes_centroid_iu8(od_fd_blazeface_pp_in_t *pInput,
   return (error);
 }
 
-int32_t fd_pp_getNNBoxes_centroid_is8(od_fd_blazeface_pp_in_t *pInput,
+static int32_t fd_pp_getNNBoxes_centroid_is8(od_blazeface_pp_in_t *pInput,
                                       od_pp_out_t *pOut,
-                                      od_fd_blazeface_pp_static_param_t *pInput_static_param)
+                                      od_blazeface_pp_static_param_t *pInput_static_param)
 {
   int32_t error   = AI_OD_POSTPROCESS_ERROR_NO;
 
@@ -452,7 +452,7 @@ int32_t fd_pp_getNNBoxes_centroid_is8(od_fd_blazeface_pp_in_t *pInput,
 
 /* ----------------------       Exported routines      ---------------------- */
 
-int32_t od_fd_blazeface_pp_reset(od_fd_blazeface_pp_static_param_t *pInput_static_param)
+int32_t od_blazeface_pp_reset(od_blazeface_pp_static_param_t *pInput_static_param)
 {
   /* Initializations */
   pInput_static_param->nb_detect = 0;
@@ -461,9 +461,9 @@ int32_t od_fd_blazeface_pp_reset(od_fd_blazeface_pp_static_param_t *pInput_stati
 }
 
 
-int32_t od_fd_blazeface_pp_process(od_fd_blazeface_pp_in_t *pInput,
+int32_t od_blazeface_pp_process(od_blazeface_pp_in_t *pInput,
                                od_pp_out_t *pOutput,
-                               od_fd_blazeface_pp_static_param_t *pInput_static_param)
+                               od_blazeface_pp_static_param_t *pInput_static_param)
 {
   int32_t error   = AI_OD_POSTPROCESS_ERROR_NO;
 
@@ -487,9 +487,9 @@ int32_t od_fd_blazeface_pp_process(od_fd_blazeface_pp_in_t *pInput,
   return (error);
 }
 
-int32_t od_fd_blazeface_pp_process_uint8(od_fd_blazeface_pp_in_t *pInput,
+int32_t od_blazeface_pp_process_uint8(od_blazeface_pp_in_t *pInput,
                               od_pp_out_t *pOutput,
-                              od_fd_blazeface_pp_static_param_t *pInput_static_param)
+                              od_blazeface_pp_static_param_t *pInput_static_param)
 {
   int32_t error   = AI_OD_POSTPROCESS_ERROR_NO;
 
@@ -513,9 +513,9 @@ int32_t od_fd_blazeface_pp_process_uint8(od_fd_blazeface_pp_in_t *pInput,
   return (error);
 }
 
-int32_t od_fd_blazeface_pp_process_int8(od_fd_blazeface_pp_in_t *pInput,
+int32_t od_blazeface_pp_process_int8(od_blazeface_pp_in_t *pInput,
                               od_pp_out_t *pOutput,
-                              od_fd_blazeface_pp_static_param_t *pInput_static_param)
+                              od_blazeface_pp_static_param_t *pInput_static_param)
 {
   int32_t error   = AI_OD_POSTPROCESS_ERROR_NO;
 
