@@ -27,6 +27,7 @@
 #define _ARM_STM_STM32N6_RISAF_H_
 
 #define	RISAF_CR		0x000
+#define	 CR_GLOCK		(1 << 0) /* Global lock */
 #define	RISAF_IASR		0x008
 #define	RISAF_IACR		0x00C
 #define	RISAF_IAESR		0x020

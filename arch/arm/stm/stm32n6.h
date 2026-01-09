@@ -67,5 +67,7 @@
 #define	RISAF5_BASE	0x4402A000	/* NPU Master 1 */
 #define	RISAF6_BASE	0x4402B000	/* CPU Master */
 #define	I2C1_BASE	0x40005400
+#define	RISAF2_BASE	0x44027000	/* CPU_axiRAM0 */
+#define	RISAF3_BASE	0x44028000	/* CPU_axiRAM1 */
 
 #endif	/* !_ARM_STM_STM32N6_H_ */
