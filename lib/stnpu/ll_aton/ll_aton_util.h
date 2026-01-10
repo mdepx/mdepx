@@ -33,7 +33,11 @@ extern "C"
 
 #define LL_ATON_PRINTF(...)  printf(__VA_ARGS__)
 #define LL_ATON_FPRINTF(...) fprintf(__VA_ARGS__)
+#ifdef __MDX__
+#define LL_ATON_PUTS(...)    printf(__VA_ARGS__)
+#else
 #define LL_ATON_PUTS(...)    puts(__VA_ARGS__)
+#endif
 #define LL_ATON_FFLUSH(...)  fflush(__VA_ARGS__)
 #define LL_ATON_FOPEN(...)   fopen(__VA_ARGS__)
 #define LL_ATON_FCLOSE(...)  fclose(__VA_ARGS__)
