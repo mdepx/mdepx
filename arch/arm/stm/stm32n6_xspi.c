@@ -136,7 +136,6 @@ stm32n6_xspi_setup(struct stm32n6_xspi_softc *sc, struct xspi_config *conf)
 	WR4(sc, XSPI_FCR, 0xff);
 
 	cr = 7 << CR_FTHRES_S;
-	cr |= CR_TCEN;
 
 	switch (conf->mode) {
 	case XSPI_MODE_INDIRECT_WRITE: cr |= CR_FMODE_IW; break;
@@ -148,17 +147,13 @@ stm32n6_xspi_setup(struct stm32n6_xspi_softc *sc, struct xspi_config *conf)
 	cr |= CR_EN;
 	WR4(sc, XSPI_CR, cr);
 
-	if (conf->mode == XSPI_MODE_MEMORY_MAPPED) {
-		WR4(sc, XSPI_WIR, conf->instruction_write);
-		WR4(sc, XSPI_IR, conf->instruction_read);
-	}
-
 	reg = conf->mem_type;
 	reg |= conf->dev_size;
 	reg |= (conf->cs_cycles - 1) << DCR1_CSHT_S;
 	WR4(sc, XSPI_DCR1, reg);
-
 	WR4(sc, XSPI_DCR2, conf->prescaler);
+	WR4(sc, XSPI_DCR3, DCR3_CSBOUND_2KB); /* TODO */
+
 	WR4(sc, XSPI_TCR, conf->dummy_cycles);
 	if (conf->mode == XSPI_MODE_MEMORY_MAPPED)
 		WR4(sc, XSPI_WTCR, conf->wdummy_cycles);
@@ -207,7 +202,7 @@ stm32n6_xspi_setup(struct stm32n6_xspi_softc *sc, struct xspi_config *conf)
 	}
 
 	printf("%s: 0 inst %x SR %x\n", __func__, conf->instruction,
-	     RD4(sc, XSPI_SR));
+	    RD4(sc, XSPI_SR));
 
 	switch(conf->mode) {
 	case XSPI_MODE_INDIRECT_WRITE:
@@ -227,6 +222,10 @@ stm32n6_xspi_setup(struct stm32n6_xspi_softc *sc, struct xspi_config *conf)
 				}
 			}
 		}
+		break;
+	case XSPI_MODE_MEMORY_MAPPED:
+		WR4(sc, XSPI_WIR, conf->instruction_write);
+		WR4(sc, XSPI_IR, conf->instruction_read);
 		break;
 	}
 

@@ -70,6 +70,8 @@
 #define	 DCR1_CSHT_M		(0x3f << DCR1_CSHT_S)
 #define	XSPI_DCR2	0x00C
 #define	XSPI_DCR3	0x010
+#define	 DCR3_CSBOUND_S		16
+#define	 DCR3_CSBOUND_2KB	(11 << DCR3_CSBOUND_S)
 #define	XSPI_DCR4	0x014
 #define	XSPI_SR		0x020
 #define	 SR_FLEVEL_S	8
