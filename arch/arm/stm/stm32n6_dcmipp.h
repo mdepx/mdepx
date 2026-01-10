@@ -59,9 +59,12 @@
 #define	 CMCR_PSFC_PIPE2	(2 << CMCR_PSFC_S)
 #define	DCMIPP_CMFRCR		0x208
 #define	DCMIPP_CMIER		0x3F0
+#define	 CMIER_P2FRAMEIE	(1 << 25)
+#define	 CMIER_P2LINEIE		(1 << 24) /* Multi-line capture complete P2 */
 #define	DCMIPP_CMSR1		0x3F4
 #define	DCMIPP_CMSR2		0x3F8
 #define	DCMIPP_CMFCR		0x3FC
+
 #define	DCMIPP_P0FSCR		0x404
 #define	 P0FSCR_PIPEN		(1 << 31)
 #define	DCMIPP_P0FCTCR		0x500
@@ -85,6 +88,7 @@
 #define	DCMIPP_P0CPPCR		0x7C0
 #define	DCMIPP_P0CPPM0AR1	0x7C4
 #define	DCMIPP_P0CPPM0AR2	0x7C8
+
 #define	DCMIPP_P1FSCR		0x804
 #define	 P1FSCR_PIPEN		(1 << 31)
 #define	 P1FSCR_FDTFEN		(1 << 30) /* Force Datatype format enable */
@@ -158,23 +162,24 @@
 #define	DCMIPP_P1CTCR3		0x8A8
 #define	DCMIPP_P1FCTCR		0x900
 #define	 P1FCTCR_CPTREQ		(1 << 3) /* Capture requested */
+#define	 P1FCTCR_CPTMODE_SS	(1 << 2) /* Snapshot mode */
 #define	DCMIPP_P1CRSTR		0x904
 #define	DCMIPP_P1CRSZR		0x908
 #define	DCMIPP_P1DCCR		0x90C
-#define	DCMIPP_P1DSCR		0x910
+#define	DCMIPP_PxDSCR(x)	(0x910 + 0x400 * ((x) - 1))
 #define	 P1DSCR_ENABLE		(1 << 31)
 #define	 P1DSCR_VDIV_S		16
 #define	 P1DSCR_HDIV_S		0
-#define	DCMIPP_P1DSRTIOR	0x914
+#define	DCMIPP_PxDSRTIOR(x)	(0x914 + 0x400 * ((x) - 1))
 #define	 P1DSRTIOR_VRATIO_S	16
 #define	 P1DSRTIOR_HRATIO_S	0
-#define	DCMIPP_P1DSSZR		0x918
+#define	DCMIPP_PxDSSZR(x)	(0x918 + 0x400 * ((x) - 1))
 #define	 P1DSSZR_VSIZE_S	16
 #define	 P1DSSZR_HSIZE_S	0
 #define	DCMIPP_P1CMRICR		0x920
 #define	DCMIPP_P1RIxCR1		0x924
 #define	DCMIPP_P1RIxCR2		0x928
-#define	DCMIPP_P1GMCR		0x970
+#define	DCMIPP_PxGMCR(x)	(0x970 + 0x400 * ((x) - 1))
 #define	 P1GMCR_EN		(1 << 0) /* Gamma is enabled */
 #define	DCMIPP_P1YUVCR		0x980
 #define	DCMIPP_P1YUVRR1		0x984
@@ -252,8 +257,17 @@
 #define	DCMIPP_P1CPPM1PR	0xBDC
 #define	DCMIPP_P1CPPM2AR1	0xBE4
 #define	DCMIPP_P1CPPM2AR2	0xBE8
+
 #define	DCMIPP_P2FSCR		0xC04
+#define	 P2FSCR_PIPEN		(1 << 31)
+#define	 P2FSCR_FDTFEN		(1 << 30) /* Force Datatype format enable */
+#define	 P2FSCR_FDTF_S		24 /* Force Datatype format */
+#define	 P2FSCR_VC_S		19 /* Virtual channel ID of the CSI flow */
+#define	 P2FSCR_DTIDB_S		8
+#define	 P2FSCR_DTIDA_S		0
 #define	DCMIPP_P2FCTCR		0xD00
+#define	 P2FCTCR_CPTREQ		(1 << 3) /* Capture requested */
+#define	 P2FCTCR_CPTMODE_SS	(1 << 2) /* Snapshot mode */
 #define	DCMIPP_P2CRSTR		0xD04
 #define	DCMIPP_P2CRSZR		0xD08
 #define	DCMIPP_P2DCCR		0xD0C
@@ -278,14 +292,27 @@
 #define	DCMIPP_P2RI8CR1		0xD5C
 #define	DCMIPP_P2RI8CR2		0xD60
 #define	DCMIPP_P2GMCR		0xD70
+#define	 P2GMCR_EN		(1 << 0) /* Gamma is enabled */
 #define	DCMIPP_P2PPCR		0xDC0
+#define	 P2PPCR_FORMAT_S		0
+#define	 P2PPCR_FORMAT_RGB888_YUV444_1	(0x0 << P2PPCR_FORMAT_S)
+#define	 P2PPCR_FORMAT_RGB565		(0x1 << P2PPCR_FORMAT_S)
+#define	 P2PPCR_FORMAT_ARGB8888		(0x2 << P2PPCR_FORMAT_S) /* A=0xff */
+#define	 P2PPCR_FORMAT_RGBA8888		(0x3 << P2PPCR_FORMAT_S) /* A=0xff */
+#define	 P2PPCR_FORMAT_MONOY8G8_1	(0x4 << P2PPCR_FORMAT_S)
+#define	 P2PPCR_FORMAT_YUV444_1_32_AYUV	(0x5 << P2PPCR_FORMAT_S)
+#define	 P2PPCR_FORMAT_YUV422_1_16_YUYV	(0x6 << P2PPCR_FORMAT_S)
 #define	DCMIPP_P2PPM0AR1	0xDC4
 #define	DCMIPP_P2PPM0AR2	0xDC8
 #define	DCMIPP_P2PPM0PR		0xDCC
+#define	 P2PPM0PR_PITCH_S	0 /* Number of bytes between two lines. */
 #define	DCMIPP_P2STM0AR		0xDD0
 #define	DCMIPP_P2IER		0xDF4
+#define	 P2IER_FRAMEIE		(1 << 1)
+#define	 P2IER_LINEIE		(1 << 0)
 #define	DCMIPP_P2SR		0xDF8
 #define	DCMIPP_P2FCR		0xDFC
+#define	 P2FCR_CFRAMEF		(1 << 1)
 #define	DCMIPP_P2CFSCR		0xE04
 #define	DCMIPP_P2CFCTCR		0xF00
 #define	DCMIPP_P2CCRSTR		0xF04
@@ -323,14 +350,29 @@ struct stm32n6_dcmipp_downsize_config {
 	uint32_t vdivfactor;
 };
 
+struct stm32n6_dcmipp_pipe_config {
+	uint32_t pipe_id;
+	uint32_t base_addr;
+	uint32_t pitch;
+	uint32_t vc; /* CSI virtual channel */
+	uint8_t flow_type;
+#define	DCMIPP_FLOW_TYPE_CONTINUOUS	(1)
+#define	DCMIPP_FLOW_TYPE_SNAPSHOT	(2)
+	uint8_t gamma_en;
+};
+
 struct stm32n6_dcmipp_softc {
 	uint32_t base;
 };
 
 void stm32n6_dcmipp_init(struct stm32n6_dcmipp_softc *sc, uint32_t base);
 void stm32n6_dcmipp_status(struct stm32n6_dcmipp_softc *sc);
-void stm32n6_dcmipp_setup(struct stm32n6_dcmipp_softc *sc);
-void stm32n6_dcmipp_setup_downsize(struct stm32n6_dcmipp_softc *sc,
+void stm32n6_dcmipp_setup(struct stm32n6_dcmipp_softc *sc,
+    struct stm32n6_dcmipp_pipe_config *conf);
+void stm32n6_dcmipp_setup_downsize(struct stm32n6_dcmipp_softc *sc, int pipe,
     struct stm32n6_dcmipp_downsize_config *conf);
+void stm32n6_dcmipp_pipe2(struct stm32n6_dcmipp_softc *sc);
+void stm32n6_dcmipp_pipe2_frame_request(struct stm32n6_dcmipp_softc *sc);
+void stm32n6_dcmipp_intr(void *arg, int irq);
 
 #endif /* !_ARM_STM_STM32N6_DCMIPP_H_ */
