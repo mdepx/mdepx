@@ -65,66 +65,43 @@
 #define	DCMIPP_CMSR2		0x3F8
 #define	DCMIPP_CMFCR		0x3FC
 
-#define	DCMIPP_P0FSCR		0x404
-#define	 P0FSCR_PIPEN		(1 << 31)
-#define	DCMIPP_P0FCTCR		0x500
-#define	 P0FCTCR_CPTREQ		(1 << 3) /* Capture requested */
-#define	DCMIPP_P0SCSTR		0x504
-#define	DCMIPP_P0SCSZR		0x508
-#define	DCMIPP_P0DCCNTR		0x5B0
-#define	DCMIPP_P0DCLMTR		0x5B4
-#define	DCMIPP_P0PPCR		0x5C0
-#define	DCMIPP_P0PPM0AR1	0x5C4
-#define	DCMIPP_P0PPM0AR2	0x5C8
-#define	DCMIPP_P0STM0AR		0x5D0
-#define	DCMIPP_P0IER		0x5F4
-#define	DCMIPP_P0SR		0x5F8
-#define	DCMIPP_P0FCR		0x5FC
-#define	DCMIPP_P0CFSCR		0x604
-#define	 P0CFSCR_PIPEN		(1 << 31) /* Current activation of PipeN */
-#define	DCMIPP_P0CFCTCR		0x700
-#define	DCMIPP_P0CSCSTR		0x704
-#define	DCMIPP_P0CSCSZR		0x708
-#define	DCMIPP_P0CPPCR		0x7C0
-#define	DCMIPP_P0CPPM0AR1	0x7C4
-#define	DCMIPP_P0CPPM0AR2	0x7C8
-
-#define	DCMIPP_P1FSCR		0x804
-#define	 P1FSCR_PIPEN		(1 << 31)
-#define	 P1FSCR_FDTFEN		(1 << 30) /* Force Datatype format enable */
-#define	 P1FSCR_FDTF_S		24 /* Force Datatype format */
-#define	 P1FSCR_VC_S		19 /* Virtual channel ID of the CSI flow */
-#define	 P1FSCR_PIPEDIFF	(1 << 18) /* Differentiates Pipe2 from Pipe1 */
-#define	 P1FSCR_DTMODE_S	16 /* Flow selection mode */
-#define	 P1FSCR_DTIDB_S		8
-#define	 P1FSCR_DTIDA_S		0
-#define	DCMIPP_P1SRCR		0x820
-#define	DCMIPP_P1BPRCR		0x824
-#define	DCMIPP_P1BPRSR		0x828
-#define	DCMIPP_P1DECR		0x830
-#define	DCMIPP_P1BLCCR		0x840
+#if 0
+#define	DCMIPP_PxFSCR(x)	(0x804 + 0x400 * (x))
+#define	 PxFSCR_PIPEN		(1 << 31)
+#define	 PxFSCR_FDTFEN		(1 << 30) /* Force Datatype format enable */
+#define	 PxFSCR_FDTF_S		24 /* Force Datatype format */
+#define	 PxFSCR_VC_S		19 /* Virtual channel ID of the CSI flow */
+#define	 PxFSCR_PIPEDIFF	(1 << 18) /* Differentiates Pipe2 from Pipe1 */
+#define	 PxFSCR_DTMODE_S	16 /* Flow selection mode */
+#define	 PxFSCR_DTIDB_S		8
+#define	 PxFSCR_DTIDA_S		0
+#define	DCMIPP_PxSRCR(x)	0x820
+#define	DCMIPP_PxBPRCR(x)	0x824
+#define	DCMIPP_PxBPRSR(x)	0x828
+#define	DCMIPP_PxDECR(x)	0x830
+#define	DCMIPP_PxBLCCR(x)	0x840
 #define	 BLCCR_ENABLE		(1 << 0)
 #define	 BLCCR_BLCB_S		8
 #define	 BLCCR_BLCG_S		16
 #define	 BLCCR_BLCR_S		24
-#define	DCMIPP_P1EXCR1		0x844
+#define	DCMIPP_PxEXCR1		0x844
 #define	 EXCR1_SHFR_S		28 /* Red */
 #define	 EXCR1_MULTR_S		20 /* Red */
 #define	 EXCR1_ENABLE		(1 << 0)
-#define	DCMIPP_P1EXCR2		0x848
+#define	DCMIPP_PxEXCR2		0x848
 #define	 EXCR2_SHFG_S		28
 #define	 EXCR2_MULTG_S		20
 #define	 EXCR2_SHFB_S		12
 #define	 EXCR2_MULTB_S		4
-#define	DCMIPP_P1ST1CR		0x850
-#define	DCMIPP_P1ST2CR		0x854
-#define	DCMIPP_P1ST3CR		0x858
-#define	DCMIPP_P1STSTR		0x85C
-#define	DCMIPP_P1STSZR		0x860
-#define	DCMIPP_P1ST1SR		0x864
-#define	DCMIPP_P1ST2SR		0x868
-#define	DCMIPP_P1ST3SR		0x86C
-#define	DCMIPP_P1DMCR		0x870
+#define	DCMIPP_PxST1CR		0x850
+#define	DCMIPP_PxST2CR		0x854
+#define	DCMIPP_PxST3CR		0x858
+#define	DCMIPP_PxSTSTR		0x85C
+#define	DCMIPP_PxSTSZR		0x860
+#define	DCMIPP_PxST1SR		0x864
+#define	DCMIPP_PxST2SR		0x868
+#define	DCMIPP_PxST3SR		0x86C
+#define	DCMIPP_PxDMCR		0x870
 #define	 DMCR_EN		(1 << 0)
 #define	 DMCR_TYPE_S		1
 #define	 DMCR_TYPE_RGGB		(0 << DMCR_TYPE_S)
@@ -135,37 +112,37 @@
 #define	 DMCR_LINEV_S		20
 #define	 DMCR_LINEH_S		24
 #define	 DMCR_EDGE_S		28
-#define	DCMIPP_P1CCCR		0x880
+#define	DCMIPP_PxCCCR		0x880
 #define	 CCCR_ENABLE		(1 << 0)
 #define	 CCCR_TYPE		(1 << 1)	/* R, G and B */
 #define	 CCCR_CLAMP		(1 << 2)
-#define	DCMIPP_P1CCRR1		0x884
+#define	DCMIPP_PxCCRR1		0x884
 #define	 CCRR1_RG_S		16
 #define	 CCRR1_RR_S		0
-#define	DCMIPP_P1CCRR2		0x888
+#define	DCMIPP_PxCCRR2		0x888
 #define	 CCRR2_RA_S		16
 #define	 CCRR2_RB_S		0
-#define	DCMIPP_P1CCGR1		0x88C
+#define	DCMIPP_PxCCGR1		0x88C
 #define	 CCGR1_GG_S		16
 #define	 CCGR1_GR_S		0
-#define	DCMIPP_P1CCGR2		0x890
+#define	DCMIPP_PxCCGR2		0x890
 #define	 CCGR2_GA_S		16
 #define	 CCGR2_GB_S		0
-#define	DCMIPP_P1CCBR1		0x894
+#define	DCMIPP_PxCCBR1		0x894
 #define	 CCBR1_BG_S		16
 #define	 CCBR1_BR_S		0
-#define	DCMIPP_P1CCBR2		0x898
+#define	DCMIPP_PxCCBR2		0x898
 #define	 CCBR2_BA_S		16
 #define	 CCBR2_BB_S		0
-#define	DCMIPP_P1CTCR1		0x8A0
-#define	DCMIPP_P1CTCR2		0x8A4
-#define	DCMIPP_P1CTCR3		0x8A8
-#define	DCMIPP_P1FCTCR		0x900
+#define	DCMIPP_PxCTCR1		0x8A0
+#define	DCMIPP_PxCTCR2		0x8A4
+#define	DCMIPP_PxCTCR3		0x8A8
+#define	DCMIPP_PxFCTCR		0x900
 #define	 P1FCTCR_CPTREQ		(1 << 3) /* Capture requested */
 #define	 P1FCTCR_CPTMODE_SS	(1 << 2) /* Snapshot mode */
-#define	DCMIPP_P1CRSTR		0x904
-#define	DCMIPP_P1CRSZR		0x908
-#define	DCMIPP_P1DCCR		0x90C
+#define	DCMIPP_PxCRSTR		0x904
+#define	DCMIPP_PxCRSZR		0x908
+#define	DCMIPP_PxDCCR		0x90C
 #define	DCMIPP_PxDSCR(x)	(0x910 + 0x400 * ((x) - 1))
 #define	 P1DSCR_ENABLE		(1 << 31)
 #define	 P1DSCR_VDIV_S		16
@@ -176,170 +153,263 @@
 #define	DCMIPP_PxDSSZR(x)	(0x918 + 0x400 * ((x) - 1))
 #define	 P1DSSZR_VSIZE_S	16
 #define	 P1DSSZR_HSIZE_S	0
-#define	DCMIPP_P1CMRICR		0x920
-#define	DCMIPP_P1RIxCR1		0x924
-#define	DCMIPP_P1RIxCR2		0x928
+#define	DCMIPP_PxCMRICR		0x920
+#define	DCMIPP_PxRIxCR1		0x924
+#define	DCMIPP_PxRIxCR2		0x928
 #define	DCMIPP_PxGMCR(x)	(0x970 + 0x400 * ((x) - 1))
 #define	 P1GMCR_EN		(1 << 0) /* Gamma is enabled */
-#define	DCMIPP_P1YUVCR		0x980
-#define	DCMIPP_P1YUVRR1		0x984
-#define	DCMIPP_P1YUVRR2		0x988
-#define	DCMIPP_P1YUVGR1		0x98C
-#define	DCMIPP_P1YUVGR2		0x990
-#define	DCMIPP_P1YUVBR1		0x994
-#define	DCMIPP_P1YUVBR2		0x998
-#define	DCMIPP_P1PPCR		0x9C0
-#define	 P1PPCR_FORMAT_S		0
-#define	 P1PPCR_FORMAT_RGB888_YUV444_1	(0x0 << P1PPCR_FORMAT_S)
-#define	 P1PPCR_FORMAT_RGB565		(0x1 << P1PPCR_FORMAT_S)
-#define	 P1PPCR_FORMAT_ARGB8888		(0x2 << P1PPCR_FORMAT_S) /* A=0xff */
-#define	 P1PPCR_FORMAT_RGBA8888		(0x3 << P1PPCR_FORMAT_S) /* A=0xff */
-#define	 P1PPCR_FORMAT_MONOY8G8_1	(0x4 << P1PPCR_FORMAT_S)
-#define	 P1PPCR_FORMAT_YUV444_1_32_AYUV	(0x5 << P1PPCR_FORMAT_S)
-#define	 P1PPCR_FORMAT_YUV422_1_16_YUYV	(0x6 << P1PPCR_FORMAT_S)
-#define	 P1PPCR_FORMAT_YUV422_2_16_NONE	(0x7 << P1PPCR_FORMAT_S)
-#define	 P1PPCR_FORMAT_YUV420_2_12_NV21	(0x8 << P1PPCR_FORMAT_S)
-#define	 P1PPCR_FORMAT_YUV420_3_12_YV12	(0x9 << P1PPCR_FORMAT_S)
-#define	 P1PPCR_FORMAT_YUV422_1_16_UYVY	(0xa << P1PPCR_FORMAT_S)
-#define	 P1PPCR_SWAPRB			(1 << 4)
-#define	 P1PPCR_DBM			(1 << 16)
-#define	DCMIPP_P1PPM0AR1	0x9C4
-#define	DCMIPP_P1PPM0AR2	0x9C8
-#define	DCMIPP_P1PPM0PR		0x9CC
-#define	 P1PPM0PR_PITCH_S	0 /* Number of bytes between two lines. */
-#define	DCMIPP_P1STM0A		0x9D0
-#define	DCMIPP_P1PPM1AR1	0x9D4
-#define	DCMIPP_P1PPM1AR2	0x9D8
-#define	DCMIPP_P1PPM1PR		0x9DC
-#define	DCMIPP_P1STM1AR		0x9E0
-#define	DCMIPP_P1PPM2AR1	0x9E4
-#define	DCMIPP_P1PPM2AR2	0x9E8
-#define	DCMIPP_P1STM2AR		0x9F0
-#define	DCMIPP_P1IER		0x9F4
-#define	DCMIPP_P1SR		0x9F8
-#define	DCMIPP_P1FCR		0x9FC
-#define	DCMIPP_P1CFSCR		0xA04
-#define	DCMIPP_P1CBPRCR		0xA24
-#define	DCMIPP_P1CBLCCR		0xA40
-#define	DCMIPP_P1CEXCR1		0xA44
-#define	DCMIPP_P1CEXCR2		0xA48
-#define	DCMIPP_P1CST1CR		0xA50
-#define	DCMIPP_P1CST2CR		0xA54
-#define	DCMIPP_P1CST3CR		0xA58
-#define	DCMIPP_P1CSTSTR		0xA5C
-#define	DCMIPP_P1CSTSZR		0xA60
-#define	DCMIPP_P1CCCCR		0xA80
-#define	DCMIPP_P1CCCRR1		0xA84
-#define	DCMIPP_P1CCCRR2		0xA88
-#define	DCMIPP_P1CCCGR1		0xA8C
-#define	DCMIPP_P1CCCGR2		0xA90
-#define	DCMIPP_P1CCCBR1		0xA94
-#define	DCMIPP_P1CCCBR2		0xA98
-#define	DCMIPP_P1CCTCR1		0xAA0
-#define	DCMIPP_P1CCTCR2		0xAA4
-#define	DCMIPP_P1CCTCR3		0xAA8
-#define	DCMIPP_P1CFCTCR		0xB00
-#define	DCMIPP_P1CCRSTR		0xB04
-#define	DCMIPP_P1CCRSZR		0xB08
-#define	DCMIPP_P1CDCCR		0xB0C
-#define	DCMIPP_P1CDSCR		0xB10
-#define	DCMIPP_P1CDSRTIOR	0xB14
-#define	DCMIPP_P1CDSSZR		0xB18
-#define	DCMIPP_P1CCMRICR	0xB20
-#define	DCMIPP_P1CRIxCR1	0xB24
-#define	DCMIPP_P1CRI1CR2	0xB28
-#define	DCMIPP_P1CPPCR		0xBC0
-#define	DCMIPP_P1CPPM0AR1	0xBC4
-#define	DCMIPP_P1CPPM0AR2	0xBC8
-#define	DCMIPP_P1CPPM0PR	0xBCC
-#define	DCMIPP_P1CPPM1AR1	0xBD4
-#define	DCMIPP_P1CPPM1AR2	0xBD8
-#define	DCMIPP_P1CPPM1PR	0xBDC
-#define	DCMIPP_P1CPPM2AR1	0xBE4
-#define	DCMIPP_P1CPPM2AR2	0xBE8
+#define	DCMIPP_PxYUVCR		0x980
+#define	DCMIPP_PxYUVRR1		0x984
+#define	DCMIPP_PxYUVRR2		0x988
+#define	DCMIPP_PxYUVGR1		0x98C
+#define	DCMIPP_PxYUVGR2		0x990
+#define	DCMIPP_PxYUVBR1		0x994
+#define	DCMIPP_PxYUVBR2		0x998
+#define	DCMIPP_PxPPCR		0x9C0
+#define	 PxPPCR_FORMAT_S		0
+#define	 PxPPCR_FORMAT_RGB888_YUV444_1	(0x0 << PxPPCR_FORMAT_S)
+#define	 PxPPCR_FORMAT_RGB565		(0x1 << PxPPCR_FORMAT_S)
+#define	 PxPPCR_FORMAT_ARGB8888		(0x2 << PxPPCR_FORMAT_S) /* A=0xff */
+#define	 PxPPCR_FORMAT_RGBA8888		(0x3 << PxPPCR_FORMAT_S) /* A=0xff */
+#define	 PxPPCR_FORMAT_MONOY8G8_1	(0x4 << PxPPCR_FORMAT_S)
+#define	 PxPPCR_FORMAT_YUV444_1_32_AYUV	(0x5 << PxPPCR_FORMAT_S)
+#define	 PxPPCR_FORMAT_YUV422_1_16_YUYV	(0x6 << PxPPCR_FORMAT_S)
+#define	 PxPPCR_FORMAT_YUV422_2_16_NONE	(0x7 << PxPPCR_FORMAT_S)
+#define	 PxPPCR_FORMAT_YUV420_2_12_NV21	(0x8 << PxPPCR_FORMAT_S)
+#define	 PxPPCR_FORMAT_YUV420_3_12_YV12	(0x9 << PxPPCR_FORMAT_S)
+#define	 PxPPCR_FORMAT_YUV422_1_16_UYVY	(0xa << PxPPCR_FORMAT_S)
+#define	 PxPPCR_SWAPRB			(1 << 4)
+#define	 PxPPCR_DBM			(1 << 16)
+#define	DCMIPP_PxPPM0AR1	0x9C4
+#define	DCMIPP_PxPPM0AR2	0x9C8
+#define	DCMIPP_PxPPM0PR		0x9CC
+#define	 PxPPM0PR_PITCH_S	0 /* Number of bytes between two lines. */
+#define	DCMIPP_PxSTM0A		0x9D0
+#define	DCMIPP_PxPPM1AR1	0x9D4
+#define	DCMIPP_PxPPM1AR2	0x9D8
+#define	DCMIPP_PxPPM1PR		0x9DC
+#define	DCMIPP_PxSTM1AR		0x9E0
+#define	DCMIPP_PxPPM2AR1	0x9E4
+#define	DCMIPP_PxPPM2AR2	0x9E8
+#define	DCMIPP_PxSTM2AR		0x9F0
+#define	DCMIPP_PxIER		0x9F4
+#define	 PxIER_FRAMEIE		(1 << 1)
+#define	 PxIER_LINEIE		(1 << 0)
+#define	DCMIPP_PxSR		0x9F8
+#define	DCMIPP_PxFCR		0x9FC
+#define	 PxFCR_CFRAMEF		(1 << 1)
+#define	DCMIPP_PxCFSCR		0xA04
+#define	DCMIPP_PxCBPRCR		0xA24
+#define	DCMIPP_PxCBLCCR		0xA40
+#define	DCMIPP_PxCEXCR1		0xA44
+#define	DCMIPP_PxCEXCR2		0xA48
+#define	DCMIPP_PxCST1CR		0xA50
+#define	DCMIPP_PxCST2CR		0xA54
+#define	DCMIPP_PxCST3CR		0xA58
+#define	DCMIPP_PxCSTSTR		0xA5C
+#define	DCMIPP_PxCSTSZR		0xA60
+#define	DCMIPP_PxCCCCR		0xA80
+#define	DCMIPP_PxCCCRR1		0xA84
+#define	DCMIPP_PxCCCRR2		0xA88
+#define	DCMIPP_PxCCCGR1		0xA8C
+#define	DCMIPP_PxCCCGR2		0xA90
+#define	DCMIPP_PxCCCBR1		0xA94
+#define	DCMIPP_PxCCCBR2		0xA98
+#define	DCMIPP_PxCCTCR1		0xAA0
+#define	DCMIPP_PxCCTCR2		0xAA4
+#define	DCMIPP_PxCCTCR3		0xAA8
+#define	DCMIPP_PxCFCTCR		0xB00
+#define	DCMIPP_PxCCRSTR		0xB04
+#define	DCMIPP_PxCCRSZR		0xB08
+#define	DCMIPP_PxCDCCR		0xB0C
+#define	DCMIPP_PxCDSCR		0xB10
+#define	DCMIPP_PxCDSRTIOR	0xB14
+#define	DCMIPP_PxCDSSZR		0xB18
+#define	DCMIPP_PxCCMRICR	0xB20
+#define	DCMIPP_PxCRIxCR1	0xB24
+#define	DCMIPP_PxCRI1CR2	0xB28
+#define	DCMIPP_PxCPPCR		0xBC0
+#define	DCMIPP_PxCPPM0AR1	0xBC4
+#define	DCMIPP_PxCPPM0AR2	0xBC8
+#define	DCMIPP_PxCPPM0PR	0xBCC
+#define	DCMIPP_PxCPPM1AR1	0xBD4
+#define	DCMIPP_PxCPPM1AR2	0xBD8
+#define	DCMIPP_PxCPPM1PR	0xBDC
+#define	DCMIPP_PxCPPM2AR1	0xBE4
+#define	DCMIPP_PxCPPM2AR2	0xBE8
+#endif
 
-#define	DCMIPP_P2FSCR		0xC04
-#define	 P2FSCR_PIPEN		(1 << 31)
-#define	 P2FSCR_FDTFEN		(1 << 30) /* Force Datatype format enable */
-#define	 P2FSCR_FDTF_S		24 /* Force Datatype format */
-#define	 P2FSCR_VC_S		19 /* Virtual channel ID of the CSI flow */
-#define	 P2FSCR_DTIDB_S		8
-#define	 P2FSCR_DTIDA_S		0
-#define	DCMIPP_P2FCTCR		0xD00
-#define	 P2FCTCR_CPTREQ		(1 << 3) /* Capture requested */
-#define	 P2FCTCR_CPTMODE_SS	(1 << 2) /* Snapshot mode */
-#define	DCMIPP_P2CRSTR		0xD04
-#define	DCMIPP_P2CRSZR		0xD08
-#define	DCMIPP_P2DCCR		0xD0C
-#define	DCMIPP_P2DSCR		0xD10
-#define	DCMIPP_P2DSRTIOR	0xD14
-#define	DCMIPP_P2DSSZR		0xD18
-#define	DCMIPP_P2CCMRICR	0xD20
-#define	DCMIPP_P2RI1CR1		0xD24
-#define	DCMIPP_P2RI1CR2		0xD28
-#define	DCMIPP_P2RI2CR1		0xD2C
-#define	DCMIPP_P2RI2CR2		0xD30
-#define	DCMIPP_P2RI3CR1		0xD34
-#define	DCMIPP_P2RI3CR2		0xD38
-#define	DCMIPP_P2RI4CR1		0xD3C
-#define	DCMIPP_P2RI4CR2		0xD40
-#define	DCMIPP_P2RI5CR1		0xD44
-#define	DCMIPP_P2RI5CR2		0xD48
-#define	DCMIPP_P2RI6CR1		0xD4C
-#define	DCMIPP_P2RI6CR2		0xD50
-#define	DCMIPP_P2RI7CR1		0xD54
-#define	DCMIPP_P2RI7CR2		0xD58
-#define	DCMIPP_P2RI8CR1		0xD5C
-#define	DCMIPP_P2RI8CR2		0xD60
-#define	DCMIPP_P2GMCR		0xD70
-#define	 P2GMCR_EN		(1 << 0) /* Gamma is enabled */
-#define	DCMIPP_P2PPCR		0xDC0
-#define	 P2PPCR_FORMAT_S		0
-#define	 P2PPCR_FORMAT_RGB888_YUV444_1	(0x0 << P2PPCR_FORMAT_S)
-#define	 P2PPCR_FORMAT_RGB565		(0x1 << P2PPCR_FORMAT_S)
-#define	 P2PPCR_FORMAT_ARGB8888		(0x2 << P2PPCR_FORMAT_S) /* A=0xff */
-#define	 P2PPCR_FORMAT_RGBA8888		(0x3 << P2PPCR_FORMAT_S) /* A=0xff */
-#define	 P2PPCR_FORMAT_MONOY8G8_1	(0x4 << P2PPCR_FORMAT_S)
-#define	 P2PPCR_FORMAT_YUV444_1_32_AYUV	(0x5 << P2PPCR_FORMAT_S)
-#define	 P2PPCR_FORMAT_YUV422_1_16_YUYV	(0x6 << P2PPCR_FORMAT_S)
-#define	DCMIPP_P2PPM0AR1	0xDC4
-#define	DCMIPP_P2PPM0AR2	0xDC8
-#define	DCMIPP_P2PPM0PR		0xDCC
-#define	 P2PPM0PR_PITCH_S	0 /* Number of bytes between two lines. */
-#define	DCMIPP_P2STM0AR		0xDD0
-#define	DCMIPP_P2IER		0xDF4
-#define	 P2IER_FRAMEIE		(1 << 1)
-#define	 P2IER_LINEIE		(1 << 0)
-#define	DCMIPP_P2SR		0xDF8
-#define	DCMIPP_P2FCR		0xDFC
-#define	 P2FCR_CFRAMEF		(1 << 1)
-#define	DCMIPP_P2CFSCR		0xE04
-#define	DCMIPP_P2CFCTCR		0xF00
-#define	DCMIPP_P2CCRSTR		0xF04
-#define	DCMIPP_P2CCRSZR		0xF08
-#define	DCMIPP_P2CDCCR		0xF0C
-#define	DCMIPP_P2CDSCR		0xF10
-#define	DCMIPP_P2CDSRTIOR	0xF14
-#define	DCMIPP_P2CDSSZR		0xF18
-#define	DCMIPP_P2CRI1CR1	0xF24
-#define	DCMIPP_P2CRI1CR2	0xF28
-#define	DCMIPP_P2CRI2CR1	0xF2C
-#define	DCMIPP_P2CRI2CR2	0xF28
-#define	DCMIPP_P2CRI3CR1	0xF34
-#define	DCMIPP_P2CRI3CR2	0xF38
-#define	DCMIPP_P2CRI4CR1	0xF3C
-#define	DCMIPP_P2CRI4CR2	0xF40
-#define	DCMIPP_P2CRI5CR1	0xF44
-#define	DCMIPP_P2CRI5CR2	0xF48
-#define	DCMIPP_P2CRI6CR1	0xF4C
-#define	DCMIPP_P2CRI6CR2	0xF50
-#define	DCMIPP_P2CRI7CR1	0xF54
-#define	DCMIPP_P2CRI7CR2	0xF58
-#define	DCMIPP_P2CRI8CR1	0xF5C
-#define	DCMIPP_P2CRI8CR2	0xF60
-#define	DCMIPP_P2CPPCR		0xFC0
-#define	DCMIPP_P2CPPM0AR1	0xFC4
-#define	DCMIPP_P2CPPM0AR2	0xFC8
+#define	DCMIPP_PxFSCR(x)	(0x404 + 0x400 * (x))
+#define	 PxFSCR_PIPEN		(1 << 31)
+#define	 PxFSCR_FDTFEN		(1 << 30) /* Force Datatype format enable */
+#define	 PxFSCR_FDTF_S		24 /* Force Datatype format */
+#define	 PxFSCR_VC_S		19 /* Virtual channel ID of the CSI flow */
+#define	 PxFSCR_PIPEDIFF	(1 << 18) /* Differentiates Pipe2 from Pipe1 */
+#define	 PxFSCR_DTMODE_S	16 /* Flow selection mode */
+#define	 PxFSCR_DTIDB_S		8
+#define	 PxFSCR_DTIDA_S		0
+#define	DCMIPP_PxSRCR(x)	(0x420 + 0x400 * (x))
+#define	DCMIPP_PxBPRCR(x)	(0x424 + 0x400 * (x))
+#define	DCMIPP_PxBPRSR(x)	(0x428 + 0x400 * (x))
+#define	DCMIPP_PxDECR(x)	(0x430 + 0x400 * (x))
+#define	DCMIPP_PxBLCCR(x)	(0x440 + 0x400 * (x))
+#define	 BLCCR_ENABLE		(1 << 0)
+#define	 BLCCR_BLCB_S		8
+#define	 BLCCR_BLCG_S		16
+#define	 BLCCR_BLCR_S		24
+#define	DCMIPP_PxEXCR1(x)	(0x444 + 0x400 * (x))
+#define	 EXCR1_SHFR_S		28 /* Red */
+#define	 EXCR1_MULTR_S		20 /* Red */
+#define	 EXCR1_ENABLE		(1 << 0)
+#define	DCMIPP_PxEXCR2(x)	(0x448 + 0x400 * (x))
+#define	 EXCR2_SHFG_S		28
+#define	 EXCR2_MULTG_S		20
+#define	 EXCR2_SHFB_S		12
+#define	 EXCR2_MULTB_S		4
+#define	DCMIPP_PxST1CR(x)	(0x450 + 0x400 * (x))
+#define	DCMIPP_PxST2CR(x)	(0x454 + 0x400 * (x))
+#define	DCMIPP_PxST3CR(x)	(0x458 + 0x400 * (x))
+#define	DCMIPP_PxSTSTR(x)	(0x45c + 0x400 * (x))
+#define	DCMIPP_PxSTSZR(x)	(0x460 + 0x400 * (x))
+#define	DCMIPP_PxST1SR(x)	(0x464 + 0x400 * (x))
+#define	DCMIPP_PxST2SR(x)	(0x468 + 0x400 * (x))
+#define	DCMIPP_PxST3SR(x)	(0x46c + 0x400 * (x))
+#define	DCMIPP_PxDMCR(x)	(0x470 + 0x400 * (x))
+#define	 DMCR_EN		(1 << 0)
+#define	 DMCR_TYPE_S		1
+#define	 DMCR_TYPE_RGGB		(0 << DMCR_TYPE_S)
+#define	 DMCR_TYPE_GRBG		(1 << DMCR_TYPE_S)
+#define	 DMCR_TYPE_GBRG		(2 << DMCR_TYPE_S)
+#define	 DMCR_TYPE_BGGR		(3 << DMCR_TYPE_S)
+#define	 DMCR_PEAK_S		16
+#define	 DMCR_LINEV_S		20
+#define	 DMCR_LINEH_S		24
+#define	 DMCR_EDGE_S		28
+#define	DCMIPP_PxCCCR(x)	(0x480 + 0x400 * (x))
+#define	 CCCR_ENABLE		(1 << 0)
+#define	 CCCR_TYPE		(1 << 1)	/* R, G and B */
+#define	 CCCR_CLAMP		(1 << 2)
+#define	DCMIPP_PxCCRR1(x)	(0x484 + 0x400 * (x))
+#define	 CCRR1_RG_S		16
+#define	 CCRR1_RR_S		0
+#define	DCMIPP_PxCCRR2(x)	(0x488 + 0x400 * (x))
+#define	 CCRR2_RA_S		16
+#define	 CCRR2_RB_S		0
+#define	DCMIPP_PxCCGR1(x)	(0x48c + 0x400 * (x))
+#define	 CCGR1_GG_S		16
+#define	 CCGR1_GR_S		0
+#define	DCMIPP_PxCCGR2(x)	(0x490 + 0x400 * (x))
+#define	 CCGR2_GA_S		16
+#define	 CCGR2_GB_S		0
+#define	DCMIPP_PxCCBR1(x)	(0x494 + 0x400 * (x))
+#define	 CCBR1_BG_S		16
+#define	 CCBR1_BR_S		0
+#define	DCMIPP_PxCCBR2(x)	(0x498 + 0x400 * (x))
+#define	 CCBR2_BA_S		16
+#define	 CCBR2_BB_S		0
+#define	DCMIPP_PxCTCR1(x)	(0x4a0 + 0x400 * (x))
+#define	DCMIPP_PxCTCR2(x)	(0x4a4 + 0x400 * (x))
+#define	DCMIPP_PxCTCR3(x)	(0x4a8 + 0x400 * (x))
+#define	DCMIPP_PxFCTCR(x)	(0x500 + 0x400 * (x))
+#define	 PxFCTCR_CPTREQ		(1 << 3) /* Capture requested */
+#define	 PxFCTCR_CPTMODE_SS	(1 << 2) /* Snapshot mode */
+#define	DCMIPP_PxCRSTR(x)	(0x504 + 0x400 * (x))
+#define	DCMIPP_PxCRSZR(x)	(0x508 + 0x400 * (x))
+#define	DCMIPP_PxDCCR(x)	(0x50c + 0x400 * (x))
+#define	DCMIPP_PxDSCR(x)	(0x510 + 0x400 * (x))
+#define	 PxDSCR_ENABLE		(1 << 31)
+#define	 PxDSCR_VDIV_S		16
+#define	 PxDSCR_HDIV_S		0
+#define	DCMIPP_PxDSRTIOR(x)	(0x514 + 0x400 * (x))
+#define	 PxDSRTIOR_VRATIO_S	16
+#define	 PxDSRTIOR_HRATIO_S	0
+#define	DCMIPP_PxDSSZR(x)	(0x518 + 0x400 * (x))
+#define	 PxDSSZR_VSIZE_S	16
+#define	 PxDSSZR_HSIZE_S	0
+#define	DCMIPP_PxCMRICR(x)	(0x520 + 0x400 * (x))
+#define	DCMIPP_PxRIxCR1(x)	(0x524 + 0x400 * (x))
+#define	DCMIPP_PxRIxCR2(x)	(0x528 + 0x400 * (x))
+#define	DCMIPP_PxGMCR(x)	(0x570 + 0x400 * (x))
+#define	 PxGMCR_EN		(1 << 0) /* Gamma is enabled */
+#define	DCMIPP_PxYUVCR(x)	(0x580 + 0x400 * (x))
+#define	DCMIPP_PxYUVRR1(x)	(0x584 + 0x400 * (x))
+#define	DCMIPP_PxYUVRR2(x)	(0x588 + 0x400 * (x))
+#define	DCMIPP_PxYUVGR1(x)	(0x58c + 0x400 * (x))
+#define	DCMIPP_PxYUVGR2(x)	(0x590 + 0x400 * (x))
+#define	DCMIPP_PxYUVBR1(x)	(0x594 + 0x400 * (x))
+#define	DCMIPP_PxYUVBR2(x)	(0x598 + 0x400 * (x))
+#define	DCMIPP_PxPPCR(x)	(0x5c0 + 0x400 * (x))
+#define	 PxPPCR_FORMAT_S		0
+#define	 PxPPCR_FORMAT_RGB888_YUV444_1	(0x0 << PxPPCR_FORMAT_S)
+#define	 PxPPCR_FORMAT_RGB565		(0x1 << PxPPCR_FORMAT_S)
+#define	 PxPPCR_FORMAT_ARGB8888		(0x2 << PxPPCR_FORMAT_S) /* A=0xff */
+#define	 PxPPCR_FORMAT_RGBA8888		(0x3 << PxPPCR_FORMAT_S) /* A=0xff */
+#define	 PxPPCR_FORMAT_MONOY8G8_1	(0x4 << PxPPCR_FORMAT_S)
+#define	 PxPPCR_FORMAT_YUV444_1_32_AYUV	(0x5 << PxPPCR_FORMAT_S)
+#define	 PxPPCR_FORMAT_YUV422_1_16_YUYV	(0x6 << PxPPCR_FORMAT_S)
+#define	 PxPPCR_FORMAT_YUV422_2_16_NONE	(0x7 << PxPPCR_FORMAT_S)
+#define	 PxPPCR_FORMAT_YUV420_2_12_NV21	(0x8 << PxPPCR_FORMAT_S)
+#define	 PxPPCR_FORMAT_YUV420_3_12_YV12	(0x9 << PxPPCR_FORMAT_S)
+#define	 PxPPCR_FORMAT_YUV422_1_16_UYVY	(0xa << PxPPCR_FORMAT_S)
+#define	 PxPPCR_SWAPRB			(1 << 4)
+#define	 PxPPCR_DBM			(1 << 16)
+#define	DCMIPP_PxPPM0AR1(x)	(0x5c4 + 0x400 * (x))
+#define	DCMIPP_PxPPM0AR2(x)	(0x5c8 + 0x400 * (x))
+#define	DCMIPP_PxPPM0PR(x)	(0x5cc + 0x400 * (x))
+#define	 PxPPM0PR_PITCH_S	0 /* Number of bytes between two lines. */
+#define	DCMIPP_PxSTM0A(x)	(0x5d0 + 0x400 * (x))
+#define	DCMIPP_PxPPM1AR1(x)	(0x5d4 + 0x400 * (x))
+#define	DCMIPP_PxPPM1AR2(x)	(0x5d8 + 0x400 * (x))
+#define	DCMIPP_PxPPM1PR(x)	(0x5dc + 0x400 * (x))
+#define	DCMIPP_PxSTM1AR(x)	(0x5e0 + 0x400 * (x))
+#define	DCMIPP_PxPPM2AR1(x)	(0x5e4 + 0x400 * (x))
+#define	DCMIPP_PxPPM2AR2(x)	(0x5e8 + 0x400 * (x))
+#define	DCMIPP_PxSTM2AR(x)	(0x5f0 + 0x400 * (x))
+#define	DCMIPP_PxIER(x)		(0x5f4 + 0x400 * (x))
+#define	 PxIER_FRAMEIE		(1 << 1)
+#define	 PxIER_LINEIE		(1 << 0)
+#define	DCMIPP_PxSR(x)		(0x5f8 + 0x400 * (x))
+#define	DCMIPP_PxFCR(x)		(0x5fc + 0x400 * (x))
+#define	 PxFCR_CFRAMEF		(1 << 1)
+#define	DCMIPP_PxCFSCR(x)	(0x604 + 0x400 * (x))
+#define	DCMIPP_PxCBPRCR(x)	(0x624 + 0x400 * (x))
+#define	DCMIPP_PxCBLCCR(x)	(0x640 + 0x400 * (x))
+#define	DCMIPP_PxCEXCR1(x)	(0x644 + 0x400 * (x))
+#define	DCMIPP_PxCEXCR2(x)	(0x648 + 0x400 * (x))
+#define	DCMIPP_PxCST1CR(x)	(0x650 + 0x400 * (x))
+#define	DCMIPP_PxCST2CR(x)	(0x654 + 0x400 * (x))
+#define	DCMIPP_PxCST3CR(x)	(0x658 + 0x400 * (x))
+#define	DCMIPP_PxCSTSTR(x)	(0x65c + 0x400 * (x))
+#define	DCMIPP_PxCSTSZR(x)	(0x660 + 0x400 * (x))
+#define	DCMIPP_PxCCCCR(x)	(0x680 + 0x400 * (x))
+#define	DCMIPP_PxCCCRR1(x)	(0x684 + 0x400 * (x))
+#define	DCMIPP_PxCCCRR2(x)	(0x688 + 0x400 * (x))
+#define	DCMIPP_PxCCCGR1(x)	(0x68c + 0x400 * (x))
+#define	DCMIPP_PxCCCGR2(x)	(0x690 + 0x400 * (x))
+#define	DCMIPP_PxCCCBR1(x)	(0x694 + 0x400 * (x))
+#define	DCMIPP_PxCCCBR2(x)	(0x698 + 0x400 * (x))
+#define	DCMIPP_PxCCTCR1(x)	(0x6a0 + 0x400 * (x))
+#define	DCMIPP_PxCCTCR2(x)	(0x6a4 + 0x400 * (x))
+#define	DCMIPP_PxCCTCR3(x)	(0x6a8 + 0x400 * (x))
+#define	DCMIPP_PxCFCTCR(x)	(0x700 + 0x400 * (x))
+#define	DCMIPP_PxCCRSTR(x)	(0x704 + 0x400 * (x))
+#define	DCMIPP_PxCCRSZR(x)	(0x708 + 0x400 * (x))
+#define	DCMIPP_PxCDCCR(x)	(0x70c + 0x400 * (x))
+#define	DCMIPP_PxCDSCR(x)	(0x710 + 0x400 * (x))
+#define	DCMIPP_PxCDSRTIOR(x)	(0x714 + 0x400 * (x))
+#define	DCMIPP_PxCDSSZR(x)	(0x718 + 0x400 * (x))
+#define	DCMIPP_PxCCMRICR(x)	(0x720 + 0x400 * (x))
+#define	DCMIPP_PxCRIxCR1(x)	(0x724 + 0x400 * (x))
+#define	DCMIPP_PxCRI1CR2(x)	(0x728 + 0x400 * (x))
+#define	DCMIPP_PxCPPCR(x)	(0x7c0 + 0x400 * (x))
+#define	DCMIPP_PxCPPM0AR1(x)	(0x7c4 + 0x400 * (x))
+#define	DCMIPP_PxCPPM0AR2(x)	(0x7c8 + 0x400 * (x))
+#define	DCMIPP_PxCPPM0PR(x)	(0x7cc + 0x400 * (x))
+#define	DCMIPP_PxCPPM1AR1(x)	(0x7d4 + 0x400 * (x))
+#define	DCMIPP_PxCPPM1AR2(x)	(0x7d8 + 0x400 * (x))
+#define	DCMIPP_PxCPPM1PR(x)	(0x7dc + 0x400 * (x))
+#define	DCMIPP_PxCPPM2AR1(x)	(0x7e4 + 0x400 * (x))
+#define	DCMIPP_PxCPPM2AR2(x)	(0x7e8 + 0x400 * (x))
 
 struct stm32n6_dcmipp_downsize_config {
 	uint32_t hratio;
@@ -354,7 +424,7 @@ struct stm32n6_dcmipp_pipe_config {
 	uint32_t pipe_id;
 	uint32_t base_addr;
 	uint32_t pitch;
-	uint32_t vc; /* CSI virtual channel */
+	uint32_t vc;		/* CSI Virtual Channel */
 	uint8_t flow_type;
 #define	DCMIPP_FLOW_TYPE_CONTINUOUS	(1)
 #define	DCMIPP_FLOW_TYPE_SNAPSHOT	(2)
@@ -372,7 +442,7 @@ void stm32n6_dcmipp_setup(struct stm32n6_dcmipp_softc *sc,
 void stm32n6_dcmipp_setup_downsize(struct stm32n6_dcmipp_softc *sc, int pipe,
     struct stm32n6_dcmipp_downsize_config *conf);
 void stm32n6_dcmipp_pipe2(struct stm32n6_dcmipp_softc *sc);
-void stm32n6_dcmipp_pipe2_frame_request(struct stm32n6_dcmipp_softc *sc);
+void stm32n6_dcmipp_pipe2_frame_request(struct stm32n6_dcmipp_softc *sc, int p);
 void stm32n6_dcmipp_intr(void *arg, int irq);
 
 #endif /* !_ARM_STM_STM32N6_DCMIPP_H_ */
