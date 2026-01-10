@@ -107,6 +107,9 @@
 #define	 AHB5RSTR_XSPI2RST	(1 << 12)
 #define	 AHB5RSTR_XSPIMRST	(1 << 13)
 #define	RCC_APB5RSTR		0x23C
+#define	 APB5RSTR_LTDCRST	(1 << 1)
+#define	 APB5RSTR_DCMIPPRST	(1 << 2)
+#define	 APB5RSTR_CSIRST	(1 << 6)
 #define	RCC_BUSENR		0x244
 #define	 BUSENR_APB2EN		(1 << 9) /* APB2 enable */
 #define	 BUSENR_AHB4EN		(1 << 6) /* AHB4 enable */
