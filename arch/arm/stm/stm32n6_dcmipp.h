@@ -255,6 +255,15 @@ struct stm32n6_dcmipp_pipe_config {
 #define	DCMIPP_FLOW_TYPE_CONTINUOUS	(1)
 #define	DCMIPP_FLOW_TYPE_SNAPSHOT	(2)
 	uint8_t gamma_en;
+	uint8_t format;
+#define	DCMIPP_FORMAT_RGB565		0
+#define	DCMIPP_FORMAT_RGB888		1
+	uint8_t decimation;
+	uint8_t debayer;
+	uint8_t black_level_calibration;
+	uint8_t color_conv;
+	uint8_t exposure;
+	uint8_t dtida;
 };
 
 struct stm32n6_dcmipp_softc {
