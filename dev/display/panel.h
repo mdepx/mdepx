@@ -38,6 +38,7 @@ struct layer_info {
 	uint32_t hbp;
 	uint32_t bpp;
 	uint32_t base;
+	uint32_t alpha;
 };
 
 #endif /* !_DEV_DISPLAY_PANEL_H_ */

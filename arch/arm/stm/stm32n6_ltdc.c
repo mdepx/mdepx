@@ -66,7 +66,7 @@ stm32n6_ltdc_layer(struct stm32n6_ltdc_softc *sc,
 	WR4(sc, LTDC_LCFBLR(i), reg);
 
 	WR4(sc, LTDC_LBLCR(i), 0);
-	WR4(sc, LTDC_LCACR(i), 0xff);
+	WR4(sc, LTDC_LCACR(i), info->alpha);
 
 	/* Enable the layer */
 	WR4(sc, LTDC_LRCR(i), 0x1 | 1 << 2);
@@ -99,7 +99,7 @@ stm32n6_ltdc_conf(struct stm32n6_ltdc_softc *sc,
 	WR4(sc, LTDC_TWCR, reg);
 
 	/* Background color */
-	WR4(sc, LTDC_BCCR, 0xde0226);
+	WR4(sc, LTDC_BCCR, 0);
 
 	stm32n6_ltdc_layer(sc, info, i);
 
