@@ -235,6 +235,7 @@ mx66uw_init(struct mx66uw_softc *sc, struct stm32n6_xspi_softc *xspi_sc)
 
 	bzero(&conf, sizeof(struct xspi_config));
 	conf.dummy_cycles = 0;
+	conf.wdummy_cycles = 0;
 	conf.mode = XSPI_MODE_INDIRECT_WRITE;
 	conf.dqs_en = 0;
 	conf.prescaler = 2; /* 50 MHz */
