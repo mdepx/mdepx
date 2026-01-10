@@ -10,7 +10,8 @@ mdepx (also known as MDX or Machdep X) is an operating system for embedded appli
   * Static/Dynamic memory allocation
   * Timed Mutexes, Semaphores
   * Symmetric Multiprocessing (SMP)
-  * BSD libc included
+  * BSD libc
+  * BSD math library (msun)
   * Flat address space
 
 ## ISA supported
@@ -20,12 +21,12 @@ mdepx (also known as MDX or Machdep X) is an operating system for embedded appli
   * RISC-V machine or supervisor modes, rv32, rv64, SMP
 
 ## Platforms supported
-  * Raspberry Pi Pico
-  * Nordic Semiconductor nRF5, nRF9
   * STMicroelectronics STM32
+  * Nordic Semiconductor nRF5, nRF9
+  * Raspberry Pi Pico
   * Microchip PIC32
   * SiFive
-  * some others...
+  * Many others...
 
 ## Emulators support (see emul/)
   * qemu/riscv64c128 CHERI Pure Capability Mode
@@ -38,7 +39,7 @@ mdepx (also known as MDX or Machdep X) is an operating system for embedded appli
   * [Raspberry Pi Pico](https://github.com/machdep/raspberrypi-pico)
   * [LTE 4G Link with nRF9160](https://github.com/machdep/nrf9160)
   * CTSRD-CHERI [device-model](https://github.com/CTSRD-CHERI/device-model) and [device-model-riscv](https://github.com/CTSRD-CHERI/device-model-riscv)
-  * Other [example apps](https://github.com/machdep/)
+  * Other [example apps](https://github.com/mdepx/)
 
 # Getting started
 
