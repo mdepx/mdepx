@@ -51,10 +51,12 @@ stm32n6_ltdc_layer(struct stm32n6_ltdc_softc *sc,
 	    ((info->vsync + info->vbp + info->height - 1) << 16);
 	WR4(sc, LTDC_LWVPCR(i), reg);
 
-	if (info->bpp == 24)
-		WR4(sc, LTDC_LPFCR(i), 6); /* RGB888 */
+	if (info->bpp == 32)
+		WR4(sc, LTDC_LPFCR(i), LPFCR_PF_ARGB8888);
+	else if (info->bpp == 24)
+		WR4(sc, LTDC_LPFCR(i), LPFCR_PF_RGB888);
 	else if (info->bpp == 16)
-		WR4(sc, LTDC_LPFCR(i), 4); /* RGB565 */
+		WR4(sc, LTDC_LPFCR(i), LPFCR_PF_RGB565);
 	else
 		panic("implement me");
 
