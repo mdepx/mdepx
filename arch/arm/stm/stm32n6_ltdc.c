@@ -71,7 +71,7 @@ stm32n6_ltdc_layer(struct stm32n6_ltdc_softc *sc,
 	WR4(sc, LTDC_LCACR(i), info->alpha);
 
 	/* Enable the layer */
-	WR4(sc, LTDC_LRCR(i), 0x1 | 1 << 2);
+	WR4(sc, LTDC_LRCR(i), LRCR_IMR | LRCR_GRMSK);
 	WR4(sc, LTDC_LxCR(i), LCR_LEN);
 }
 

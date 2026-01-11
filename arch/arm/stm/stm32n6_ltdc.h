@@ -63,6 +63,8 @@
 #define	LTDC_LC1R(x)	(0x104 + 0x100 * (x))
 #define	LTDC_LRCR(x)	(0x108 + 0x100 * (x))
 #define	 LRCR_IMR	(1 << 0) /* Immediate reload trigger */
+#define	 LRCR_VBR	(1 << 1) /* Vertical blanking reload request */
+#define	 LRCR_GRMSK	(1 << 2) /* Shadow reload control */
 #define	LTDC_LxCR(x)	(0x10C + 0x100 * (x))
 #define	 LCR_LEN	(1 << 0) /* Layer enable */
 #define	 LCR_CKEN	(1 << 1) /* Color keying enable */
