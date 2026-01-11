@@ -35,26 +35,26 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-static mdx_sem_t frame_sem;
-
 #define	dprintf(...)
 
 void
 stm32n6_dcmipp_intr(void *arg, int irq)
 {
 	struct stm32n6_dcmipp_softc *sc;
+	int pending;
 	int pipe;
 
 	sc = arg;
 
-	dprintf("%s\n", __func__);
+	pending = RD4(sc, DCMIPP_CMSR2);
 
-	/* TODO */
-	pipe = 2;
+	dprintf("%s: pending %x\n", __func__, pending);
 
-	WR4(sc, DCMIPP_PxFCR(pipe), PxFCR_CFRAMEF);
-
-	mdx_sem_post(&frame_sem);
+	if (pending & CMSR2_P2FRAMEF) {
+		pipe = 2;
+		mdx_sem_post(&sc->pipe_frame_sem[pipe]);
+		WR4(sc, DCMIPP_PxFCR(pipe), PxFCR_CFRAMEF);
+	}
 }
 
 void
@@ -311,11 +311,11 @@ stm32n6_dcmipp_setup(struct stm32n6_dcmipp_softc *sc,
 }
 
 void
-stm32n6_dcmipp_pipe2_frame_request(struct stm32n6_dcmipp_softc *sc, int pipe)
+stm32n6_dcmipp_capture_req(struct stm32n6_dcmipp_softc *sc, int pipe)
 {
 	uint32_t reg;
 
-	mdx_sem_init(&frame_sem, 0);
+	mdx_sem_init(&sc->pipe_frame_sem[pipe], 0);
 
 	WR4(sc, DCMIPP_PxIER(pipe), PxIER_FRAMEIE);
 
@@ -323,7 +323,7 @@ stm32n6_dcmipp_pipe2_frame_request(struct stm32n6_dcmipp_softc *sc, int pipe)
 	reg |= PxFCTCR_CPTREQ;
 	WR4(sc, DCMIPP_PxFCTCR(pipe), reg);
 
-	mdx_sem_wait(&frame_sem);
+	mdx_sem_wait(&sc->pipe_frame_sem[pipe]);
 
 	WR4(sc, DCMIPP_PxIER(pipe), 0);
 }

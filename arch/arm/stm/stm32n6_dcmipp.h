@@ -23,6 +23,8 @@
  * SUCH DAMAGE.
  */
 
+#include <sys/sem.h>
+
 #ifndef _ARM_STM_STM32N6_DCMIPP_H_
 #define _ARM_STM_STM32N6_DCMIPP_H_
 
@@ -63,6 +65,8 @@
 #define	 CMIER_P2LINEIE		(1 << 24) /* Multi-line capture complete P2 */
 #define	DCMIPP_CMSR1		0x3F4
 #define	DCMIPP_CMSR2		0x3F8
+#define	 CMSR2_P1FRAMEF		(1 << 17) /* Frame capture completed */
+#define	 CMSR2_P2FRAMEF		(1 << 25)
 #define	DCMIPP_CMFCR		0x3FC
 
 #define	DCMIPP_PxFSCR(x)	(0x404 + 0x400 * (x))
@@ -237,6 +241,8 @@
 #define	DCMIPP_PxCPPM2AR1(x)	(0x7e4 + 0x400 * (x))
 #define	DCMIPP_PxCPPM2AR2(x)	(0x7e8 + 0x400 * (x))
 
+#define	DCMIPP_MAX_PIPES	3
+
 struct stm32n6_dcmipp_downsize_config {
 	uint32_t hratio;
 	uint32_t vratio;
@@ -268,6 +274,7 @@ struct stm32n6_dcmipp_pipe_config {
 
 struct stm32n6_dcmipp_softc {
 	uint32_t base;
+	mdx_sem_t pipe_frame_sem[DCMIPP_MAX_PIPES];
 };
 
 void stm32n6_dcmipp_init(struct stm32n6_dcmipp_softc *sc, uint32_t base);
@@ -276,8 +283,7 @@ void stm32n6_dcmipp_setup(struct stm32n6_dcmipp_softc *sc,
     struct stm32n6_dcmipp_pipe_config *conf);
 void stm32n6_dcmipp_setup_downsize(struct stm32n6_dcmipp_softc *sc, int pipe,
     struct stm32n6_dcmipp_downsize_config *conf);
-void stm32n6_dcmipp_pipe2(struct stm32n6_dcmipp_softc *sc);
-void stm32n6_dcmipp_pipe2_frame_request(struct stm32n6_dcmipp_softc *sc, int p);
+void stm32n6_dcmipp_capture_req(struct stm32n6_dcmipp_softc *sc, int p);
 void stm32n6_dcmipp_intr(void *arg, int irq);
 
 #endif /* !_ARM_STM_STM32N6_DCMIPP_H_ */
