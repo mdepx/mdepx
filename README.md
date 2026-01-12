@@ -36,8 +36,9 @@ mdepx (also known as MDX or Machdep X) is an operating system for embedded appli
   * qemu/mips64
 
 ## Featured applications (external)
-  * [Raspberry Pi Pico](https://github.com/machdep/raspberrypi-pico)
-  * [LTE 4G Link with nRF9160](https://github.com/machdep/nrf9160)
+  * [LTE 4G Link with nRF9160](https://github.com/mdepx/nrf9160)
+  * [AI inference with stm32n6](https://github.com/mdepx/stm32n6570-dk)
+  * [Neoden YY1 pick and place firmware](https://github.com/mdepx/neodenyy1)
   * CTSRD-CHERI [device-model](https://github.com/CTSRD-CHERI/device-model) and [device-model-riscv](https://github.com/CTSRD-CHERI/device-model-riscv)
   * Other [example apps](https://github.com/mdepx/)
 
