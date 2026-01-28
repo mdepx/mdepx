@@ -48,7 +48,7 @@
 	*(volatile uint8_t *)((_sc)->base + _reg) = _val
 
 void
-stm32f4_spi_intr(void *arg)
+stm32f4_spi_intr(void *arg, int irq)
 {
 	struct stm32f4_spi_softc *sc;
 	uint32_t pending;
