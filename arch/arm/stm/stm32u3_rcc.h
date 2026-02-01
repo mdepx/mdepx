@@ -41,6 +41,7 @@
 #define	 AHB2ENR1_GPIOAEN	(1 << 0) /* I/O port clock enable */
 #define	RCC_AHB2ENR2		0x90
 #define	RCC_AHB1ENR2		0x94
+#define	 AHB1ENR2_PWREN		(1 << 2) /* PWR clock enable */
 #define	RCC_APB1ENR1		0x9C
 #define	RCC_APB1ENR2		0xA0
 #define	RCC_APB2ENR		0xA4
