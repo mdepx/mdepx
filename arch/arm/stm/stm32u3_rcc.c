@@ -51,8 +51,14 @@ stm32u3_rcc_setup(struct stm32u3_rcc_softc *sc, struct rcc_config *cfg)
 int
 stm32u3_rcc_init(struct stm32u3_rcc_softc *sc, uint32_t base)
 {
+	uint32_t reg;
 
 	sc->base = base;
+
+	/* Enable HSI48 for USB. */
+	reg = RD4(sc, RCC_CR);
+	reg |= CR_HSI48ON;
+	WR4(sc, RCC_CR, reg);
 
 	return (0);
 }

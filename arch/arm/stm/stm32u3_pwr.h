@@ -30,7 +30,10 @@
 #define	PWR_CR2			0x04
 #define	PWR_CR3			0x08
 #define	PWR_SVMCR		0x10
+#define	 SVMCR_UVMEN		(1 << 24) /* VDDUSB independent volt monitor */
 #define	 SVMCR_USV		(1 << 28) /* VDDUSB independent supply valid */
+#define	PWR_SVMSR		0x3C
+#define	 SVMSR_VDDUSBRDY	(1 << 24) /* VDDUSB ready */
 
 struct stm32u3_pwr_softc {
 	uint32_t base;

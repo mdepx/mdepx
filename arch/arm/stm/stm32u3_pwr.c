@@ -39,6 +39,16 @@ stm32u3_pwr_init(struct stm32u3_pwr_softc *sc, uint32_t base)
 	sc->base = base;
 
 	reg = RD4(sc, PWR_SVMCR);
+	reg |= SVMCR_UVMEN;
+	WR4(sc, PWR_SVMCR, reg);
+
+	do {
+		reg = RD4(sc, PWR_SVMSR);
+		if (reg & SVMSR_VDDUSBRDY)
+			break;
+	} while (1);
+
+	reg = RD4(sc, PWR_SVMCR);
 	reg |= SVMCR_USV;
 	WR4(sc, PWR_SVMCR, reg);
 

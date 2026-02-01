@@ -27,6 +27,7 @@
 #define _ARM_STM_STM32U3_RCC_H_
 
 #define	RCC_CR			0x00
+#define	 CR_HSI48ON		(1 << 14) /* HSI48 clock enable */
 #define	RCC_AHB1ENR1		0x88
 #define	 AHB1ENR1_SRAM1EN	(1 << 31) /* SRAM1 clock enable */
 #define	 AHB1ENR1_FLASHEN	(1 << 8) /* FLASH clock enable */
