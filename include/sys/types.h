@@ -196,4 +196,8 @@ typedef	int		locale_t;
 
 typedef	__uint32_t	ticks_t;
 
+#define	float32_t	float
+#define	INT8_MIN	(-0x7f-1)
+#define	UINT8_MAX	0xff
+
 #endif /* !_SYS_TYPES_H_ */
