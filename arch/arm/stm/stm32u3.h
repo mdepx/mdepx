@@ -39,4 +39,8 @@
 #define	TIM1_BASE	0x40012C00
 #define	NVIC_BASE	0xE000E100
 
+#define	USB_BASE	0x40016000
+#define	USB_RAM_BASE	0x40016400
+#define	USB_RAM_SIZE	(2 * 1024)
+
 #endif	/* !_ARM_STM_STM32U3_H_ */

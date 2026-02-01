@@ -44,6 +44,7 @@
 #define	RCC_APB1ENR1		0x9C
 #define	RCC_APB1ENR2		0xA0
 #define	RCC_APB2ENR		0xA4
+#define	 APB2ENR_USB1EN		(1 << 24) /* USB1 clock enable */
 #define	 APB2ENR_TIM1EN		(1 << 11) /* TIM1 clock enable */
 #define	 APB2ENR_USART1EN	(1 << 14) /* USART1 clock enable */
 #define	RCC_APB3ENR		0xA8
