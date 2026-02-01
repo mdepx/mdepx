@@ -23,26 +23,19 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ARM_STM_STM32U3_H_
-#define _ARM_STM_STM32U3_H_
+#ifndef _ARM_STM_STM32U3_PWR_H_
+#define _ARM_STM_STM32U3_PWR_H_
 
-#include <arm/stm/stm32l4_usart.h>
-#include <arm/stm/stm32f4_gpio.h>
-#include <arm/stm/stm32u3_rcc.h>
-#include <arm/stm/stm32f4_timer.h>
-#include <arm/stm/stm32u3_pwr.h>
+#define	PWR_CR1			0x00
+#define	PWR_CR2			0x04
+#define	PWR_CR3			0x08
+#define	PWR_SVMCR		0x10
+#define	 SVMCR_USV		(1 << 28) /* VDDUSB independent supply valid */
 
-#define	USART1_BASE	0x40013800
-#define	USART3_BASE	0x40004800
+struct stm32u3_pwr_softc {
+	uint32_t base;
+};
 
-#define	PWR_BASE	0x40030800
-#define	GPIO_BASE	0x42020000
-#define	RCC_BASE	0x40030C00
-#define	TIM1_BASE	0x40012C00
-#define	NVIC_BASE	0xE000E100
+int stm32u3_pwr_init(struct stm32u3_pwr_softc *sc, uint32_t base);
 
-#define	USB_BASE	0x40016000
-#define	USB_RAM_BASE	0x40016400
-#define	USB_RAM_SIZE	(2 * 1024)
-
-#endif	/* !_ARM_STM_STM32U3_H_ */
+#endif /* !_ARM_STM_STM32U3_PWR_H_ */
