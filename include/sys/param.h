@@ -33,6 +33,7 @@
 #define	ntohs(x)	__ntohs(x)
 
 #define	roundup2(x, y)	(((x)+((y)-1))&(~((y)-1)))
+#define	powerof2(x)	((((x)-1)&(x))==0)
 
 #define	MIN(a, b)	(((a) < (b)) ? (a) : (b))
 #define	MAX(a, b)	(((a) > (b)) ? (a) : (b))
