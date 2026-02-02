@@ -28,6 +28,13 @@
 
 #define	RCC_CR			0x00
 #define	 CR_HSI48ON		(1 << 14) /* HSI48 clock enable */
+#define	 CR_HSIRDY		(1 << 13)
+#define	 CR_HSION		(1 << 11)
+#define	 CR_MSIKON		(1 << 3)
+#define	 CR_MSISON		(1 << 1)
+#define	RCC_CFGR1		0x1C
+#define	RCC_CFGR2		0x20
+#define	RCC_ICSCR1		0x08
 #define	RCC_AHB1ENR1		0x88
 #define	 AHB1ENR1_SRAM1EN	(1 << 31) /* SRAM1 clock enable */
 #define	 AHB1ENR1_FLASHEN	(1 << 8) /* FLASH clock enable */
@@ -47,8 +54,8 @@
 #define	RCC_APB1ENR2		0xA0
 #define	RCC_APB2ENR		0xA4
 #define	 APB2ENR_USB1EN		(1 << 24) /* USB1 clock enable */
-#define	 APB2ENR_TIM1EN		(1 << 11) /* TIM1 clock enable */
 #define	 APB2ENR_USART1EN	(1 << 14) /* USART1 clock enable */
+#define	 APB2ENR_TIM1EN		(1 << 11) /* TIM1 clock enable */
 #define	RCC_APB3ENR		0xA8
 
 struct rcc_config {

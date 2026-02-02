@@ -33,9 +33,37 @@
 #define	WR4(_sc, _reg, _val)	\
 	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
+#define	dprintf(fmt, ...)
+
 void
 stm32u3_rcc_setup(struct stm32u3_rcc_softc *sc, struct rcc_config *cfg)
 {
+	uint32_t reg;
+
+	dprintf("%s: CR %x\n", __func__, RD4(sc, RCC_CR));
+	dprintf("%s: CFGR1 %x\n", __func__, RD4(sc, RCC_CFGR1));
+	dprintf("%s: CFGR2 %x\n", __func__, RD4(sc, RCC_CFGR2));
+	dprintf("%s: ICSCR1 %x\n", __func__, RD4(sc, RCC_ICSCR1));
+
+	/* Switch to HSI. */
+
+	reg = RD4(sc, RCC_CR);
+	reg |= CR_HSION;
+	WR4(sc, RCC_CR, reg);
+
+	do {
+		reg = RD4(sc, RCC_CR);
+		if (reg & CR_HSIRDY)
+			break;
+	} while (1);
+
+	/* Switch to HSI */
+	WR4(sc, RCC_CFGR1, 1);
+
+	/* Enable HSI48 for USB. */
+	reg = RD4(sc, RCC_CR);
+	reg |= CR_HSI48ON;
+	WR4(sc, RCC_CR, reg);
 
 	WR4(sc, RCC_AHB1ENR1, cfg->ahb1enr1);
 	WR4(sc, RCC_AHB2ENR1, cfg->ahb2enr1);
@@ -51,14 +79,8 @@ stm32u3_rcc_setup(struct stm32u3_rcc_softc *sc, struct rcc_config *cfg)
 int
 stm32u3_rcc_init(struct stm32u3_rcc_softc *sc, uint32_t base)
 {
-	uint32_t reg;
 
 	sc->base = base;
-
-	/* Enable HSI48 for USB. */
-	reg = RD4(sc, RCC_CR);
-	reg |= CR_HSI48ON;
-	WR4(sc, RCC_CR, reg);
 
 	return (0);
 }
