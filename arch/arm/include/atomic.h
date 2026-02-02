@@ -866,4 +866,7 @@ atomic_thread_fence_seq_cst(void)
 #define atomic_store_rel_int		atomic_store_rel_32
 #define atomic_swap_int			atomic_swap_32
 
+#define	atomic_load_32(p)		(*(const volatile u_int *)(p))
+#define	atomic_store_32(p, v)		(*(volatile u_int *)(p) = (u_int)(v))
+
 #endif /* _MACHINE_ATOMIC_H_ */
