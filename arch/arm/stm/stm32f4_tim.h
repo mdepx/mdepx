@@ -45,6 +45,8 @@
 #define	 CCMR1_OC1M_S		4
 #define	 CCMR1_OC1M_PWM1	(0x6 << CCMR1_OC1M_S)
 #define	 CCMR1_OC1M_PWM2	(0x7 << CCMR1_OC1M_S)
+#define	 CCMR1_OC1M_PWM1_ASYM	(0xe << CCMR1_OC1M_S)
+#define	 CCMR1_OC1M_PWM2_ASYM	(0xf << CCMR1_OC1M_S)
 #define	 CCMR1_OC1PE		(1 << 3) /* Output compare 1 preload enable */
 #define	 CCMR1_OC2M_S		12
 #define	 CCMR1_OC2M_PWM1	(0x6 << CCMR1_OC2M_S)
@@ -61,8 +63,14 @@
 #define	 CCMR2_OC4PE		(1 << 11) /* Output compare 4 preload enable */
 #define	TIM_CCER	0x20 /* Capture/compare enable register */
 #define	 CCER_CC4E	(1 << 12) /* Capture/Compare 4 output enable */
+#define	 CCER_CC3NP	(1 << 11) /* Capture/Compare 3 complementary out pol */
+#define	 CCER_CC3NE	(1 << 10) /* Capture/Compare 3 complementary out en */
 #define	 CCER_CC3E	(1 << 8) /* Capture/Compare 3 output enable */
+#define	 CCER_CC2NP	(1 << 7) /* Capture/Compare 2 complementary out pol */
+#define	 CCER_CC2NE	(1 << 6) /* Capture/Compare 2 complementary out en */
 #define	 CCER_CC2E	(1 << 4) /* Capture/Compare 2 output enable */
+#define	 CCER_CC1NP	(1 << 3) /* Capture/Compare 1 complementary out pol */
+#define	 CCER_CC1NE	(1 << 2) /* Capture/Compare 1 complementary out en */
 #define	 CCER_CC1E	(1 << 0) /* Capture/Compare 1 output enable */
 #define	TIM_CNT		0x24 /* Counter */
 #define	TIM_PSC		0x28 /* Prescaler */

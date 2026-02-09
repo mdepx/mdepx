@@ -34,6 +34,7 @@
 #include <arm/stm/stm32f4_i2c.h>
 #include <arm/stm/stm32g0_syscfg.h>
 #include <arm/stm/stm32g0_exti.h>
+#include <arm/stm/stm32f4_pwm.h>
 
 #define	USART2_BASE	0x40004400
 #define	USART1_BASE	0x40013800
@@ -48,5 +49,13 @@
 #define	I2C3_BASE	0x40008800
 #define	SYSCFG_BASE	0x40010000
 #define	EXTI_BASE	0x40021800
+#define	TIM2_BASE	0x40000000
+#define	TIM3_BASE	0x40000400
+#define	TIM4_BASE	0x40000800
+#define	TIM6_BASE	0x40001000
+#define	TIM7_BASE	0x40001400
+#define	TIM14_BASE	0x40002000
+#define	TIM16_BASE	0x40014400
+#define	TIM17_BASE	0x40014800
 
 #endif	/* !_ARM_STM_STM32G0_H_ */

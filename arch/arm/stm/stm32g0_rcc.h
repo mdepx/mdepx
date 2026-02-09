@@ -84,6 +84,7 @@
 #define	 APBENR1_TIM6EN		(1 << 4)
 #define	 APBENR1_TIM4EN		(1 << 2)
 #define	 APBENR1_TIM3EN		(1 << 1)
+#define	 APBENR1_TIM2EN		(1 << 0)
 #define	RCC_APBENR2		0x40
 #define	 APBENR2_ADCEN		(1 << 20) /* ADC clock enable */
 #define	 APBENR2_TIM17EN	(1 << 18)
