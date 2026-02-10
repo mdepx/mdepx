@@ -51,11 +51,15 @@
 #define	 CCMR1_OC2M_S		12
 #define	 CCMR1_OC2M_PWM1	(0x6 << CCMR1_OC2M_S)
 #define	 CCMR1_OC2M_PWM2	(0x7 << CCMR1_OC2M_S)
+#define	 CCMR1_OC2M_PWM1_ASYM	(0xe << CCMR1_OC2M_S)
+#define	 CCMR1_OC2M_PWM2_ASYM	(0xf << CCMR1_OC2M_S)
 #define	 CCMR1_OC2PE		(1 << 11) /* Output compare 2 preload enable */
 #define	TIM_CCMR2	0x1C /* Capture/compare mode register 2 */
 #define	 CCMR2_OC3M_S		4
 #define	 CCMR2_OC3M_PWM1	(0x6 << CCMR2_OC3M_S)
 #define	 CCMR2_OC3M_PWM2	(0x7 << CCMR2_OC3M_S)
+#define	 CCMR2_OC3M_PWM1_ASYM	(0xe << CCMR2_OC3M_S)
+#define	 CCMR2_OC3M_PWM2_ASYM	(0xf << CCMR2_OC3M_S)
 #define	 CCMR2_OC3PE		(1 << 3) /* Output compare 3 preload enable */
 #define	 CCMR2_OC4M_S		12
 #define	 CCMR2_OC4M_PWM1	(0x6 << CCMR2_OC4M_S)
@@ -65,12 +69,15 @@
 #define	 CCER_CC4E	(1 << 12) /* Capture/Compare 4 output enable */
 #define	 CCER_CC3NP	(1 << 11) /* Capture/Compare 3 complementary out pol */
 #define	 CCER_CC3NE	(1 << 10) /* Capture/Compare 3 complementary out en */
+#define	 CCER_CC3P	(1 << 9) /* Capture/Compare 3 output polarity */
 #define	 CCER_CC3E	(1 << 8) /* Capture/Compare 3 output enable */
 #define	 CCER_CC2NP	(1 << 7) /* Capture/Compare 2 complementary out pol */
 #define	 CCER_CC2NE	(1 << 6) /* Capture/Compare 2 complementary out en */
+#define	 CCER_CC2P	(1 << 5) /* Capture/Compare 2 output polarity */
 #define	 CCER_CC2E	(1 << 4) /* Capture/Compare 2 output enable */
 #define	 CCER_CC1NP	(1 << 3) /* Capture/Compare 1 complementary out pol */
 #define	 CCER_CC1NE	(1 << 2) /* Capture/Compare 1 complementary out en */
+#define	 CCER_CC1P	(1 << 1) /* Capture/Compare 1 output polarity */
 #define	 CCER_CC1E	(1 << 0) /* Capture/Compare 1 output enable */
 #define	TIM_CNT		0x24 /* Counter */
 #define	TIM_PSC		0x28 /* Prescaler */
@@ -83,6 +90,9 @@
 #define	TIM_CCR3	0x3C /* Capture/compare register 3 */
 #define	TIM_CCR4	0x40 /* Capture/compare register 4 */
 #define	TIM_BDTR	0x44 /* Break and dead-time register */
+#define	 BDTR_MOE	(1 << 15) /* Main output enable */
+#define	 BDTR_DTG_S	0
+#define	 BDTR_DTG_M	(0xff << BDTR_DTG_S)
 #define	TIM_DCR		0x48 /* DMA control register */
 #define	TIM_DMAR	0x4C /* DMA address for full transfer */
 
