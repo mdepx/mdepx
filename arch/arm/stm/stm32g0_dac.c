@@ -1,6 +1,5 @@
 /*-
- * Copyright (c) 2023 Ruslan Bukin <br@bsdpad.com>
- * All rights reserved.
+ * Copyright (c) 2026 Ruslan Bukin <br@bsdpad.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,40 +23,29 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _ARM_STM_STM32G0_H_
-#define _ARM_STM_STM32G0_H_
-
-#include <arm/stm/stm32f4_gpio.h>
-#include <arm/stm/stm32f4_timer.h>
-#include <arm/stm/stm32g0_rcc.h>
-#include <arm/stm/stm32l4_usart.h>
-#include <arm/stm/stm32f4_i2c.h>
-#include <arm/stm/stm32g0_syscfg.h>
-#include <arm/stm/stm32g0_exti.h>
-#include <arm/stm/stm32f4_pwm.h>
+#include <sys/cdefs.h>
 #include <arm/stm/stm32g0_dac.h>
 
-#define	USART2_BASE	0x40004400
-#define	USART1_BASE	0x40013800
-#define	RCC_BASE	0x40021000
-#define	FLASH_BASE	0x40022000
-#define	GPIO_BASE	0x50000000
-#define	TIM1_BASE	0x40012C00
-#define	NVIC_BASE	0xE000E100
-#define	I2C1_BASE	0x40005400
-#define	I2C2_BASE	0x40005800
-#define	PWR_BASE	0x40007000
-#define	I2C3_BASE	0x40008800
-#define	SYSCFG_BASE	0x40010000
-#define	EXTI_BASE	0x40021800
-#define	TIM2_BASE	0x40000000
-#define	TIM3_BASE	0x40000400
-#define	TIM4_BASE	0x40000800
-#define	TIM6_BASE	0x40001000
-#define	TIM7_BASE	0x40001400
-#define	TIM14_BASE	0x40002000
-#define	TIM16_BASE	0x40014400
-#define	TIM17_BASE	0x40014800
-#define	DAC_BASE	0x40007400
+#define	RD4(_sc, _reg)		\
+	*(volatile uint32_t *)((_sc)->base + _reg)
+#define	WR4(_sc, _reg, _val)	\
+	*(volatile uint32_t *)((_sc)->base + _reg) = _val
 
-#endif	/* !_ARM_STM_STM32G0_H_ */
+void
+stm32g0_dac_chan1(struct stm32g0_dac_softc *sc, uint16_t val)
+{
+	uint32_t reg;
+
+	reg = RD4(sc, DAC_CR);
+	reg |= CR_EN1;
+	WR4(sc, DAC_CR, reg);
+
+	WR4(sc, DAC_DHR12R1, (val & 0xfff));
+}
+
+void
+stm32g0_dac_init(struct stm32g0_dac_softc *sc, uint32_t base)
+{
+
+	sc->base = base;
+}

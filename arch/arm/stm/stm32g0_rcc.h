@@ -65,6 +65,7 @@
 #define	 AHBENR_DMA2EN		(1 << 1)
 #define	 AHBENR_DMA1EN		(1 << 0)
 #define	RCC_APBENR1		0x3C
+#define	 APBENR1_DAC1EN		(1 << 29) /* DAC1 interface clock enable */
 #define	 APBENR1_PWREN		(1 << 28) /* Power interface clock enable */
 #define	 APBENR1_DBGEN		(1 << 27) /* Debug support clock enable */
 #define	 APBENR1_I2C3EN		(1 << 23) /* I2C3 clock enable */
