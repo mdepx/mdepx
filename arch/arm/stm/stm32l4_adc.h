@@ -196,8 +196,8 @@
 #define	ADC_DIFSEL	0xB0 /* ADC Differential mode Selection Register */
 #define	 DIFSEL_DIFSEL_S	16	/* Differential mode for channels 18 to 16. */
 #define	 DIFSEL_DIFSEL_M	(0x7 << DIFSEL_DIFSEL_S)
-#define	 DIFSEL_DIFSEL_S	1	/* Differential mode for channels 15 to 1 */
-#define	 DIFSEL_DIFSEL_M	(0x7fff << DIFSEL_DIFSEL_S)
+#define	 DIFSEL_DIFSEL_1_15_S	1	/* Differential mode for channels 15 to 1 */
+#define	 DIFSEL_DIFSEL_1_15_M	(0x7fff << DIFSEL_DIFSEL_1_15_S)
 #define	ADC_CALFACT	0xB4 /* ADC Calibration Factors */
 #define	 CALFACT_CALFACT_D_S	16 /* Calibration Factors in differential mode */
 #define	 CALFACT_CALFACT_D_M	(0x7f << CALFACT_CALFACT_D_S)
