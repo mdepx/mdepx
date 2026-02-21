@@ -37,6 +37,7 @@
 #include <arm/stm/stm32f4_pwm.h>
 #include <arm/stm/stm32g0_dac.h>
 #include <arm/stm/stm32g0_adc.h>
+#include <arm/stm/stm32f4_spi.h>
 
 #define	USART2_BASE	0x40004400
 #define	USART1_BASE	0x40013800
@@ -61,5 +62,6 @@
 #define	TIM17_BASE	0x40014800
 #define	DAC_BASE	0x40007400
 #define	ADC_BASE	0x40012400
+#define	SPI1_BASE	0x40013000
 
 #endif	/* !_ARM_STM_STM32G0_H_ */
