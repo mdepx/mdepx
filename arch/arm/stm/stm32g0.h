@@ -63,5 +63,6 @@
 #define	DAC_BASE	0x40007400
 #define	ADC_BASE	0x40012400
 #define	SPI1_BASE	0x40013000
+#define	CRS_BASE	0x40006C00
 
 #endif	/* !_ARM_STM_STM32G0_H_ */
