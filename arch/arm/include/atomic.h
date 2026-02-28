@@ -47,6 +47,8 @@
 #define wmb()  dmb()
 #define rmb()  dmb()
 
+#ifndef MDX_ARM_THUMB_CM0	/* No atomics on Cortex M0 */
+
 #define ATOMIC_ACQ_REL_LONG(NAME)					\
 static __inline void							\
 atomic_##NAME##_acq_long(__volatile u_long *p, u_long v)		\
@@ -869,4 +871,34 @@ atomic_thread_fence_seq_cst(void)
 #define	atomic_load_32(p)		(*(const volatile u_int *)(p))
 #define	atomic_store_32(p, v)		(*(volatile u_int *)(p) = (u_int)(v))
 
+#else /* !MDX_ARM_THUMB_CM0 */
+
+/* No atomics on Cortex-M0, provide some compatibility. */
+
+#define	atomic_store_32(p, v)		(*(volatile u_int *)(p) = (u_int)(v))
+#define	atomic_store_rel_32		atomic_store_32
+
+#define	atomic_load_32(p)		(*(volatile u_int *)(p))
+#define	atomic_load_acq_32		atomic_load_32
+
+static __inline int
+atomic_cmpset_32(volatile uint32_t *p, uint32_t cmpval, uint32_t newval)
+{
+	uint32_t val;
+
+	critical_enter();
+
+	val = *(volatile uint32_t *)p;
+	if (val == cmpval) {
+		*(volatile uint32_t *)p = newval;
+		critical_exit();
+		return (1);
+	}
+
+	critical_exit();
+
+	return (0);
+}
+
+#endif /* !MDX_ARM_THUMB_CM0 */
 #endif /* _MACHINE_ATOMIC_H_ */
