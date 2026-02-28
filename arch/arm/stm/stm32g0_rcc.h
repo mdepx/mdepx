@@ -74,6 +74,7 @@
 #define	 APBENR1_USART4EN	(1 << 19) /* USART3 clock enable */
 #define	 APBENR1_USART3EN	(1 << 18) /* USART3 clock enable */
 #define	 APBENR1_USART2EN	(1 << 17) /* USART2 clock enable */
+#define	 APBENR1_CRSEN		(1 << 16) /* CRS clock enable */
 #define	 APBENR1_SPI3EN		(1 << 15) /* SPI3 clock enable */
 #define	 APBENR1_SPI2EN		(1 << 14) /* SPI2 clock enable */
 #define	 APBENR1_USBEN		(1 << 13) /* USB clock enable */
