@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2023 Ruslan Bukin <br@bsdpad.com>
+ * Copyright (c) 2023-2026 Ruslan Bukin <br@bsdpad.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,8 @@
 #define	RCC_CR			0x00
 #define	 CR_PLLRDY		(1 << 25)
 #define	 CR_PLLON		(1 << 24)
+#define	 CR_HSI48RDY		(1 << 23) /* HSI48 clock ready flag */
+#define	 CR_HSI48ON		(1 << 22) /* HSI48 RC oscillator enable */
 #define	 CR_CSSON		(1 << 19) /* Clock security system enable */
 #define	 CR_HSEBYP		(1 << 18) /* HSE clock bypass */
 #define	 CR_HSERDY		(1 << 17) /* HSE clock ready flag */
@@ -39,12 +41,35 @@
 #define	 CR_HSION		(1 << 8)
 #define	RCC_ICSCR		0x04
 #define	RCC_CFGR		0x08
+#define	 CFGR_SWS_S		3
+#define	 CFGR_SWS_M		(7 << CFGR_SWS_S)
+#define	 CFGR_SWS_LSE		(4 << CFGR_SWS_S)
+#define	 CFGR_SWS_LSI		(3 << CFGR_SWS_S)
+#define	 CFGR_SWS_PLLRCLK	(2 << CFGR_SWS_S)
+#define	 CFGR_SWS_HSE		(1 << CFGR_SWS_S)
+#define	 CFGR_SWS_HSISYS	(0 << CFGR_SWS_S)
+#define	 CFGR_SW_S		0
+#define	 CFGR_SW_M		(7 << CFGR_SW_S)
+#define	 CFGR_SW_LSE		(4 << CFGR_SW_S)
+#define	 CFGR_SW_LSI		(3 << CFGR_SW_S)
+#define	 CFGR_SW_PLLRCLK	(2 << CFGR_SW_S)
+#define	 CFGR_SW_HSE		(1 << CFGR_SW_S)
+#define	 CFGR_SW_HSISYS		(0 << CFGR_SW_S)
 #define	RCC_PLLCFGR		0x0C
-#define	 PLLCFGR_PLLR_S		25
-#define	 PLLCFGR_PLLQ_S		21
+#define	 PLLCFGR_PLLR_S		29
+#define	 PLLCFGR_PLLREN		(1 << 28)
+#define	 PLLCFGR_PLLQ_S		25
+#define	 PLLCFGR_PLLQEN		(1 << 24)
 #define	 PLLCFGR_PLLP_S		17
+#define	 PLLCFGR_PLLPEN		(1 << 16)
 #define	 PLLCFGR_PLLN_S		8
 #define	 PLLCFGR_PLLM_S		4
+#define	 PLLCFGR_PLLSRC_S	0
+#define	 PLLCFGR_PLLSRC_M	(0x3 << PLLCFGR_PLLSRC_S)
+#define	 PLLCFGR_PLLSRC_HSE	(0x3 << PLLCFGR_PLLSRC_S)
+#define	 PLLCFGR_PLLSRC_HSI16	(0x2 << PLLCFGR_PLLSRC_S)
+#define	 PLLCFGR_PLLSRC_RESV	(0x1 << PLLCFGR_PLLSRC_S)
+#define	 PLLCFGR_PLLSRC_NOCLK	(0x0 << PLLCFGR_PLLSRC_S)
 #define	RCC_CIER		0x18
 #define	RCC_CIFR		0x1C
 #define	RCC_CICR		0x20
@@ -135,7 +160,6 @@
 #define	 CFGR_PPRE1_16		(0x7 << CFGR_PPRE1_S)
 #define	 CFGR_HPRE_S		4 /* AHB prescaler */
 #define	 CFGR_HPRE_M		(0xf << CFGR_HPRE_S)
-#endif
 
 #define	 CFGR_SWS_S		3 /* System clock switch status */
 #define	 CFGR_SWS_M		(0x7 << CFGR_SWS_S)
@@ -152,6 +176,7 @@
 #define	 CFGR_SW_PLLRCLK	(0x2 << CFGR_SW_S)
 #define	 CFGR_SW_HSE		(0x1 << CFGR_SW_S)
 #define	 CFGR_SW_HSISYS		(0x0 << CFGR_SW_S)
+#endif
 
 #if 0
 #define	RCC_APB1RSTR		0x38
@@ -180,5 +205,7 @@ int stm32g0_rcc_lsi_enable(struct stm32g0_rcc_softc *sc);
 void stm32g0_rcc_bdcr_setup(struct stm32g0_rcc_softc *sc, uint32_t bdcr);
 void stm32g0_rcc_hse_enable(struct stm32g0_rcc_softc *sc);
 void stm32g0_rcc_usartsel_sysclk(struct stm32g0_rcc_softc *sc);
+void stm32g0_rcc_64mhz(struct stm32g0_rcc_softc *sc);
+void stm32g0_rcc_hsi48(struct stm32g0_rcc_softc *sc);
 
 #endif /* !_ARM_STM_STM32G0_RCC_H_ */

@@ -119,14 +119,70 @@ stm32g0_rcc_pll_configure(struct stm32g0_rcc_softc *sc,
 }
 
 void
-stm32g0_rcc_setup(struct stm32g0_rcc_softc *sc,
-    struct rcc_config *cfg)
+stm32g0_rcc_setup(struct stm32g0_rcc_softc *sc, struct rcc_config *cfg)
 {
 
 	WR4(sc, RCC_IOPENR, cfg->iopenr);
 	WR4(sc, RCC_AHBENR, cfg->ahbenr);
 	WR4(sc, RCC_APBENR1, cfg->apbenr1);
 	WR4(sc, RCC_APBENR2, cfg->apbenr2);
+}
+
+void
+stm32g0_rcc_hsi48(struct stm32g0_rcc_softc *sc)
+{
+	uint32_t reg;
+
+	reg = RD4(sc, RCC_CR);
+	reg |= CR_HSI48ON;
+	WR4(sc, RCC_CR, reg);
+
+	do {
+		reg = RD4(sc, RCC_CR);
+		if (reg & CR_HSI48RDY)
+			break;
+	} while (1);
+}
+
+void
+stm32g0_rcc_64mhz(struct stm32g0_rcc_softc *sc)
+{
+	uint32_t reg;
+
+	/*
+	 * Note: flash latency has to be increased for this to work.
+	 */
+
+	/* PLLs 64 MHz, FVCO 128 MHz. */
+	reg = PLLCFGR_PLLSRC_HSI16 | PLLCFGR_PLLREN;
+	reg |= (8 << PLLCFGR_PLLN_S);
+	reg |= (0 << PLLCFGR_PLLM_S);
+	reg |= (1 << PLLCFGR_PLLP_S);
+	reg |= (1 << PLLCFGR_PLLQ_S);
+	reg |= (1 << PLLCFGR_PLLR_S);
+	WR4(sc, RCC_PLLCFGR, reg);
+
+	/* PLL */
+	reg = RD4(sc, RCC_CR);
+	reg |= CR_PLLON;
+	WR4(sc, RCC_CR, reg);
+
+	do {
+		reg = RD4(sc, RCC_CR);
+		if (reg & CR_PLLRDY)
+			break;
+	} while (1);
+
+	reg = RD4(sc, RCC_CFGR);
+	reg &= ~CFGR_SW_M;
+	reg |= CFGR_SW_PLLRCLK;
+	WR4(sc, RCC_CFGR, reg);
+
+	do {
+		reg = RD4(sc, RCC_CFGR);
+		if ((reg & CFGR_SWS_M) == CFGR_SWS_PLLRCLK)
+			break;
+	} while (1);
 }
 
 void
