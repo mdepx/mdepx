@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Nordic Semiconductor ASA
+ * Copyright (c) 2024 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -51,10 +51,10 @@ struct nrf_wifi_bal_dev_ctx {
 	void *hal_dev_ctx;
 	/** Pointer to the bus device context. */
 	void *bus_dev_ctx;
-#ifdef CONFIG_NRF_WIFI_LOW_POWER
+#ifdef NRF_WIFI_LOW_POWER
 	/** Flag indicating if the RPU firmware has booted. */
 	bool rpu_fw_booted;
-#endif /* CONFIG_NRF_WIFI_LOW_POWER */
+#endif /* NRF_WIFI_LOW_POWER */
 };
 
 #endif /* __BAL_STRUCTS_H__ */

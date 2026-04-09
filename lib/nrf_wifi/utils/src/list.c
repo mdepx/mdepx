@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Nordic Semiconductor ASA
+ * Copyright (c) 2024 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -31,12 +31,34 @@ out:
 
 }
 
+void *nrf_wifi_utils_ctrl_list_alloc(void)
+{
+	void *list = NULL;
+
+	list = nrf_wifi_osal_ctrl_llist_alloc();
+
+	if (!list) {
+		nrf_wifi_osal_log_err("%s: Unable to allocate list",
+				      __func__);
+		goto out;
+	}
+
+	nrf_wifi_osal_llist_init(list);
+
+out:
+	return list;
+
+}
 
 void nrf_wifi_utils_list_free(void *list)
 {
 	nrf_wifi_osal_llist_free(list);
 }
 
+void nrf_wifi_utils_ctrl_list_free(void *list)
+{
+	nrf_wifi_osal_ctrl_llist_free(list);
+}
 
 enum nrf_wifi_status nrf_wifi_utils_list_add_tail(void *list,
 						  void *data)
@@ -56,6 +78,26 @@ enum nrf_wifi_status nrf_wifi_utils_list_add_tail(void *list,
 
 	nrf_wifi_osal_llist_add_node_tail(list,
 					  list_node);
+
+	return NRF_WIFI_STATUS_SUCCESS;
+}
+
+enum nrf_wifi_status nrf_wifi_utils_ctrl_list_add_tail(void *list,
+	void *data)
+{
+	void *list_node = NULL;
+
+	list_node = nrf_wifi_osal_ctrl_llist_node_alloc();
+
+	if (!list_node) {
+		nrf_wifi_osal_log_err("%s: Unable to allocate list node",
+			      __func__);
+		return NRF_WIFI_STATUS_FAIL;
+	}
+
+	nrf_wifi_osal_llist_node_data_set(list_node, data);
+
+	nrf_wifi_osal_llist_add_node_tail(list, list_node);
 
 	return NRF_WIFI_STATUS_SUCCESS;
 }
@@ -124,6 +166,26 @@ void *nrf_wifi_utils_list_del_head(void *list)
 	nrf_wifi_osal_llist_del_node(list,
 				     list_node);
 	nrf_wifi_osal_llist_node_free(list_node);
+
+out:
+	return data;
+}
+
+void *nrf_wifi_utils_ctrl_list_del_head(void *list)
+{
+	void *list_node = NULL;
+	void *data = NULL;
+
+	list_node = nrf_wifi_osal_llist_get_node_head(list);
+	if (!list_node) {
+		goto out;
+	}
+
+	data = nrf_wifi_osal_llist_node_data_get(list_node);
+
+	nrf_wifi_osal_llist_del_node(list,
+				     list_node);
+	nrf_wifi_osal_ctrl_llist_node_free(list_node);
 
 out:
 	return data;

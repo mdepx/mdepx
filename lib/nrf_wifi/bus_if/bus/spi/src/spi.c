@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Nordic Semiconductor ASA
+ * Copyright (c) 2024 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -81,8 +81,7 @@ static void nrf_wifi_bus_spi_dev_rem(void *bus_dev_ctx)
 
 	spi_dev_ctx = bus_dev_ctx;
 
-	nrf_wifi_osal_mem_free(spi_dev_ctx->spi_priv->opriv,
-			       spi_dev_ctx);
+	nrf_wifi_osal_mem_free(spi_dev_ctx);
 }
 
 
@@ -94,26 +93,22 @@ static enum nrf_wifi_status nrf_wifi_bus_spi_dev_init(void *bus_dev_ctx)
 	spi_dev_ctx = bus_dev_ctx;
 
 
-	status = nrf_wifi_osal_bus_spi_dev_intr_reg(spi_dev_ctx->spi_priv->opriv,
-						     spi_dev_ctx->os_spi_dev_ctx,
-						     spi_dev_ctx,
-						     &nrf_wifi_bus_spi_irq_handler);
+	status = nrf_wifi_osal_bus_spi_dev_intr_reg(spi_dev_ctx->os_spi_dev_ctx, spi_dev_ctx,
+					&nrf_wifi_bus_spi_irq_handler);
 
 	if (status != NRF_WIFI_STATUS_SUCCESS) {
-		nrf_wifi_osal_log_err(spi_dev_ctx->spi_priv->opriv,
+		nrf_wifi_osal_log_err(
 				      "%s: Unable to register interrupt to the OS",
 				      __func__);
 		goto out;
 	}
 
-	status = nrf_wifi_osal_bus_spi_dev_init(spi_dev_ctx->spi_priv->opriv,
-						 spi_dev_ctx->os_spi_dev_ctx);
+	status = nrf_wifi_osal_bus_spi_dev_init(spi_dev_ctx->os_spi_dev_ctx);
 
 	if (status != NRF_WIFI_STATUS_SUCCESS) {
 		nrf_wifi_osal_log_err("%s: nrf_wifi_osal_spi_dev_init failed", __func__);
 
-		nrf_wifi_osal_bus_spi_dev_intr_unreg(spi_dev_ctx->spi_priv->opriv,
-						     spi_dev_ctx->os_spi_dev_ctx);
+		nrf_wifi_osal_bus_spi_dev_intr_unreg(spi_dev_ctx->os_spi_dev_ctx);
 		goto out;
 	}
 out:
@@ -127,10 +122,10 @@ static void nrf_wifi_bus_spi_dev_deinit(void *bus_dev_ctx)
 
 	spi_dev_ctx = bus_dev_ctx;
 
-	nrf_wifi_osal_bus_spi_dev_intr_unreg(spi_dev_ctx->spi_priv->opriv,
+	nrf_wifi_osal_bus_spi_dev_intr_unreg(
 					      spi_dev_ctx->os_spi_dev_ctx);
 
-	nrf_wifi_osal_bus_spi_dev_deinit(spi_dev_ctx->spi_priv->opriv,
+	nrf_wifi_osal_bus_spi_dev_deinit(
 					  spi_dev_ctx->os_spi_dev_ctx);
 }
 
@@ -275,7 +270,7 @@ static unsigned long nrf_wifi_bus_spi_dma_unmap(void *dev_ctx,
 }
 
 
-#ifdef CONFIG_NRF_WIFI_LOW_POWER
+#ifdef NRF_WIFI_LOW_POWER
 static void nrf_wifi_bus_spi_ps_sleep(void *dev_ctx)
 {
 	struct nrf_wifi_bus_spi_dev_ctx *spi_dev_ctx = NULL;
@@ -304,7 +299,7 @@ static int nrf_wifi_bus_spi_ps_status(void *dev_ctx)
 
 	return nrf_wifi_osal_bus_qspi_ps_status(spi_dev_ctx->os_spi_dev_ctx);
 }
-#endif /* CONFIG_NRF_WIFI_LOW_POWER */
+#endif /* NRF_WIFI_LOW_POWER */
 
 
 static struct nrf_wifi_bal_ops nrf_wifi_bus_spi_ops = {
@@ -320,11 +315,11 @@ static struct nrf_wifi_bal_ops nrf_wifi_bus_spi_ops = {
 	.write_block = &nrf_wifi_bus_spi_write_block,
 	.dma_map = &nrf_wifi_bus_spi_dma_map,
 	.dma_unmap = &nrf_wifi_bus_spi_dma_unmap,
-#ifdef CONFIG_NRF_WIFI_LOW_POWER
+#ifdef NRF_WIFI_LOW_POWER
 	.rpu_ps_sleep = &nrf_wifi_bus_spi_ps_sleep,
 	.rpu_ps_wake = &nrf_wifi_bus_spi_ps_wake,
 	.rpu_ps_status = &nrf_wifi_bus_spi_ps_status,
-#endif /* CONFIG_NRF_WIFI_LOW_POWER */
+#endif /* NRF_WIFI_LOW_POWER */
 };
 
 

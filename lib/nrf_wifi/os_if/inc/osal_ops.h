@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Nordic Semiconductor ASA
+ * Copyright (c) 2024 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -28,13 +28,13 @@ struct nrf_wifi_osal_ops {
 	/**
 	 * @brief Allocate memory.
 	 *
-	 * @param size The size of the memory to allocate.
+	 * @param size The size of the memory to allocate for control messages.
 	 * @return A pointer to the start of the allocated memory.
 	 */
 	void *(*mem_alloc)(size_t size);
 
 	/**
-	 * @brief Allocate zero-initialized memory.
+	 * @brief Allocate zero-initialized memory for control messages.
 	 *
 	 * @param size The size of the memory to allocate.
 	 * @return A pointer to the start of the allocated memory.
@@ -42,11 +42,26 @@ struct nrf_wifi_osal_ops {
 	void *(*mem_zalloc)(size_t size);
 
 	/**
-	 * @brief Free allocated memory.
+	 * @brief Free memory allocated for control messages.
 	 *
 	 * @param buf A pointer to the memory to free.
 	 */
 	void (*mem_free)(void *buf);
+
+	/**
+	 * @brief Allocate zero-initialized memory for data.
+	 *
+	 * @param size The size of the memory to allocate.
+	 * @return A pointer to the start of the allocated memory.
+	 */
+	void *(*data_mem_zalloc)(size_t size);
+
+	/**
+	 * @brief Free memory allocated for data.
+	 *
+	 * @param buf A pointer to the memory to free.
+	 */
+	void (*data_mem_free)(void *buf);
 
 	/**
 	 * @brief Copy memory.
@@ -291,11 +306,25 @@ struct nrf_wifi_osal_ops {
 	void *(*llist_node_alloc)(void);
 
 	/**
+	 * @brief Allocate a linked list node from control pool.
+	 *
+	 * @return A pointer to the allocated linked list node.
+	 */
+	 void *(*ctrl_llist_node_alloc)(void);
+
+	/**
 	 * @brief Free a linked list node.
 	 *
 	 * @param node A pointer to the linked list node to free.
 	 */
 	void (*llist_node_free)(void *node);
+
+	/**
+	 * @brief Free a linked list node from control pool.
+	 *
+	 * @param node A pointer to the linked list node to free.
+	 */
+	 void (*ctrl_llist_node_free)(void *node);
 
 	/**
 	 * @brief Get the pointer to the data which the linked list node points to.
@@ -321,11 +350,25 @@ struct nrf_wifi_osal_ops {
 	void *(*llist_alloc)(void);
 
 	/**
+	 * @brief Allocate a linked list for control path.
+	 *
+	 * @return A pointer to the allocated linked list.
+	 */
+	void *(*ctrl_llist_alloc)(void);
+
+	/**
 	 * @brief Free a linked list.
 	 *
 	 * @param llist A pointer to the linked list to free.
 	 */
 	void (*llist_free)(void *llist);
+
+	/**
+	 * @brief Free a linked list for control path.
+	 *
+	 * @param llist A pointer to the linked list to free.
+	 */
+	void (*ctrl_llist_free)(void *llist);
 
 	/**
 	 * @brief Initialize a linked list.
@@ -481,7 +524,31 @@ struct nrf_wifi_osal_ops {
 	 * @param chksum_done The checksum status to set.
 	 */
 	void (*nbuf_set_chksum_done)(void *nbuf, unsigned char chksum_done);
+#if defined(NRF70_RAW_DATA_TX) || defined(__DOXYGEN__)
+	/**
+	 * @brief Set the raw Tx header in a network buffer.
+	 *
+	 * @param nbuf A pointer to the network buffer.
+	 * @param raw_hdr_len The length of the raw header to set.
+	 */
+	void *(*nbuf_set_raw_tx_hdr)(void *nbuf, unsigned short raw_hdr_len);
+	/**
+	 * @brief Get the raw Tx header from a network buffer.
+	 *
+	 * @param nbuf A pointer to the network buffer.
+	 * @return A pointer to the raw Tx header.
+	 */
+	void *(*nbuf_get_raw_tx_hdr)(void *nbuf);
 
+	/**
+	 * @brief Check if the network buffer is a raw Tx buffer.
+	 *
+	 * @param nbuf A pointer to the network buffer.
+	 *
+	 * @return true if it is a raw Tx buffer, false otherwise.
+	 */
+	bool (*nbuf_is_raw_tx)(void *nbuf);
+#endif /* NRF70_RAW_DATA_TX || __DOXYGEN__ */
 	/**
 	 * @brief Allocate a tasklet structure.
 	 *
@@ -550,6 +617,20 @@ struct nrf_wifi_osal_ops {
 	 * @return The time elapsed in microseconds.
 	 */
 	unsigned int (*time_elapsed_us)(unsigned long start_time);
+
+	/** @brief Get the current time of the day in milliseconds.
+	 *
+	 * @return The current time of the day in milliseconds.
+	 */
+	unsigned long (*time_get_curr_ms)(void);
+
+	/**
+	 * @brief Return the time elapsed in milliseconds since a specified time instant.
+	 *
+	 * @param start_time The time instant to measure the elapsed time from.
+	 * @return The time elapsed in milliseconds.
+	 */
+	unsigned int (*time_elapsed_ms)(unsigned long start_time_us);
 
 	/**
 	 * @brief Initialize the PCIe bus.
@@ -809,7 +890,7 @@ struct nrf_wifi_osal_ops {
 	void (*bus_spi_dev_host_map_get)(void *os_spi_dev_ctx,
 			struct nrf_wifi_osal_host_map *host_map);
 
-	#if defined(CONFIG_NRF_WIFI_LOW_POWER) || defined(__DOXYGEN__)
+	#if defined(NRF_WIFI_LOW_POWER) || defined(__DOXYGEN__)
 	/**
 	 * @brief Allocate a timer.
 	 *
@@ -873,7 +954,7 @@ struct nrf_wifi_osal_ops {
 	 * @return The power state of the QSPI bus.
 	 */
 	int (*bus_qspi_ps_status)(void *os_qspi_priv);
-	#endif /* CONFIG_NRF_WIFI_LOW_POWER */
+	#endif /* NRF_WIFI_LOW_POWER */
 
 	/**
 	 * @brief Assert a condition and display an error message if the condition is false.
@@ -895,5 +976,12 @@ struct nrf_wifi_osal_ops {
 	 * @return The length of the string.
 	 */
 	unsigned int (*strlen)(const void *str);
+
+	/**
+	 * @brief Get a random 8-bit value.
+	 *
+	 * @return A random 8-bit value.
+	 */
+	unsigned char (*rand8_get)(void);
 };
 #endif /* __OSAL_OPS_H__ */

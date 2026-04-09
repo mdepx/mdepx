@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Nordic Semiconductor ASA
+ * Copyright (c) 2024 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -37,9 +37,21 @@ void *nrf_wifi_osal_mem_zalloc(size_t size)
 }
 
 
+void *nrf_wifi_osal_data_mem_zalloc(size_t size)
+{
+	return os_ops->data_mem_zalloc(size);
+}
+
+
 void nrf_wifi_osal_mem_free(void *buf)
 {
 	os_ops->mem_free(buf);
+}
+
+
+void nrf_wifi_osal_data_mem_free(void *buf)
+{
+	os_ops->data_mem_free(buf);
 }
 
 
@@ -166,7 +178,7 @@ void nrf_wifi_osal_spinlock_irq_rel(void *lock,
 }
 
 
-#if CONFIG_WIFI_NRF700X_LOG_LEVEL >= NRF_WIFI_LOG_LEVEL_DBG
+#if WIFI_NRF70_LOG_LEVEL >= NRF_WIFI_LOG_LEVEL_DBG
 int nrf_wifi_osal_log_dbg(const char *fmt,
 			  ...)
 {
@@ -181,10 +193,10 @@ int nrf_wifi_osal_log_dbg(const char *fmt,
 
 	return ret;
 }
-#endif /* CONFIG_WIFI_NRF700X_LOG_LEVEL_DBG */
+#endif /* WIFI_NRF70_LOG_LEVEL_DBG */
 
 
-#if CONFIG_WIFI_NRF700X_LOG_LEVEL >= NRF_WIFI_LOG_LEVEL_INF
+#if WIFI_NRF70_LOG_LEVEL >= NRF_WIFI_LOG_LEVEL_INF
 int nrf_wifi_osal_log_info(const char *fmt,
 			   ...)
 {
@@ -199,10 +211,10 @@ int nrf_wifi_osal_log_info(const char *fmt,
 
 	return ret;
 }
-#endif /* CONFIG_WIFI_NRF700X_LOG_LEVEL_INF */
+#endif /* WIFI_NRF70_LOG_LEVEL_INF */
 
 
-#if CONFIG_WIFI_NRF700X_LOG_LEVEL >= NRF_WIFI_LOG_LEVEL_ERR
+#if WIFI_NRF70_LOG_LEVEL >= NRF_WIFI_LOG_LEVEL_ERR
 int nrf_wifi_osal_log_err(const char *fmt,
 			  ...)
 {
@@ -217,7 +229,7 @@ int nrf_wifi_osal_log_err(const char *fmt,
 
 	return ret;
 }
-#endif /* CONFIG_WIFI_NRF700X_LOG_LEVEL_ERR */
+#endif /* WIFI_NRF70_LOG_LEVEL_ERR */
 
 
 void *nrf_wifi_osal_llist_node_alloc(void)
@@ -226,9 +238,21 @@ void *nrf_wifi_osal_llist_node_alloc(void)
 }
 
 
+void *nrf_wifi_osal_ctrl_llist_node_alloc(void)
+{
+	return os_ops->ctrl_llist_node_alloc();
+}
+
+
 void nrf_wifi_osal_llist_node_free(void *node)
 {
 	os_ops->llist_node_free(node);
+}
+
+
+void nrf_wifi_osal_ctrl_llist_node_free(void *node)
+{
+	os_ops->ctrl_llist_node_free(node);
 }
 
 
@@ -251,12 +275,20 @@ void *nrf_wifi_osal_llist_alloc(void)
 	return os_ops->llist_alloc();
 }
 
+void *nrf_wifi_osal_ctrl_llist_alloc(void)
+{
+	return os_ops->ctrl_llist_alloc();
+}
 
 void nrf_wifi_osal_llist_free(void *llist)
 {
 	return os_ops->llist_free(llist);
 }
 
+void nrf_wifi_osal_ctrl_llist_free(void *llist)
+{
+	return os_ops->ctrl_llist_free(llist);
+}
 
 void nrf_wifi_osal_llist_init(void *llist)
 {
@@ -384,6 +416,25 @@ void nrf_wifi_osal_nbuf_set_chksum_done(void *nbuf,
 	return os_ops->nbuf_set_chksum_done(nbuf, chksum_done);
 }
 
+#ifdef CONFIG_NRF70_RAW_DATA_TX
+void *nrf_wifi_osal_nbuf_set_raw_tx_hdr(void *nbuf,
+					unsigned short raw_hdr_len)
+{
+	return os_ops->nbuf_set_raw_tx_hdr(nbuf,
+				      raw_hdr_len);
+}
+
+void *nrf_wifi_osal_nbuf_get_raw_tx_hdr(void *nbuf)
+{
+	return os_ops->nbuf_get_raw_tx_hdr(nbuf);
+}
+
+bool nrf_wifi_osal_nbuf_is_raw_tx(void *nbuf)
+{
+	return os_ops->nbuf_is_raw_tx(nbuf);
+}
+#endif /* CONFIG_NRF70_RAW_DATA_TX */
+
 
 void *nrf_wifi_osal_tasklet_alloc(int type)
 {
@@ -442,6 +493,15 @@ unsigned int nrf_wifi_osal_time_elapsed_us(unsigned long start_time_us)
 	return os_ops->time_elapsed_us(start_time_us);
 }
 
+unsigned long nrf_wifi_osal_time_get_curr_ms()
+{
+	return os_ops->time_get_curr_ms();
+}
+
+unsigned int nrf_wifi_osal_time_elapsed_ms(unsigned long start_time_ms)
+{
+	return os_ops->time_elapsed_ms(start_time_ms);
+}
 
 void *nrf_wifi_osal_bus_pcie_init(const char *dev_name,
 				  unsigned int vendor_id,
@@ -744,7 +804,7 @@ void nrf_wifi_osal_spi_cpy_to(void *os_spi_dev_ctx,
 				   count);
 }
 
-#ifdef CONFIG_NRF_WIFI_LOW_POWER
+#ifdef NRF_WIFI_LOW_POWER
 void *nrf_wifi_osal_timer_alloc(void)
 {
 	return os_ops->timer_alloc();
@@ -798,7 +858,7 @@ int nrf_wifi_osal_bus_qspi_ps_status(void *os_qspi_priv)
 {
 	return os_ops->bus_qspi_ps_status(os_qspi_priv);
 }
-#endif /* CONFIG_NRF_WIFI_LOW_POWER */
+#endif /* NRF_WIFI_LOW_POWER */
 
 void nrf_wifi_osal_assert(int test_val,
 			  int val,
@@ -812,3 +872,9 @@ unsigned int nrf_wifi_osal_strlen(const void *str)
 {
 	return os_ops->strlen(str);
 }
+
+unsigned char nrf_wifi_osal_rand8_get(void)
+{
+	return os_ops->rand8_get();
+}
+

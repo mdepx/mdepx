@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Nordic Semiconductor ASA
+ * Copyright (c) 2024 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -18,9 +18,27 @@
 #include <stdarg.h>
 #elif __KERNEL__
 /* For Linux, use kernel internal headers instead of C headers*/
+#if 0
 #include <linux/stddef.h>
 #include <linux/string.h>
+#include <linux/version.h>
+#else
+#include <stddef.h>
+#include <stdbool.h>
+#include <stdarg.h>
+#endif
+#if 0
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 14, 0)
+#undef strlen
 #include <linux/stdarg.h>
+#else
+#include <stdarg.h>
+#endif
+#endif
+#else
+#include <stddef.h>
+#include <stdbool.h>
+#include <stdarg.h>
 #endif
 
 /**

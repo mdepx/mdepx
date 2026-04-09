@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Nordic Semiconductor ASA
+ * Copyright (c) 2024 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -143,7 +143,7 @@ struct nrf_wifi_bal_ops {
 				   size_t len,
 				   enum nrf_wifi_osal_dma_dir dma_dir);
 
-#if defined(CONFIG_NRF_WIFI_LOW_POWER) || defined(__DOXYGEN__)
+#if defined(NRF_WIFI_LOW_POWER) || defined(__DOXYGEN__)
 	/**
 	 * @brief Put the device into power-saving sleep mode.
 	 *
@@ -165,7 +165,7 @@ struct nrf_wifi_bal_ops {
 	 * @return Power-saving status of the device.
 	 */
 	int (*rpu_ps_status)(void *bus_dev_ctx);
-#endif /* CONFIG_NRF_WIFI_LOW_POWER */
+#endif /* NRF_WIFI_LOW_POWER */
 };
 
 /**

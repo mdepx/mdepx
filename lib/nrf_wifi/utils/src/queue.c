@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Nordic Semiconductor ASA
+ * Copyright (c) 2024 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -17,18 +17,32 @@ void *nrf_wifi_utils_q_alloc(void)
 	return nrf_wifi_utils_list_alloc();
 }
 
+void *nrf_wifi_utils_ctrl_q_alloc(void)
+{
+	return nrf_wifi_utils_ctrl_list_alloc();
+}
 
 void nrf_wifi_utils_q_free(void *q)
 {
 	nrf_wifi_utils_list_free(q);
 }
 
+void nrf_wifi_utils_ctrl_q_free(void *q)
+{
+	nrf_wifi_utils_ctrl_list_free(q);
+}
 
 enum nrf_wifi_status nrf_wifi_utils_q_enqueue(void *q,
 					      void *data)
 {
 	return nrf_wifi_utils_list_add_tail(q,
 					    data);
+}
+
+enum nrf_wifi_status nrf_wifi_utils_ctrl_q_enqueue(void *q,
+						   void *data)
+{
+	return nrf_wifi_utils_ctrl_list_add_tail(q, data);
 }
 
 enum nrf_wifi_status nrf_wifi_utils_q_enqueue_head(void *q,
@@ -42,6 +56,12 @@ enum nrf_wifi_status nrf_wifi_utils_q_enqueue_head(void *q,
 void *nrf_wifi_utils_q_dequeue(void *q)
 {
 	return nrf_wifi_utils_list_del_head(q);
+}
+
+
+void *nrf_wifi_utils_ctrl_q_dequeue(void *q)
+{
+	return nrf_wifi_utils_ctrl_list_del_head(q);
 }
 
 

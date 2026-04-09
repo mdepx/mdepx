@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Nordic Semiconductor ASA
+ * Copyright (c) 2024 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -14,15 +14,15 @@
 #ifndef __LMAC_IF_COMMON__
 #define __LMAC_IF_COMMON__
 
-#include "rpu_if.h"
-#include "phy_rf_params.h"
-#include "pack_def.h"
+#include "common/rpu_if.h"
+#include "common/phy_rf_params_common.h"
+#include "common/pack_def.h"
 
 #define RPU_MEM_LMAC_BOOT_SIG 0xB7000D50
 #define RPU_MEM_LMAC_VER 0xB7000D54
 
-#define RPU_MEM_LMAC_PATCH_BIN 0x80044000
-#define RPU_MEM_LMAC_PATCH_BIMG 0x8004B400
+#define RPU_MEM_LMAC_PATCH_BIN 0x80043A80
+#define RPU_MEM_LMAC_PATCH_BIMG 0x8004BBC0
 
 #define NRF_WIFI_LMAC_VER(ver) ((ver & 0xFF000000) >> 24)
 #define NRF_WIFI_LMAC_VER_MAJ(ver) ((ver & 0x00FF0000) >> 16)

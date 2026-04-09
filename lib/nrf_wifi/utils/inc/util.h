@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Nordic Semiconductor ASA
+ * Copyright (c) 2024 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -13,6 +13,7 @@
 #define __UTIL_H__
 
 #include "osal_api.h"
+
 #include "host_rpu_umac_if.h"
 
 #ifndef ARRAY_SIZE

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Nordic Semiconductor ASA
+ * Copyright (c) 2024 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -11,7 +11,8 @@
 
 #include "bal_structs.h"
 #include "qspi.h"
-#include "pal.h"
+#include "osal_api.h"
+#include "common/pal.h"
 
 
 static int nrf_wifi_bus_qspi_irq_handler(void *data)
@@ -272,7 +273,7 @@ static unsigned long nrf_wifi_bus_qspi_dma_unmap(void *dev_ctx,
 }
 
 
-#ifdef CONFIG_NRF_WIFI_LOW_POWER
+#ifdef NRF_WIFI_LOW_POWER
 static void nrf_wifi_bus_qspi_ps_sleep(void *dev_ctx)
 {
 	struct nrf_wifi_bus_qspi_dev_ctx *qspi_dev_ctx = NULL;
@@ -301,7 +302,7 @@ static int nrf_wifi_bus_qspi_ps_status(void *dev_ctx)
 
 	return nrf_wifi_osal_bus_qspi_ps_status(qspi_dev_ctx->os_qspi_dev_ctx);
 }
-#endif /* CONFIG_NRF_WIFI_LOW_POWER */
+#endif /* NRF_WIFI_LOW_POWER */
 
 
 static struct nrf_wifi_bal_ops nrf_wifi_bus_qspi_ops = {
@@ -317,11 +318,11 @@ static struct nrf_wifi_bal_ops nrf_wifi_bus_qspi_ops = {
 	.write_block = &nrf_wifi_bus_qspi_write_block,
 	.dma_map = &nrf_wifi_bus_qspi_dma_map,
 	.dma_unmap = &nrf_wifi_bus_qspi_dma_unmap,
-#ifdef CONFIG_NRF_WIFI_LOW_POWER
+#ifdef NRF_WIFI_LOW_POWER
 	.rpu_ps_sleep = &nrf_wifi_bus_qspi_ps_sleep,
 	.rpu_ps_wake = &nrf_wifi_bus_qspi_ps_wake,
 	.rpu_ps_status = &nrf_wifi_bus_qspi_ps_status,
-#endif /* CONFIG_NRF_WIFI_LOW_POWER */
+#endif /* NRF_WIFI_LOW_POWER */
 };
 
 

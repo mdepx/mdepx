@@ -1,6 +1,6 @@
 /*
  *
- *Copyright (c) 2022 Nordic Semiconductor ASA
+ *Copyright (c) 2024 Nordic Semiconductor ASA
  *
  *SPDX-License-Identifier: BSD-3-Clause
  */
@@ -17,9 +17,8 @@
 #ifndef __NRF_WIFI_HOST_RPU_COMMON_IFACE_H__
 #define __NRF_WIFI_HOST_RPU_COMMON_IFACE_H__
 
-#include "rpu_if.h"
-
-#include "pack_def.h"
+#include "common/rpu_if.h"
+#include "common/pack_def.h"
 
 #define NRF_WIFI_UMAC_VER(version) (((version)&0xFF000000) >> 24)
 #define NRF_WIFI_UMAC_VER_MAJ(version) (((version)&0x00FF0000) >> 16)
@@ -31,7 +30,7 @@
 #define RPU_MEM_UMAC_CMD_ADDRESS 0xB00007A8
 #define RPU_MEM_UMAC_EVENT_ADDRESS 0xB0000E28
 #define RPU_MEM_UMAC_PATCH_BIN 0x8008C000
-#define RPU_MEM_UMAC_PATCH_BIMG 0x80099400
+#define RPU_MEM_UMAC_PATCH_BIMG 0x8009B800
 
 #define NRF_WIFI_UMAC_BOOT_SIG 0x5A5A5A5A
 #define NRF_WIFI_UMAC_ROM_PATCH_OFFSET (RPU_MEM_UMAC_PATCH_BIMG - RPU_ADDR_UMAC_CORE_RET_START)

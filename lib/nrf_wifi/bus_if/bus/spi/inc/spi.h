@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Nordic Semiconductor ASA
+ * Copyright (c) 2024 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -11,8 +11,8 @@
  * of the Wi-Fi driver.
  */
 
-#ifndef __LINUX_SPI_H__
-#define __LINUX_SPI_H__
+#ifndef __SPI_H__
+#define __SPI_H__
 
 #include "osal_structs.h"
 #include "bal_structs.h"

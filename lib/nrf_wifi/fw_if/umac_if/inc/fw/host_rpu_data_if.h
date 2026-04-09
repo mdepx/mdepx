@@ -1,6 +1,6 @@
 /*
  *
- *Copyright (c) 2022 Nordic Semiconductor ASA
+ *Copyright (c) 2024 Nordic Semiconductor ASA
  *
  *SPDX-License-Identifier: BSD-3-Clause
  */
@@ -18,8 +18,7 @@
 
 #include "host_rpu_common_if.h"
 #include "host_rpu_sys_if.h"
-
-#include "pack_def.h"
+#include "common/pack_def.h"
 
 #define TX_BUF_HEADROOM 52
 
@@ -72,8 +71,9 @@ struct nrf_wifi_umac_head {
 #define NRF_WIFI_TX_FLAGS_DSCP_TOS(x)    (((x) << NRF_WIFI_TX_FLAGS_DSCP_TOS_SHIFT) & NRF_WIFI_TX_FLAGS_DSCP_TOS_MASK)
 
 enum nrf_wifi_tx_flags {
-	NRF_WIFI_TX_FLAG_TWT_EMERGENCY_TX = (1 << 31),
-	NRF_WIFI_TX_FLAG_CHKSUM_AVAILABLE = (1 << 30),
+        NRF_WIFI_TX_FLAG_TWT_EMERGENCY_TX = (1 << 31),
+        NRF_WIFI_TX_FLAG_CHKSUM_AVAILABLE = (1 << 30),
+        NRF_WIFI_TX_FLAG_QOS_CTL_ACK_POLICY_NOACK = (1 << 29)
 };
 
 /**

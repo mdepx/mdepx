@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Nordic Semiconductor ASA
+ * Copyright (c) 2024 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -13,7 +13,7 @@
 #ifndef _PATCH_INFO_H
 #define _PATCH_INFO_H
 
-#include "pack_def.h"
+#include "common/pack_def.h"
 
 #ifndef BIT
 #define BIT(x) (1 << (x))
@@ -30,6 +30,7 @@ enum nrf70_feature_flags {
 	NRF70_FEAT_RADIO_TEST = BIT(1),
 	NRF70_FEAT_SCAN_ONLY = BIT(2),
 	NRF70_FEAT_SYSTEM_WITH_RAW_MODES = BIT(3),
+	NRF70_FEAT_OFFLOADED_RAW_TX = BIT(4),
 };
 
 enum nrf70_image_ids {
@@ -60,8 +61,8 @@ struct nrf70_fw_image_info {
 
 #define RPU_FAMILY         (1)
 #define RPU_MAJOR_VERSION   (2)
-#define RPU_MINOR_VERSION   (11)
-#define RPU_PATCH_VERSION   (3)
+#define RPU_MINOR_VERSION   (14)
+#define RPU_PATCH_VERSION   (8)
 
 /**
  * @}

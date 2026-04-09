@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Nordic Semiconductor ASA
+ * Copyright (c) 2024 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -12,8 +12,8 @@
 
 #include "bal_api.h"
 
-#ifdef CONFIG_NRF_WIFI_LOW_POWER
-#ifdef CONFIG_NRF_WIFI_LOW_POWER_DBG
+#ifdef NRF_WIFI_LOW_POWER
+#ifdef NRF_WIFI_LOW_POWER_DBG
 #include "pal.h"
 
 static void nrf_wifi_rpu_bal_sleep_chk(struct nrf_wifi_bal_dev_ctx *bal_ctx,
@@ -43,8 +43,8 @@ static void nrf_wifi_rpu_bal_sleep_chk(struct nrf_wifi_bal_dev_ctx *bal_ctx,
 				      sleep_reg_val);
 	}
 }
-#endif	/* CONFIG_NRF_WIFI_LOW_POWER_DBG */
-#endif  /* CONFIG_NRF_WIFI_LOW_POWER */
+#endif	/* NRF_WIFI_LOW_POWER_DBG */
+#endif  /* NRF_WIFI_LOW_POWER */
 
 
 struct nrf_wifi_bal_dev_ctx *nrf_wifi_bal_dev_add(struct nrf_wifi_bal_priv *bpriv,
@@ -96,9 +96,9 @@ enum nrf_wifi_status nrf_wifi_bal_dev_init(struct nrf_wifi_bal_dev_ctx *bal_dev_
 {
 	enum nrf_wifi_status status = NRF_WIFI_STATUS_FAIL;
 
-#ifdef CONFIG_NRF_WIFI_LOW_POWER
+#ifdef NRF_WIFI_LOW_POWER
 	bal_dev_ctx->rpu_fw_booted = true;
-#endif /* CONFIG_NRF_WIFI_LOW_POWER */
+#endif /* NRF_WIFI_LOW_POWER */
 
 	status = bal_dev_ctx->bpriv->ops->dev_init(bal_dev_ctx->bus_dev_ctx);
 
@@ -146,6 +146,12 @@ nrf_wifi_bal_init(struct nrf_wifi_bal_cfg_params *cfg_params,
 	bpriv->intr_callbk_fn = intr_callbk_fn;
 
 	bpriv->ops = get_bus_ops();
+	if (!bpriv->ops) {
+		nrf_wifi_osal_log_err("%s: Bus ops not available", __func__);
+		nrf_wifi_osal_mem_free(bpriv);
+		bpriv = NULL;
+		goto out;
+	}
 
 	bpriv->bus_priv = bpriv->ops->init(cfg_params,
 					   &nrf_wifi_bal_isr);
@@ -177,12 +183,12 @@ unsigned int nrf_wifi_bal_read_word(void *ctx,
 
 	bal_dev_ctx = (struct nrf_wifi_bal_dev_ctx *)ctx;
 
-#ifdef CONFIG_NRF_WIFI_LOW_POWER
-#ifdef CONFIG_NRF_WIFI_LOW_POWER_DBG
+#ifdef NRF_WIFI_LOW_POWER
+#ifdef NRF_WIFI_LOW_POWER_DBG
 	nrf_wifi_rpu_bal_sleep_chk(bal_dev_ctx,
 				   addr_offset);
-#endif	/* CONFIG_NRF_WIFI_LOW_POWER_DBG */
-#endif  /* CONFIG_NRF_WIFI_LOW_POWER */
+#endif	/* NRF_WIFI_LOW_POWER_DBG */
+#endif  /* NRF_WIFI_LOW_POWER */
 
 	val = bal_dev_ctx->bpriv->ops->read_word(bal_dev_ctx->bus_dev_ctx,
 						 addr_offset);
@@ -199,12 +205,12 @@ void nrf_wifi_bal_write_word(void *ctx,
 
 	bal_dev_ctx = (struct nrf_wifi_bal_dev_ctx *)ctx;
 
-#ifdef CONFIG_NRF_WIFI_LOW_POWER
-#ifdef CONFIG_NRF_WIFI_LOW_POWER_DBG
+#ifdef NRF_WIFI_LOW_POWER
+#ifdef NRF_WIFI_LOW_POWER_DBG
 	nrf_wifi_rpu_bal_sleep_chk(bal_dev_ctx,
 				   addr_offset);
-#endif	/* CONFIG_NRF_WIFI_LOW_POWER_DBG */
-#endif  /* CONFIG_NRF_WIFI_LOW_POWER */
+#endif	/* NRF_WIFI_LOW_POWER_DBG */
+#endif  /* NRF_WIFI_LOW_POWER */
 
 	bal_dev_ctx->bpriv->ops->write_word(bal_dev_ctx->bus_dev_ctx,
 					    addr_offset,
@@ -221,12 +227,12 @@ void nrf_wifi_bal_read_block(void *ctx,
 
 	bal_dev_ctx = (struct nrf_wifi_bal_dev_ctx *)ctx;
 
-#ifdef CONFIG_NRF_WIFI_LOW_POWER
-#ifdef CONFIG_NRF_WIFI_LOW_POWER_DBG
+#ifdef NRF_WIFI_LOW_POWER
+#ifdef NRF_WIFI_LOW_POWER_DBG
 	nrf_wifi_rpu_bal_sleep_chk(bal_dev_ctx,
 				   src_addr_offset);
-#endif	/* CONFIG_NRF_WIFI_LOW_POWER_DBG */
-#endif  /* CONFIG_NRF_WIFI_LOW_POWER */
+#endif	/* NRF_WIFI_LOW_POWER_DBG */
+#endif  /* NRF_WIFI_LOW_POWER */
 
 	bal_dev_ctx->bpriv->ops->read_block(bal_dev_ctx->bus_dev_ctx,
 					    dest_addr,
@@ -244,12 +250,12 @@ void nrf_wifi_bal_write_block(void *ctx,
 
 	bal_dev_ctx = (struct nrf_wifi_bal_dev_ctx *)ctx;
 
-#ifdef CONFIG_NRF_WIFI_LOW_POWER
-#ifdef CONFIG_NRF_WIFI_LOW_POWER_DBG
+#ifdef NRF_WIFI_LOW_POWER
+#ifdef NRF_WIFI_LOW_POWER_DBG
 	nrf_wifi_rpu_bal_sleep_chk(bal_dev_ctx,
 				   dest_addr_offset);
-#endif	/* CONFIG_NRF_WIFI_LOW_POWER_DBG */
-#endif  /* CONFIG_NRF_WIFI_LOW_POWER */
+#endif	/* NRF_WIFI_LOW_POWER_DBG */
+#endif  /* NRF_WIFI_LOW_POWER */
 
 	bal_dev_ctx->bpriv->ops->write_block(bal_dev_ctx->bus_dev_ctx,
 					     dest_addr_offset,
@@ -296,7 +302,7 @@ unsigned long nrf_wifi_bal_dma_unmap(void *ctx,
 }
 
 
-#ifdef CONFIG_NRF_WIFI_LOW_POWER
+#ifdef NRF_WIFI_LOW_POWER
 void nrf_wifi_bal_rpu_ps_sleep(void *ctx)
 {
 	struct nrf_wifi_bal_dev_ctx *bal_dev_ctx = NULL;
@@ -325,4 +331,4 @@ int nrf_wifi_bal_rpu_ps_status(void *ctx)
 
 	return bal_dev_ctx->bpriv->ops->rpu_ps_status(bal_dev_ctx->bus_dev_ctx);
 }
-#endif /* CONFIG_NRF_WIFI_LOW_POWER */
+#endif /* NRF_WIFI_LOW_POWER */

@@ -1,6 +1,6 @@
 /*
  *
- *Copyright (c) 2022 Nordic Semiconductor ASA
+ *Copyright (c) 2024 Nordic Semiconductor ASA
  *
  *SPDX-License-Identifier: BSD-3-Clause
  */
@@ -18,7 +18,7 @@
 #include "host_rpu_data_if.h"
 #include "host_rpu_sys_if.h"
 
-#include "pack_def.h"
+#include "common/pack_def.h"
 
 #define MAX_NRF_WIFI_UMAC_CMD_SIZE 400
 
@@ -148,6 +148,8 @@ enum nrf_wifi_umac_commands {
 	NRF_WIFI_UMAC_CMD_CONFIG_EXTENDED_PS,
 	/** Configure quiet period nrf_wifi_umac_cmd_config_quiet_period */
 	NRF_WIFI_UMAC_CMD_CONFIG_QUIET_PERIOD,
+	/** Command to specify power save exit strategy */
+	NRF_WIFI_UMAC_CMD_PS_EXIT_STRATEGY,
 };
 
  /**
@@ -441,14 +443,34 @@ enum nrf_wifi_security_type {
 	NRF_WIFI_WPA,
 	/** WPA2 */
 	NRF_WIFI_WPA2,
-	/** WPA3 */
-	NRF_WIFI_WPA3,
 	/** WAPI */
 	NRF_WIFI_WAPI,
 	/** Enterprise mode */
 	NRF_WIFI_EAP,
-	/** WPA2 sha 256 */
-	NRF_WIFI_WPA2_256
+	/** FT 8021X */
+	NRF_WIFI_FT_EAP,
+	/** Enterprise tls SHA256 */
+	NRF_WIFI_EAP_TLS_SHA256,
+	/** WPA2 SHA256 */
+        NRF_WIFI_WPA2_256,
+	/** WPA3-HNP */
+        NRF_WIFI_WPA3_HNP,
+	/** WPA3-H2E */
+        NRF_WIFI_WPA3_H2E,
+	/** WPA3-AUTO : HNP-H2E */
+	NRF_WIFI_WPA3_AUTO,
+	/** WPA3-FT-SAE */
+	NRF_WIFI_WPA3_FT_SAE,
+	/** 8021X SUITE-B SHA256 */
+        NRF_WIFI_EAP_SUITEB_SHA256,
+	/** 8021X SUITE-B SHA384 */
+        NRF_WIFI_EAP_SUITEB_SHA384,
+	/** FT 8021X SHA384 */
+        NRF_WIFI_FT_EAP_SHA384,
+	/** FT PSK SHA384 */
+        NRF_WIFI_FT_PSK_SHA384,
+	/** PSK SHA384 */
+        NRF_WIFI_PSK_SHA384,
 };
 
 /**
@@ -1307,6 +1329,18 @@ struct nrf_wifi_umac_cmd_auth {
 #define NRF_WIFI_CMD_ASSOCIATE_MAC_ADDR_VALID (1 << 0)
 
 /**
+ * @brief Types of connection protected/un-protected.
+ *
+ */
+
+enum nrf_wifi_conn_type {
+	/* Connection to be non-protected */
+	NRF_WIFI_CONN_TYPE_OPEN,
+	/* Connection to be protected */
+	NRF_WIFI_CONN_TYPE_SECURE,
+};
+
+/**
  * @brief This structure specifies the parameters to be used when sending an association request.
  *
  */
@@ -1335,6 +1369,8 @@ struct nrf_wifi_umac_assoc_info {
 	 *  BSS MAX IDLE IE in assoc request frame.
 	 */
 	unsigned short bss_max_idle_time;
+	/** Connection type */
+	unsigned char conn_type;
 } __NRF_WIFI_PKD;
 
 /**
@@ -2386,6 +2422,10 @@ struct nrf_wifi_umac_config_twt_info {
 	unsigned char twt_resp_status;
         /** TWT early wake duration */
         unsigned int twt_wake_ahead_duration;
+	/** Timeout value (in milliseconds) used by the RPU to send TWT requests
+	 *  to the AP before receiving a TWT response from the AP.
+	 */
+        unsigned int twt_req_timeout;
 } __NRF_WIFI_PKD;
 
 /**
@@ -2634,6 +2674,7 @@ struct nrf_wifi_umac_event_new_scan_display_results {
 #define NRF_WIFI_EVENT_MLME_WME_UAPSD_QUEUES_VALID (1 << 5)
 #define NRF_WIFI_EVENT_MLME_RXMGMT_FLAGS_VALID (1 << 6)
 #define NRF_WIFI_EVENT_MLME_IE_VALID   (1 << 7)
+#define NRF_WIFI_EVENT_MLME_RXDEAUTH_FROM_AP   (1 << 8)
 
 #define NRF_WIFI_EVENT_MLME_TIMED_OUT (1 << 0)
 #define NRF_WIFI_EVENT_MLME_ACK (1 << 1)
@@ -2928,6 +2969,8 @@ struct nrf_wifi_umac_event_power_save_info {
 	unsigned int ps_timeout;
 	/** Listen interval value */
 	unsigned short listen_interval;
+	/** Power save exit strategy */
+	unsigned char ps_exit_strategy;
 	/** Number TWT flows */
 	unsigned char num_twt_flows;
 	/** TWT info of each flow nrf_wifi_umac_config_twt_info */
@@ -3508,7 +3551,7 @@ struct nrf_wifi_umac_event_cmd_status {
   *
   */
 struct nrf_wifi_umac_cmd_config_quiet_period {
-	/** Header @ref nrf_wifi_umac_hdr */
+	/** Header nrf_wifi_umac_hdr */
 	struct nrf_wifi_umac_hdr umac_hdr;
 	/** quiet period value in seconds */
 	unsigned int quiet_period_in_sec;
@@ -3517,4 +3560,16 @@ struct nrf_wifi_umac_cmd_config_quiet_period {
 /**
  * @}
  */
+/**
+ * @brief This structure defines the command used to configure the power save exit
+ * strategy for retrieving buffered data from the AP in power save mode.
+ *
+ */
+struct nrf_wifi_cmd_ps_exit_strategy {
+	/** Header @ref nrf_wifi_umac_hdr */
+	struct nrf_wifi_umac_hdr umac_hdr;
+	/** Power save exit strategy */
+	unsigned char ps_exit_strategy;
+} __NRF_WIFI_PKD;
+
 #endif /* __HOST_RPU_UMAC_IF_H */

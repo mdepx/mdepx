@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Nordic Semiconductor ASA
+ * Copyright (c) 2024 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -19,9 +19,9 @@
 #define NRF_WIFI_LOG_LEVEL_INF 3U
 #define NRF_WIFI_LOG_LEVEL_DBG 4U
 
-#ifndef CONFIG_NRF700X_LOG_VERBOSE
+#ifndef NRF70_LOG_VERBOSE
 #define __func__ "<snipped>"
-#endif /* CONFIG_NRF700X_LOG_VERBOSE */
+#endif /* NRF70_LOG_VERBOSE */
 
 /**
  * @brief Initialize the OSAL layer.
@@ -29,8 +29,6 @@
  *
  * Initializes the OSAL layer and is expected to be called
  * before using the OSAL layer.
- *
- * @return None.
  */
 void nrf_wifi_osal_init(const struct nrf_wifi_osal_ops *ops);
 
@@ -39,16 +37,14 @@ void nrf_wifi_osal_init(const struct nrf_wifi_osal_ops *ops);
  *
  * Deinitialize the OSAL layer and is expected to be called after done using
  * the OSAL layer.
- *
- * @return None.
  */
 void nrf_wifi_osal_deinit(void);
 
 /**
- * @brief Allocate memory.
+ * @brief Allocate memory for control path requests.
  * @param size Size of the memory to be allocated in bytes.
  *
- * Allocates memory of @size bytes and returns a pointer to the start
+ * Allocates memory of @p size bytes and returns a pointer to the start
  * of the memory allocated.
  *
  * @return Pointer to start of allocated memory on success, NULL on error.
@@ -56,10 +52,10 @@ void nrf_wifi_osal_deinit(void);
 void *nrf_wifi_osal_mem_alloc(size_t size);
 
 /**
- * @brief Allocated zero-initialized memory.
+ * @brief Allocated zero-initialized memory for control path requests.
  * @param size Size of the memory to be allocated in bytes.
  *
- * Allocates zero-initialized memory of @size bytes and returns a pointer to the start
+ * Allocates zero-initialized memory of @p size bytes and returns a pointer to the start
  * of the memory allocated.
  *
  * @return Pointer to start of allocated memory on success, NULL on error.
@@ -67,15 +63,36 @@ void *nrf_wifi_osal_mem_alloc(size_t size);
 void *nrf_wifi_osal_mem_zalloc(size_t size);
 
 /**
- * @brief Free previously allocated memory.
+ * @brief Allocated zero-initialized memory for data.
+ *
+ * @param size Size of the memory to be allocated in bytes.
+ *
+ * Allocates memory of @p size bytes, zeroes it out and returns a pointer to the
+ * start of the memory allocated.
+ *
+ * @return: Pointer to start of allocated memory or NULL.
+ */
+void *nrf_wifi_osal_data_mem_zalloc(size_t size);
+
+/**
+ * @brief Free previously allocated memory for control path requests.
  * @param buf Pointer to the memory to be freed.
  *
- * Free up memory which has been allocated using  nrf_wifi_osal_mem_alloc or
- * nrf_wifi_osal_mem_zalloc.
- *
- * @return None.
+ * Free up memory which has been allocated using  @ref nrf_wifi_osal_mem_alloc or
+ * @ref nrf_wifi_osal_mem_zalloc.
  */
 void nrf_wifi_osal_mem_free(void *buf);
+
+/**
+ * @brief Free previously allocated memory for data.
+ *
+ * @param buf Pointer to the memory to be freed.
+ *
+ * Free up memory which has been allocated using @ref nrf_wifi_osal_mem_alloc or
+ * @ref nrf_wifi_osal_mem_zalloc.
+ *
+ */
+void nrf_wifi_osal_data_mem_free(void *buf);
 
 /**
  * @brief Copy contents from one memory location to another.
@@ -84,7 +101,7 @@ void nrf_wifi_osal_mem_free(void *buf);
  * @param src Pointer to the memory location from where contents are to be copied.
  * @param count Number of bytes to be copied.
  *
- * Copies @count number of bytes from @src location in memory to @dest
+ * Copies @p count number of bytes from @p src location in memory to @p dest
  * location in memory.
  *
  * @return Pointer to destination memory if successful, NULL otherwise.
@@ -99,7 +116,8 @@ void *nrf_wifi_osal_mem_cpy(void *dest,
  * @param val Value to be set.
  * @param size Number of bytes to be set.
  *
- * Fills a block of memory of @size bytes, starting at @start with a value specified by @val. 
+ * Fills a block of memory of @p size bytes, starting at @p start with a value
+ * specified by @p val.
  *
  * @return Pointer to memory location which was set on success, NULL on error.
  */
@@ -113,7 +131,7 @@ void *nrf_wifi_osal_mem_set(void *start,
  * @param addr Address of the IO memory to be mapped.
  * @param size Size of the IO memory in bytes.
  *
- * Maps IO memory of @size bytes pointed to by @addr into CPU space.
+ * Maps IO memory of @p size bytes pointed to by @p addr into CPU space.
  *
  * @return Pointer to the mapped IO memory on success, NULL on error.
  */
@@ -125,8 +143,6 @@ void *nrf_wifi_osal_iomem_mmap(unsigned long addr,
  * @param addr Pointer to mapped IO memory to be unmapped.
  *
  * Unmaps IO memory from CPU space that was mapped using nrf_wifi_osal_iomem_mmap.
- *
- * @return None.
  */
 void nrf_wifi_osal_iomem_unmap(volatile void *addr);
 
@@ -145,8 +161,6 @@ unsigned int nrf_wifi_osal_iomem_read_reg32(const volatile void *addr);
  *
  * Writes a 32 bit value (val) to a 32 bit device register using a memory
  * mapped address (addr).
- *
- * @return None.
  */
 void nrf_wifi_osal_iomem_write_reg32(volatile void *addr,
 				     unsigned int val);
@@ -159,8 +173,6 @@ void nrf_wifi_osal_iomem_write_reg32(volatile void *addr,
  *
  * Copies a block of data of size  count bytes from memory mapped device memory(src)
  * to host memory(dest).
- *
- * @return None.
  */
 void nrf_wifi_osal_iomem_cpy_from(void *dest,
 				  const volatile void *src,
@@ -174,8 +186,6 @@ void nrf_wifi_osal_iomem_cpy_from(void *dest,
  *
  * Copies a block of data of size  count bytes from host memory (src) to memory mapped
  * device memory(dest).
- *
- * @return None.
  */
 void nrf_wifi_osal_iomem_cpy_to(volatile void *dest,
 				const void *src,
@@ -196,8 +206,6 @@ void *nrf_wifi_osal_spinlock_alloc(void);
  * @param lock Pointer to a busy lock instance.
  *
  * Frees a busy lock (lock) allocated by nrf_wifi_osal_spinlock_alloc.
- *
- * @return None.
  */
 void nrf_wifi_osal_spinlock_free(void *lock);
 
@@ -207,8 +215,6 @@ void nrf_wifi_osal_spinlock_free(void *lock);
  * @param lock Pointer to a busy lock instance.
  *
  * Initialize a busy lock (lock) allocated by  nrf_wifi_osal_spinlock_alloc.
- *
- * @return None.
  */
 void nrf_wifi_osal_spinlock_init(void *lock);
 
@@ -218,8 +224,6 @@ void nrf_wifi_osal_spinlock_init(void *lock);
  * @param lock: Pointer to a busy lock instance.
  *
  * Acquires a busy lock (lock) allocated by nrf_wifi_osal_spinlock_alloc.
- *
- * @return None.
  */
 void nrf_wifi_osal_spinlock_take(void *lock);
 
@@ -229,8 +233,6 @@ void nrf_wifi_osal_spinlock_take(void *lock);
  * @param lock: Pointer to a busy lock instance.
  *
  * Releases a busy lock (lock) acquired by nrf_wifi_osal_spinlock_take.
- *
- * @return None.
  */
 void nrf_wifi_osal_spinlock_rel(void *lock);
 
@@ -240,10 +242,8 @@ void nrf_wifi_osal_spinlock_rel(void *lock);
  * @param lock Pointer to a busy lock instance.
  * @param flags Interrupt state flags.
  *
- * Saves interrupt states (@flags), disable interrupts and takes a
- * busy lock (@lock).
- *
- * @return None.
+ * Saves interrupt states (@p flags), disable interrupts and takes a
+ * busy lock (@p lock).
  */
 void nrf_wifi_osal_spinlock_irq_take(void *lock,
 				     unsigned long *flags);
@@ -254,16 +254,14 @@ void nrf_wifi_osal_spinlock_irq_take(void *lock,
  * @param lock Pointer to a busy lock instance.
  * @param flags Interrupt state flags.
  *
- * Restores interrupt states (@flags) and releases busy lock (@lock) acquired
+ * Restores interrupt states (@p flags) and releases busy lock (@p lock) acquired
  * using nrf_wifi_osal_spinlock_irq_take.
- *
- * @return None.
  */
 void nrf_wifi_osal_spinlock_irq_rel(void *lock,
 				    unsigned long *flags);
 
 
-#if CONFIG_WIFI_NRF700X_LOG_LEVEL >= NRF_WIFI_LOG_LEVEL_DBG
+#if WIFI_NRF70_LOG_LEVEL >= NRF_WIFI_LOG_LEVEL_DBG
 /**
  * @brief Log a debug message.
  * @param fmt: Format string.
@@ -278,7 +276,7 @@ int nrf_wifi_osal_log_dbg(const char *fmt, ...);
 #define nrf_wifi_osal_log_dbg(fmt, ...)
 #endif
 
-#if CONFIG_WIFI_NRF700X_LOG_LEVEL >= NRF_WIFI_LOG_LEVEL_INF
+#if WIFI_NRF70_LOG_LEVEL >= NRF_WIFI_LOG_LEVEL_INF
 /**
  * @brief Logs an informational message.
  * @param fmt Format string.
@@ -293,7 +291,7 @@ int nrf_wifi_osal_log_info(const char *fmt, ...);
 #define nrf_wifi_osal_log_info(fmt, ...)
 #endif
 
-#if CONFIG_WIFI_NRF700X_LOG_LEVEL >= NRF_WIFI_LOG_LEVEL_ERR
+#if WIFI_NRF70_LOG_LEVEL >= NRF_WIFI_LOG_LEVEL_ERR
 /**
  * @brief Logs an error message.
  * @param fmt Format string.
@@ -319,14 +317,30 @@ int nrf_wifi_osal_log_err(const char *fmt, ...);
 void *nrf_wifi_osal_llist_node_alloc(void);
 
 /**
+ * @brief Allocate a linked list node from control pool.
+ *
+ * Allocate a linked list node from control pool.
+ *
+ * @return Pointer to the linked list node allocated.
+ *         NULL if there is an error.
+ */
+ void *nrf_wifi_osal_ctrl_llist_node_alloc(void);
+
+/**
  * @brief Free a linked list node.
  * @param node Pointer to a linked list node.
  *
  * Frees a linked list node(node) which was allocated by nrf_wifi_osal_llist_node_alloc.
- *
- * @return None. 
  */
 void nrf_wifi_osal_llist_node_free(void *node);
+
+/**
+ * @brief Free a linked list node in control pool.
+ * @param node Pointer to a linked list node.
+ *
+ * Frees a linked list node(node) which was allocated by nrf_wifi_osal_ctrl_llist_node_alloc.
+ */
+void nrf_wifi_osal_ctrl_llist_node_free(void *node);
 
 /**
  * @brief Get data stored in a linked list node.
@@ -346,8 +360,6 @@ void *nrf_wifi_osal_llist_node_data_get(void *node);
  * @param data Pointer to the data to be stored in the linked list node.
  *
  * Stores the pointer to the data(data) in a linked list node(node).
- *
- * @return None. 
  */
 void nrf_wifi_osal_llist_node_data_set(void *node,
 				       void *data);
@@ -367,19 +379,31 @@ void *nrf_wifi_osal_llist_alloc(void);
  * @param llist Pointer to a linked list.
  *
  * Frees a linked list (llist) allocated by  nrf_wifi_osal_llist_alloc.
- *
- * @return None. 
  */
 void nrf_wifi_osal_llist_free(void *llist);
 
+/**
+ * @brief Allocate a linked list.
+ *
+ * Allocate a linked list.
+ *
+ * @return Pointer to the allocated linked list on success, NULL on error.
+ */
+void *nrf_wifi_osal_ctrl_llist_alloc(void);
+
+/**
+ * @brief Free a linked list.
+ * @param llist Pointer to a linked list.
+ *
+ * Frees a linked list (llist) allocated by  nrf_wifi_osal_llist_alloc.
+ */
+void nrf_wifi_osal_ctrl_llist_free(void *llist);
 
 /**
  * @brief Initialize a linked list.
  * @param llist Pointer to a linked list.
  *
  * Initialize a linked list (llist) allocated by  nrf_wifi_osal_llist_alloc.
- *
- * @return None. 
  */
 void nrf_wifi_osal_llist_init(void *llist);
 
@@ -391,8 +415,6 @@ void nrf_wifi_osal_llist_init(void *llist);
  *
  * Adds a linked list node ( llist_node) allocated by  nrf_wifi_osal_llist_node_alloc
  * to the tail of a linked list (llist) allocated by  nrf_wifi_osal_llist_alloc.
- *
- * @return None. 
  */
 void nrf_wifi_osal_llist_add_node_tail(void *llist,
 				       void *llist_node);
@@ -405,8 +427,6 @@ void nrf_wifi_osal_llist_add_node_tail(void *llist,
  *
  * Adds a linked list node ( llist_node) allocated by  nrf_wifi_osal_llist_node_alloc
  * to the head of a linked list (llist) allocated by  nrf_wifi_osal_llist_alloc.
- *
- * @return None. 
  */
 void nrf_wifi_osal_llist_add_node_head(void *llist,
 				       void *llist_node);
@@ -427,7 +447,7 @@ void *nrf_wifi_osal_llist_get_node_head(void *llist);
  * @param llist Pointer to a linked list.
  * @param llist_node Pointer to a linked list node.
  *
- * Return the node next to the node passed in the @llist_node parameter.
+ * Return the node next to the node passed in the @p llist_node parameter.
  * The node returned is not removed from the linked list.
  *
  * @return Pointer to the next node in the linked list if successful, NULL otherwise.
@@ -441,10 +461,8 @@ void *nrf_wifi_osal_llist_get_node_nxt(void *llist,
  * @param llist Pointer to a linked list.
  * @param llist_node Pointer to a linked list node.
  *
- * Removes the node passed in the @llist_node parameter from the linked list
- * passed in the @llist parameter.
- *
- * @return None.
+ * Removes the node passed in the @p llist_node parameter from the linked list
+ * passed in the @p llist parameter.
  */
 void nrf_wifi_osal_llist_del_node(void *llist,
 				  void *llist_node);
@@ -454,7 +472,7 @@ void nrf_wifi_osal_llist_del_node(void *llist,
  * @brief Get length of a linked list.
  * @param llist Pointer to a linked list.
  *
- * Returns the length of the linked list(@llist).
+ * Returns the length of the linked list(@p llist).
  *
  * @return Linked list length in bytes.
  */
@@ -476,10 +494,8 @@ void *nrf_wifi_osal_nbuf_alloc(unsigned int size);
  * @brief Free a network buffer.
  * @param nbuf Pointer to a network buffer.
  *
- * Frees a network buffer(@nbuf) which was allocated by
- * @nrf_wifi_osal_nbuf_alloc.
- *
- * @return None.
+ * Frees a network buffer(@p nbuf) which was allocated by
+ * nrf_wifi_osal_nbuf_alloc().
  */
 void nrf_wifi_osal_nbuf_free(void *nbuf);
 
@@ -489,10 +505,8 @@ void nrf_wifi_osal_nbuf_free(void *nbuf);
  * @param nbuf Pointer to a network buffer.
  * @param size Size in bytes of the headroom to be reserved.
  *
- * Reserves headroom of size(@size) bytes at the beginning of the data area of
- * a network buffer(@nbuf).
- *
- * @return None.
+ * Reserves headroom of size(@p size) bytes at the beginning of the data area of
+ * a network buffer(@p nbuf).
  */
 void nrf_wifi_osal_nbuf_headroom_res(void *nbuf,
 				     unsigned int size);
@@ -504,7 +518,7 @@ void nrf_wifi_osal_nbuf_headroom_res(void *nbuf,
  * @param nbuf Pointer to a network buffer.
  *
  * Gets the size of the reserved headroom at the beginning
- * of the data area of a network buffer(@nbuf).
+ * of the data area of a network buffer(@p nbuf).
  *
  * @return Size of the network buffer data headroom in bytes.
  */
@@ -514,7 +528,7 @@ unsigned int nrf_wifi_osal_nbuf_headroom_get(void *nbuf);
  * @brief Get the size of data in a network buffer.
  * @param nbuf Pointer to a network buffer.
  *
- * Gets the size of the data area of a network buffer (@nbuf).
+ * Gets the size of the data area of a network buffer (@p nbuf).
  *
  * @return Size of the network buffer data in bytes.
  */
@@ -525,7 +539,7 @@ unsigned int nrf_wifi_osal_nbuf_data_size(void *nbuf);
  * @brief Get a handle to the data in a network buffer.
  * @param nbuf Pointer to a network buffer.
  *
- * Gets the pointer to the data area of a network buffer(@nbuf).
+ * Gets the pointer to the data area of a network buffer(@p nbuf).
  *
  * @return Pointer to the data in the network buffer if successful, otherwise NULL.
  */
@@ -537,7 +551,7 @@ void *nrf_wifi_osal_nbuf_data_get(void *nbuf);
  * @param nbuf Pointer to a network buffer.
  * @param size Size in bytes of the extension.
  *
- * Increases the data area of a network buffer(@nbuf) by @size bytes at the
+ * Increases the data area of a network buffer(@p nbuf) by @p size bytes at the
  * end of the area and returns the pointer to the beginning of
  * the data area.
  *
@@ -552,7 +566,7 @@ void *nrf_wifi_osal_nbuf_data_put(void *nbuf,
  * @param nbuf Pointer to a network buffer.
  * @param size Size in bytes, of the extension.
  *
- * Increases the data area of a network buffer(@nbuf) by @size bytes at the
+ * Increases the data area of a network buffer(@p nbuf) by @p size bytes at the
  * start of the area and returns the pointer to the beginning of
  * the data area.
  *
@@ -567,7 +581,7 @@ void *nrf_wifi_osal_nbuf_data_push(void *nbuf,
  * @param nbuf Pointer to a network buffer.
  * @param size Size in bytes, of the reduction.
  *
- * Decreases the data area of a network buffer(@nbuf) by @size bytes at the
+ * Decreases the data area of a network buffer(@p nbuf) by @p size bytes at the
  * start of the area and returns the pointer to the beginning
  * of the data area.
  *
@@ -603,11 +617,43 @@ unsigned char nrf_wifi_osal_nbuf_get_chksum_done(void *nbuf);
  * @param chksum_done Checksum status of the network buffer.
  *
  * Set the checksum status of a network buffer.
- *
- * @return None
  */
 void nrf_wifi_osal_nbuf_set_chksum_done(void *nbuf,
 					unsigned char chksum_done);
+
+#if defined(CONFIG_NRF70_RAW_DATA_TX) || defined(__DOXYGEN__)
+/**
+ * @brief Set the raw Tx header in a network buffer.
+ * @param nbuf Pointer to a network buffer.
+ * @param raw_hdr_len Length of the raw Tx header to be set.
+ *
+ * Sets the raw Tx header in a network buffer.
+ *
+ * * @return Pointer to the raw Tx header if successful, NULL otherwise.
+ */
+void *nrf_wifi_osal_nbuf_set_raw_tx_hdr(void *nbuf,
+					unsigned short raw_hdr_len);
+
+/**
+ * @brief Get the raw Tx header from a network buffer.
+ * @param nbuf Pointer to a network buffer.
+ *
+ * Gets the raw Tx header from a network buffer.
+ *
+ * @return Pointer to the raw Tx header if successful, NULL otherwise.
+ */
+void *nrf_wifi_osal_nbuf_get_raw_tx_hdr(void *nbuf);
+
+/**
+ * @brief Check if a network buffer is a raw Tx buffer.
+ * @param nbuf Pointer to a network buffer.
+ *
+ * Checks if a network buffer is a raw Tx buffer.
+ *
+ * @return true if the network buffer is a raw Tx buffer, false otherwise.
+ */
+bool nrf_wifi_osal_nbuf_is_raw_tx(void *nbuf);
+#endif /* CONFIG_NRF70_RAW_DATA_TX || __DOXYGEN__ */
 
 /**
  * @brief Allocate a tasklet.
@@ -624,9 +670,7 @@ void *nrf_wifi_osal_tasklet_alloc(int type);
  * @param tasklet Pointer to a tasklet.
  *
  * Frees a tasklet structure that had been allocated using
- * @nrf_wifi_osal_tasklet_alloc.
- *
- * @return None.
+ * nrf_wifi_osal_tasklet_alloc().
  */
 void nrf_wifi_osal_tasklet_free(void *tasklet);
 
@@ -638,8 +682,6 @@ void nrf_wifi_osal_tasklet_free(void *tasklet);
  * @param data Data to be passed to the callback function when the tasklet invokes it.
  *
  * Initializes a tasklet.
- *
- * @return None.
  */
 void nrf_wifi_osal_tasklet_init(void *tasklet,
 				void (*callbk_fn)(unsigned long),
@@ -653,8 +695,6 @@ void nrf_wifi_osal_tasklet_init(void *tasklet,
  * Schedules a tasklet that had been allocated using
  *  nrf_wifi_osal_tasklet_alloc and initialized using
  *  nrf_wifi_osal_tasklet_init.
- *
- * @return None.
  */
 void nrf_wifi_osal_tasklet_schedule(void *tasklet);
 
@@ -665,8 +705,6 @@ void nrf_wifi_osal_tasklet_schedule(void *tasklet);
  *
  * Terminates a tasklet(tasklet) that had been scheduled by
  * nrf_wifi_osal_tasklet_schedule.
- *
- * @return None.
  */
 void nrf_wifi_osal_tasklet_kill(void *tasklet);
 
@@ -676,8 +714,6 @@ void nrf_wifi_osal_tasklet_kill(void *tasklet);
  * @param msecs: Sleep duration in milliseconds.
  *
  * Puts the calling thread to sleep for at least msecs milliseconds.
- *
- * @return None.
  */
 void nrf_wifi_osal_sleep_ms(unsigned int msecs);
 
@@ -689,8 +725,6 @@ void nrf_wifi_osal_sleep_ms(unsigned int msecs);
  * Delays execution of calling thread for usecs microseconds. This is
  * busy-waiting and won't allow other threads to execute during
  * the time lapse.
- *
- * @return None.
  */
 void nrf_wifi_osal_delay_us(unsigned long usecs);
 
@@ -713,6 +747,27 @@ unsigned long nrf_wifi_osal_time_get_curr_us(void);
  * @return Elapsed time in microseconds.
  */
 unsigned int nrf_wifi_osal_time_elapsed_us(unsigned long start_time_us);
+
+/**
+ * nrf_wifi_osal_time_get_curr_ms() - Get current system uptime in milliseconds.
+ *
+ * Gets the current system uptime in milliseconds.
+ *
+ * Return: System uptime in milliseconds.
+ */
+unsigned long nrf_wifi_osal_time_get_curr_ms(void);
+
+/**
+ * nrf_wifi_osal_time_elapsed_ms() - Get elapsed time in milliseconds
+ * @param start_time_ms: The timestamp in milliseconds from which elapsed
+ *			   time is to be measured.
+ *
+ * Returns the time elapsed in milliseconds since some
+ * time instant (@p start_time_ms).
+ *
+ * Return: Elapsed time in milliseconds.
+ */
+unsigned int nrf_wifi_osal_time_elapsed_ms(unsigned long start_time_ms);
 
 /**
  * @brief Initialize a PCIe driver.
@@ -739,8 +794,6 @@ void *nrf_wifi_osal_bus_pcie_init(const char *dev_name,
  *
  * This API should be called when the PCIe device driver is to be unregistered from
  * the OS's PCIe core.
- *
- * @return None. 
  */
 void nrf_wifi_osal_bus_pcie_deinit(void *os_pcie_priv);
 
@@ -749,8 +802,6 @@ void nrf_wifi_osal_bus_pcie_deinit(void *os_pcie_priv);
  * brief Add a PCIe device instance.
  * @param os_pcie_priv OS specific PCIe context.
  * @param osal_pcie_dev_ctx: Pointer to the OSAL PCIe device context.
- *
- * @return OS specific PCIe device context.
  */
 void *nrf_wifi_osal_bus_pcie_dev_add(void *os_pcie_priv,
 				     void *osal_pcie_dev_ctx);
@@ -762,8 +813,6 @@ void *nrf_wifi_osal_bus_pcie_dev_add(void *os_pcie_priv,
  *	returned by  nrf_wifi_osal_bus_pcie_dev_add.
  *
  * Function to be invoked when a matching PCIe device is removed from the system.
- *
- * @return None. 
  */
 void nrf_wifi_osal_bus_pcie_dev_rem(void *os_pcie_dev_ctx);
 
@@ -786,8 +835,6 @@ enum nrf_wifi_status nrf_wifi_osal_bus_pcie_dev_init(void *os_pcie_dev_ctx);
  *                        returned by  nrf_wifi_osal_bus_pcie_dev_add.
  *
  * Function to be invoked when a PCIe device is to be deinitialized.
- *
- * @return None. 
  */
 void nrf_wifi_osal_bus_pcie_dev_deinit(void *os_pcie_dev_ctx);
 
@@ -813,8 +860,6 @@ enum nrf_wifi_status nrf_wifi_osal_bus_pcie_dev_intr_reg(void *os_pcie_dev_ctx,
  * @param os_pcie_dev_ctx OS specific PCIe device context.
  *
  * Unregisters the interrupt handler that was registered using
- *
- * @return None. 
  */
 void nrf_wifi_osal_bus_pcie_dev_intr_unreg(void *os_pcie_dev_ctx);
 
@@ -826,15 +871,13 @@ void nrf_wifi_osal_bus_pcie_dev_intr_unreg(void *os_pcie_dev_ctx);
  * @param size Size in bytes of the host memory to be DMA mapped.
  * @param dir DMA direction.
  *
- * Maps host memory of @size bytes pointed to by the virtual address
- * @virt_addr to be used by the device(@dma_dev) for DMAing contents.
- * The contents are available for DMAing to the device if @dir has a
- * value of @NRF_WIFI_OSAL_DMA_DIR_TO_DEV. Conversely the device can DMA
- * contents to the host memory if @dir has a value of
- * @NRF_WIFI_OSAL_DMA_DIR_FROM_DEV. The function returns the DMA address
+ * Maps host memory of @p size bytes pointed to by the virtual address
+ * @p virt_addr to be used by the device(@p dma_dev) for DMAing contents.
+ * The contents are available for DMAing to the device if @p dir has a
+ * value of NRF_WIFI_OSAL_DMA_DIR_TO_DEV. Conversely the device can DMA
+ * contents to the host memory if @p dir has a value of
+ * NRF_WIFI_OSAL_DMA_DIR_FROM_DEV. The function returns the DMA address
  * of the mapped memory.
- *
- * @return Pointer to the DMA mapped physical address if successful, NULL otherwise.
  */
 void *nrf_wifi_osal_bus_pcie_dev_dma_map(void *os_pcie_dev_ctx,
 					 void *virt_addr,
@@ -849,9 +892,7 @@ void *nrf_wifi_osal_bus_pcie_dev_dma_map(void *os_pcie_dev_ctx,
  * @param size Size in bytes of the DMA mapped host memory.
  * @param dir DMA direction.
  *
- * Unmaps the host memory which was mapped for DMA using @nrf_wifi_osal_dma_map.
- *
- * @return None.
+ * Unmaps the host memory which was mapped for DMA using nrf_wifi_osal_dma_map.
  */
 void nrf_wifi_osal_bus_pcie_dev_dma_unmap(void *os_pcie_dev_ctx,
 					  void *dma_addr,
@@ -865,8 +906,6 @@ void nrf_wifi_osal_bus_pcie_dev_dma_unmap(void *os_pcie_dev_ctx,
  * @param host_map Host map address information.
  *
  * Get host mapped address for a PCIe device.
- *
- * @return None.
  */
 void nrf_wifi_osal_bus_pcie_dev_host_map_get(void *os_pcie_dev_ctx,
 					     struct nrf_wifi_osal_host_map *host_map);
@@ -889,8 +928,6 @@ void *nrf_wifi_osal_bus_qspi_init(void);
  *
  * This API should be called when the qspi device driver is
  * to be unregistered from the OS's qspi core.
- *
- * @return None.
  */
 void nrf_wifi_osal_bus_qspi_deinit(void *os_qspi_priv);
 
@@ -912,11 +949,9 @@ void *nrf_wifi_osal_bus_qspi_dev_add(void *os_qspi_priv,
 /**
  * brief Remove a qspi device instance.
  * @param os_qspi_dev_ctx: Pointer to the OS specific qspi device context which was
- *                         returned by @nrf_wifi_osal_bus_qspi_dev_add.
+ *                         returned by nrf_wifi_osal_bus_qspi_dev_add.
  *
  * Function to be invoked when a matching qspi device is removed from the system.
- *
- * @return None.
  */
 void nrf_wifi_osal_bus_qspi_dev_rem(void *os_qspi_dev_ctx);
 
@@ -924,7 +959,7 @@ void nrf_wifi_osal_bus_qspi_dev_rem(void *os_qspi_dev_ctx);
 /**
  * @brief Initialize a qspi device instance.
  * @param os_qspi_dev_ctx: Pointer to the OS specific qspi device context which was
- *                         returned by @nrf_wifi_osal_bus_qspi_dev_add.
+ *                         returned by nrf_wifi_osal_bus_qspi_dev_add.
  *
  * Function to be invoked when a qspi device is to be initialized.
  *
@@ -938,11 +973,9 @@ enum nrf_wifi_status nrf_wifi_osal_bus_qspi_dev_init(void *os_qspi_dev_ctx);
 /**
  * brief Deinitialize a qspi device instance.
  * @param os_qspi_dev_ctx: Pointer to the OS specific qspi device context which was
- *                         returned by @nrf_wifi_osal_bus_qspi_dev_add.
+ *                         returned by nrf_wifi_osal_bus_qspi_dev_add.
  *
  * Function to be invoked when a qspi device is to be deinitialized.
- *
- * @return None.
  */
 void nrf_wifi_osal_bus_qspi_dev_deinit(void *os_qspi_dev_ctx);
 
@@ -968,9 +1001,7 @@ enum nrf_wifi_status nrf_wifi_osal_bus_qspi_dev_intr_reg(void *os_qspi_dev_ctx,
  * @param os_qspi_dev_ctx OS specific qspi device context.
  *
  * Unregisters the interrupt handler that was registered using
- * @nrf_wifi_osal_bus_qspi_dev_intr_reg.
- *
- * @return None.
+ * nrf_wifi_osal_bus_qspi_dev_intr_reg.
  */
 void nrf_wifi_osal_bus_qspi_dev_intr_unreg(void *os_qspi_dev_ctx);
 
@@ -981,8 +1012,6 @@ void nrf_wifi_osal_bus_qspi_dev_intr_unreg(void *os_qspi_dev_ctx);
  * @param host_map Host map address information.
  *
  * Gets the host map address for a qspi device.
- *
- * @return None.
  */
 void nrf_wifi_osal_bus_qspi_dev_host_map_get(void *os_qspi_dev_ctx,
 					     struct nrf_wifi_osal_host_map *host_map);
@@ -1002,8 +1031,6 @@ unsigned int nrf_wifi_osal_qspi_read_reg32(void *priv,
  * @param priv
  * @param addr Address of the register to write to.
  * @param val Value to be written to the register.
- *
- * @return None.
  */
 void nrf_wifi_osal_qspi_write_reg32(void *priv,
 				    unsigned long addr,
@@ -1015,8 +1042,6 @@ void nrf_wifi_osal_qspi_write_reg32(void *priv,
  * @param dest Destination buffer.
  * @param addr Address of the data to be copied.
  * @param count Number of bytes to be copied.
- *
- * @return None.
  */
 void nrf_wifi_osal_qspi_cpy_from(void *priv,
 				 void *dest,
@@ -1029,8 +1054,6 @@ void nrf_wifi_osal_qspi_cpy_from(void *priv,
  * @param addr Address of the data to be written.
  * @param src Source buffer.
  * @param count Number of bytes to be copied.
- *
- * @return None.
  */
 void nrf_wifi_osal_qspi_cpy_to(void *priv,
 			       unsigned long addr,
@@ -1052,14 +1075,13 @@ void *nrf_wifi_osal_bus_spi_init(void);
  *
  * This API should be called when the spi device driver is
  * to be unregistered from the OS's spi core.
- *
- * @return None.
  */
 void nrf_wifi_osal_bus_spi_deinit(void *os_spi_priv);
 
 
 /**
  * brief Add a spi device instance.
+ * @param os_spi_priv OS specific spi context.
  * @param osal_spi_dev_ctx Pointer to the OSAL spi device context.
  *
  * Function to be invoked when a matching spi device is added to the system.
@@ -1074,11 +1096,9 @@ void *nrf_wifi_osal_bus_spi_dev_add(void *os_spi_priv,
 /**
  * @brief Remove a spi device instance.
  * @param os_spi_dev_ctx Pointer to the OS specific spi device context which was
- *                       returned by @nrf_wifi_osal_bus_spi_dev_add.
+ *                       returned by nrf_wifi_osal_bus_spi_dev_add.
  *
  * Function to be invoked when a matching spi device is removed from the system.
- *
- * @return None.
  */
 void nrf_wifi_osal_bus_spi_dev_rem(void *os_spi_dev_ctx);
 
@@ -1086,7 +1106,7 @@ void nrf_wifi_osal_bus_spi_dev_rem(void *os_spi_dev_ctx);
 /**
  * @brief Initialize a spi device instance.
  * @param os_spi_dev_ctx Pointer to the OS specific spi device context which was
- *                       returned by @nrf_wifi_osal_bus_spi_dev_add.
+ *                       returned by nrf_wifi_osal_bus_spi_dev_add.
  *
  * Function to be invoked when a spi device is to be initialized.
  *
@@ -1100,11 +1120,9 @@ enum nrf_wifi_status nrf_wifi_osal_bus_spi_dev_init(void *os_spi_dev_ctx);
 /**
  * @brief Deinitialize a spi device instance.
  * @param os_spi_dev_ctx Pointer to the OS specific spi device context which was
- *                       returned by @nrf_wifi_osal_bus_spi_dev_add.
+ *                       returned by nrf_wifi_osal_bus_spi_dev_add.
  *
  * Function to be invoked when a spi device is to be deinitialized.
- *
- * @return None.
  */
 void nrf_wifi_osal_bus_spi_dev_deinit(void *os_spi_dev_ctx);
 
@@ -1133,8 +1151,6 @@ enum nrf_wifi_status nrf_wifi_osal_bus_spi_dev_intr_reg(void *os_spi_dev_ctx,
  *
  * Unregisters the interrupt handler that was registered using
  *  nrf_wifi_osal_bus_spi_dev_intr_reg.
- *
- * @return None.
  */
 void nrf_wifi_osal_bus_spi_dev_intr_unreg(void *os_spi_dev_ctx);
 
@@ -1145,8 +1161,6 @@ void nrf_wifi_osal_bus_spi_dev_intr_unreg(void *os_spi_dev_ctx);
  * @param host_map Host map address information.
  *
  * Get the host map address for a spi device.
- *
- * @return None.
  */
 void nrf_wifi_osal_bus_spi_dev_host_map_get(void *os_spi_dev_ctx,
 					    struct nrf_wifi_osal_host_map *host_map);
@@ -1166,8 +1180,6 @@ unsigned int nrf_wifi_osal_spi_read_reg32(void *priv,
  * @param priv
  * @param addr Address of the register to write to.
  * @param val Value to be written to the register.
- *
- * @return None.
  */
 void nrf_wifi_osal_spi_write_reg32(void *priv,
 				   unsigned long addr,
@@ -1179,8 +1191,6 @@ void nrf_wifi_osal_spi_write_reg32(void *priv,
  * @param dest Destination buffer.
  * @param addr Address of the register to read from.
  * @param count Number of bytes to copy.
- *
- * @return None.
  */
 void nrf_wifi_osal_spi_cpy_from(void *priv,
 				void *dest,
@@ -1193,8 +1203,6 @@ void nrf_wifi_osal_spi_cpy_from(void *priv,
  * @param addr Address of the register to write to.
  * @param src Source buffer.
  * @param count Number of bytes to copy.
- *
- * @return None.
  */
 void nrf_wifi_osal_spi_cpy_to(void *priv,
 			      unsigned long addr,
@@ -1202,7 +1210,7 @@ void nrf_wifi_osal_spi_cpy_to(void *priv,
 			      size_t count);
 
 
-#if defined(CONFIG_NRF_WIFI_LOW_POWER) || defined(__DOXYGEN__)
+#if defined(NRF_WIFI_LOW_POWER) || defined(__DOXYGEN__)
 /**
  * @brief Allocate a timer.
  *
@@ -1216,9 +1224,7 @@ void *nrf_wifi_osal_timer_alloc(void);
  * @brief Free a timer.
  * @param timer Pointer to a timer instance.
  *
- * Frees/Deallocates a timer that has been allocated using @nrf_wifi_osal_timer_alloc
- *
- * @return None.
+ * Frees/Deallocates a timer that has been allocated using nrf_wifi_osal_timer_alloc
  */
 void nrf_wifi_osal_timer_free(void *timer);
 
@@ -1229,11 +1235,9 @@ void nrf_wifi_osal_timer_free(void *timer);
  * @param callbk_fn Callback function to be invoked when the timer expires.
  * @param data Data to be passed to the callback function.
  *
- * Initializes a timer that has been allocated using @nrf_wifi_osal_timer_alloc
- * Need to pass (@callbk_fn) callback function with the data(@data) to be
+ * Initializes a timer that has been allocated using nrf_wifi_osal_timer_alloc
+ * Need to pass (@p callbk_fn) callback function with the data(@p data) to be
  * passed to the callback function, whenever the timer expires.
- *
- * @return None.
  */
 void nrf_wifi_osal_timer_init(void *timer,
 			      void (*callbk_fn)(unsigned long),
@@ -1245,10 +1249,8 @@ void nrf_wifi_osal_timer_init(void *timer,
  * @param timer Pointer to a timer instance.
  * @param duration Duration of the timer in seconds.
  *
- * Schedules a timer with a @duration seconds that has been allocated using
- * @nrf_wifi_osal_timer_alloc and initialized with @nrf_wifi_osal_timer_init.
- *
- * @return None.
+ * Schedules a timer with a @p duration seconds that has been allocated using
+ * nrf_wifi_osal_timer_alloc and initialized with nrf_wifi_osal_timer_init.
  */
 void nrf_wifi_osal_timer_schedule(void *timer,
 				  unsigned long duration);
@@ -1257,8 +1259,6 @@ void nrf_wifi_osal_timer_schedule(void *timer,
 /**
  * @brief Kills a timer.
  * @param timer Pointer to a timer instance.
- *
- * @return None.
  */
 void nrf_wifi_osal_timer_kill(void *timer);
 
@@ -1287,18 +1287,16 @@ int nrf_wifi_osal_bus_qspi_ps_wake(void *os_qspi_priv);
  *         Negative error code on failure.
  */
 int nrf_wifi_osal_bus_qspi_ps_status(void *os_qspi_priv);
-#endif /* CONFIG_NRF_WIFI_LOW_POWER */
+#endif /* NRF_WIFI_LOW_POWER */
 
 /**
  * @brief nrf_wifi_osal_assert() - Assert a condition with a value.
  * @param test Variable to be tested.
- * @param val Value to be checked for the @test
+ * @param val Value to be checked for the @p test
  * @param op Type of operation to be done during assertion check.
  * @param msg Assertion message.
  *
- * Compares @test with @val. If true, prints assert message.
- *
- * @return None.
+ * Compares @p test with @p val. If true, prints assert message.
  */
 void nrf_wifi_osal_assert(int test,
 			  int val,
@@ -1306,7 +1304,7 @@ void nrf_wifi_osal_assert(int test,
 			  char *msg);
 
 /**
- * @brief Gives the length of the string @str.
+ * @brief Gives the length of the string @p str.
  * @param str: Pointer to the memory location of the string.
  *
  * Calculates the length of the string pointed to by str.
@@ -1329,4 +1327,16 @@ unsigned int nrf_wifi_osal_strlen(const void *str);
 int nrf_wifi_osal_mem_cmp(const void *addr1,
 			  const void *addr2,
 			  size_t count);
+
+/**
+ * nrf_wifi_osal_rand8_get() - Get a random 8 bit number.
+ *
+ * Generates an 8 bit random number.
+ *
+ * Return:
+ * 			returns an 8 bit random number.
+ */
+unsigned char nrf_wifi_osal_rand8_get(void);
+
+
 #endif /* __OSAL_API_H__ */
