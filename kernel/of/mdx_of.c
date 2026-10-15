@@ -84,6 +84,7 @@ bool
 mdx_of_node_is_compatible(int offset, const char *check)
 {
 	const char *compat;
+	int clen;
 	int len;
 
 	compat = fdt_getprop(fdt, offset, "compatible", &len);
@@ -91,10 +92,11 @@ mdx_of_node_is_compatible(int offset, const char *check)
 		return (false);
 
 	while (len > 0) {
+		clen = strlen(compat);
 		if (strcasecmp(compat, check) == 0)
 			return (true);
-		compat += (strlen(compat) + 1);
-		len -= (strlen(compat) + 1);
+		compat += (clen + 1);
+		len -= (clen + 1);
 	}
 
 	return (false);
